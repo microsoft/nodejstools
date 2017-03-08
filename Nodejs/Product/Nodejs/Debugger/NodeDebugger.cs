@@ -26,43 +26,43 @@ namespace Microsoft.NodejsTools.Debugger
     internal sealed class NodeDebugger : IDisposable
     {
         public readonly int MainThreadId = 1;
-        private readonly Dictionary<int, NodeBreakpointBinding> _breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
-        private readonly IDebuggerClient _client;
-        private readonly IDebuggerConnection _connection;
-        private readonly Uri _debuggerEndpointUri;
-        private readonly Dictionary<int, string> _errorCodes = new Dictionary<int, string>();
-        private readonly ExceptionHandler _exceptionHandler;
-        private readonly Dictionary<string, NodeModule> _modules = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
-        private readonly EvaluationResultFactory _resultFactory;
-        private readonly SourceMapper _sourceMapper;
-        private readonly Dictionary<int, NodeThread> _threads = new Dictionary<int, NodeThread>();
-        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(5);
-        private bool _attached;
-        private bool _breakOnAllExceptions;
-        private bool _breakOnUncaughtExceptions;
-        private int _commandId;
-        private IFileNameMapper _fileNameMapper;
-        private bool _handleEntryPointHit;
-        private int? _id;
-        private bool _loadCompleteHandled;
-        private NodeProcess _process;
-        private int _steppingCallstackDepth;
-        private SteppingKind _steppingMode;
+        private readonly Dictionary<int, NodeBreakpointBinding> breakpointBindings = new Dictionary<int, NodeBreakpointBinding>();
+        private readonly IDebuggerClient client;
+        private readonly IDebuggerConnection connection;
+        private readonly Uri debuggerEndpointUri;
+        private readonly Dictionary<int, string> errorCodes = new Dictionary<int, string>();
+        private readonly ExceptionHandler exceptionHandler;
+        private readonly Dictionary<string, NodeModule> modules = new Dictionary<string, NodeModule>(StringComparer.OrdinalIgnoreCase);
+        private readonly EvaluationResultFactory resultFactory;
+        private readonly SourceMapper sourceMapper;
+        private readonly Dictionary<int, NodeThread> threads = new Dictionary<int, NodeThread>();
+        private readonly TimeSpan timeout = TimeSpan.FromSeconds(5);
+        private bool attached;
+        private bool breakOnAllExceptions;
+        private bool breakOnUncaughtExceptions;
+        private int commandId;
+        private IFileNameMapper fileNameMapper;
+        private bool handleEntryPointHit;
+        private int? id;
+        private bool loadCompleteHandled;
+        private NodeProcess process;
+        private int steppingCallstackDepth;
+        private SteppingKind steppingMode;
 
         private NodeDebugger()
         {
-            this._connection = new DebuggerConnection(new NetworkClientFactory());
-            this._connection.ConnectionClosed += this.OnConnectionClosed;
+            this.connection = new DebuggerConnection(new NetworkClientFactory());
+            this.connection.ConnectionClosed += this.OnConnectionClosed;
 
-            this._client = new DebuggerClient(this._connection);
-            this._client.BreakpointEvent += this.OnBreakpointEvent;
-            this._client.CompileScriptEvent += this.OnCompileScriptEvent;
-            this._client.ExceptionEvent += this.OnExceptionEvent;
+            this.client = new DebuggerClient(this.connection);
+            this.client.BreakpointEvent += this.OnBreakpointEvent;
+            this.client.CompileScriptEvent += this.OnCompileScriptEvent;
+            this.client.ExceptionEvent += this.OnExceptionEvent;
 
-            this._resultFactory = new EvaluationResultFactory();
-            this._exceptionHandler = new ExceptionHandler();
-            this._sourceMapper = new SourceMapper();
-            this._fileNameMapper = new LocalFileNameMapper();
+            this.resultFactory = new EvaluationResultFactory();
+            this.exceptionHandler = new ExceptionHandler();
+            this.sourceMapper = new SourceMapper();
+            this.fileNameMapper = new LocalFileNameMapper();
         }
 
         public NodeDebugger(
@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Debugger
                 }
             }
 
-            this._debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
+            this.debuggerEndpointUri = new UriBuilder { Scheme = "tcp", Host = "localhost", Port = debuggerPortOrDefault }.Uri;
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
             var allArgs = string.Format(CultureInfo.InvariantCulture,
@@ -123,7 +123,7 @@ namespace Microsoft.NodejsTools.Debugger
                 }
             }
 
-            this._process = new NodeProcess(
+            this.process = new NodeProcess(
                 psi,
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnAbnormalExit),
                 debugOptions.HasFlag(NodeDebugOptions.WaitOnNormalExit),
@@ -133,16 +133,16 @@ namespace Microsoft.NodejsTools.Debugger
         public NodeDebugger(Uri debuggerEndpointUri, int id)
             : this()
         {
-            this._debuggerEndpointUri = debuggerEndpointUri;
-            this._id = id;
-            this._attached = true;
+            this.debuggerEndpointUri = debuggerEndpointUri;
+            this.id = id;
+            this.attached = true;
         }
 
         #region Public Process API
 
-        public int Id => this._id != null ? this._id.Value : this._process.Id;
-        private NodeThread MainThread => this._threads[this.MainThreadId];
-        public bool HasExited => !this._connection.Connected;
+        public int Id => this.id != null ? this.id.Value : this.process.Id;
+        private NodeThread MainThread => this.threads[this.MainThreadId];
+        public bool HasExited => !this.connection.Connected;
         /// <summary>
         /// Gets or sets a value indicating whether executed remote debugging process.
         /// </summary>
@@ -150,7 +150,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public void Start(bool startListening = true)
         {
-            this._process.Start();
+            this.process.Start();
             if (startListening)
             {
                 StartListening();
@@ -159,20 +159,20 @@ namespace Microsoft.NodejsTools.Debugger
 
         public void WaitForExit()
         {
-            if (this._process == null)
+            if (this.process == null)
             {
                 return;
             }
-            this._process.WaitForExit();
+            this.process.WaitForExit();
         }
 
         public bool WaitForExit(int milliseconds)
         {
-            if (this._process == null)
+            if (this.process == null)
             {
                 return true;
             }
-            return this._process.WaitForExit(milliseconds);
+            return this.process.WaitForExit(milliseconds);
         }
 
         /// <summary>
@@ -183,25 +183,25 @@ namespace Microsoft.NodejsTools.Debugger
             lock (this)
             {
                 // Disconnect
-                this._connection.Close();
+                this.connection.Close();
 
                 // Fall back to using -1 for exit code if we cannot obtain one from the process
                 // This is the normal case for attach where there is no process to interrogate
                 var exitCode = -1;
 
-                if (this._process != null)
+                if (this.process != null)
                 {
                     // Cleanup process
-                    Debug.Assert(!this._attached);
+                    Debug.Assert(!this.attached);
                     try
                     {
-                        if (killProcess && !this._process.HasExited)
+                        if (killProcess && !this.process.HasExited)
                         {
-                            this._process.Kill();
+                            this.process.Kill();
                         }
                         else
                         {
-                            exitCode = this._process.ExitCode;
+                            exitCode = this.process.ExitCode;
                         }
                     }
                     catch (InvalidOperationException)
@@ -211,17 +211,17 @@ namespace Microsoft.NodejsTools.Debugger
                     {
                     }
 
-                    this._process.Dispose();
-                    this._process = null;
+                    this.process.Dispose();
+                    this.process = null;
                 }
                 else
                 {
                     // Avoid multiple events fired if multiple calls to Terminate()
-                    if (!this._attached)
+                    if (!this.attached)
                     {
                         return;
                     }
-                    this._attached = false;
+                    this.attached = false;
                 }
 
                 // Fire event
@@ -240,14 +240,14 @@ namespace Microsoft.NodejsTools.Debugger
         {
             DebugWriteCommand("BreakAll");
 
-            var tokenSource = new CancellationTokenSource(this._timeout);
+            var tokenSource = new CancellationTokenSource(this.timeout);
             var suspendCommand = new SuspendCommand(this.CommandId);
             await TrySendRequestAsync(suspendCommand, tokenSource.Token).ConfigureAwait(false);
 
             // Handle success
             // We need to get the backtrace before we break, so we request the backtrace
             // and follow up with firing the appropriate event for the break
-            tokenSource = new CancellationTokenSource(this._timeout);
+            tokenSource = new CancellationTokenSource(this.timeout);
             var running = await PerformBacktraceAsync(tokenSource.Token).ConfigureAwait(false);
             Debug.Assert(!running);
 
@@ -261,10 +261,10 @@ namespace Microsoft.NodejsTools.Debugger
 
         internal bool IsRunning()
         {
-            var backtraceCommand = new BacktraceCommand(this.CommandId, this._resultFactory, fromFrame: 0, toFrame: 1);
-            var tokenSource = new CancellationTokenSource(this._timeout);
+            var backtraceCommand = new BacktraceCommand(this.CommandId, this.resultFactory, fromFrame: 0, toFrame: 1);
+            var tokenSource = new CancellationTokenSource(this.timeout);
             var task = TrySendRequestAsync(backtraceCommand, tokenSource.Token);
-            if (task.Wait(this._timeout) && task.Result)
+            if (task.Wait(this.timeout) && task.Result)
             {
                 return backtraceCommand.Running;
             }
@@ -284,7 +284,7 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("Resume");
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var tokenSource = new CancellationTokenSource(this._timeout);
+                var tokenSource = new CancellationTokenSource(this.timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.None, cancellationToken: tokenSource.Token).ConfigureAwait(false);
             });
         }
@@ -293,8 +293,8 @@ namespace Microsoft.NodejsTools.Debugger
         {
             if (resetSteppingMode)
             {
-                this._steppingMode = steppingKind;
-                this._steppingCallstackDepth = this.MainThread.CallstackDepth;
+                this.steppingMode = steppingKind;
+                this.steppingCallstackDepth = this.MainThread.CallstackDepth;
             }
 
             return ContinueAsync(steppingKind, stepCount, cancellationToken);
@@ -303,8 +303,8 @@ namespace Microsoft.NodejsTools.Debugger
         private async Task ContinueAsync(SteppingKind stepping = SteppingKind.None, int stepCount = 1, CancellationToken cancellationToken = new CancellationToken())
         {
             // Ensure load complete and entrypoint breakpoint/tracepoint handling disabled after first real continue
-            this._loadCompleteHandled = true;
-            this._handleEntryPointHit = false;
+            this.loadCompleteHandled = true;
+            this.handleEntryPointHit = false;
 
             var continueCommand = new ContinueCommand(this.CommandId, stepping, stepCount);
             await TrySendRequestAsync(continueCommand, cancellationToken).ConfigureAwait(false);
@@ -313,7 +313,7 @@ namespace Microsoft.NodejsTools.Debugger
         private Task AutoResumeAsync(bool haveCallstack, CancellationToken cancellationToken = new CancellationToken())
         {
             // Simply continue, if not stepping
-            if (this._steppingMode != SteppingKind.None)
+            if (this.steppingMode != SteppingKind.None)
             {
                 return AutoResumeSteppingAsync(haveCallstack, cancellationToken);
             }
@@ -341,10 +341,10 @@ namespace Microsoft.NodejsTools.Debugger
 
         private async Task AutoResumeSteppingAsync(int callstackDepth, bool haveCallstack, CancellationToken cancellationToken = new CancellationToken())
         {
-            switch (this._steppingMode)
+            switch (this.steppingMode)
             {
                 case SteppingKind.Over:
-                    var stepCount = callstackDepth - this._steppingCallstackDepth;
+                    var stepCount = callstackDepth - this.steppingCallstackDepth;
                     if (stepCount > 0)
                     {
                         // Stepping over autoresumed break (in nested frame)
@@ -353,7 +353,7 @@ namespace Microsoft.NodejsTools.Debugger
                     }
                     break;
                 case SteppingKind.Out:
-                    stepCount = callstackDepth - this._steppingCallstackDepth + 1;
+                    stepCount = callstackDepth - this.steppingCallstackDepth + 1;
                     if (stepCount > 0)
                     {
                         // Stepping out across autoresumed break (in nested frame)
@@ -365,7 +365,7 @@ namespace Microsoft.NodejsTools.Debugger
                     // Stepping into or to autoresumed break
                     break;
                 default:
-                    LiveLogger.WriteLine("Unexpected SteppingMode: {0}", this._steppingMode);
+                    LiveLogger.WriteLine("Unexpected SteppingMode: {0}", this.steppingMode);
                     break;
             }
 
@@ -409,17 +409,17 @@ namespace Microsoft.NodejsTools.Debugger
 
                 if (defaultExceptionTreatment.HasValue)
                 {
-                    updated |= this._exceptionHandler.SetDefaultExceptionHitTreatment(defaultExceptionTreatment.Value);
+                    updated |= this.exceptionHandler.SetDefaultExceptionHitTreatment(defaultExceptionTreatment.Value);
                 }
 
                 if (exceptionTreatments != null)
                 {
-                    updated |= this._exceptionHandler.SetExceptionTreatments(exceptionTreatments);
+                    updated |= this.exceptionHandler.SetExceptionTreatments(exceptionTreatments);
                 }
 
                 if (updated)
                 {
-                    var tokenSource = new CancellationTokenSource(this._timeout);
+                    var tokenSource = new CancellationTokenSource(this.timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
             });
@@ -436,14 +436,14 @@ namespace Microsoft.NodejsTools.Debugger
 
                 if (defaultExceptionTreatment.HasValue)
                 {
-                    updated |= this._exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
+                    updated |= this.exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
                 }
 
-                updated |= this._exceptionHandler.ClearExceptionTreatments(exceptionTreatments);
+                updated |= this.exceptionHandler.ClearExceptionTreatments(exceptionTreatments);
 
                 if (updated)
                 {
-                    var tokenSource = new CancellationTokenSource(this._timeout);
+                    var tokenSource = new CancellationTokenSource(this.timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
             });
@@ -453,12 +453,12 @@ namespace Microsoft.NodejsTools.Debugger
         {
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var updated = this._exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
-                updated |= this._exceptionHandler.ResetExceptionTreatments();
+                var updated = this.exceptionHandler.SetDefaultExceptionHitTreatment(ExceptionHitTreatment.BreakNever);
+                updated |= this.exceptionHandler.ResetExceptionTreatments();
 
                 if (updated)
                 {
-                    var tokenSource = new CancellationTokenSource(this._timeout);
+                    var tokenSource = new CancellationTokenSource(this.timeout);
                     await SetExceptionBreakAsync(tokenSource.Token).ConfigureAwait(false);
                 }
             });
@@ -471,22 +471,22 @@ namespace Microsoft.NodejsTools.Debugger
         /// <summary>
         /// Gets a next command identifier.
         /// </summary>
-        private int CommandId => Interlocked.Increment(ref this._commandId);
+        private int CommandId => Interlocked.Increment(ref this.commandId);
         /// <summary>
         /// Gets a source mapper.
         /// </summary>
-        public SourceMapper SourceMapper => this._sourceMapper;
+        public SourceMapper SourceMapper => this.sourceMapper;
         /// <summary>
         /// Gets or sets a file name mapper.
         /// </summary>
         public IFileNameMapper FileNameMapper
         {
-            get { return this._fileNameMapper; }
+            get { return this.fileNameMapper; }
             set
             {
                 if (value != null)
                 {
-                    this._fileNameMapper = value;
+                    this.fileNameMapper = value;
                 }
             }
         }
@@ -533,25 +533,25 @@ namespace Microsoft.NodejsTools.Debugger
         {
             LiveLogger.WriteLine("NodeDebugger start listening");
 
-            this._connection.Connect(this._debuggerEndpointUri);
+            this.connection.Connect(this.debuggerEndpointUri);
 
             var mainThread = new NodeThread(this, this.MainThreadId, false);
-            this._threads[mainThread.Id] = mainThread;
+            this.threads[mainThread.Id] = mainThread;
 
-            if (!GetScriptsAsync().Wait((int)this._timeout.TotalMilliseconds))
+            if (!GetScriptsAsync().Wait((int)this.timeout.TotalMilliseconds))
             {
                 LiveLogger.WriteLine("NodeDebugger GetScripts timeout");
                 throw new TimeoutException("Timed out while retrieving scripts from debuggee.");
             }
 
-            if (!SetExceptionBreakAsync().Wait((int)this._timeout.TotalMilliseconds))
+            if (!SetExceptionBreakAsync().Wait((int)this.timeout.TotalMilliseconds))
             {
                 LiveLogger.WriteLine("NodeDebugger SetException timeout");
                 throw new TimeoutException("Timed out while setting up exception handling in debuggee.");
             }
 
             var backTraceTask = PerformBacktraceAsync();
-            if (!backTraceTask.Wait((int)this._timeout.TotalMilliseconds))
+            if (!backTraceTask.Wait((int)this.timeout.TotalMilliseconds))
             {
                 LiveLogger.WriteLine("NodeDebugger backtrace timeout");
                 throw new TimeoutException("Timed out while performing initial backtrace.");
@@ -590,7 +590,7 @@ namespace Microsoft.NodejsTools.Debugger
                 NodeModule newModule;
                 if (GetOrAddModule(module, out newModule))
                 {
-                    foreach (var breakpoint in this._breakpointBindings)
+                    foreach (var breakpoint in this.breakpointBindings)
                     {
                         var target = breakpoint.Value.Breakpoint.Target;
                         if (target.FileName.Equals(newModule.FileName, StringComparison.OrdinalIgnoreCase))
@@ -613,9 +613,9 @@ namespace Microsoft.NodejsTools.Debugger
             // UNDONE Handle break on unhandled, once just my code is supported
             // Node has a catch all, so there are no uncaught exceptions
             // For now just break on all
-            //var breakOnAllExceptions = _defaultExceptionTreatment == ExceptionHitTreatment.BreakAlways || _exceptionTreatments.Values.Any(value => value == ExceptionHitTreatment.BreakAlways);
-            //var breakOnUncaughtExceptions = !all && (_defaultExceptionTreatment != ExceptionHitTreatment.BreakNever || _exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever));
-            var breakOnAllExceptions = this._exceptionHandler.BreakOnAllExceptions;
+            //var breakOnAllExceptions = defaultExceptionTreatment == ExceptionHitTreatment.BreakAlways || exceptionTreatments.Values.Any(value => value == ExceptionHitTreatment.BreakAlways);
+            //var breakOnUncaughtExceptions = !all && (defaultExceptionTreatment != ExceptionHitTreatment.BreakNever || exceptionTreatments.Values.Any(value => value != ExceptionHitTreatment.BreakNever));
+            var breakOnAllExceptions = this.exceptionHandler.BreakOnAllExceptions;
             const bool breakOnUncaughtExceptions = false;
 
             if (this.HasExited)
@@ -623,20 +623,20 @@ namespace Microsoft.NodejsTools.Debugger
                 return;
             }
 
-            if (this._breakOnAllExceptions != breakOnAllExceptions)
+            if (this.breakOnAllExceptions != breakOnAllExceptions)
             {
                 var setExceptionBreakCommand = new SetExceptionBreakCommand(this.CommandId, false, breakOnAllExceptions);
                 await TrySendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
 
-                this._breakOnAllExceptions = breakOnAllExceptions;
+                this.breakOnAllExceptions = breakOnAllExceptions;
             }
 
-            if (this._breakOnUncaughtExceptions != breakOnUncaughtExceptions)
+            if (this.breakOnUncaughtExceptions != breakOnUncaughtExceptions)
             {
                 var setExceptionBreakCommand = new SetExceptionBreakCommand(this.CommandId, true, breakOnUncaughtExceptions);
                 await TrySendRequestAsync(setExceptionBreakCommand, cancellationToken).ConfigureAwait(false);
 
-                this._breakOnUncaughtExceptions = breakOnUncaughtExceptions;
+                this.breakOnUncaughtExceptions = breakOnUncaughtExceptions;
             }
         }
 
@@ -667,7 +667,7 @@ namespace Microsoft.NodejsTools.Debugger
                 foreach (var breakpoint in args.BreakpointEvent.Breakpoints)
                 {
                     NodeBreakpointBinding nodeBreakpointBinding;
-                    if (this._breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding))
+                    if (this.breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding))
                     {
                         breakpointBindings.Add(nodeBreakpointBinding);
                     }
@@ -686,7 +686,7 @@ namespace Microsoft.NodejsTools.Debugger
                     // this for the time being and not do anything - when we report LoadComplete, VS will calls us
                     // back telling us to continue, and at that point we will unfreeze the process.
                     // Otherwise, this is just some breakpoint that we don't know of, so tell it to resume running.
-                    if (this._loadCompleteHandled)
+                    if (this.loadCompleteHandled)
                     {
                         await AutoResumeAsync(false).ConfigureAwait(false);
                     }
@@ -771,7 +771,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             foreach (var hitBinding in hitBindings)
             {
-                var localFileName = this._fileNameMapper.GetLocalFileName(fileName);
+                var localFileName = this.fileNameMapper.GetLocalFileName(fileName);
                 if (string.Equals(localFileName, hitBinding.Position.FileName, StringComparison.OrdinalIgnoreCase))
                 {
                     yield return hitBinding;
@@ -797,19 +797,19 @@ namespace Microsoft.NodejsTools.Debugger
 
                 var errorNumber = exception.ErrorNumber.Value;
                 string errorCodeFromMap;
-                if (this._errorCodes.TryGetValue(errorNumber, out errorCodeFromMap))
+                if (this.errorCodes.TryGetValue(errorNumber, out errorCodeFromMap))
                 {
                     ReportException(exception, errorCodeFromMap);
                     return;
                 }
 
-                var lookupCommand = new LookupCommand(this.CommandId, this._resultFactory, new[] { exception.ErrorNumber.Value });
+                var lookupCommand = new LookupCommand(this.CommandId, this.resultFactory, new[] { exception.ErrorNumber.Value });
                 string errorCodeFromLookup = null;
 
                 if (await TrySendRequestAsync(lookupCommand).ConfigureAwait(false))
                 {
                     errorCodeFromLookup = lookupCommand.Results[errorNumber][0].StringValue;
-                    this._errorCodes[errorNumber] = errorCodeFromLookup;
+                    this.errorCodes[errorNumber] = errorCodeFromLookup;
                 }
 
                 ReportException(exception, errorCodeFromLookup);
@@ -831,7 +831,7 @@ namespace Microsoft.NodejsTools.Debugger
                 // For now just break always or never
                 //if (exceptionTreatment == ExceptionHitTreatment.BreakNever ||
                 //    (exceptionTreatment == ExceptionHitTreatment.BreakOnUnhandled && !uncaught)) {
-                var exceptionTreatment = this._exceptionHandler.GetExceptionHitTreatment(exceptionName);
+                var exceptionTreatment = this.exceptionHandler.GetExceptionHitTreatment(exceptionName);
                 if (exceptionTreatment == ExceptionHitTreatment.BreakNever)
                 {
                     await AutoResumeAsync(false).ConfigureAwait(false);
@@ -854,8 +854,8 @@ namespace Microsoft.NodejsTools.Debugger
                 if (description.StartsWith("#<", StringComparison.Ordinal) && description.EndsWith(">", StringComparison.Ordinal))
                 {
                     // Serialize exception object to get a proper description
-                    var tokenSource = new CancellationTokenSource(this._timeout);
-                    var evaluateCommand = new EvaluateCommand(this.CommandId, this._resultFactory, exceptionEvent.ExceptionId);
+                    var tokenSource = new CancellationTokenSource(this.timeout);
+                    var evaluateCommand = new EvaluateCommand(this.CommandId, this.resultFactory, exceptionEvent.ExceptionId);
                     if (await TrySendRequestAsync(evaluateCommand, tokenSource.Token).ConfigureAwait(false))
                     {
                         description = evaluateCommand.Result.StringValue;
@@ -869,7 +869,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         private async Task<int> GetCallstackDepthAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            var backtraceCommand = new BacktraceCommand(this.CommandId, this._resultFactory, 0, 1, true);
+            var backtraceCommand = new BacktraceCommand(this.CommandId, this.resultFactory, 0, 1, true);
             await TrySendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false);
             return backtraceCommand.CallstackDepth;
         }
@@ -922,7 +922,7 @@ namespace Microsoft.NodejsTools.Debugger
             // request takes a 'bottom' parameter, empirically, Node.js fails requests with it set.  Here we
             // approximate 'bottom' for 'toFrame' using int.MaxValue.  Node.js silently handles toFrame depths
             // greater than the current callstack.
-            var backtraceCommand = new BacktraceCommand(this.CommandId, this._resultFactory, 0, int.MaxValue);
+            var backtraceCommand = new BacktraceCommand(this.CommandId, this.resultFactory, 0, int.MaxValue);
             if (!await TrySendRequestAsync(backtraceCommand, cancellationToken).ConfigureAwait(false))
             {
                 return false;
@@ -944,7 +944,7 @@ namespace Microsoft.NodejsTools.Debugger
 
             if (numbersWithNullValue.Count > 0)
             {
-                var lookupCommand = new LookupCommand(this.CommandId, this._resultFactory, numbersWithNullValue);
+                var lookupCommand = new LookupCommand(this.CommandId, this.resultFactory, numbersWithNullValue);
                 if (await TrySendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false))
                 {
                     foreach (var targetResult in numbersWithNullValue)
@@ -962,7 +962,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         internal IList<NodeThread> GetThreads()
         {
-            return this._threads.Values.ToList();
+            return this.threads.Values.ToList();
         }
 
         internal void SendStepOver(int identity)
@@ -970,7 +970,7 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("StepOver");
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var tokenSource = new CancellationTokenSource(this._timeout);
+                var tokenSource = new CancellationTokenSource(this.timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Over, cancellationToken: tokenSource.Token).ConfigureAwait(false);
             });
         }
@@ -980,7 +980,7 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("StepInto");
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var tokenSource = new CancellationTokenSource(this._timeout);
+                var tokenSource = new CancellationTokenSource(this.timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Into, cancellationToken: tokenSource.Token).ConfigureAwait(false);
             });
         }
@@ -990,7 +990,7 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("StepOut");
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
-                var tokenSource = new CancellationTokenSource(this._timeout);
+                var tokenSource = new CancellationTokenSource(this.timeout);
                 await ContinueAndSaveSteppingAsync(SteppingKind.Out, cancellationToken: tokenSource.Token).ConfigureAwait(false);
             });
         }
@@ -1001,10 +1001,10 @@ namespace Microsoft.NodejsTools.Debugger
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
                 // Handle load complete resume
-                if (!this._loadCompleteHandled)
+                if (!this.loadCompleteHandled)
                 {
-                    this._loadCompleteHandled = true;
-                    this._handleEntryPointHit = true;
+                    this.loadCompleteHandled = true;
+                    this.handleEntryPointHit = true;
 
                     // Handle breakpoint binding at entrypoint
                     // Attempt to fire breakpoint hit event without actually resuming
@@ -1014,7 +1014,7 @@ namespace Microsoft.NodejsTools.Debugger
                     var breakModule = GetModuleForFilePath(breakFileName);
 
                     var breakpointBindings = new List<NodeBreakpointBinding>();
-                    foreach (var breakpointBinding in this._breakpointBindings.Values)
+                    foreach (var breakpointBinding in this.breakpointBindings.Values)
                     {
                         if (breakpointBinding.Enabled && breakpointBinding.Position.Line == currentLine &&
                             GetModuleForFilePath(breakpointBinding.Target.FileName) == breakModule)
@@ -1059,9 +1059,9 @@ namespace Microsoft.NodejsTools.Debugger
 
         private bool HandleEntryPointHit()
         {
-            if (this._handleEntryPointHit)
+            if (this.handleEntryPointHit)
             {
-                this._handleEntryPointHit = false;
+                this.handleEntryPointHit = false;
                 EventHandler<ThreadEventArgs> entryPointHit = EntryPointHit;
                 if (entryPointHit != null)
                 {
@@ -1084,10 +1084,10 @@ namespace Microsoft.NodejsTools.Debugger
             DebuggerClient.RunWithRequestExceptionsHandled(async () =>
             {
                 // Disconnect request has no response
-                var tokenSource = new CancellationTokenSource(this._timeout);
+                var tokenSource = new CancellationTokenSource(this.timeout);
                 var disconnectCommand = new DisconnectCommand(this.CommandId);
                 await TrySendRequestAsync(disconnectCommand, tokenSource.Token).ConfigureAwait(false);
-                this._connection.Close();
+                this.connection.Close();
             });
         }
 
@@ -1152,7 +1152,7 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             var breakpointBinding = breakpoint.CreateBinding(target, position, breakpointId, scriptId, fullyBound);
-            this._breakpointBindings[breakpointId] = breakpointBinding;
+            this.breakpointBindings[breakpointId] = breakpointBinding;
             return breakpointBinding;
         }
 
@@ -1212,8 +1212,8 @@ namespace Microsoft.NodejsTools.Debugger
         {
             DebugWriteCommand("Execute Text Async");
 
-            var evaluateCommand = new EvaluateCommand(this.CommandId, this._resultFactory, text, stackFrame);
-            await this._client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
+            var evaluateCommand = new EvaluateCommand(this.CommandId, this.resultFactory, text, stackFrame);
+            await this.client.SendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false);
             return evaluateCommand.Result;
         }
 
@@ -1226,13 +1226,13 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("Set Variable Value");
 
             // Create a new value
-            var evaluateValueCommand = new EvaluateCommand(this.CommandId, this._resultFactory, value, stackFrame);
-            await this._client.SendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false);
+            var evaluateValueCommand = new EvaluateCommand(this.CommandId, this.resultFactory, value, stackFrame);
+            await this.client.SendRequestAsync(evaluateValueCommand, cancellationToken).ConfigureAwait(false);
             var handle = evaluateValueCommand.Result.Handle;
 
             // Set variable value
-            var setVariableValueCommand = new SetVariableValueCommand(this.CommandId, this._resultFactory, stackFrame, name, handle);
-            await this._client.SendRequestAsync(setVariableValueCommand, cancellationToken).ConfigureAwait(false);
+            var setVariableValueCommand = new SetVariableValueCommand(this.CommandId, this.resultFactory, stackFrame, name, handle);
+            await this.client.SendRequestAsync(setVariableValueCommand, cancellationToken).ConfigureAwait(false);
             return setVariableValueCommand.Result;
         }
 
@@ -1240,7 +1240,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             DebugWriteCommand("Enum Children");
 
-            var lookupCommand = new LookupCommand(this.CommandId, this._resultFactory, new List<NodeEvaluationResult> { nodeEvaluationResult });
+            var lookupCommand = new LookupCommand(this.CommandId, this.resultFactory, new List<NodeEvaluationResult> { nodeEvaluationResult });
             if (!await TrySendRequestAsync(lookupCommand, cancellationToken).ConfigureAwait(false))
             {
                 return null;
@@ -1260,14 +1260,14 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             var breakpointId = breakpointBinding.BreakpointId;
-            if (this._connection.Connected)
+            if (this.connection.Connected)
             {
                 var clearBreakpointsCommand = new ClearBreakpointCommand(this.CommandId, breakpointId);
                 await TrySendRequestAsync(clearBreakpointsCommand, cancellationToken).ConfigureAwait(false);
             }
 
             var breakpoint = breakpointBinding.Breakpoint;
-            this._breakpointBindings.Remove(breakpointId);
+            this.breakpointBindings.Remove(breakpointId);
             breakpoint.RemoveBinding(breakpointBinding);
             breakpointBinding.Unbound = true;
 
@@ -1297,7 +1297,7 @@ namespace Microsoft.NodejsTools.Debugger
             DebugWriteCommand("TestPredicate: " + expression);
 
             var predicateExpression = string.Format(CultureInfo.InvariantCulture, "Boolean({0})", expression);
-            var evaluateCommand = new EvaluateCommand(this.CommandId, this._resultFactory, predicateExpression);
+            var evaluateCommand = new EvaluateCommand(this.CommandId, this.resultFactory, predicateExpression);
 
             return await TrySendRequestAsync(evaluateCommand, cancellationToken).ConfigureAwait(false) &&
                    evaluateCommand.Result != null &&
@@ -1309,7 +1309,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             try
             {
-                await this._client.SendRequestAsync(command, cancellationToken).ConfigureAwait(false);
+                await this.client.SendRequestAsync(command, cancellationToken).ConfigureAwait(false);
                 return true;
             }
             catch (DebuggerCommandException ex)
@@ -1395,7 +1395,7 @@ namespace Microsoft.NodejsTools.Debugger
             }
 
             // Check whether module already exits
-            if (this._modules.TryGetValue(module.FileName, out value))
+            if (this.modules.TryGetValue(module.FileName, out value))
             {
                 return false;
             }
@@ -1403,7 +1403,7 @@ namespace Microsoft.NodejsTools.Debugger
             value = module;
 
             // Add module
-            this._modules[module.FileName] = module;
+            this.modules[module.FileName] = module;
 
             return true;
         }
@@ -1416,7 +1416,7 @@ namespace Microsoft.NodejsTools.Debugger
         public NodeModule GetModuleForFilePath(string filePath)
         {
             NodeModule module;
-            this._modules.TryGetValue(filePath, out module);
+            this.modules.TryGetValue(filePath, out module);
             return module;
         }
 
