@@ -1,25 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Events {
-    sealed class ExceptionEvent : IDebuggerEvent {
+namespace Microsoft.NodejsTools.Debugger.Events
+{
+    internal sealed class ExceptionEvent : IDebuggerEvent
+    {
         /// <summary>
         /// V8 type transformations.
         /// </summary>
@@ -35,24 +23,26 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             { "error", NodeVariableType.Error },
         };
 
-        public ExceptionEvent(JObject message) {
-            Running = false;
+        public ExceptionEvent(JObject message)
+        {
+            this.Running = false;
 
-            JToken body = message["body"];
-            Line = (int?)body["sourceLine"];
-            Column = (int?)body["sourceColumn"];
-            Uncaught = (bool)body["uncaught"];
-            ExceptionId = (int)body["exception"]["handle"];
-            Description = (string)body["exception"]["text"];
-            TypeName = GetExceptionType(body);
-            ExceptionName = GetExceptionName(message);
-            ErrorNumber = GetExceptionCodeRef(body);
+            var body = message["body"];
+            this.Line = (int?)body["sourceLine"];
+            this.Column = (int?)body["sourceColumn"];
+            this.Uncaught = (bool)body["uncaught"];
+            this.ExceptionId = (int)body["exception"]["handle"];
+            this.Description = (string)body["exception"]["text"];
+            this.TypeName = GetExceptionType(body);
+            this.ExceptionName = GetExceptionName(message);
+            this.ErrorNumber = GetExceptionCodeRef(body);
 
-            JToken script = body["script"];
-            if (script != null) {
+            var script = body["script"];
+            if (script != null)
+            {
                 var scriptId = (int)script["id"];
                 var fileName = (string)script["name"];
-                Module = new NodeModule(scriptId, fileName);
+                this.Module = new NodeModule(scriptId, fileName);
             }
         }
 
@@ -67,12 +57,16 @@ namespace Microsoft.NodejsTools.Debugger.Events {
         public NodeModule Module { get; private set; }
         public bool Running { get; private set; }
 
-        private int? GetExceptionCodeRef(JToken body) {
-            JToken exception = body["exception"];
+        private int? GetExceptionCodeRef(JToken body)
+        {
+            var exception = body["exception"];
             var properties = (JArray)exception["properties"];
-            if (properties != null) {
-                foreach (JToken property in properties) {
-                    if (((string)property["name"]) == "code") {
+            if (properties != null)
+            {
+                foreach (var property in properties)
+                {
+                    if (((string)property["name"]) == "code")
+                    {
                         return (int)property["ref"];
                     }
                 }
@@ -80,37 +74,45 @@ namespace Microsoft.NodejsTools.Debugger.Events {
             return null;
         }
 
-        private string GetExceptionName(JObject json) {
-            JToken body = json["body"];
-            JToken exception = body["exception"];
+        private string GetExceptionName(JObject json)
+        {
+            var body = json["body"];
+            var exception = body["exception"];
             var name = (string)exception["type"];
-            if (name == "error" || name == "object") {
-                JToken constructorFunction = exception["constructorFunction"];
+            if (name == "error" || name == "object")
+            {
+                var constructorFunction = exception["constructorFunction"];
                 var constructorFunctionHandle = (int)constructorFunction["ref"];
                 var refs = (JArray)json["refs"];
-                JToken refRecord = GetRefRecord(refs, constructorFunctionHandle);
-                if (refRecord != null) {
+                var refRecord = GetRefRecord(refs, constructorFunctionHandle);
+                if (refRecord != null)
+                {
                     name = (string)refRecord["name"];
                 }
             }
-            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
+            return this._typeNameMappings.ContainsKey(name) ? this._typeNameMappings[name] : name;
         }
 
-        private JToken GetRefRecord(JArray refs, int handle) {
-            foreach (JToken refRecordObj in refs) {
-                JToken refRecord = refRecordObj;
+        private JToken GetRefRecord(JArray refs, int handle)
+        {
+            foreach (var refRecordObj in refs)
+            {
+                var refRecord = refRecordObj;
                 var refRecordHandle = (int)refRecord["handle"];
-                if (refRecordHandle == handle) {
+                if (refRecordHandle == handle)
+                {
                     return refRecord;
                 }
             }
             return null;
         }
 
-        private string GetExceptionType(JToken body) {
-            string name = (string)body["exception"]["className"]
+        private string GetExceptionType(JToken body)
+        {
+            var name = (string)body["exception"]["className"]
                           ?? (string)body["exception"]["type"];
-            return _typeNameMappings.ContainsKey(name) ? _typeNameMappings[name] : name;
+            return this._typeNameMappings.ContainsKey(name) ? this._typeNameMappings[name] : name;
         }
     }
 }
+

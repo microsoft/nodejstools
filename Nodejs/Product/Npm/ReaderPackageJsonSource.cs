@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -20,26 +6,41 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm {
-    public class ReaderPackageJsonSource : IPackageJsonSource {
-        public ReaderPackageJsonSource(TextReader reader) {
-            try {
+namespace Microsoft.NodejsTools.Npm
+{
+    public class ReaderPackageJsonSource : IPackageJsonSource
+    {
+        public ReaderPackageJsonSource(TextReader reader)
+        {
+            try
+            {
                 var text = reader.ReadToEnd();
-                try {
+                try
+                {
                     // JsonConvert and JObject.Parse exhibit slightly different behavior,
                     // so fall back to JObject.Parse if JsonConvert does not properly deserialize
                     // the object.
                     Package = JsonConvert.DeserializeObject(text);
-                } catch (ArgumentException) {
+                }
+                catch (ArgumentException)
+                {
                     Package = JObject.Parse(text);
                 }
-            } catch (JsonReaderException jre) {
+            }
+            catch (JsonReaderException jre)
+            {
                 WrapExceptionAndRethrow(jre);
-            } catch (JsonSerializationException jse) {
+            }
+            catch (JsonSerializationException jse)
+            {
                 WrapExceptionAndRethrow(jse);
-            } catch (FormatException fe) {
+            }
+            catch (FormatException fe)
+            {
                 WrapExceptionAndRethrow(fe);
-            } catch (ArgumentException ae) {
+            }
+            catch (ArgumentException ae)
+            {
                 throw new PackageJsonException(
                     string.Format(CultureInfo.CurrentCulture, @"Error reading package.json. The file may be parseable JSON but may contain objects with duplicate properties.
 
@@ -51,7 +52,8 @@ The following error occurred:
         }
 
         private void WrapExceptionAndRethrow(
-            Exception ex) {
+            Exception ex)
+        {
             throw new PackageJsonException(
                 string.Format(CultureInfo.CurrentCulture, @"Unable to read package.json. Please ensure the file is valid JSON.
 
@@ -64,3 +66,4 @@ Reading failed because the following error occurred:
         public dynamic Package { get; private set; }
     }
 }
+

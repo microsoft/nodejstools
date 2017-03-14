@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +9,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -30,32 +19,37 @@ namespace Microsoft.VisualStudio.Repl {
     /// 
     /// Instances of the repl window can be created by using MEF to import the IReplWindowProvider interface.
     /// </summary>
-    public interface IReplWindow {
+    public interface IReplWindow
+    {
         /// <summary>
         /// Gets the IWpfTextView in which the REPL window is executing.
         /// </summary>
-        IWpfTextView TextView {
+        IWpfTextView TextView
+        {
             get;
         }
 
         /// <summary>
         /// Returns the current language buffer.
         /// </summary>
-        ITextBuffer CurrentLanguageBuffer {
-            get; 
+        ITextBuffer CurrentLanguageBuffer
+        {
+            get;
         }
 
         /// <summary>
         /// The language evaluator used in Repl Window
         /// </summary>
-        IReplEvaluator Evaluator {
+        IReplEvaluator Evaluator
+        {
             get;
         }
 
         /// <summary>
         /// Title of the Repl Window
         /// </summary>
-        string Title {
+        string Title
+        {
             get;
         }
 
@@ -73,7 +67,7 @@ namespace Microsoft.VisualStudio.Repl {
         /// Focuses the window.
         /// </summary>
         void Focus();
-        
+
         /// <summary>
         /// Clears the current input.
         /// </summary>
@@ -161,8 +155,8 @@ namespace Microsoft.VisualStudio.Repl {
         event Action ReadyForInput;
     }
 
-    public interface IReplWindow2 : IReplWindow {
-
+    public interface IReplWindow2 : IReplWindow
+    {
         /// <summary>
         /// Executes a special REPL command as if it were submitted as an input.
         /// </summary>
@@ -172,11 +166,12 @@ namespace Microsoft.VisualStudio.Repl {
         Task<ExecutionResult> ExecuteCommand(string text);
     }
 
-    public interface IReplWindow3 : IReplWindow2 {
-
+    public interface IReplWindow3 : IReplWindow2
+    {
         /// <summary>
         /// Storage
         /// </summary>
         PropertyCollection Properties { get; }
     }
 }
+

@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -25,61 +13,78 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     [Guid("B7773A32-2EE5-4844-9630-F14768A5D03C")]
-    partial class WebPiComponentPickerControl : UserControl {
+    internal partial class WebPiComponentPickerControl : UserControl
+    {
         private readonly List<PackageInfo> _packages = new List<PackageInfo>();
         private const string _defaultFeeds = "https://www.microsoft.com/web/webpi/5.0/webproductlist.xml";
         private ListViewSorter _sorter = new ListViewSorter();
 
-        public WebPiComponentPickerControl() {
+        public WebPiComponentPickerControl()
+        {
             InitializeComponent();
 
-            AutoSize = true;
-            AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            _productsList.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(ProductsListItemSelectionChanged);
-            _productsList.ListViewItemSorter = _sorter;
-            _productsList.DoubleClick += new EventHandler(ProductsListDoubleClick);
-            _productsList.ColumnClick += new ColumnClickEventHandler(ProductsListColumnClick);
+            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._productsList.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(this.ProductsListItemSelectionChanged);
+            this._productsList.ListViewItemSorter = this._sorter;
+            this._productsList.DoubleClick += new EventHandler(this.ProductsListDoubleClick);
+            this._productsList.ColumnClick += new ColumnClickEventHandler(this.ProductsListColumnClick);
         }
 
-        private void ProductsListColumnClick(object sender, ColumnClickEventArgs e) {
-            if (e.Column == _sorter.Column) {
-                if (_sorter.Order == SortOrder.Ascending) {
-                    _sorter.Order = SortOrder.Descending;
-                } else {
-                    _sorter.Order = SortOrder.Ascending;
+        private void ProductsListColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            if (e.Column == this._sorter.Column)
+            {
+                if (this._sorter.Order == SortOrder.Ascending)
+                {
+                    this._sorter.Order = SortOrder.Descending;
                 }
-            } else {
-                _sorter.Column = e.Column;
-                _sorter.Order = SortOrder.Ascending;
+                else
+                {
+                    this._sorter.Order = SortOrder.Ascending;
+                }
             }
-            _productsList.Sort();
+            else
+            {
+                this._sorter.Column = e.Column;
+                this._sorter.Order = SortOrder.Ascending;
+            }
+            this._productsList.Sort();
         }
 
-        private void ProductsListDoubleClick(object sender, EventArgs e) {
+        private void ProductsListDoubleClick(object sender, EventArgs e)
+        {
             NativeMethods.SendMessage(
-                NativeMethods.GetParent(NativeMethods.GetParent(NativeMethods.GetParent(Handle))),
+                NativeMethods.GetParent(NativeMethods.GetParent(NativeMethods.GetParent(this.Handle))),
                 (uint)VSConstants.CPDN_SELDBLCLICK,
                 IntPtr.Zero,
-                Handle
+                this.Handle
             );
         }
 
-        private void ProductsListItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) {
+        private void ProductsListItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
             NativeMethods.SendMessage(
-                NativeMethods.GetParent(NativeMethods.GetParent(NativeMethods.GetParent(Handle))),
+                NativeMethods.GetParent(NativeMethods.GetParent(NativeMethods.GetParent(this.Handle))),
                 (uint)VSConstants.CPDN_SELCHANGED,
                 IntPtr.Zero,
-                Handle
+                this.Handle
             );
         }
 
-        private async Task RequestFeeds(string feedSource) {
-            try {
+        private async Task RequestFeeds(string feedSource)
+        {
+            try
+            {
                 await Task.Run(() => GetFeeds(feedSource));
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -87,43 +92,52 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 var fullMessage = SR.GetString(SR.WebPiFeedError, feedSource, ex);
                 Trace.WriteLine(fullMessage);
-                try {
+                try
+                {
                     ActivityLog.LogError("WebPiComponentPickerControl", fullMessage);
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                 }
             }
         }
 
-        private void GetFeeds(string feed) {
+        private void GetFeeds(string feed)
+        {
             var doc = new XPathDocument(feed);
-            XmlNamespaceManager mngr = new XmlNamespaceManager(new NameTable());
+            var mngr = new XmlNamespaceManager(new NameTable());
             mngr.AddNamespace("x", "http://www.w3.org/2005/Atom");
 
             var nav = doc.CreateNavigator();
 
             var nodes = nav.Select("/x:feed/x:entry", mngr);
-            foreach (XPathNavigator node in nodes) {
+            foreach (XPathNavigator node in nodes)
+            {
                 var title = node.Select("x:title", mngr);
                 var updated = node.Select("x:updated", mngr);
                 var productId = node.Select("x:productId", mngr);
 
                 string titleVal = null;
-                foreach (XPathNavigator titleNode in title) {
+                foreach (XPathNavigator titleNode in title)
+                {
                     titleVal = titleNode.Value;
                     break;
                 }
 
                 string updatedVal = null;
-                foreach (XPathNavigator updatedNode in updated) {
+                foreach (XPathNavigator updatedNode in updated)
+                {
                     updatedVal = updatedNode.Value;
                 }
 
                 string productIdVal = null;
-                foreach (XPathNavigator productIdNode in productId) {
+                foreach (XPathNavigator productIdNode in productId)
+                {
                     productIdVal = productIdNode.Value;
                 }
 
-                if (titleVal != null && updatedVal != null && productIdVal != null) {
+                if (titleVal != null && updatedVal != null && productIdVal != null)
+                {
                     var newPackage = new PackageInfo(
                         titleVal,
                         updatedVal,
@@ -131,21 +145,25 @@ namespace Microsoft.VisualStudioTools.Project {
                         feed
                     );
 
-                    _packages.Add(newPackage);
+                    this._packages.Add(newPackage);
 
-                    try {
-                        BeginInvoke(new Action<object>(AddPackage), newPackage);
-                    } catch (InvalidOperationException) {
+                    try
+                    {
+                        BeginInvoke(new Action<object>(this.AddPackage), newPackage);
+                    }
+                    catch (InvalidOperationException)
+                    {
                         break;
                     }
                 }
             }
         }
 
-        private void AddPackage(object package) {
+        private void AddPackage(object package)
+        {
             var pkgInfo = (PackageInfo)package;
             var item = new ListViewItem(
-                new[] { 
+                new[] {
                     pkgInfo.Title,
                     pkgInfo.Updated,
                     pkgInfo.ProductId,
@@ -154,51 +172,59 @@ namespace Microsoft.VisualStudioTools.Project {
             );
 
             item.Tag = pkgInfo;
-            _productsList.Items.Add(item);
+            this._productsList.Items.Add(item);
         }
 
-        class PackageInfo {
+        private class PackageInfo
+        {
             public readonly string Title;
             public readonly string Updated;
             public readonly string ProductId;
             public readonly string Feed;
 
-            public PackageInfo(string title, string updated, string productId, string feed) {
-                Title = title;
-                Updated = updated;
-                ProductId = productId;
-                Feed = feed;
+            public PackageInfo(string title, string updated, string productId, string feed)
+            {
+                this.Title = title;
+                this.Updated = updated;
+                this.ProductId = productId;
+                this.Feed = feed;
             }
         }
 
-        class ListViewSorter : IComparer {
+        private class ListViewSorter : IComparer
+        {
             public SortOrder Order;
             public int Column;
 
             #region IComparer Members
 
-            public int Compare(object x, object y) {
-                ListViewItem itemX = (ListViewItem)x;
-                ListViewItem itemY = (ListViewItem)y;
+            public int Compare(object x, object y)
+            {
+                var itemX = (ListViewItem)x;
+                var itemY = (ListViewItem)y;
 
                 int? res = null;
-                if (Column == 1) {
+                if (this.Column == 1)
+                {
                     DateTime dtX, dtY;
                     if (DateTime.TryParse(itemX.SubItems[1].Text, out dtX) &&
-                        DateTime.TryParse(itemY.SubItems[1].Text, out dtY)) {
+                        DateTime.TryParse(itemY.SubItems[1].Text, out dtY))
+                    {
                         res = dtX.CompareTo(dtY);
                     }
                 }
 
-                if (res == null) {
-                    res = String.Compare(
+                if (res == null)
+                {
+                    res = string.Compare(
                        itemX.SubItems[0].Text,
                        itemY.SubItems[0].Text,
                        true
                    );
                 }
 
-                if (Order == SortOrder.Descending) {
+                if (this.Order == SortOrder.Descending)
+                {
                     return -res.Value;
                 }
                 return res.Value;
@@ -206,12 +232,15 @@ namespace Microsoft.VisualStudioTools.Project {
 
             #endregion
         }
-        private void AddNewFeedClick(object sender, EventArgs e) {
-            RequestFeeds(_newFeedUrl.Text).DoNotWait();
+        private void AddNewFeedClick(object sender, EventArgs e)
+        {
+            RequestFeeds(this._newFeedUrl.Text).DoNotWait();
         }
 
-        protected override void DefWndProc(ref Message m) {
-            switch (m.Msg) {
+        protected override void DefWndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
                 case NativeMethods.WM_INITDIALOG:
                     SetWindowStyleOnStaticHostControl();
                     goto default;
@@ -219,34 +248,38 @@ namespace Microsoft.VisualStudioTools.Project {
                     RequestFeeds(_defaultFeeds).DoNotWait();
                     break;
                 case VSConstants.CPPM_SETMULTISELECT:
-                    _productsList.MultiSelect = (m.WParam != IntPtr.Zero);
+                    this._productsList.MultiSelect = (m.WParam != IntPtr.Zero);
                     break;
                 case VSConstants.CPPM_CLEARSELECTION:
-                    _productsList.SelectedItems.Clear();
+                    this._productsList.SelectedItems.Clear();
                     break;
                 case VSConstants.CPPM_QUERYCANSELECT:
                     Marshal.WriteInt32(
                         m.LParam,
-                        (_productsList.SelectedItems.Count > 0) ? 1 : 0
+                        (this._productsList.SelectedItems.Count > 0) ? 1 : 0
                     );
                     break;
                 case VSConstants.CPPM_GETSELECTION:
                     var items = new PackageInfo[this._productsList.SelectedItems.Count];
-                    for (int i = 0; i < items.Length; i++) {
-                        items[i] = (PackageInfo)_productsList.SelectedItems[0].Tag;
+                    for (var i = 0; i < items.Length; i++)
+                    {
+                        items[i] = (PackageInfo)this._productsList.SelectedItems[0].Tag;
                     }
-                    int count = items != null ? items.Length : 0;
+                    var count = items != null ? items.Length : 0;
                     Marshal.WriteByte(m.WParam, Convert.ToByte(count));
-                    if (count > 0) {
-                        IntPtr ppItems = Marshal.AllocCoTaskMem(
+                    if (count > 0)
+                    {
+                        var ppItems = Marshal.AllocCoTaskMem(
                           count * Marshal.SizeOf(typeof(IntPtr)));
-                        for (int i = 0; i < count; i++) {
-                            IntPtr pItem = Marshal.AllocCoTaskMem(
+                        for (var i = 0; i < count; i++)
+                        {
+                            var pItem = Marshal.AllocCoTaskMem(
                                     Marshal.SizeOf(typeof(VSCOMPONENTSELECTORDATA)));
                             Marshal.WriteIntPtr(
                                 ppItems + i * Marshal.SizeOf(typeof(IntPtr)),
                                 pItem);
-                            VSCOMPONENTSELECTORDATA data = new VSCOMPONENTSELECTORDATA() {
+                            var data = new VSCOMPONENTSELECTORDATA()
+                            {
                                 dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORDATA)),
                                 bstrFile = items[i].Feed,
                                 bstrTitle = items[i].ProductId,
@@ -259,20 +292,22 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                     break;
                 case NativeMethods.WM_SIZE:
-                    IntPtr parentHwnd = NativeMethods.GetParent(Handle);
+                    var parentHwnd = NativeMethods.GetParent(this.Handle);
 
-                    if (parentHwnd != IntPtr.Zero) {
-                        IntPtr grandParentHwnd = NativeMethods.GetParent(parentHwnd);
+                    if (parentHwnd != IntPtr.Zero)
+                    {
+                        var grandParentHwnd = NativeMethods.GetParent(parentHwnd);
 
                         User32RECT parentClientRect, grandParentClientRect;
                         if (grandParentHwnd != IntPtr.Zero &&
                             NativeMethods.GetClientRect(parentHwnd, out parentClientRect) &&
-                                NativeMethods.GetClientRect(grandParentHwnd, out grandParentClientRect)) {
+                                NativeMethods.GetClientRect(grandParentHwnd, out grandParentClientRect))
+                        {
+                            var width = grandParentClientRect.Width;
+                            var height = grandParentClientRect.Height;
 
-                            int width = grandParentClientRect.Width;
-                            int height = grandParentClientRect.Height;
-
-                            if ((parentClientRect.Width != width) || (parentClientRect.Height != height)) {
+                            if ((parentClientRect.Width != width) || (parentClientRect.Height != height))
+                            {
                                 NativeMethods.MoveWindow(parentHwnd, 0, 0, width, height, true);
                                 this.Width = width;
                                 this.Height = height;
@@ -287,12 +322,16 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-        private void NewFeedUrlTextChanged(object sender, EventArgs e) {
-            try {
-                new Uri(_newFeedUrl.Text);
-                _addNewFeed.Enabled = true;
-            } catch (UriFormatException) {
-                _addNewFeed.Enabled = false;
+        private void NewFeedUrlTextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                new Uri(this._newFeedUrl.Text);
+                this._addNewFeed.Enabled = true;
+            }
+            catch (UriFormatException)
+            {
+                this._addNewFeed.Enabled = false;
             }
         }
 
@@ -307,8 +346,9 @@ namespace Microsoft.VisualStudioTools.Project {
         /// So we go in and muck about with the This is a static! control's window style so that
         /// we don't hang VS if the user alt-tabs away.
         /// </summary>
-        private void SetWindowStyleOnStaticHostControl() {
-            var target = (NativeMethods.GetParent(Handle));
+        private void SetWindowStyleOnStaticHostControl()
+        {
+            var target = (NativeMethods.GetParent(this.Handle));
             NativeMethods.SetWindowLong(
                 target,
                 NativeMethods.GWL_EXSTYLE,
@@ -317,4 +357,5 @@ namespace Microsoft.VisualStudioTools.Project {
         }
     }
 }
+
 

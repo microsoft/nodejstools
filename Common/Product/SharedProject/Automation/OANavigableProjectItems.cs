@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -18,12 +6,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.VisualStudioTools.Project.Automation {
+namespace Microsoft.VisualStudioTools.Project.Automation
+{
     /// <summary>
     /// This can navigate a collection object only (partial implementation of ProjectItems interface)
     /// </summary>
     [ComVisible(true)]
-    public class OANavigableProjectItems : EnvDTE.ProjectItems {
+    public class OANavigableProjectItems : EnvDTE.ProjectItems
+    {
         #region fields
         private OAProject project;
         private HierarchyNode nodeWithItems;
@@ -33,20 +23,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Defines a relationship to the associated project.
         /// </summary>
-        internal OAProject Project {
-            get {
-                return this.project;
-            }
-        }
+        internal OAProject Project => this.project;
 
         /// <summary>
         /// Defines the node that contains the items
         /// </summary>
-        internal HierarchyNode NodeWithItems {
-            get {
-                return this.nodeWithItems;
-            }
-        }
+        internal HierarchyNode NodeWithItems => this.nodeWithItems;
         #endregion
 
         #region ctor
@@ -55,7 +37,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// </summary>
         /// <param name="project">The associated project.</param>
         /// <param name="nodeWithItems">The node that defines the items.</param>
-        internal OANavigableProjectItems(OAProject project, HierarchyNode nodeWithItems) {
+        internal OANavigableProjectItems(OAProject project, HierarchyNode nodeWithItems)
+        {
             this.project = project;
             this.nodeWithItems = nodeWithItems;
         }
@@ -67,13 +50,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Gets a value indicating the number of objects in the collection.
         /// </summary>
-        public virtual int Count {
-            get {
-                int count = 0;
-                
-                this.project.ProjectNode.Site.GetUIThread().Invoke(() => {
-                    for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling) {
-                        if (!child.IsNonMemberItem && child.GetAutomationObject() is EnvDTE.ProjectItem) {
+        public virtual int Count
+        {
+            get
+            {
+                var count = 0;
+
+                this.project.ProjectNode.Site.GetUIThread().Invoke(() =>
+                {
+                    for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                    {
+                        if (!child.IsNonMemberItem && child.GetAutomationObject() is EnvDTE.ProjectItem)
+                        {
                             count += 1;
                         }
                     }
@@ -85,46 +73,32 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <summary>
         /// Gets the immediate parent object of a ProjectItems collection.
         /// </summary>
-        public virtual object Parent {
-            get {
-                return this.nodeWithItems.GetAutomationObject();
-            }
-        }
+        public virtual object Parent => this.nodeWithItems.GetAutomationObject();
 
         /// <summary>
         /// Gets an enumeration indicating the type of object.
         /// </summary>
-        public virtual string Kind {
-            get {
+        public virtual string Kind =>
                 // TODO:  Add OAProjectItems.Kind getter implementation
-                return null;
-            }
-        }
+                null;
 
         /// <summary>
         /// Gets the top-level extensibility object.
         /// </summary>
-        public virtual EnvDTE.DTE DTE {
-            get {
-                return (EnvDTE.DTE)this.project.DTE;
-            }
-        }
+        public virtual EnvDTE.DTE DTE => (EnvDTE.DTE)this.project.DTE;
 
         /// <summary>
         /// Gets the project hosting the project item or items.
         /// </summary>
-        public virtual EnvDTE.Project ContainingProject {
-            get {
-                return this.project;
-            }
-        }
+        public virtual EnvDTE.Project ContainingProject => this.project;
 
         /// <summary>
         /// Adds one or more ProjectItem objects from a directory to the ProjectItems collection. 
         /// </summary>
         /// <param name="directory">The directory from which to add the project item.</param>
         /// <returns>A ProjectItem object.</returns>
-        public virtual EnvDTE.ProjectItem AddFromDirectory(string directory) {
+        public virtual EnvDTE.ProjectItem AddFromDirectory(string directory)
+        {
             throw new NotImplementedException();
         }
 
@@ -134,7 +108,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <param name="fileName">The full path and file name of the template project file.</param>
         /// <param name="name">The file name to use for the new project item.</param>
         /// <returns>A ProjectItem object. </returns>
-        public virtual EnvDTE.ProjectItem AddFromTemplate(string fileName, string name) {
+        public virtual EnvDTE.ProjectItem AddFromTemplate(string fileName, string name)
+        {
             throw new NotImplementedException();
         }
 
@@ -144,7 +119,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// <param name="name">The name of the folder node in Solution Explorer.</param>
         /// <param name="kind">The type of folder to add. The available values are based on vsProjectItemsKindConstants and vsProjectItemKindConstants</param>
         /// <returns>A ProjectItem object.</returns>
-        public virtual EnvDTE.ProjectItem AddFolder(string name, string kind) {
+        public virtual EnvDTE.ProjectItem AddFolder(string name, string kind)
+        {
             throw new NotImplementedException();
         }
 
@@ -153,7 +129,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// </summary>
         /// <param name="filePath">The path and file name of the project item to be added.</param>
         /// <returns>A ProjectItem object. </returns>
-        public virtual EnvDTE.ProjectItem AddFromFileCopy(string filePath) {
+        public virtual EnvDTE.ProjectItem AddFromFileCopy(string filePath)
+        {
             throw new NotImplementedException();
         }
 
@@ -162,7 +139,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// </summary>
         /// <param name="fileName">The file name of the item to add as a project item. </param>
         /// <returns>A ProjectItem object. </returns>
-        public virtual EnvDTE.ProjectItem AddFromFile(string fileName) {
+        public virtual EnvDTE.ProjectItem AddFromFile(string fileName)
+        {
             throw new NotImplementedException();
         }
 
@@ -171,32 +149,44 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// </summary>
         /// <param name="index">Either index by number (1-based) or by name can be used to get the item</param>
         /// <returns>Project Item. ArgumentException if invalid index is specified</returns>
-        public virtual EnvDTE.ProjectItem Item(object index) {
+        public virtual EnvDTE.ProjectItem Item(object index)
+        {
             // Changed from MPFProj: throws ArgumentException instead of returning null (http://mpfproj10.codeplex.com/workitem/9158)
-            if (index is int) {
-                int realIndex = (int)index - 1;
-                if (realIndex >= 0) {
-                    for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling) {
-                        if (child.IsNonMemberItem) {
+            if (index is int)
+            {
+                var realIndex = (int)index - 1;
+                if (realIndex >= 0)
+                {
+                    for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                    {
+                        if (child.IsNonMemberItem)
+                        {
                             continue;
                         }
                         var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                        if (item != null) {
-                            if (realIndex == 0) {
+                        if (item != null)
+                        {
+                            if (realIndex == 0)
+                            {
                                 return item;
                             }
                             realIndex -= 1;
                         }
                     }
                 }
-            } else if (index is string) {
-                string name = (string)index;
-                for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling) {
-                    if (child.IsNonMemberItem) {
+            }
+            else if (index is string)
+            {
+                var name = (string)index;
+                for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+                {
+                    if (child.IsNonMemberItem)
+                    {
                         continue;
                     }
                     var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                    if (item != null && String.Compare(item.Name, name, StringComparison.OrdinalIgnoreCase) == 0) {
+                    if (item != null && String.Compare(item.Name, name, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
                         return item;
                     }
                 }
@@ -208,13 +198,17 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         /// Returns an enumeration for items in a collection. 
         /// </summary>
         /// <returns>An IEnumerator for this object.</returns>
-        public virtual IEnumerator GetEnumerator() {
-            for (HierarchyNode child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling) {
-                if (child.IsNonMemberItem) {
+        public virtual IEnumerator GetEnumerator()
+        {
+            for (var child = this.NodeWithItems.FirstChild; child != null; child = child.NextSibling)
+            {
+                if (child.IsNonMemberItem)
+                {
                     continue;
                 }
                 var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                if (item != null) {
+                if (item != null)
+                {
                     yield return item;
                 }
             }
@@ -223,3 +217,4 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         #endregion
     }
 }
+

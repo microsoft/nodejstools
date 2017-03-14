@@ -1,32 +1,25 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
-namespace Microsoft.NodejsTools.Debugger.Communication {
-    internal sealed class NetworkClientFactory : INetworkClientFactory {
-        public INetworkClient CreateNetworkClient(Uri uri) {
-            if (uri == null) {
+namespace Microsoft.NodejsTools.Debugger.Communication
+{
+    internal sealed class NetworkClientFactory : INetworkClientFactory
+    {
+        public INetworkClient CreateNetworkClient(Uri uri)
+        {
+            if (uri == null)
+            {
                 throw new ArgumentNullException("uri");
             }
 
-            if (uri.IsAbsoluteUri) {
-                switch (uri.Scheme) {
+            if (uri.IsAbsoluteUri)
+            {
+                switch (uri.Scheme)
+                {
                     case "tcp":
-                        if (uri.Port < 0) {
+                        if (uri.Port < 0)
+                        {
                             throw new ArgumentException("tcp:// URI must include port number", "uri");
                         }
                         return new TcpNetworkClient(uri.Host, uri.Port);
@@ -40,3 +33,4 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         }
     }
 }
+

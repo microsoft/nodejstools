@@ -265,15 +265,6 @@
           <CommandName>Node.js 디버거 연결</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
-        <Strings>
-          <ButtonText>진단 정보(&amp;D)...</ButtonText>
-          <MenuText>진단 정보(&amp;D)...</MenuText>
-          <ToolTipText>진단 정보...</ToolTipText>
-          <CommandName>진단 정보...</CommandName>
-        </Strings>
-      </Button>
     </Buttons>
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -327,7 +318,6 @@
       <IDSymbol name="cmdidImportWizard" value="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
-      <IDSymbol name="cmdidDiagnostics" value="0x0208" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
       <IDSymbol name="cmdidSendFeedback" value="0x0215" />
       <IDSymbol name="cmdidDocumentation" value="0x0216" />

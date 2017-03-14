@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -30,11 +18,14 @@ using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using VSLangProj;
 
-namespace Microsoft.VisualStudioTools.SharedProjectTests {
+namespace Microsoft.VisualStudioTools.SharedProjectTests
+{
     [TestClass]
-    public class BasicProjectTests : SharedProjectTest {
+    public class BasicProjectTests : SharedProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
@@ -145,7 +136,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
 #endif
 
-        private static ProjectDefinition BasicProject(ProjectType projectType) {
+        private static ProjectDefinition BasicProject(ProjectType projectType)
+        {
             return new ProjectDefinition(
                 "HelloWorld",
                 projectType,
@@ -156,10 +148,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectAddItem() {
-            try {
-                foreach (var projectType in ProjectTypes) {
-                    using (var solution = BasicProject(projectType).Generate().ToVs()) {
+        public void ProjectAddItem()
+        {
+            try
+            {
+                foreach (var projectType in ProjectTypes)
+                {
+                    using (var solution = BasicProject(projectType).Generate().ToVs())
+                    {
                         var project = solution.GetProject("HelloWorld");
 
                         // Counts may differ between project types, so we take
@@ -192,7 +188,9 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Assert.AreEqual(0, project.ProjectItems.Count - previousCount, "Expected no new items");
                     }
                 }
-            } finally {
+            }
+            finally
+            {
                 VSTestContext.DTE.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -201,8 +199,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void CleanSolution() {
-            foreach (var projectType in ProjectTypes) {
+        public void CleanSolution()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -218,7 +218,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
 
                 );
-                using (var app = proj.Generate().ToVs()) {
+                using (var app = proj.Generate().ToVs())
+                {
                     var msbuildLogProperty = app.Dte.get_Properties("Environment", "ProjectsAndSolution").Item("MSBuildOutputVerbosity");
                     var originalValue = msbuildLogProperty.Value;
                     msbuildLogProperty.Value = 2;
@@ -233,8 +234,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void BuildSolution() {
-            foreach (var projectType in ProjectTypes) {
+        public void BuildSolution()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -250,7 +253,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     ),
                     Target("CreateManifestResourceNames")
                 );
-                using (var app = proj.Generate().ToVs()) {
+                using (var app = proj.Generate().ToVs())
+                {
                     var msbuildLogProperty = app.Dte.get_Properties("Environment", "ProjectsAndSolution").Item("MSBuildOutputVerbosity");
                     var originalValue = msbuildLogProperty.Value;
                     msbuildLogProperty.Value = 2;
@@ -1189,15 +1193,20 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void OpenCommandHere() {
+        public void OpenCommandHere()
+        {
             var existing = System.Diagnostics.Process.GetProcesses().Select(x => x.Id).ToSet();
-            try {
+            try
+            {
                 VSTestContext.DTE.Commands.Item("File.OpenCommandPromptHere");
-            } catch (ArgumentException) {
+            }
+            catch (ArgumentException)
+            {
                 Assert.Inconclusive("Open Command Prompt Here command is not implemented");
             }
 
-            foreach (var projectType in ProjectTypes) {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -1205,9 +1214,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Folder("Folder", isExcluded: true)
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var folder = solution.WaitForItem("HelloWorld", "Folder");
-                    if (folder == null) {
+                    if (folder == null)
+                    {
                         solution.SelectProject(solution.GetProject("HelloWorld"));
                         solution.ExecuteCommand("Project.ShowAllFiles");
                         folder = solution.WaitForItem("HelloWorld", "Folder");
@@ -1234,8 +1245,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void PasteFileWhileOpenInEditor() {
-            foreach (var projectType in ProjectTypes) {
+        public void PasteFileWhileOpenInEditor()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -1243,14 +1256,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Folder("Folder", isExcluded: true),
                     Compile("Folder\\server", content: "// new server", isExcluded: true)
                 );
-                using (var solution = proj.Generate().ToVs()) {
+                using (var solution = proj.Generate().ToVs())
+                {
                     var window = solution.GetProject("HelloWorld").ProjectItems.Item(projectType.Code("server")).Open();
                     window.Activate();
 
                     var docWindow = solution.GetDocument(window.Document.FullName);
                     var copyPath = Path.Combine(solution.SolutionDirectory, "HelloWorld", "Folder", projectType.Code("server"));
 
-                    docWindow.Invoke((Action)(() => {
+                    docWindow.Invoke((Action)(() =>
+                    {
                         Clipboard.SetFileDropList(
                             new StringCollection() { copyPath }
                         );
@@ -1281,9 +1296,12 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ItemVisibility() {
-            try {
-                foreach (var projectType in ProjectTypes) {
+        public void ItemVisibility()
+        {
+            try
+            {
+                foreach (var projectType in ProjectTypes)
+                {
                     var imported = new ProjectDefinition(
                         "Imported",
                         ItemGroup(
@@ -1310,13 +1328,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     );
 
                     var solutionFile = SolutionFile.Generate("HelloWorld", baseProj, imported);
-                    using (var solution = solutionFile.ToVs()) {
+                    using (var solution = solutionFile.ToVs())
+                    {
                         Assert.IsNotNull(solution.WaitForItem("HelloWorld", "VisibleItem.txt"), "VisibleItem.txt not found");
                         Assert.IsNull(solution.FindItem("HelloWorld", "ProjectInvisible.txt"), "VisibleItem.txt not found");
                         Assert.IsNull(solution.FindItem("HelloWorld", "ImportedItem.txt"), "VisibleItem.txt not found");
                     }
                 }
-            } finally {
+            }
+            finally
+            {
                 VSTestContext.DTE.Solution.Close();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -1325,19 +1346,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ProjectAddExistingExcludedFolder() {
-            foreach (var projectType in ProjectTypes) {
+        public void ProjectAddExistingExcludedFolder()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
                     Folder("Folder", isExcluded: true)
                 );
 
-                using (var solution = def.Generate().ToVs()) {
-                    try {
+                using (var solution = def.Generate().ToVs())
+                {
+                    try
+                    {
                         solution.GetProject("HelloWorld").ProjectItems.Item("Folder");
                         Assert.Fail("Expected ArgumentException");
-                    } catch (ArgumentException ex) {
+                    }
+                    catch (ArgumentException ex)
+                    {
                         Console.WriteLine("Handled {0}", ex);
                     }
 
@@ -1349,30 +1376,37 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
-        class DocumentTracker : IVsTrackProjectDocumentsEvents2 {
+        private class DocumentTracker : IVsTrackProjectDocumentsEvents2
+        {
             public bool Renamed;
 
-            public int OnAfterAddDirectoriesEx(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDDIRECTORYFLAGS[] rgFlags) {
+            public int OnAfterAddDirectoriesEx(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDDIRECTORYFLAGS[] rgFlags)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterAddFilesEx(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDFILEFLAGS[] rgFlags) {
+            public int OnAfterAddFilesEx(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDFILEFLAGS[] rgFlags)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterRemoveDirectories(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEDIRECTORYFLAGS[] rgFlags) {
+            public int OnAfterRemoveDirectories(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEDIRECTORYFLAGS[] rgFlags)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags) {
+            public int OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEDIRECTORYFLAGS[] rgFlags) {
+            public int OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEDIRECTORYFLAGS[] rgFlags)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags) {
+            public int OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
+            {
                 Assert.AreEqual(cProjects, 1);
                 Assert.AreEqual(cFiles, 1);
                 uint itemid;
@@ -1384,67 +1418,83 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 return VSConstants.S_OK;
             }
 
-            public int OnAfterSccStatusChanged(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, uint[] rgdwSccStatus) {
+            public int OnAfterSccStatusChanged(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, uint[] rgdwSccStatus)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryAddDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYADDDIRECTORYFLAGS[] rgFlags, VSQUERYADDDIRECTORYRESULTS[] pSummaryResult, VSQUERYADDDIRECTORYRESULTS[] rgResults) {
+            public int OnQueryAddDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYADDDIRECTORYFLAGS[] rgFlags, VSQUERYADDDIRECTORYRESULTS[] pSummaryResult, VSQUERYADDDIRECTORYRESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryAddFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult, VSQUERYADDFILERESULTS[] rgResults) {
+            public int OnQueryAddFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYADDFILEFLAGS[] rgFlags, VSQUERYADDFILERESULTS[] pSummaryResult, VSQUERYADDFILERESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryRemoveDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYREMOVEDIRECTORYFLAGS[] rgFlags, VSQUERYREMOVEDIRECTORYRESULTS[] pSummaryResult, VSQUERYREMOVEDIRECTORYRESULTS[] rgResults) {
+            public int OnQueryRemoveDirectories(IVsProject pProject, int cDirectories, string[] rgpszMkDocuments, VSQUERYREMOVEDIRECTORYFLAGS[] rgFlags, VSQUERYREMOVEDIRECTORYRESULTS[] pSummaryResult, VSQUERYREMOVEDIRECTORYRESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryRemoveFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYREMOVEFILEFLAGS[] rgFlags, VSQUERYREMOVEFILERESULTS[] pSummaryResult, VSQUERYREMOVEFILERESULTS[] rgResults) {
+            public int OnQueryRemoveFiles(IVsProject pProject, int cFiles, string[] rgpszMkDocuments, VSQUERYREMOVEFILEFLAGS[] rgFlags, VSQUERYREMOVEFILERESULTS[] pSummaryResult, VSQUERYREMOVEFILERESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryRenameDirectories(IVsProject pProject, int cDirs, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags, VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult, VSQUERYRENAMEDIRECTORYRESULTS[] rgResults) {
+            public int OnQueryRenameDirectories(IVsProject pProject, int cDirs, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEDIRECTORYFLAGS[] rgFlags, VSQUERYRENAMEDIRECTORYRESULTS[] pSummaryResult, VSQUERYRENAMEDIRECTORYRESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnQueryRenameFiles(IVsProject pProject, int cFiles, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult, VSQUERYRENAMEFILERESULTS[] rgResults) {
+            public int OnQueryRenameFiles(IVsProject pProject, int cFiles, string[] rgszMkOldNames, string[] rgszMkNewNames, VSQUERYRENAMEFILEFLAGS[] rgFlags, VSQUERYRENAMEFILERESULTS[] pSummaryResult, VSQUERYRENAMEFILERESULTS[] rgResults)
+            {
                 return VSConstants.S_OK;
             }
         }
 
-        class HierarchyEvents : IVsHierarchyEvents {
+        private class HierarchyEvents : IVsHierarchyEvents
+        {
             private readonly IVsHierarchy _hierarchy;
             private readonly string _codeExtension;
             public bool PropertyChanged;
 
-            public HierarchyEvents(IVsHierarchy hierarchy, string codeExtension) {
+            public HierarchyEvents(IVsHierarchy hierarchy, string codeExtension)
+            {
                 _hierarchy = hierarchy;
                 _codeExtension = codeExtension;
             }
 
-            public int OnInvalidateIcon(IntPtr hicon) {
+            public int OnInvalidateIcon(IntPtr hicon)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnInvalidateItems(uint itemidParent) {
+            public int OnInvalidateItems(uint itemidParent)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded) {
+            public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemDeleted(uint itemid) {
+            public int OnItemDeleted(uint itemid)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemsAppended(uint itemidParent) {
+            public int OnItemsAppended(uint itemidParent)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnPropertyChanged(uint itemid, int propid, uint flags) {
-                if (propid == (int)__VSHPROPID.VSHPROPID_Caption) {
+            public int OnPropertyChanged(uint itemid, int propid, uint flags)
+            {
+                if (propid == (int)__VSHPROPID.VSHPROPID_Caption)
+                {
                     string name;
                     ErrorHandler.ThrowOnFailure(_hierarchy.GetCanonicalName(itemid, out name));
                     object caption;
@@ -1467,14 +1517,17 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void RenameFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void RenameFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
                     Compile("server")
                 );
-                using (var solution = proj.Generate().ToVs()) {
+                using (var solution = proj.Generate().ToVs())
+                {
                     Console.WriteLine(projectType.ProjectExtension);
 
                     var project = (IVsHierarchy)((dynamic)solution.GetProject("HelloWorld")).Project;
@@ -1482,13 +1535,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     uint hierarchyCookie = VSConstants.VSCOOKIE_NIL;
 
                     ErrorHandler.ThrowOnFailure(project.AdviseHierarchyEvents(hierarchyEvents, out hierarchyCookie));
-                    try {
+                    try
+                    {
                         var trackDocs = (IVsTrackProjectDocuments2)VSTestContext.ServiceProvider.GetService(typeof(SVsTrackProjectDocuments));
                         var docTracker = new DocumentTracker();
                         uint cookie = VSConstants.VSCOOKIE_NIL;
 
                         trackDocs.AdviseTrackProjectDocumentsEvents(docTracker, out cookie);
-                        try {
+                        try
+                        {
                             var file = solution.FindItem("HelloWorld", projectType.Code("server"));
                             AutomationWrapper.Select(file);
 
@@ -1497,13 +1552,19 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                             Assert.IsTrue(docTracker.Renamed, "didn't get rename event");
                             Assert.IsTrue(hierarchyEvents.PropertyChanged, "didn't get property changed event");
-                        } finally {
-                            if (cookie != VSConstants.VSCOOKIE_NIL) {
+                        }
+                        finally
+                        {
+                            if (cookie != VSConstants.VSCOOKIE_NIL)
+                            {
                                 trackDocs.UnadviseTrackProjectDocumentsEvents(cookie);
                             }
                         }
-                    } finally {
-                        if (hierarchyCookie != VSConstants.VSCOOKIE_NIL) {
+                    }
+                    finally
+                    {
+                        if (hierarchyCookie != VSConstants.VSCOOKIE_NIL)
+                        {
                             project.UnadviseHierarchyEvents(hierarchyCookie);
                         }
                     }
@@ -1513,8 +1574,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void IsDocumentInProject() {
-            foreach (var projectType in ProjectTypes) {
+        public void IsDocumentInProject()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -1522,10 +1585,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Folder("folder"),
                     Compile("folder\\file2")
                 );
-                using (var solution = proj.Generate().ToVs()) {
+                using (var solution = proj.Generate().ToVs())
+                {
                     var project = (IVsProject)((dynamic)solution.GetProject("HelloWorld")).Project;
-                    foreach (var item in proj.Items.OfType<CompileItem>()) {
-                        foreach (var name in new[] { item.Name, item.Name.Replace('\\', '/') }) {
+                    foreach (var item in proj.Items.OfType<CompileItem>())
+                    {
+                        foreach (var name in new[] { item.Name, item.Name.Replace('\\', '/') })
+                        {
                             string relativeName = name + projectType.CodeExtension;
                             string absoluteName = Path.Combine(solution.SolutionDirectory, proj.Name, relativeName);
 
@@ -1550,8 +1616,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DeleteFolderWithReadOnlyFile() {
-            foreach (var projectType in ProjectTypes) {
+        public void DeleteFolderWithReadOnlyFile()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var proj = new ProjectDefinition(
                     "HelloWorld",
                     projectType,
@@ -1559,9 +1627,12 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Folder("folder"),
                     Compile("folder\\file2")
                 );
-                using (var solution = proj.Generate().ToVs()) {
-                    foreach (var item in proj.Items.OfType<CompileItem>()) {
-                        foreach (var name in new[] { item.Name, item.Name.Replace('\\', '/') }) {
+                using (var solution = proj.Generate().ToVs())
+                {
+                    foreach (var item in proj.Items.OfType<CompileItem>())
+                    {
+                        foreach (var name in new[] { item.Name, item.Name.Replace('\\', '/') })
+                        {
                             string fullName = Path.Combine(solution.SolutionDirectory, proj.Name, name) + projectType.CodeExtension;
                             File.SetAttributes(fullName, FileAttributes.ReadOnly);
                         }
@@ -1575,3 +1646,4 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
     }
 }
+

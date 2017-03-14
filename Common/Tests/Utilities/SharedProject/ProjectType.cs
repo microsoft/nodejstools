@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +6,8 @@ using System.Diagnostics;
 using System.IO;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace TestUtilities.SharedProject {
+namespace TestUtilities.SharedProject
+{
     /// <summary>
     /// Represents a project type.  ProjectType's can be created and exported to MEF by
     /// defining a ProjectTypeDefinition export.
@@ -27,7 +16,8 @@ namespace TestUtilities.SharedProject {
     /// language.  This includes the project extension, project type guid, code file 
     /// extension, etc...
     /// </summary>
-    public sealed class ProjectType {
+    public sealed class ProjectType
+    {
         public readonly string CodeExtension, ProjectExtension, SampleCode;
         public readonly Guid ProjectTypeGuid;
         public readonly IProjectProcessor[] Processors;
@@ -44,7 +34,8 @@ namespace TestUtilities.SharedProject {
         /// </summary>
         public static readonly ProjectType Generic = new ProjectType(".txt", ".proj", Guid.Empty, "");
 
-        public ProjectType(string codeExtension, string projectExtension, Guid projectTypeGuid, string sampleCode = "", IProjectProcessor[] postProcess = null) {
+        public ProjectType(string codeExtension, string projectExtension, Guid projectTypeGuid, string sampleCode = "", IProjectProcessor[] postProcess = null)
+        {
             Debug.Assert(!String.IsNullOrWhiteSpace(codeExtension));
 
             CodeExtension = codeExtension;
@@ -57,11 +48,14 @@ namespace TestUtilities.SharedProject {
         /// <summary>
         /// Appends the code extension to a filename
         /// </summary>
-        public string Code(string filename) {
-            if (String.IsNullOrWhiteSpace(filename)) {
+        public string Code(string filename)
+        {
+            if (String.IsNullOrWhiteSpace(filename))
+            {
                 throw new ArgumentException("no filename suppied", "filename");
             }
             return filename + CodeExtension;
         }
     }
 }
+

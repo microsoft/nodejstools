@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.CodeDom.Compiler;
@@ -31,7 +17,8 @@ using Microsoft.NodejsTools.SourceMapping;
 using NodeLogConverter;
 using NodeLogConverter.LogParsing;
 
-namespace Microsoft.NodejsTools.LogParsing {
+namespace Microsoft.NodejsTools.LogParsing
+{
     /// <summary>
     /// Parses a V8 profiling log which is just a CSV file.  The CSV file includes several
     /// different record types including tick events with stack traces, code compilation events
@@ -65,7 +52,8 @@ namespace Microsoft.NodejsTools.LogParsing {
     /// 
     /// Finally we zip up the resulting ETL file and save it under the filename requested.
     /// </summary>
-    class LogConverter {
+    internal class LogConverter
+    {
         private static readonly char[] _invalidPathChars = Path.GetInvalidPathChars();
         private static readonly Version v012 = new Version(0, 12);
 
@@ -74,18 +62,19 @@ namespace Microsoft.NodejsTools.LogParsing {
         private readonly TimeSpan? _executionTime;
         private readonly bool _justMyCode;
         private readonly Version _nodeVersion;
-        private readonly SortedDictionary<AddressRange, bool> _codeAddresses = new SortedDictionary<AddressRange,bool>();
+        private readonly SortedDictionary<AddressRange, bool> _codeAddresses = new SortedDictionary<AddressRange, bool>();
         private Dictionary<string, SourceMap> _sourceMaps = new Dictionary<string, SourceMap>(StringComparer.OrdinalIgnoreCase);
         // Currently we maintain 2 layouts, one for code, one for shared libraries,
         // because V8 is dropping the high 32-bits of code loaded on 64-bit systems.
         // This will let us lookup against the JIT code layout, and then the lib layout, and
         // then the lib layout minus the high 32-bit bits to find the appropriate tag for
         // code and not have to deal with collisions.
-        static uint ThreadId = 0x1234;
-        static uint ProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
-        const int JitModuleId = 1;
+        private static uint ThreadId = 0x1234;
+        private static uint ProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
+        private const int JitModuleId = 1;
 
-        public LogConverter(string filename, string outputFile, TimeSpan? executionTime, bool justMyCode, Version nodeVersion) {
+        public LogConverter(string filename, string outputFile, TimeSpan? executionTime, bool justMyCode, Version nodeVersion)
+        {
             _filename = filename;
             _outputFile = outputFile;
             _executionTime = executionTime;
@@ -94,20 +83,24 @@ namespace Microsoft.NodejsTools.LogParsing {
         }
 
         [STAThread]
-        public static int Main(string[] args) {
-            if (args.Length < 2) {
+        public static int Main(string[] args)
+        {
+            if (args.Length < 2)
+            {
                 Console.WriteLine("Usage: [/jmc] [/v:<node version>] <v8.log path> <output.vspx path> [<start time> <execution time>]");
                 return 1;
             }
 
             bool jmc = false;
-            if (string.Equals(args[0], "/jmc", StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(args[0], "/jmc", StringComparison.OrdinalIgnoreCase))
+            {
                 args = args.Skip(1).ToArray();
                 jmc = true;
             }
 
             var nodeVersion = new Version(0, 10);
-            if (args[0].StartsWith("/v:", StringComparison.OrdinalIgnoreCase)) {
+            if (args[0].StartsWith("/v:", StringComparison.OrdinalIgnoreCase))
+            {
                 nodeVersion = new Version(args[0].Substring(3));
                 args = args.Skip(1).ToArray();
             }
@@ -115,24 +108,31 @@ namespace Microsoft.NodejsTools.LogParsing {
             string inputFile = args[0];
             string outputFile = args[1];
             TimeSpan? executionTime = null;
-            if (args.Length > 3) {
-                try {
+            if (args.Length > 3)
+            {
+                try
+                {
                     //startTime = DateTime.Parse(args[2]);
                     executionTime = TimeSpan.Parse(args[3]);
-                } catch {
+                }
+                catch
+                {
                     Console.WriteLine("Bad execution time: {0}", executionTime);
                     return 2;
                 }
             }
 
 #if DEBUG
-            try {
+            try
+            {
 #endif
                 var log = new LogConverter(inputFile, outputFile, executionTime, jmc, nodeVersion);
                 log.Process();
                 return 0;
 #if DEBUG
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine("Internal error while converting log: {0}", e.ToString());
                 MessageBox.Show(e.ToString());
                 throw;
@@ -140,7 +140,8 @@ namespace Microsoft.NodejsTools.LogParsing {
 #endif
         }
 
-        public void Process() {
+        public void Process()
+        {
             string line;
 
             uint methodToken = 0x06000001;
@@ -153,13 +154,15 @@ namespace Microsoft.NodejsTools.LogParsing {
             _allMethods.Clear();
 
             int tickCount = 0;
-            using (var reader = new StreamReader(_filename)) {
+            using (var reader = new StreamReader(_filename))
+            {
                 var logCreationTime = DateTime.Now;
                 var logCreationTimeStamp = Stopwatch.GetTimestamp();
 
                 var log = TraceLog.Start(filename + ".etl", null);
 
-                try {
+                try
+                {
                     EVENT_TRACE_HEADER header;
 
                     //////////////////////////////////////
@@ -225,15 +228,19 @@ namespace Microsoft.NodejsTools.LogParsing {
                         String.Empty
                     );
 
-                    while ((line = reader.ReadLine()) != null) {
+                    while ((line = reader.ReadLine()) != null)
+                    {
                         var records = SplitRecord(line);
-                        if (records.Length == 0) {
+                        if (records.Length == 0)
+                        {
                             continue;
                         }
 
-                        switch (records[0]) {
+                        switch (records[0])
+                        {
                             case "shared-library":
-                                if (records.Length < 4) {
+                                if (records.Length < 4)
+                                {
                                     continue; // missing info?
                                 }
                                 break;
@@ -243,7 +250,8 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                             case "code-creation":
                                 int shift = (_nodeVersion >= v012 ? 1 : 0);
-                                if (records.Length < shift + 5) {
+                                if (records.Length < shift + 5)
+                                {
                                     continue; // missing info?
                                 }
                                 var startAddr = ParseAddress(records[shift + 2]);
@@ -260,7 +268,8 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                                 var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4], records[1]);
                                 string functionName = funcInfo.Function;
-                                if (funcInfo.IsRecompilation) {
+                                if (funcInfo.IsRecompilation)
+                                {
                                     functionName += " (recompiled)";
                                 }
 
@@ -271,7 +280,8 @@ namespace Microsoft.NodejsTools.LogParsing {
                                 break;
 
                             case "tick":
-                                if (records.Length < 5) {
+                                if (records.Length < 5)
+                                {
                                     continue;
                                 }
                                 var addr = ParseAddress(records[1]);
@@ -285,7 +295,8 @@ namespace Microsoft.NodejsTools.LogParsing {
 
                                 log.Trace(header, profileInfo);
 
-                                if (records.Length > 2) {
+                                if (records.Length > 2)
+                                {
                                     header = NewStackWalkRecord();
 
                                     var sw = new StackWalk();
@@ -302,17 +313,21 @@ namespace Microsoft.NodejsTools.LogParsing {
                                     List<object> args = new List<object>();
                                     args.Add(sw);
                                     var ipAddr = ParseAddress(records[1]);
-                                    if (ipAddr != 0 && ShouldIncludeCode(ipAddr)) {
+                                    if (ipAddr != 0 && ShouldIncludeCode(ipAddr))
+                                    {
                                         args.Add(ipAddr);
                                     }
-                                    for (int i = nonStackFrames; i < records.Length; i++) {
+                                    for (int i = nonStackFrames; i < records.Length; i++)
+                                    {
                                         var callerAddr = ParseAddress(records[i]);
-                                        if (callerAddr != 0 && ShouldIncludeCode(callerAddr)) {
+                                        if (callerAddr != 0 && ShouldIncludeCode(callerAddr))
+                                        {
                                             args.Add(callerAddr);
                                         }
                                     }
 
-                                    if ((records.Length - nonStackFrames) == 0) {
+                                    if ((records.Length - nonStackFrames) == 0)
+                                    {
                                         // idle CPU time
                                         sw.Process = 0;
                                     }
@@ -338,7 +353,9 @@ namespace Microsoft.NodejsTools.LogParsing {
                     processInfo.ParentId = 100;
 
                     log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), String.Empty);
-                } finally {
+                }
+                finally
+                {
                     log.Stop();
                 }
 
@@ -346,12 +363,16 @@ namespace Microsoft.NodejsTools.LogParsing {
             }
 
             // save the VSPX file
-            using (var stream = new FileStream(filename + ".vspx", FileMode.Create, FileAccess.ReadWrite, FileShare.None)) {
-                using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, false)) {
+            using (var stream = new FileStream(filename + ".vspx", FileMode.Create, FileAccess.ReadWrite, FileShare.None))
+            {
+                using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, false))
+                {
                     var entry = archive.CreateEntry("VSProfilingData\\" + Path.GetFileName(filename) + ".etl");
 
-                    using (FileStream etlStream = new FileStream(filename + ".etl", FileMode.Open, FileAccess.Read)) {
-                        using (var entryStream = entry.Open()) {
+                    using (FileStream etlStream = new FileStream(filename + ".etl", FileMode.Open, FileAccess.Read))
+                    {
+                        using (var entryStream = entry.Open())
+                        {
                             etlStream.CopyTo(entryStream);
                         }
                     }
@@ -359,10 +380,13 @@ namespace Microsoft.NodejsTools.LogParsing {
             }
         }
 
-        private bool ShouldIncludeCode(ulong callerAddr) {
-            if (_justMyCode) {
+        private bool ShouldIncludeCode(ulong callerAddr)
+        {
+            if (_justMyCode)
+            {
                 bool isMyCode;
-                if (_codeAddresses.TryGetValue(new AddressRange(callerAddr), out isMyCode)) {
+                if (_codeAddresses.TryGetValue(new AddressRange(callerAddr), out isMyCode))
+                {
                     return isMyCode;
                 }
             }
@@ -370,45 +394,60 @@ namespace Microsoft.NodejsTools.LogParsing {
             return true;
         }
 
-        private static bool IsMyCode(FunctionInformation funcInfo) {
+        private static bool IsMyCode(FunctionInformation funcInfo)
+        {
             return !String.IsNullOrWhiteSpace(funcInfo.Filename) &&
                 funcInfo.Filename.IndexOfAny(_invalidPathChars) == -1 &&
                 funcInfo.Filename.IndexOf("\\node_modules\\") == -1 &&
                 Path.IsPathRooted(funcInfo.Filename);
         }
 
-        private static ulong ParseAddress(string address) {
+        private static ulong ParseAddress(string address)
+        {
             ulong res;
-            if (address.StartsWith("0x", StringComparison.OrdinalIgnoreCase)) {
-                if (UInt64.TryParse(address.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat, out res)) {
+            if (address.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                if (UInt64.TryParse(address.Substring(2), NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
                     return res;
                 }
-            } else if (UInt64.TryParse(address, out res)) {
+            }
+            else if (UInt64.TryParse(address, out res))
+            {
                 return res;
             }
             return 0;
         }
 
-        internal static string[] SplitRecord(string line) {
+        internal static string[] SplitRecord(string line)
+        {
             int start = 0;
             List<string> records = new List<string>();
             bool inQuote = false, containsDoubleQuote = false;
-            for (int i = 0; i < line.Length; i++) {
-                if (line[i] == ',' && !inQuote) {
+            for (int i = 0; i < line.Length; i++)
+            {
+                if (line[i] == ',' && !inQuote)
+                {
                     records.Add(RemoveDoubleQuotes(containsDoubleQuote, line.Substring(start, i - start)));
                     start = i + 1;
                     containsDoubleQuote = false;
-                } else if (line[i] == '"') {
-                    if (i + 1 == line.Length || line[i + 1] != '"') {
+                }
+                else if (line[i] == '"')
+                {
+                    if (i + 1 == line.Length || line[i + 1] != '"')
+                    {
                         inQuote = !inQuote;
-                    } else if (inQuote) {
+                    }
+                    else if (inQuote)
+                    {
                         containsDoubleQuote = true;
                         i++;
                     }
                 }
             }
 
-            if (start < line.Length) {
+            if (start < line.Length)
+            {
                 var record = RemoveDoubleQuotes(containsDoubleQuote, line.Substring(start, line.Length - start));
                 records.Add(record);
             }
@@ -416,8 +455,10 @@ namespace Microsoft.NodejsTools.LogParsing {
             return records.ToArray();
         }
 
-        private static string RemoveDoubleQuotes(bool containsDoubleQuote, string record) {
-            if (containsDoubleQuote) {
+        private static string RemoveDoubleQuotes(bool containsDoubleQuote, string record)
+        {
+            if (containsDoubleQuote)
+            {
                 record = record.Replace("\"\"", "\"");
             }
             return record;
@@ -425,7 +466,8 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         private HashSet<string> _allMethods = new HashSet<string>();
 
-        internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile") {
+        internal FunctionInformation ExtractNamespaceAndMethodName(string method, string type = "LazyCompile")
+        {
             bool isRecompilation = !_allMethods.Add(method);
 
             return ExtractNamespaceAndMethodName(method, isRecompilation, type, _sourceMaps);
@@ -433,19 +475,22 @@ namespace Microsoft.NodejsTools.LogParsing {
 
         internal const string _topLevelModule = "<top-level module code>";
 
-        internal static FunctionInformation ExtractNamespaceAndMethodName(string location, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null) {
+        internal static FunctionInformation ExtractNamespaceAndMethodName(string location, bool isRecompilation, string type = "LazyCompile", Dictionary<string, SourceMap> sourceMaps = null)
+        {
             string fileName = null;
             string moduleName = "";
             string methodName = location;
             List<int> pos = null;
 
-            if (location.Length >= 2 && location.StartsWith("\"", StringComparison.Ordinal) && location.EndsWith("\"", StringComparison.Ordinal)) {
+            if (location.Length >= 2 && location.StartsWith("\"", StringComparison.Ordinal) && location.EndsWith("\"", StringComparison.Ordinal))
+            {
                 // v8 usually includes quotes, strip them
                 location = location.Substring(1, location.Length - 2);
             }
 
             int firstSpace;
-            if (type == "Script" || type == "Function") {
+            if (type == "Script" || type == "Function")
+            {
                 // code-creation,Function,0xf1c38300,1928," assert.js:1",0xa6d4df58,~
                 // code-creation,Script,0xf1c38aa0,244,"assert.js",0xa6d4e050,~
                 // code-creation,Script,0xf1c141c0,844,"native runtime.js",0xa6d1aa98,~
@@ -453,22 +498,29 @@ namespace Microsoft.NodejsTools.LogParsing {
                 // this is a top level script or module, report it as such
                 methodName = _topLevelModule;
 
-                if (type == "Function") {
+                if (type == "Function")
+                {
                     location = location.Substring(location.IndexOf(' ') + 1);
                 }
 
                 ParseLocation(location, out fileName, out moduleName, out pos);
                 pos = new List<int> { 1 };
-            } else {
+            }
+            else
+            {
                 // " net.js:931"
                 // "func C:\Source\NodeApp2\NodeApp2\server.js:5"
                 // " C:\Source\NodeApp2\NodeApp2\server.js:16"
 
                 firstSpace = FirstSpace(location);
-                if (firstSpace != -1) {
-                    if (firstSpace == 0) {
+                if (firstSpace != -1)
+                {
+                    if (firstSpace == 0)
+                    {
                         methodName = "anonymous method";
-                    } else {
+                    }
+                    else
+                    {
                         methodName = location.Substring(0, firstSpace);
                     }
 
@@ -481,23 +533,28 @@ namespace Microsoft.NodejsTools.LogParsing {
             return SourceMapper.MaybeMap(new FunctionInformation(moduleName, methodName, lineNo, fileName, isRecompilation), sourceMaps);
         }
 
-        private static int FirstSpace(string method) {
+        private static int FirstSpace(string method)
+        {
             int parenCount = 0;
-            for (int i = 0; i < method.Length; i++) {
-                switch (method[i]) {
+            for (int i = 0; i < method.Length; i++)
+            {
+                switch (method[i])
+                {
                     case '(': parenCount++; break;
                     case ')': parenCount--; break;
                     case ' ':
-                        if (parenCount == 0) {
+                        if (parenCount == 0)
+                        {
                             return i;
                         }
                         break;
                 }
             }
             return -1;
-        }       
+        }
 
-        private static void ParseLocation(string location, out string fileName, out string moduleName, out List<int> pos) {
+        private static void ParseLocation(string location, out string fileName, out string moduleName, out List<int> pos)
+        {
             location = location.Trim();
             pos = new List<int>();
 
@@ -510,10 +567,12 @@ namespace Microsoft.NodejsTools.LogParsing {
             // To cover them all, we just repeatedly strip the tail of the string after the last ':',
             // so long as it can be parsed as an integer.
             int colon;
-            while ((colon = location.LastIndexOf(":", StringComparison.Ordinal)) != -1) {
+            while ((colon = location.LastIndexOf(":", StringComparison.Ordinal)) != -1)
+            {
                 string tail = location.Substring(colon + 1, location.Length - (colon + 1));
                 int number;
-                if (!Int32.TryParse(tail, out number)) {
+                if (!Int32.TryParse(tail, out number))
+                {
                     break;
                 }
                 pos.Insert(0, number);
@@ -521,14 +580,18 @@ namespace Microsoft.NodejsTools.LogParsing {
             }
 
             moduleName = fileName = location;
-            if (string.IsNullOrEmpty(moduleName)) {
+            if (string.IsNullOrEmpty(moduleName))
+            {
                 moduleName = "<unknown module>";
-            } else if (moduleName.IndexOfAny(_invalidPathChars) == -1) {
+            }
+            else if (moduleName.IndexOfAny(_invalidPathChars) == -1)
+            {
                 moduleName = Path.GetFileNameWithoutExtension(moduleName);
             }
         }
 
-        private static EVENT_TRACE_HEADER NewMethodEventHeader() {
+        private static EVENT_TRACE_HEADER NewMethodEventHeader()
+        {
             var header = NewHeader();
             header.Size = (ushort)(Marshal.SizeOf(typeof(EVENT_TRACE_HEADER)) + Marshal.SizeOf(typeof(MethodLoadUnload)));
             header.Guid = TraceLog.MethodEventGuid;
@@ -537,7 +600,8 @@ namespace Microsoft.NodejsTools.LogParsing {
             return header;
         }
 
-        private static EVENT_TRACE_HEADER NewTickRecord() {
+        private static EVENT_TRACE_HEADER NewTickRecord()
+        {
             var header = NewHeader();
             header.Size = (ushort)(Marshal.SizeOf(typeof(EVENT_TRACE_HEADER)) + Marshal.SizeOf(typeof(SampledProfile)));
             header.Guid = TraceLog.PerfInfoEventGuid;
@@ -546,7 +610,8 @@ namespace Microsoft.NodejsTools.LogParsing {
             return header;
         }
 
-        private static EVENT_TRACE_HEADER NewStackWalkRecord() {
+        private static EVENT_TRACE_HEADER NewStackWalkRecord()
+        {
             var header = NewHeader();
             header.Size = (ushort)(Marshal.SizeOf(typeof(EVENT_TRACE_HEADER)) + Marshal.SizeOf(typeof(StackWalk)) + sizeof(int) * 2);
             header.Guid = TraceLog.StackWalkEventGuid;
@@ -555,7 +620,8 @@ namespace Microsoft.NodejsTools.LogParsing {
             return header;
         }
 
-        private static EVENT_TRACE_HEADER NewHeader() {
+        private static EVENT_TRACE_HEADER NewHeader()
+        {
             var header = new EVENT_TRACE_HEADER();
             header.ProcessId = ProcessId;
             header.ThreadId = ThreadId;
@@ -571,44 +637,57 @@ namespace Microsoft.NodejsTools.LogParsing {
         /// Creates a .pdb file for the code creation in the 
         /// </summary>
         /// <returns></returns>
-        private string CreatePdbFile(out Guid pdbSig, out uint pdbAge) {
+        private string CreatePdbFile(out Guid pdbSig, out uint pdbAge)
+        {
             StringBuilder pdbCode = new StringBuilder();
             pdbCode.Append("class JavaScriptFunctions {");
 
             int id = 0;
             string dllDirectory;
-            for (; ; ) {
+            for (;;)
+            {
                 dllDirectory = Path.Combine(Path.GetTempPath(), "JavaScriptFunctions_" + id);
                 id++;
-                if (!Directory.Exists(dllDirectory)) {
-                    try {
+                if (!Directory.Exists(dllDirectory))
+                {
+                    try
+                    {
                         Directory.CreateDirectory(dllDirectory);
                         break;
-                    } catch {
+                    }
+                    catch
+                    {
                     }
                 }
-            }             
+            }
 
             string dllPath = Path.Combine(dllDirectory, "JavaScriptFunctions.dll");
             uint methodToken = 0x06000001;
-            using (var reader = new StreamReader(_filename)) {
+            using (var reader = new StreamReader(_filename))
+            {
                 string line;
-                while ((line = reader.ReadLine()) != null) {
+                while ((line = reader.ReadLine()) != null)
+                {
                     var records = SplitRecord(line);
-                    if (records.Length == 0) {
+                    if (records.Length == 0)
+                    {
                         continue;
                     }
-                    switch (records[0]) {
+                    switch (records[0])
+                    {
                         case "code-creation":
                             int shift = (_nodeVersion >= v012 ? 1 : 0);
                             var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
-                            if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename)) {
+                            if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename))
+                            {
                                 pdbCode.Append(string.Format(CultureInfo.InvariantCulture, @"
 #line {0} ""{1}""
 public static void X{2:X}() {{
 }}
 ", funcInfo.LineNumber, funcInfo.Filename, methodToken));
-                            } else {
+                            }
+                            else
+                            {
                                 // we need to keep outputting methods just to keep tokens lined up.
                                 pdbCode.Append(String.Format(CultureInfo.InvariantCulture, @"
 public static void X{0:X}() {{
@@ -629,13 +708,15 @@ public static void X{0:X}() {{
             parameters.OutputAssembly = dllPath;
             parameters.GenerateExecutable = false;
             var res = compiler.CreateProvider().CompileAssemblyFromSource(parameters, pdbCode.ToString());
-            if (res.Errors.Count > 0) {
+            if (res.Errors.Count > 0)
+            {
 #if DEBUG
                 var tempPath = Path.GetTempFileName();
                 File.WriteAllText(tempPath, pdbCode.ToString());
 #endif
                 StringBuilder errors = new StringBuilder("Error while generating symbols:");
-                foreach (var error in res.Errors) {
+                foreach (var error in res.Errors)
+                {
                     errors.AppendFormat("    {0}", error);
                     errors.AppendLine();
                 }
@@ -649,7 +730,8 @@ public static void X{0:X}() {{
             return dllPath;
         }
 
-        public static void ReadPdbSigAndAge(string dllPath, out Guid sig, out uint age) {
+        public static void ReadPdbSigAndAge(string dllPath, out Guid sig, out uint age)
+        {
             sig = default(Guid);
             age = 0;
 
@@ -663,16 +745,20 @@ public static void X{0:X}() {{
                 0,
                 false,
                 DuplicateOptions.DUPLICATE_SAME_ACCESS
-            )) {
+            ))
+            {
                 return;
             }
 
-            try {
-                if (!NativeMethods.SymInitialize(duplicatedHandle, IntPtr.Zero, false)) {
+            try
+            {
+                if (!NativeMethods.SymInitialize(duplicatedHandle, IntPtr.Zero, false))
+                {
                     return;
                 }
 
-                try {
+                try
+                {
                     ulong moduleAddress = NativeMethods.SymLoadModuleEx(
                         duplicatedHandle,
                         IntPtr.Zero,
@@ -684,23 +770,29 @@ public static void X{0:X}() {{
                         0
                     );
 
-                    if (moduleAddress == 0) {
+                    if (moduleAddress == 0)
+                    {
                         return;
                     }
 
                     IMAGEHLP_MODULE64 module64 = new IMAGEHLP_MODULE64();
                     module64.SizeOfStruct = (uint)Marshal.SizeOf(typeof(IMAGEHLP_MODULE64));
 
-                    if (!NativeMethods.SymGetModuleInfo64(duplicatedHandle, moduleAddress, ref module64)) {
+                    if (!NativeMethods.SymGetModuleInfo64(duplicatedHandle, moduleAddress, ref module64))
+                    {
                         return;
                     }
 
                     sig = module64.PdbSig70;
                     age = module64.PdbAge;
-                } finally {
+                }
+                finally
+                {
                     NativeMethods.SymCleanup(duplicatedHandle);
                 }
-            } finally {
+            }
+            finally
+            {
                 NativeMethods.CloseHandle(duplicatedHandle);
             }
         }
@@ -709,15 +801,20 @@ public static void X{0:X}() {{
 
         #region Relogging
 
-        private void RelogTrace(TimeSpan executionTime, int stackWalkCount, string filename) {
+        private void RelogTrace(TimeSpan executionTime, int stackWalkCount, string filename)
+        {
             // if we're on Win8 or later we want to re-write the timestamps using the relogger
             ITraceRelogger traceRelogger = null;
-            try {
+            try
+            {
                 traceRelogger = (ITraceRelogger)Activator.CreateInstance(Type.GetTypeFromCLSID(EtlNativeMethods.CLSID_TraceRelogger));
-            } catch(COMException) {
+            }
+            catch (COMException)
+            {
             }
 
-            if (traceRelogger != null) {
+            if (traceRelogger != null)
+            {
                 var callback = new TraceReloggerCallback(executionTime, stackWalkCount);
                 ulong newTraceHandle;
 
@@ -728,20 +825,23 @@ public static void X{0:X}() {{
                 traceRelogger.ProcessTrace();
 
                 File.Copy(filename + ".tmp", filename, true);
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("Failed to create relogger, timestamps will be incorrect");
             }
-
         }
 
-        class TraceReloggerCallback : ITraceEventCallback {
+        private class TraceReloggerCallback : ITraceEventCallback
+        {
             private readonly TimeSpan _executionTime;
             private readonly int _stackWalkCount;
             private long _currentTimeStamp;
             private long _ticksPerStack;
             private const int EmptyStackWalkSize = 24;  // size of an empty stack walk record
 
-            public TraceReloggerCallback(TimeSpan executionTime, int stackWalkCount) {
+            public TraceReloggerCallback(TimeSpan executionTime, int stackWalkCount)
+            {
                 _currentTimeStamp = Stopwatch.GetTimestamp();
                 _executionTime = executionTime;
                 _stackWalkCount = stackWalkCount;
@@ -749,7 +849,8 @@ public static void X{0:X}() {{
 
             #region ITraceEventCallback Members
 
-            public void OnBeginProcessTrace(ITraceEvent HeaderEvent, ITraceRelogger Relogger) {
+            public void OnBeginProcessTrace(ITraceEvent HeaderEvent, ITraceRelogger Relogger)
+            {
                 IntPtr recordPtr;
                 HeaderEvent.GetEventRecord(out recordPtr);
                 EVENT_RECORD record = (EVENT_RECORD)Marshal.PtrToStructure(recordPtr, typeof(EVENT_RECORD));
@@ -761,19 +862,23 @@ public static void X{0:X}() {{
                 _ticksPerStack = (long)(ticksPerMs * (ulong)msPerStack);
             }
 
-            public void OnFinalizeProcessTrace(ITraceRelogger Relogger) {
+            public void OnFinalizeProcessTrace(ITraceRelogger Relogger)
+            {
             }
 
-            public void OnEvent(ITraceEvent Event, ITraceRelogger Relogger) {
+            public void OnEvent(ITraceEvent Event, ITraceRelogger Relogger)
+            {
                 IntPtr recordPtr;
                 Event.GetEventRecord(out recordPtr);
                 EVENT_RECORD record = (EVENT_RECORD)Marshal.PtrToStructure(recordPtr, typeof(EVENT_RECORD));
 
-                if (IsStackWalkRecord(ref record)) {
+                if (IsStackWalkRecord(ref record))
+                {
                     // path the timestamp in the stack walk record.
                     Marshal.WriteInt64(record.UserData, _currentTimeStamp);
                     _currentTimeStamp += _ticksPerStack;
-                    if (record.UserDataLength == EmptyStackWalkSize) {
+                    if (record.UserDataLength == EmptyStackWalkSize)
+                    {
                         // this is an empty stack walk, which means that the CPU is actually idle.
                         // We inject these when writing the log, and then remove them when doing
                         // the rewrite.  This lets us keep the correct timing information but removing
@@ -787,13 +892,15 @@ public static void X{0:X}() {{
                 var newTimeStamp = _currentTimeStamp;
                 Event.SetTimeStamp(ref newTimeStamp);
 
-                if (IsStackWalkRecord(ref record)) {
+                if (IsStackWalkRecord(ref record))
+                {
                 }
 
                 Relogger.Inject(Event);
             }
 
-            private static bool IsStackWalkRecord(ref EVENT_RECORD record) {
+            private static bool IsStackWalkRecord(ref EVENT_RECORD record)
+            {
                 return record.EventHeader.ProviderId == TraceLog.StackWalkEventGuid &&
                         record.EventHeader.EventDescriptor.Opcode == 32 &&
                         record.EventHeader.EventDescriptor.Version == 2;
@@ -804,12 +911,14 @@ public static void X{0:X}() {{
 
         #endregion
 
-        struct AddressRange : IComparable<AddressRange>, IEquatable<AddressRange> {
+        private struct AddressRange : IComparable<AddressRange>, IEquatable<AddressRange>
+        {
             public readonly ulong Start;
             public readonly uint Length;
             public readonly bool Lookup;
 
-            public AddressRange(ulong start, uint length) {
+            public AddressRange(ulong start, uint length)
+            {
                 Start = start;
                 Length = length;
                 Lookup = false;
@@ -819,43 +928,59 @@ public static void X{0:X}() {{
             /// Creates a new AddressRange to perform a lookup
             /// </summary>
             /// <param name="start"></param>
-            public AddressRange(ulong start) {
+            public AddressRange(ulong start)
+            {
                 Start = start;
                 Length = 0;
                 Lookup = true;
             }
 
-            public int CompareTo(AddressRange other) {
-                if (Lookup) {
+            public int CompareTo(AddressRange other)
+            {
+                if (Lookup)
+                {
                     // fuzzy lookup
-                    if (Start >= other.Start && Start < other.Start + other.Length) {
+                    if (Start >= other.Start && Start < other.Start + other.Length)
+                    {
                         return 0;
                     }
-                } else if (other.Lookup) {
-                    if (other.Start >= Start && other.Start < Start + Length) {
+                }
+                else if (other.Lookup)
+                {
+                    if (other.Start >= Start && other.Start < Start + Length)
+                    {
                         return 0;
                     }
                 }
 
-                if (Start > other.Start) {
+                if (Start > other.Start)
+                {
                     return 1;
-                } else if (other.Start == Start) {
+                }
+                else if (other.Start == Start)
+                {
                     return 0;
-                } else {
+                }
+                else
+                {
                     return -1;
                 }
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 return String.Format("AddressRange: {0} {1}", Start, Length);
             }
-            public override int GetHashCode() {
+            public override int GetHashCode()
+            {
                 return (int)Start;
             }
 
-            public bool Equals(AddressRange other) {
+            public bool Equals(AddressRange other)
+            {
                 return CompareTo(other) == 0;
             }
         }
     }
 }
+

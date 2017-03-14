@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +8,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -28,12 +17,14 @@ namespace Microsoft.VisualStudio.Repl {
     /// Provides the classifier for our repl error output buffer.
     /// </summary>
     [Export(typeof(IClassifierProvider)), ContentType(ReplConstants.ReplOutputContentTypeName)]
-    class ReplOutputClassifierProvider : IClassifierProvider {
+    internal class ReplOutputClassifierProvider : IClassifierProvider
+    {
         internal readonly Dictionary<ConsoleColor, IClassificationType> _classTypes = new Dictionary<ConsoleColor, IClassificationType>();
 
         [ImportingConstructor]
-        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService) {
-            _classTypes[ConsoleColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);            
+        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService)
+        {
+            _classTypes[ConsoleColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkBlue] = classificationService.GetClassificationType(InteractiveDarkBlueFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkGreen] = classificationService.GetClassificationType(InteractiveDarkGreenFormatDefinition.Name);
             _classTypes[ConsoleColor.DarkCyan] = classificationService.GetClassificationType(InteractiveDarkCyanFormatDefinition.Name);
@@ -53,10 +44,12 @@ namespace Microsoft.VisualStudio.Repl {
 
         #region IClassifierProvider Members
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer) {
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        {
             return new ReplOutputClassifier(this, textBuffer);
         }
 
         #endregion
     }
 }
+

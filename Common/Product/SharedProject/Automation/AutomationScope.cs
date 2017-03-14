@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -38,13 +26,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             Utilities.ArgumentNotNull("provider", provider);
 
-            extensibility = provider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
-            if (null == extensibility)
+            this.extensibility = provider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
+            if (null == this.extensibility)
             {
                 throw new InvalidOperationException();
             }
-            ErrorHandler.ThrowOnFailure(extensibility.EnterAutomationFunction());
-            inAutomation = true;
+            ErrorHandler.ThrowOnFailure(this.extensibility.EnterAutomationFunction());
+            this.inAutomation = true;
         }
 
         /// <summary>
@@ -53,21 +41,17 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// </summary>
         public void ExitAutomation()
         {
-            if (inAutomation)
+            if (this.inAutomation)
             {
-                ErrorHandler.ThrowOnFailure(extensibility.ExitAutomationFunction());
-                inAutomation = false;
+                ErrorHandler.ThrowOnFailure(this.extensibility.ExitAutomationFunction());
+                this.inAutomation = false;
             }
         }
 
         /// <summary>
         /// Gets the IVsExtensibility3 interface used in the automation function.
         /// </summary>
-        public IVsExtensibility3 Extensibility
-        {
-            get { return extensibility; }
-        }
-
+        public IVsExtensibility3 Extensibility => this.extensibility;
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -93,3 +77,4 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
     }
 }
+

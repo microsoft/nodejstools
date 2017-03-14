@@ -1,65 +1,64 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Text;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    internal sealed class ReplSpan {
+    internal sealed class ReplSpan
+    {
         private readonly object _span; // ITrackingSpan or string
         public readonly ReplSpanKind Kind;
 
-        public ReplSpan(ITrackingSpan span, ReplSpanKind kind) {
+        public ReplSpan(ITrackingSpan span, ReplSpanKind kind)
+        {
             Debug.Assert(!kind.IsPrompt());
             _span = span;
             Kind = kind;
         }
 
-        public ReplSpan(string litaral, ReplSpanKind kind) {
+        public ReplSpan(string litaral, ReplSpanKind kind)
+        {
             _span = litaral;
             Kind = kind;
         }
 
-        public object Span {
+        public object Span
+        {
             get { return _span; }
         }
 
-        public string Prompt {
+        public string Prompt
+        {
             get { return (string)_span; }
         }
 
-        public ITrackingSpan TrackingSpan {
+        public ITrackingSpan TrackingSpan
+        {
             get { return (ITrackingSpan)_span; }
         }
 
-        public int Length {
-            get {
+        public int Length
+        {
+            get
+            {
                 return _span is string ? Prompt.Length : TrackingSpan.GetSpan(TrackingSpan.TextBuffer.CurrentSnapshot).Length;
             }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return String.Format("{0}: {1}", Kind, _span);
         }
     }
 
-    internal enum ReplSpanKind {
+    internal enum ReplSpanKind
+    {
         None,
         /// <summary>
         /// The span represents output from the program (standard output)
@@ -87,9 +86,12 @@ namespace Microsoft.VisualStudio.Repl {
         StandardInput,
     }
 
-    internal static class ReplSpanKindExtensions {
-        internal static bool IsPrompt(this ReplSpanKind kind) {
-            switch (kind) {
+    internal static class ReplSpanKindExtensions
+    {
+        internal static bool IsPrompt(this ReplSpanKind kind)
+        {
+            switch (kind)
+            {
                 case ReplSpanKind.Prompt:
                 case ReplSpanKind.SecondaryPrompt:
                 case ReplSpanKind.StandardInputPrompt:
@@ -100,3 +102,4 @@ namespace Microsoft.VisualStudio.Repl {
         }
     }
 }
+

@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -22,26 +8,33 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.NodejsTools.Options {
-    public partial class NodejsNpmOptionsControl : UserControl {
-        public NodejsNpmOptionsControl() {
+namespace Microsoft.NodejsTools.Options
+{
+    public partial class NodejsNpmOptionsControl : UserControl
+    {
+        public NodejsNpmOptionsControl()
+        {
             InitializeComponent();
         }
 
-        internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page) {
-            _showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
-            _cacheClearedSuccessfully.Visible = false;
+        internal void SyncControlWithPageSettings(NodejsNpmOptionsPage page)
+        {
+            this._showOutputWhenRunningNpm.Checked = page.ShowOutputWindowWhenExecutingNpm;
+            this._cacheClearedSuccessfully.Visible = false;
         }
 
-        internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page) {
-            page.ShowOutputWindowWhenExecutingNpm = _showOutputWhenRunningNpm.Checked;
+        internal void SyncPageWithControlSettings(NodejsNpmOptionsPage page)
+        {
+            page.ShowOutputWindowWhenExecutingNpm = this._showOutputWhenRunningNpm.Checked;
         }
 
-        private void ClearCacheButton_Click(object sender, EventArgs e) {
-            bool didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
-            bool didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
+        private void ClearCacheButton_Click(object sender, EventArgs e)
+        {
+            var didClearNpmCache = TryDeleteCacheDirectory(NodejsConstants.NpmCachePath);
+            var didClearTools = TryDeleteCacheDirectory(NodejsConstants.ExternalToolsPath);
 
-            if (!didClearNpmCache || !didClearTools) {
+            if (!didClearNpmCache || !didClearTools)
+            {
                 MessageBox.Show(
                    string.Format(CultureInfo.CurrentCulture, Resources.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
                    Resources.CacheDirectoryClearFailedTitle,
@@ -49,42 +42,57 @@ namespace Microsoft.NodejsTools.Options {
                    MessageBoxIcon.Information);
             }
 
-            _cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
+            this._cacheClearedSuccessfully.Visible = didClearNpmCache && didClearTools;
         }
 
-        private static bool TryDeleteCacheDirectory(string cachePath) {
-            if (!Directory.Exists(cachePath)) {
+        private static bool TryDeleteCacheDirectory(string cachePath)
+        {
+            if (!Directory.Exists(cachePath))
+            {
                 return true;
             }
 
-            try {
+            try
+            {
                 // To handle long paths, nuke the directory contents with robocopy
-                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                var tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
-                var psi = new ProcessStartInfo("cmd.exe", string.Format(CultureInfo.InvariantCulture, @"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath)) {
+                var psi = new ProcessStartInfo("cmd.exe", string.Format(CultureInfo.InvariantCulture, @"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath))
+                {
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
-                using (var process = Process.Start(psi)) {
+                using (var process = Process.Start(psi))
+                {
                     process.WaitForExit(10000);
                 }
 
                 // Then delete the directory itself
-                try {
+                try
+                {
                     Directory.Delete(cachePath, true);
-                } catch (DirectoryNotFoundException) {
+                }
+                catch (DirectoryNotFoundException)
+                {
                     // noop
                 }
 
                 return !Directory.Exists(cachePath);
-            } catch (IOException) {
+            }
+            catch (IOException)
+            {
                 // files are in use or path is too long
                 return false;
-            } catch (Exception exception) {
-                try {
+            }
+            catch (Exception exception)
+            {
+                try
+                {
                     ActivityLog.LogError(SR.ProductName, exception.ToString());
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Activity Log is unavailable.
                 }
             }
@@ -92,3 +100,4 @@ namespace Microsoft.NodejsTools.Options {
         }
     }
 }
+

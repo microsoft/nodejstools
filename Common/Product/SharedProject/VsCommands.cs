@@ -1,26 +1,16 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Defines menu commands guids and menu command id's
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1053:StaticHolderTypesShouldNotHaveConstructors"), SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Vs")]
-    public class VsMenus {
+    public class VsMenus
+    {
         // menu command guids.
         public static Guid guidStandardCommandSet97 = new Guid("5efc7975-14bc-11cf-9b2b-00aa00573819");
 
@@ -48,3 +38,4 @@ namespace Microsoft.VisualStudioTools.Project {
         public const int IDM_VS_CTXT_XPROJ_PROJITEM = 0x0417;
     }
 }
+

@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -45,7 +31,8 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools {
+namespace Microsoft.NodejsTools
+{
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -82,7 +69,8 @@ namespace Microsoft.NodejsTools {
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.JadeFileExtension)]
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.PugFileExtension)]
     [ProvideTextEditorAutomation(JadeContentTypeDefinition.JadeLanguageName, 3041, 3045, ProfileMigrationType.PassThrough)]
-    internal sealed partial class NodejsPackage : CommonPackage {
+    internal sealed partial class NodejsPackage : CommonPackage
+    {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
         internal static NodejsPackage Instance;
@@ -97,7 +85,8 @@ namespace Microsoft.NodejsTools {
 
         private static readonly Version _minRequiredTypescriptVersion = new Version("1.8");
 
-        private readonly Lazy<bool> _hasRequiredTypescriptVersion = new Lazy<bool>(() => {
+        private readonly Lazy<bool> _hasRequiredTypescriptVersion = new Lazy<bool>(() =>
+        {
             Version version;
             var versionString = GetTypeScriptToolsVersion();
             return !string.IsNullOrEmpty(versionString)
@@ -112,49 +101,36 @@ namespace Microsoft.NodejsTools {
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public NodejsPackage() {
+        public NodejsPackage()
+        {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
             Debug.Assert(Instance == null, "NodejsPackage created multiple times");
             Instance = this;
         }
 
-        public NodejsGeneralOptionsPage GeneralOptionsPage {
-            get {
-                return (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
-            }
-        }
+        public NodejsGeneralOptionsPage GeneralOptionsPage => (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
 
-        public NodejsNpmOptionsPage NpmOptionsPage {
-            get {
-                return (NodejsNpmOptionsPage)GetDialogPage(typeof(NodejsNpmOptionsPage));
-            }
-        }
+        public NodejsNpmOptionsPage NpmOptionsPage => (NodejsNpmOptionsPage)GetDialogPage(typeof(NodejsNpmOptionsPage));
 
-        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage {
-            get {
-                return (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
-            }
-        }
+        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage => (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
 
-        public EnvDTE.DTE DTE {
-            get {
-                return (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-            }
-        }
+        public EnvDTE.DTE DTE => (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
-#region Package Members
+        #region Package Members
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize() {
+        protected override void Initialize()
+        {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
-            if (!_hasRequiredTypescriptVersion.Value) {
+            if (!this._hasRequiredTypescriptVersion.Value)
+            {
                 MessageBox.Show(
                    string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
                    Project.SR.ProductName,
@@ -180,13 +156,15 @@ namespace Microsoft.NodejsTools {
                 new OpenRemoteDebugDocumentationCommand(),
                 new SurveyNewsCommand(),
                 new ImportWizardCommand(),
-                new DiagnosticsCommand(this),
                 new SendFeedbackCommand(),
                 new ShowDocumentationCommand()
             };
-            try {
+            try
+            {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
-            } catch (NotSupportedException) {
+            }
+            catch (NotSupportedException)
+            {
             }
             RegisterCommands(commands, Guids.NodejsCmdSet);
 
@@ -201,110 +179,117 @@ namespace Microsoft.NodejsTools {
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
 
             var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDDIR");
-            if (!string.IsNullOrEmpty(devenvPath)) {
-                try {
+            if (!string.IsNullOrEmpty(devenvPath))
+            {
+                try
+                {
                     var root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(devenvPath), @"..\.."));
                     Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
-                } catch (Exception) {
+                }
+                catch (Exception)
+                {
                     // noop
                 }
             }
         }
 
         private void SubscribeToVsCommandEvents(
-            int eventId, 
+            int eventId,
             EnvDTE._dispCommandEvents_BeforeExecuteEventHandler beforeExecute = null,
-            EnvDTE._dispCommandEvents_AfterExecuteEventHandler afterExecute = null) {
+            EnvDTE._dispCommandEvents_AfterExecuteEventHandler afterExecute = null)
+        {
             var commandEventGuid = typeof(VSConstants.VSStd97CmdID).GUID.ToString("B");
-            var targetEvent = DTE.Events.CommandEvents[commandEventGuid, eventId];
-            if (beforeExecute != null) {
+            var targetEvent = this.DTE.Events.CommandEvents[commandEventGuid, eventId];
+            if (beforeExecute != null)
+            {
                 targetEvent.BeforeExecute += beforeExecute;
             }
-            if (afterExecute != null) {
+            if (afterExecute != null)
+            {
                 targetEvent.AfterExecute += afterExecute;
             }
-            _subscribedCommandEvents.Add(targetEvent);
+            this._subscribedCommandEvents.Add(targetEvent);
         }
 
-        private void InitializeLogging() {
-            _logger = new NodejsToolsLogger(ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
+        private void InitializeLogging()
+        {
+            this._logger = new NodejsToolsLogger(this.ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
 
             // log interesting stats on startup
-            _logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, GeneralOptionsPage.SurveyNewsCheck);
+            this._logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, this.GeneralOptionsPage.SurveyNewsCheck);
         }
 
-        private void InitializeTelemetry() {
+        private void InitializeTelemetry()
+        {
             var thisAssembly = typeof(NodejsPackage).Assembly;
 
             // Get telemetry logger
-            _telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
+            this._telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
 
-            TelemetrySetup.Instance.LogPackageLoad(_telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
+            TelemetrySetup.Instance.LogPackageLoad(this._telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
         }
 
-        public new IComponentModel ComponentModel {
-            get {
-                return this.GetComponentModel();
-            }
-        }
+        public new IComponentModel ComponentModel => this.GetComponentModel();
 
-        internal NodejsToolsLogger Logger {
-            get {
-                return _logger;
-            }
-        }
+        internal NodejsToolsLogger Logger => this._logger;
 
-        internal ITelemetryLogger TelemetryLogger {
-            get {
-                return _telemetryLogger;
-            }
-        }
+        internal ITelemetryLogger TelemetryLogger => this._telemetryLogger;
 
         /// <summary>
         /// Makes the debugger context available - this enables our debugger when we're installed into
         /// a SKU which doesn't support every installed debugger.
         /// </summary>
-        private void MakeDebuggerContextAvailable() {
+        private void MakeDebuggerContextAvailable()
+        {
             var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
-            Guid debugEngineGuid = AD7Engine.DebugEngineGuid;
+            var debugEngineGuid = AD7Engine.DebugEngineGuid;
             uint contextCookie;
-            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie))) {
+            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie)))
+            {
                 ErrorHandler.ThrowOnFailure(monitorSelection.SetCmdUIContext(contextCookie, 1));
             }
         }
 
-        internal IReplWindow2 OpenReplWindow(bool focus = true) {
-            var compModel = ComponentModel;
+        internal IReplWindow2 OpenReplWindow(bool focus = true)
+        {
+            var compModel = this.ComponentModel;
             var provider = compModel.GetService<IReplWindowProvider>();
 
             var window = (IReplWindow2)provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
-            if (window == null) {
+            if (window == null)
+            {
                 window = (IReplWindow2)provider.CreateReplWindow(
-                    ReplContentType,
+                    this.ReplContentType,
                     Resources.InteractiveWindowTitle,
                     Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );
             }
 
-            IVsWindowFrame windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
+            var windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
 
-            if (focus) {
+            if (focus)
+            {
                 window.Focus();
             }
 
             return window;
         }
 
-        internal static bool TryGetStartupFileAndDirectory(System.IServiceProvider serviceProvider, out string fileName, out string directory) {
+        internal static bool TryGetStartupFileAndDirectory(System.IServiceProvider serviceProvider, out string fileName, out string directory)
+        {
             var startupProject = GetStartupProject(serviceProvider);
-            if (startupProject != null) {
+            if (startupProject != null)
+            {
                 fileName = startupProject.GetStartupFile();
-                directory = startupProject.GetWorkingDirectory();                
-            } else {
+                directory = startupProject.GetWorkingDirectory();
+            }
+            else
+            {
                 var textView = CommonPackage.GetActiveTextView(serviceProvider);
-                if (textView == null) {
+                if (textView == null)
+                {
                     fileName = null;
                     directory = null;
                     return false;
@@ -315,110 +300,139 @@ namespace Microsoft.NodejsTools {
             return true;
         }
 
-        private IContentType ReplContentType {
-            get {
-                if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
+        private IContentType ReplContentType
+        {
+            get
+            {
+                if (this._contentType == null)
+                {
+                    this._contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
-                return _contentType;
+                return this._contentType;
             }
         }
 
-#endregion
+        #endregion
 
-        internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
+        internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package)
+        {
             return new NodejsLibraryManager(this);
         }
 
-        public override Type GetLibraryManagerType() {
+        public override Type GetLibraryManagerType()
+        {
             return typeof(NodejsLibraryManager);
         }
 
-        public override bool IsRecognizedFile(string filename) {
+        public override bool IsRecognizedFile(string filename)
+        {
             var ext = Path.GetExtension(filename);
 
             return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        internal new object GetService(Type serviceType) {
+        internal new object GetService(Type serviceType)
+        {
             return base.GetService(serviceType);
         }
 
-        public string BrowseForDirectory(IntPtr owner, string initialDirectory = null) {
-            IVsUIShell uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell) {
-                using (var ofd = new FolderBrowserDialog()) {
+        public string BrowseForDirectory(IntPtr owner, string initialDirectory = null)
+        {
+            var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
+            if (null == uiShell)
+            {
+                using (var ofd = new FolderBrowserDialog())
+                {
                     ofd.RootFolder = Environment.SpecialFolder.Desktop;
                     ofd.ShowNewFolderButton = false;
                     DialogResult result;
-                    if (owner == IntPtr.Zero) {
+                    if (owner == IntPtr.Zero)
+                    {
                         result = ofd.ShowDialog();
-                    } else {
+                    }
+                    else
+                    {
                         result = ofd.ShowDialog(NativeWindow.FromHandle(owner));
                     }
-                    if (result == DialogResult.OK) {
+                    if (result == DialogResult.OK)
+                    {
                         return ofd.SelectedPath;
-                    } else {
+                    }
+                    else
+                    {
                         return null;
                     }
                 }
             }
 
-            if (owner == IntPtr.Zero) {
+            if (owner == IntPtr.Zero)
+            {
                 ErrorHandler.ThrowOnFailure(uiShell.GetDialogOwnerHwnd(out owner));
             }
 
-            VSBROWSEINFOW[] browseInfo = new VSBROWSEINFOW[1];
+            var browseInfo = new VSBROWSEINFOW[1];
             browseInfo[0].lStructSize = (uint)Marshal.SizeOf(typeof(VSBROWSEINFOW));
             browseInfo[0].pwzInitialDir = initialDirectory;
             browseInfo[0].hwndOwner = owner;
             browseInfo[0].nMaxDirName = 260;
-            IntPtr pDirName = IntPtr.Zero;
-            try {
+            var pDirName = IntPtr.Zero;
+            try
+            {
                 browseInfo[0].pwzDirName = pDirName = Marshal.AllocCoTaskMem(520);
-                int hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
-                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
+                var hr = uiShell.GetDirectoryViaBrowseDlg(browseInfo);
+                if (hr == VSConstants.OLE_E_PROMPTSAVECANCELLED)
+                {
                     return null;
                 }
                 ErrorHandler.ThrowOnFailure(hr);
                 return Marshal.PtrToStringAuto(browseInfo[0].pwzDirName);
-            } finally {
-                if (pDirName != IntPtr.Zero) {
+            }
+            finally
+            {
+                if (pDirName != IntPtr.Zero)
+                {
                     Marshal.FreeCoTaskMem(pDirName);
                 }
             }
         }
 
-        private void BrowseSurveyNewsOnIdle(object sender, ComponentManagerEventArgs e) {
-            this.OnIdle -= BrowseSurveyNewsOnIdle;
+        private void BrowseSurveyNewsOnIdle(object sender, ComponentManagerEventArgs e)
+        {
+            this.OnIdle -= this.BrowseSurveyNewsOnIdle;
 
-            lock (_surveyNewsUrlLock) {
-                if (!string.IsNullOrEmpty(_surveyNewsUrl)) {
-                    OpenVsWebBrowser(this, _surveyNewsUrl);
-                    _surveyNewsUrl = null;
+            lock (this._surveyNewsUrlLock)
+            {
+                if (!string.IsNullOrEmpty(this._surveyNewsUrl))
+                {
+                    OpenVsWebBrowser(this, this._surveyNewsUrl);
+                    this._surveyNewsUrl = null;
                 }
             }
         }
 
-        internal void BrowseSurveyNews(string url) {
-            lock (_surveyNewsUrlLock) {
-                _surveyNewsUrl = url;
+        internal void BrowseSurveyNews(string url)
+        {
+            lock (this._surveyNewsUrlLock)
+            {
+                this._surveyNewsUrl = url;
             }
 
-            this.OnIdle += BrowseSurveyNewsOnIdle;
+            this.OnIdle += this.BrowseSurveyNewsOnIdle;
         }
 
-        private void CheckSurveyNewsThread(Uri url, bool warnIfNoneAvailable) {
+        private void CheckSurveyNewsThread(Uri url, bool warnIfNoneAvailable)
+        {
             // We can't use a simple WebRequest, because that doesn't have access
             // to the browser's session cookies.  Cookies are used to remember
             // which survey/news item the user has submitted/accepted.  The server 
             // checks the cookies and returns the survey/news urls that are 
             // currently available (availability is determined via the survey/news 
             // item start and end date).
-            var th = new Thread(() => {
+            var th = new Thread(() =>
+            {
                 var br = new WebBrowser();
                 br.Tag = warnIfNoneAvailable;
-                br.DocumentCompleted += OnSurveyNewsDocumentCompleted;
+                br.DocumentCompleted += this.OnSurveyNewsDocumentCompleted;
                 br.Navigate(url);
                 Application.Run();
             });
@@ -426,21 +440,27 @@ namespace Microsoft.NodejsTools {
             th.Start();
         }
 
-        private void OnSurveyNewsDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e) {
+        private void OnSurveyNewsDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
             var br = (WebBrowser)sender;
             var warnIfNoneAvailable = (bool)br.Tag;
-            if (br.Url == e.Url) {
+            if (br.Url == e.Url)
+            {
                 List<string> available = null;
 
-                string json = br.DocumentText;
-                if (!string.IsNullOrEmpty(json)) {
-                    int startIndex = json.IndexOf("<PRE>");
-                    if (startIndex > 0) {
-                        int endIndex = json.IndexOf("</PRE>", startIndex);
-                        if (endIndex > 0) {
+                var json = br.DocumentText;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var startIndex = json.IndexOf("<PRE>");
+                    if (startIndex > 0)
+                    {
+                        var endIndex = json.IndexOf("</PRE>", startIndex);
+                        if (endIndex > 0)
+                        {
                             json = json.Substring(startIndex + 5, endIndex - startIndex - 5);
 
-                            try {
+                            try
+                            {
                                 // Example JSON data returned by the server:
                                 //{
                                 // "cannotvoteagain": [], 
@@ -457,22 +477,32 @@ namespace Microsoft.NodejsTools {
                                 // voted: cookie found
                                 // notvoted: cookie not found
                                 // canvoteagain: cookie found, but multiple votes are allowed
-                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                var serializer = new JavaScriptSerializer();
                                 var results = serializer.Deserialize<Dictionary<string, List<string>>>(json);
                                 available = results["notvoted"];
-                            } catch (ArgumentException) {
-                            } catch (InvalidOperationException) {
+                            }
+                            catch (ArgumentException)
+                            {
+                            }
+                            catch (InvalidOperationException)
+                            {
                             }
                         }
                     }
                 }
 
-                if (available != null && available.Count > 0) {
+                if (available != null && available.Count > 0)
+                {
                     BrowseSurveyNews(available[0]);
-                } else if (warnIfNoneAvailable) {
-                    if (available != null) {
-                        BrowseSurveyNews(GeneralOptionsPage.SurveyNewsIndexUrl);
-                    } else {
+                }
+                else if (warnIfNoneAvailable)
+                {
+                    if (available != null)
+                    {
+                        BrowseSurveyNews(this.GeneralOptionsPage.SurveyNewsIndexUrl);
+                    }
+                    else
+                    {
                         BrowseSurveyNews(NodejsToolsInstallPath.GetFile("NoSurveyNewsFeed.html"));
                     }
                 }
@@ -481,27 +511,32 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable) {
-            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer()) {
-                var options = GeneralOptionsPage;
+        internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable)
+        {
+            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer())
+            {
+                var options = this.GeneralOptionsPage;
                 options.SurveyNewsLastCheck = DateTime.Now;
                 options.SaveSettingsToStorage();
                 CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
             }
         }
 
-        private bool ShouldQuerySurveryNewsServer() {
-            var options = GeneralOptionsPage;
+        private bool ShouldQuerySurveryNewsServer()
+        {
+            var options = this.GeneralOptionsPage;
             // Ensure that we don't prompt the user on their very first project creation.
             // Delay by 3 days by pretending we checked 4 days ago (the default of check
             // once a week ensures we'll check again in 3 days).
-            if (options.SurveyNewsLastCheck == DateTime.MinValue) {
+            if (options.SurveyNewsLastCheck == DateTime.MinValue)
+            {
                 options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
                 options.SaveSettingsToStorage();
             }
 
             var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
-            switch (options.SurveyNewsCheck) {
+            switch (options.SurveyNewsCheck)
+            {
                 case SurveyNewsPolicy.Disabled:
                     return false;
                 case SurveyNewsPolicy.CheckOnceDay:
@@ -516,30 +551,37 @@ namespace Microsoft.NodejsTools {
             }
         }
 
-        internal static void NavigateTo(string filename, int line, int col) {
+        internal static void NavigateTo(string filename, int line, int col)
+        {
             VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
         }
 
-        internal static void NavigateTo(string filename, int pos) {
+        internal static void NavigateTo(string filename, int pos)
+        {
             VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
 
-        private static string GetTypeScriptToolsVersion() {
+        private static string GetTypeScriptToolsVersion()
+        {
             var toolsVersion = string.Empty;
-            try {
+            try
+            {
                 object installDirAsObject = null;
                 var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
-                if (shell != null) {
+                if (shell != null)
+                {
                     shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
                 }
 
                 var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
-                if (string.IsNullOrEmpty(idePath)) {
+                if (string.IsNullOrEmpty(idePath))
+                {
                     return toolsVersion;
                 }
 
                 var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
-                if (!File.Exists(typeScriptServicesPath)) {
+                if (!File.Exists(typeScriptServicesPath))
+                {
                     return toolsVersion;
                 }
 
@@ -548,11 +590,15 @@ namespace Microsoft.NodejsTools {
                 var match = regex.Match(fileText);
 
                 var version = match.Groups["version"].Value;
-                if (!string.IsNullOrWhiteSpace(version)) {
+                if (!string.IsNullOrWhiteSpace(version))
+                {
                     toolsVersion = version;
                 }
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -563,3 +609,4 @@ namespace Microsoft.NodejsTools {
         }
     }
 }
+

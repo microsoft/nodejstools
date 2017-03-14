@@ -1,42 +1,32 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Implements <seealso cref="ITextProvider"/> on a string
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
-    class TextStream : ITextProvider {
-        string _text;
+    internal class TextStream : ITextProvider
+    {
+        private string _text;
 
         // Array access (i.e. converting string to an array)
         // is faster, but takes more memory.
 
         [DebuggerStepThrough]
-        public TextStream(string text) {
-            _text = text;
+        public TextStream(string text)
+        {
+            this._text = text;
         }
 
         [DebuggerStepThrough]
-        public override string ToString() {
-            return _text;
+        public override string ToString()
+        {
+            return this._text;
         }
 
         #region ITextStream
@@ -44,38 +34,39 @@ namespace Microsoft.NodejsTools.Jade {
         /// <summary>
         /// Text length
         /// </summary>
-        public int Length {
-            get { return _text.Length; }
-        }
-
+        public int Length => this._text.Length;
         /// <summary>
         /// Retrieves character at a given position
         /// </summary>
-        public char this[int position] {
-            get {
-                if (position < 0 || position >= _text.Length)
+        public char this[int position]
+        {
+            get
+            {
+                if (position < 0 || position >= this._text.Length)
                     return '\0';
 
-                return _text[position];
+                return this._text[position];
             }
         }
 
         /// <summary>
         /// Retrieves a substring given start position and length
         /// </summary>
-        public string GetText(int position, int length) {
+        public string GetText(int position, int length)
+        {
             if (length == 0)
                 return String.Empty;
 
-            Debug.Assert(position >= 0 && length >= 0 && position + length <= _text.Length);
-            return _text.Substring(position, length);
+            Debug.Assert(position >= 0 && length >= 0 && position + length <= this._text.Length);
+            return this._text.Substring(position, length);
         }
 
         /// <summary>
         /// Retrieves substring given text range
         /// </summary>
         [DebuggerStepThrough]
-        public string GetText(ITextRange range) {
+        public string GetText(ITextRange range)
+        {
             return GetText(range.Start, range.Length);
         }
 
@@ -86,8 +77,9 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="startPosition">Starting position</param>
         /// <param name="ignoreCase">True if search should be case-insensitive</param>
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
-        public int IndexOf(string stringToFind, int startPosition, bool ignoreCase) {
-            return _text.IndexOf(stringToFind, startPosition, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+        public int IndexOf(string stringToFind, int startPosition, bool ignoreCase)
+        {
+            return this._text.IndexOf(stringToFind, startPosition, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
         }
 
         /// <summary>
@@ -98,30 +90,32 @@ namespace Microsoft.NodejsTools.Jade {
         /// <param name="range">Range to search in</param>
         /// <param name="ignoreCase">True if search should be case-insensitive</param>
         /// <returns>Character index of the first string appearance or -1 if string was not found</returns>
-        public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase) {
-            if (range.Start + stringToFind.Length > _text.Length)
+        public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase)
+        {
+            if (range.Start + stringToFind.Length > this._text.Length)
                 return -1;
 
-            if (range.End > _text.Length)
+            if (range.End > this._text.Length)
                 return -1;
 
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
-            return _text.IndexOf(stringToFind, range.Start, range.Length, comparison);
+            return this._text.IndexOf(stringToFind, range.Start, range.Length, comparison);
         }
 
-        public bool CompareTo(int position, int length, string compareTo, bool ignoreCase) {
+        public bool CompareTo(int position, int length, string compareTo, bool ignoreCase)
+        {
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
-            return String.Compare(_text, position, compareTo, 0, length, comparison) == 0;
+            return String.Compare(this._text, position, compareTo, 0, length, comparison) == 0;
         }
 
-        public ITextProvider Clone() {
-            return new TextStream(_text);
+        public ITextProvider Clone()
+        {
+            return new TextStream(this._text);
         }
 
-        public int Version { get { return 0; } }
-
+        public int Version => 0;
         // static string text provider does not fire text change event
 #pragma warning disable 0067
         public event EventHandler<TextChangeEventArgs> OnTextChange;
@@ -130,9 +124,11 @@ namespace Microsoft.NodejsTools.Jade {
         #endregion
 
         #region Dispose
-        public void Dispose() {
-            _text = null;
+        public void Dispose()
+        {
+            this._text = null;
         }
         #endregion
     }
 }
+

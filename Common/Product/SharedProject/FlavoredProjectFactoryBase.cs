@@ -1,18 +1,7 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     using System;
     using System.Diagnostics;
     using System.Runtime.InteropServices;
@@ -27,17 +16,20 @@ namespace Microsoft.VisualStudioTools.Project {
     /// The project factory for the project flavor.
     /// Note that this is also known as Project Subtype
     /// </devdoc>
-    public abstract class FlavoredProjectFactoryBase : IVsAggregatableProjectFactoryCorrected, IVsProjectFactory {
+    public abstract class FlavoredProjectFactoryBase : IVsAggregatableProjectFactoryCorrected, IVsProjectFactory
+    {
         private readonly System.IServiceProvider _serviceProvider;
 
         /// <include file='doc\FlavoredProjectFactoryBase.uex' path='docs/doc[@for="FlavoredProjectFactoryBase.FlavoredProjectFactoryBase"]/*' />
-        public FlavoredProjectFactoryBase(System.IServiceProvider serviceProvider) {
-            _serviceProvider = serviceProvider;
+        public FlavoredProjectFactoryBase(System.IServiceProvider serviceProvider)
+        {
+            this._serviceProvider = serviceProvider;
         }
 
         #region IVsProjectFactory
 
-        int IVsProjectFactory.CanCreateProject(string fileName, uint flags, out int canCreate) {
+        int IVsProjectFactory.CanCreateProject(string fileName, uint flags, out int canCreate)
+        {
             canCreate = this.CanCreateProject(fileName, flags) ? 1 : 0;
             return VSConstants.S_OK;
         }
@@ -46,9 +38,10 @@ namespace Microsoft.VisualStudioTools.Project {
         /// This is called to ask the factory if it can create a project based on the current parameters
         /// </devdoc>
         /// <returns>True if the project can be created</returns>
-        protected virtual bool CanCreateProject(string fileName, uint flags) {
+        protected virtual bool CanCreateProject(string fileName, uint flags)
+        {
             // Validate the filename
-            bool canCreate = !string.IsNullOrEmpty(fileName);
+            var canCreate = !string.IsNullOrEmpty(fileName);
             canCreate |= !PackageUtilities.ContainsInvalidFileNameChars(fileName);
             return canCreate;
         }
@@ -56,7 +49,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <devdoc>
         /// This is not expected to be called unless using an extension other then the base project
         /// </devdoc>
-        int IVsProjectFactory.CreateProject(string fileName, string location, string name, uint flags, ref Guid projectGuid, out System.IntPtr project, out int canceled) {
+        int IVsProjectFactory.CreateProject(string fileName, string location, string name, uint flags, ref Guid projectGuid, out System.IntPtr project, out int canceled)
+        {
             this.CreateProject(fileName, location, name, flags, ref projectGuid, out project, out canceled);
             return VSConstants.S_OK;
         }
@@ -65,23 +59,27 @@ namespace Microsoft.VisualStudioTools.Project {
         /// If you want to use your own extension, you will need to call IVsCreateAggregatedProject.CreateAggregatedProject()
         /// </devdoc>
         /// <returns>HRESULT</returns>
-        protected virtual void CreateProject(string fileName, string location, string name, uint flags, ref Guid projectGuid, out System.IntPtr project, out int canceled) {
+        protected virtual void CreateProject(string fileName, string location, string name, uint flags, ref Guid projectGuid, out System.IntPtr project, out int canceled)
+        {
             // If the extension is that of the base project then we don't get called
             project = IntPtr.Zero;
             canceled = 0;
         }
 
-        int IVsProjectFactory.Close() {
+        int IVsProjectFactory.Close()
+        {
             this.Dispose(true);
 
             return VSConstants.S_OK;
         }
 
         /// <include file='doc\FlavoredProjectFactoryBase.uex' path='docs/doc[@for="FlavoredProjectFactoryBase.Dispose"]/*' />
-        protected virtual void Dispose(bool disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
         }
 
-        int IVsProjectFactory.SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider provider) {
+        int IVsProjectFactory.SetSite(Microsoft.VisualStudio.OLE.Interop.IServiceProvider provider)
+        {
             this.Initialize();
 
             return VSConstants.S_OK;
@@ -90,48 +88,57 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <devdoc>
         /// Called by SetSite after setting our service provider
         /// </devdoc>
-        protected virtual void Initialize() {
+        protected virtual void Initialize()
+        {
         }
 
         #endregion
 
         #region IVsAggregatableProjectFactory
 
-        int IVsAggregatableProjectFactoryCorrected.GetAggregateProjectType(string fileName, out string projectTypeGuid) {
+        int IVsAggregatableProjectFactoryCorrected.GetAggregateProjectType(string fileName, out string projectTypeGuid)
+        {
             projectTypeGuid = this.ProjectTypeGuids(fileName);
             return VSConstants.S_OK;
         }
 
-        int IVsAggregatableProjectFactoryCorrected.PreCreateForOuter(IntPtr outerProjectIUnknown, out IntPtr projectIUnknown) {
+        int IVsAggregatableProjectFactoryCorrected.PreCreateForOuter(IntPtr outerProjectIUnknown, out IntPtr projectIUnknown)
+        {
             projectIUnknown = IntPtr.Zero;  // always initialize out parameters of COM interfaces!
 
-            object newProject = PreCreateForOuter(outerProjectIUnknown);
+            var newProject = PreCreateForOuter(outerProjectIUnknown);
 
-            IntPtr newProjectIUnknown = IntPtr.Zero;
-            ILocalRegistryCorrected localRegistry = (ILocalRegistryCorrected)_serviceProvider.GetService(typeof(SLocalRegistry));
+            var newProjectIUnknown = IntPtr.Zero;
+            var localRegistry = (ILocalRegistryCorrected)this._serviceProvider.GetService(typeof(SLocalRegistry));
             Debug.Assert(localRegistry != null, "Could not get the ILocalRegistry object");
-            if (localRegistry == null) {
+            if (localRegistry == null)
+            {
                 throw new InvalidOperationException();
             }
-            Guid clsid = typeof(Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass).GUID;
-            Guid riid = VSConstants.IID_IUnknown;
-            uint dwClsCtx = (uint)CLSCTX.CLSCTX_INPROC_SERVER;
-            IntPtr aggregateProjectIUnknown = IntPtr.Zero;
+            var clsid = typeof(Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass).GUID;
+            var riid = VSConstants.IID_IUnknown;
+            var dwClsCtx = (uint)CLSCTX.CLSCTX_INPROC_SERVER;
+            var aggregateProjectIUnknown = IntPtr.Zero;
             IVsProjectAggregator2 vsProjectAggregator2 = null;
 
-            try {
+            try
+            {
                 ErrorHandler.ThrowOnFailure(localRegistry.CreateInstance(clsid, outerProjectIUnknown, ref riid, dwClsCtx, out aggregateProjectIUnknown));
 
                 // If we have a non-NULL punkOuter then we need to create a COM aggregated object with that punkOuter,
                 // if not then we are the top of the aggregation.
-                if (outerProjectIUnknown != IntPtr.Zero) {
+                if (outerProjectIUnknown != IntPtr.Zero)
+                {
                     newProjectIUnknown = Marshal.CreateAggregatedObject(outerProjectIUnknown, newProject);
-                } else {
+                }
+                else
+                {
                     newProjectIUnknown = Marshal.CreateAggregatedObject(aggregateProjectIUnknown, newProject); ;
                 }
 
                 vsProjectAggregator2 = (IVsProjectAggregator2)Marshal.GetObjectForIUnknown(aggregateProjectIUnknown);
-                if (vsProjectAggregator2 != null) {
+                if (vsProjectAggregator2 != null)
+                {
                     vsProjectAggregator2.SetMyProject(newProjectIUnknown);
                 }
 
@@ -144,7 +151,9 @@ namespace Microsoft.VisualStudioTools.Project {
                 // Note: we need to return an AddRef'ed IUnknown (AddRef comes from CreateInstance call).
                 projectIUnknown = aggregateProjectIUnknown;
                 aggregateProjectIUnknown = IntPtr.Zero;
-            } finally {
+            }
+            finally
+            {
                 if (newProjectIUnknown != IntPtr.Zero)
                     Marshal.Release(newProjectIUnknown);
                 if (aggregateProjectIUnknown != IntPtr.Zero)
@@ -168,9 +177,11 @@ namespace Microsoft.VisualStudioTools.Project {
         #endregion
 
         /// <include file='doc\FlavoredProjectFactoryBase.uex' path='docs/doc[@for="FlavoredProjectFactoryBase.ProjectTypeGuids"]/*' />
-        protected virtual string ProjectTypeGuids(string file) {
+        protected virtual string ProjectTypeGuids(string file)
+        {
             throw new NotImplementedException();
         }
     }
 }
+
 

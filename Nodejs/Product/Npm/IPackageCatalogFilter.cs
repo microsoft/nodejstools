@@ -1,29 +1,15 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm {
-
+namespace Microsoft.NodejsTools.Npm
+{
     /// <summary>
     /// Used to filter the entire package catalog down to a more manageable/relevant
     /// list.
     /// </summary>
-    public interface IPackageCatalogFilter {
-
+    public interface IPackageCatalogFilter
+    {
         /// <summary>
         /// Filters the entire package list based on the supplied filter string and returns
         /// any packages that match. If filterString starts with a '/' it will be treated as
@@ -37,6 +23,7 @@ namespace Microsoft.NodejsTools.Npm {
         /// <returns>
         /// List of matching packages. If there are no matches an empty list is returned.
         /// </returns>
-        IEnumerable<IPackage> Filter(string filterString);  
+        IEnumerable<IPackage> Filter(string filterString);
     }
 }
+

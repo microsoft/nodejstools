@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -26,19 +14,24 @@ using TestUtilities.SharedProject;
 using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 
-namespace Microsoft.VisualStudioTools.SharedProjectTests {
+namespace Microsoft.VisualStudioTools.SharedProjectTests
+{
     [TestClass]
-    public class ShowAllFiles : SharedProjectTest {
+    public class ShowAllFiles : SharedProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesToggle() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesToggle()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFiles",
                     projectType,
@@ -47,7 +40,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "ProjectFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFiles", "SubFolder", "server" + projectType.CodeExtension);
                     AutomationWrapper.Select(projectNode);
 
@@ -60,10 +54,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesFilesAlwaysHidden() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesFilesAlwaysHidden()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = MakeBasicProject(projectType);
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFiles");
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "ShowAllFiles.sln"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "ShowAllFiles.suo"));
@@ -73,8 +70,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesSymLinks() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesSymLinks()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesSymLink",
                     projectType,
@@ -93,7 +92,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     String.Format("/c mklink /J \"{0}\" \"{1}\"",
                         Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SymFolder"),
                         Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SubFolder")
-                    ))) {
+                    )))
+                {
                     p.WaitForExit();
                 }
 
@@ -101,12 +101,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     String.Format("/c mklink /J \"{0}\" \"{1}\"",
                         Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SubFolder\Infinite"),
                         Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SubFolder")
-                    ))) {
+                    )))
+                {
                     p.WaitForExit();
                 }
 
-                try {
-                    using (var solution = solutionFile.ToVs()) {
+                try
+                {
+                    using (var solution = solutionFile.ToVs())
+                    {
                         Assert.IsNotNull(solution.WaitForItem("ShowAllFilesSymLink", "SymFolder"));
 
                         // https://pytools.codeplex.com/workitem/1150 - infinite links, not displayed
@@ -121,12 +124,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         Assert.IsNotNull(solution.WaitForItem("ShowAllFilesSymLink", "SubFolder", "Foo.txt"));
                         Assert.IsNotNull(solution.WaitForItem("ShowAllFilesSymLink", "SymFolder", "Foo.txt"));
                     }
-                } finally {
+                }
+                finally
+                {
                     using (System.Diagnostics.Process p = System.Diagnostics.Process.Start("cmd.exe",
                         String.Format("/c rmdir \"{0}\" \"{1}\"",
                             Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SymFolder"),
                             Path.Combine(solutionFile.Directory, @"ShowAllFilesSymLink\SubFolder\Infinite")
-                        ))) {
+                        )))
+                    {
                         p.WaitForExit();
                     }
                 }
@@ -135,8 +141,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesLinked() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesLinked()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesLinked",
                     projectType,
@@ -146,7 +154,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "ProjectFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var linkedNode = solution.WaitForItem("ShowAllFilesLinked", "File" + projectType.CodeExtension);
                     AutomationWrapper.Select(linkedNode);
                     Keyboard.ControlC();
@@ -177,8 +186,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesIncludeExclude() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesIncludeExclude()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesIncludeExclude",
                     projectType,
@@ -208,7 +219,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesIncludeExclude");
 
                     var excludedFolder = solution.GetProject("ShowAllFilesIncludeExclude").ProjectItems.Item("ExcludeFolder1");
@@ -240,10 +252,13 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     // https://pytools.codeplex.com/workitem/1153
                     // Shouldn't have a BuildAction property on excluded items
-                    try {
+                    try
+                    {
                         solution.GetProject("ShowAllFilesIncludeExclude").ProjectItems.Item("ExcludedFolder1").ProjectItems.Item("Item.txt").Properties.Item("BuildAction");
                         Assert.Fail("Excluded item had BuildAction");
-                    } catch (ArgumentException) {
+                    }
+                    catch (ArgumentException)
+                    {
                     }
 
                     var file = solution.WaitForItem("ShowAllFilesIncludeExclude", "ExcludeFolder2", "Item.txt");
@@ -262,19 +277,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     AutomationWrapper.Select(itemTxtNode);
 
                     // https://pytools.codeplex.com/workitem/1143
-                    try {
+                    try
+                    {
                         solution.ExecuteCommand("Project.AddNewItem");
                         Assert.Fail("Added a new item on excluded node");
-                    } catch (COMException) {
+                    }
+                    catch (COMException)
+                    {
                     }
 
                     var excludedFolderNode = solution.WaitForItem("ShowAllFilesIncludeExclude", "ExcludeFolder1");
                     Assert.IsNotNull(excludedFolderNode);
                     AutomationWrapper.Select(excludedFolderNode);
-                    try {
+                    try
+                    {
                         solution.ExecuteCommand("Project.NewFolder");
                         Assert.Fail("Added a new folder on excluded node");
-                    } catch (COMException) {
+                    }
+                    catch (COMException)
+                    {
                     }
 
                     // include
@@ -373,9 +394,12 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesChanges() {
-            foreach (var projectType in ProjectTypes) {
-                using (var solution = MakeBasicProject(projectType).Generate().ToVs()) {
+        public void ShowAllFilesChanges()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
+                using (var solution = MakeBasicProject(projectType).Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFiles");
                     AutomationWrapper.Select(projectNode);
 
@@ -389,11 +413,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "File.txt"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "SubFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "SubFolder", "SubFile.txt"));
-                                        
+
                     // create some stuff, it should show up...
                     File.WriteAllText(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFile.txt"));
-                    
+
                     File.WriteAllText(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\Folder\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "Folder", "NewFile.txt"));
                     Assert.IsTrue(dteProject.GetIsFolderExpanded(@"Folder"));
@@ -403,39 +427,39 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
                     Directory.CreateDirectory(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder"));
-                    
+
                     Directory.CreateDirectory(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder\SubFolder"));
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder", "SubFolder"));
-                    
+
                     File.WriteAllText(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder\SubFolder\NewFile.txt"), "");
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "NewFolder", "SubFolder", "NewFile.txt"));
-                    
+
                     // delete some stuff, it should go away
                     File.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\Folder\File.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "Folder", "File.txt"));
-                    
+
                     File.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFile.txt"));
-                    
+
                     File.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "NewFile.txt"));
-                    
+
                     File.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder\SubFolder\NewFile.txt"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "SubFolder", "NewFile.txt"));
-                    
+
                     Directory.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder\SubFolder"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder", "SubFolder"));
-                    
+
                     Directory.Delete(Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\NewFolder"));
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFiles", "NewFolder"));
-                    
+
                     Directory.Move(
                         Path.Combine(solution.SolutionDirectory, @"MovedIntoShowAllFiles"),
                         Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\MovedIntoShowAllFiles")
                     );
 
                     Assert.IsNotNull(solution.WaitForItem("ShowAllFiles", "MovedIntoShowAllFiles", "Text.txt"));
-                    
+
                     // move it back
                     Directory.Move(
                         Path.Combine(solution.SolutionDirectory, @"ShowAllFiles\MovedIntoShowAllFiles"),
@@ -457,8 +481,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesHiddenFiles() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesHiddenFiles()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesHiddenFiles",
                     projectType,
@@ -497,7 +523,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 );
 
 
-                using (var solution = solutionFile.ToVs()) {
+                using (var solution = solutionFile.ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesHiddenFiles");
 
                     // hidden files/folders shouldn't be visible
@@ -545,13 +572,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsNull(solution.WaitForItemRemoved("ShowAllFilesHiddenFiles", "Folder"));
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesOnPerUser() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesOnPerUser()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var solutionFile = SolutionFile.Generate("ShowAllFilesOnPerUser",
                     new ProjectDefinition(
                         "ShowAllFilesOnPerUser",
@@ -566,7 +594,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = solutionFile.ToVs()) {
+                using (var solution = solutionFile.ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesOnPerUser");
                     AutomationWrapper.Select(projectNode);
 
@@ -588,8 +617,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesOnPerProject() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesOnPerProject()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesOnPerProject",
                     projectType,
@@ -597,7 +628,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "ShowAllFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesOnPerProject");
                     AutomationWrapper.Select(projectNode);
 
@@ -615,13 +647,14 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Assert.IsTrue(projectText.Contains("<ProjectView>ProjectFiles</ProjectView>"));
                 }
             }
-
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesOffPerUser() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesOffPerUser()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var solutionFile = SolutionFile.Generate("ShowAllFilesOffPerUser",
                     new ProjectDefinition(
                         "ShowAllFilesOffPerUser",
@@ -636,7 +669,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = solutionFile.ToVs()) {
+                using (var solution = solutionFile.ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesOffPerUser");
                     AutomationWrapper.Select(projectNode);
 
@@ -658,8 +692,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesOffPerProject() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesOffPerProject()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesOffPerProject",
                     projectType,
@@ -667,7 +703,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "ProjectFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesOffPerProject");
                     AutomationWrapper.Select(projectNode);
 
@@ -689,8 +726,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesDefault() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesDefault()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesDefault",
                     projectType,
@@ -700,7 +739,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesDefault");
                     AutomationWrapper.Select(projectNode);
 
@@ -726,22 +766,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllMoveNotInProject() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllMoveNotInProject()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllMoveNotInProject",
                     projectType,
                     ItemGroup(
                         Folder("Folder", isExcluded: true),
                         Folder("Folder\\SubFolder", isExcluded: true),
-                        Compile("NotInProject", isExcluded:true),
+                        Compile("NotInProject", isExcluded: true),
                         Compile("Folder\\File", isExcluded: true),
                         Content("Folder\\SubFolder\\SubFile.txt", "", isExcluded: true)
                     ),
                     Property("ProjectView", "ShowAllFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     solution.WaitForItem("ShowAllMoveNotInProject");
 
                     var file = solution.WaitForItem("ShowAllMoveNotInProject", "NotInProject" + projectType.CodeExtension);
@@ -784,8 +827,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllExcludeSelected() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllExcludeSelected()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllExcludeSelected",
                     projectType,
@@ -797,7 +842,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Property("ProjectView", "ProjectFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     solution.WaitForItem("ShowAllExcludeSelected");
 
                     var file = solution.WaitForItem("ShowAllExcludeSelected", "Folder", "File2" + projectType.CodeExtension);
@@ -818,7 +864,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
-        private static string GetSelectedItemName() {
+        private static string GetSelectedItemName()
+        {
             var window = UIHierarchyUtilities.GetUIHierarchyWindow(
                 VSTestContext.ServiceProvider,
                 new Guid(ToolWindowGuids80.SolutionExplorer)
@@ -829,12 +876,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             ErrorHandler.ThrowOnFailure(window.GetCurrentSelection(out hier, out itemid, out select));
             Assert.AreNotEqual(IntPtr.Zero, hier);
             Assert.IsNull(select);
-            try {
+            try
+            {
                 var obj = (IVsHierarchy)Marshal.GetObjectForIUnknown(hier);
                 string name;
                 ErrorHandler.ThrowOnFailure(obj.GetCanonicalName(itemid, out name));
                 return name;
-            } finally {
+            }
+            finally
+            {
                 Marshal.Release(hier);
             }
         }
@@ -848,27 +898,32 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesRapidChanges() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesRapidChanges()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesRapidChanges",
                     projectType,
                     Property("ProjectView", "ShowAllFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesRapidChanges");
                     AutomationWrapper.Select(projectNode);
 
                     List<string> addedItems = new List<string>();
-                    for (int i = 0; i < 1000; i++) {
+                    for (int i = 0; i < 1000; i++)
+                    {
                         var filename = Path.Combine(solution.SolutionDirectory, "ShowAllFilesRapidChanges", Path.GetRandomFileName());
                         File.WriteAllText(filename, "");
                         File.Delete(filename);
                         addedItems.Add(filename);
                     }
 
-                    foreach (var item in addedItems) {
+                    foreach (var item in addedItems)
+                    {
                         Assert.IsNull(solution.WaitForItemRemoved("ShowAllFilesRapidChanges", Path.GetFileName(item)));
                     }
                 }
@@ -882,20 +937,24 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesRapidChanges2() {
-            foreach (var projectType in ProjectTypes) {
+        public void ShowAllFilesRapidChanges2()
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesRapidChanges",
                     projectType,
                     Property("ProjectView", "ShowAllFiles")
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesRapidChanges");
                     AutomationWrapper.Select(projectNode);
 
                     HashSet<string> addedItems = new HashSet<string>();
-                    for (int i = 0; i < 100; i++) {
+                    for (int i = 0; i < 100; i++)
+                    {
                         var filename = Path.Combine(solution.SolutionDirectory, "ShowAllFilesRapidChanges", Path.GetRandomFileName());
                         File.WriteAllText(filename, "");
                         File.Delete(filename);
@@ -906,7 +965,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     // give some time for changes to be processed...
                     System.Threading.Thread.Sleep(10000);
 
-                    foreach (var item in addedItems) {
+                    foreach (var item in addedItems)
+                    {
                         Assert.IsNotNull(solution.WaitForItem("ShowAllFilesRapidChanges", Path.GetFileName(item)), item);
                     }
                 }
@@ -916,22 +976,26 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesCopyExcludedFolderWithItemByKeyboard() {
+        public void ShowAllFilesCopyExcludedFolderWithItemByKeyboard()
+        {
             ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.CopyByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesCopyExcludedFolderWithItemByMouse() {
+        public void ShowAllFilesCopyExcludedFolderWithItemByMouse()
+        {
             ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.CopyByMouse);
         }
 
         /// <summary>
         /// https://nodejstools.codeplex.com/workitem/475
         /// </summary>
-        private void ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.MoveDelegate copier) {
-            foreach (var projectType in ProjectTypes) {
+        private void ShowAllFilesCopyExcludedFolderWithItem(DragDropCopyCutPaste.MoveDelegate copier)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "CopyExcludedFolderWithItem",
                     projectType,
@@ -941,7 +1005,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Compile("server", isExcluded: true)
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("CopyExcludedFolderWithItem");
                     AutomationWrapper.Select(projectNode);
 
@@ -955,7 +1020,7 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.WaitForItem("CopyExcludedFolderWithItem", "NewFolder1", "NewFolder2")
                     );
                     solution.ExecuteCommand("Project.ShowAllFiles"); // stop showing all
-                    
+
                     Assert.IsNull(
                         solution.WaitForItemRemoved("CopyExcludedFolderWithItem", "NewFolder1", "NewFolder2")
                     );
@@ -966,22 +1031,26 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesMoveExcludedItemToExcludedFolderByKeyboard() {
+        public void ShowAllFilesMoveExcludedItemToExcludedFolderByKeyboard()
+        {
             ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ShowAllFilesMoveExcludedItemToExcludedFolderByMouse() {
+        public void ShowAllFilesMoveExcludedItemToExcludedFolderByMouse()
+        {
             ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveByMouse);
         }
 
         /// <summary>
         /// https://pytools.codeplex.com/workitem/1909
         /// </summary>
-        private void ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void ShowAllFilesMoveExcludedItemToExcludedFolder(DragDropCopyCutPaste.MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var def = new ProjectDefinition(
                     "ShowAllFilesMoveExcludedItemToExcludedFolder",
                     projectType,
@@ -990,7 +1059,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     Compile("server", isExcluded: true)
                 );
 
-                using (var solution = def.Generate().ToVs()) {
+                using (var solution = def.Generate().ToVs())
+                {
                     var projectNode = solution.WaitForItem("ShowAllFilesMoveExcludedItemToExcludedFolder");
                     AutomationWrapper.Select(projectNode);
 
@@ -1015,7 +1085,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             }
         }
 
-        private static ProjectDefinition MakeBasicProject(ProjectType projectType) {
+        private static ProjectDefinition MakeBasicProject(ProjectType projectType)
+        {
             var def = new ProjectDefinition(
                 "ShowAllFiles",
                 projectType,
@@ -1039,3 +1110,4 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         }
     }
 }
+

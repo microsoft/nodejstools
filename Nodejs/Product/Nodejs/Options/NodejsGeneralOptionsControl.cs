@@ -1,35 +1,27 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Windows.Forms;
 
-namespace Microsoft.NodejsTools.Options {
-    public partial class NodejsGeneralOptionsControl : UserControl {
+namespace Microsoft.NodejsTools.Options
+{
+    public partial class NodejsGeneralOptionsControl : UserControl
+    {
         private const int SurveyNewsNeverIndex = 0;
         private const int SurveyNewsOnceDayIndex = 1;
         private const int SurveyNewsOnceWeekIndex = 2;
         private const int SurveyNewsOnceMonthIndex = 3;
 
-        public NodejsGeneralOptionsControl() {
+        public NodejsGeneralOptionsControl()
+        {
             InitializeComponent();
         }
 
-        internal SurveyNewsPolicy SurveyNewsCheckCombo {
-            get {
-                switch (_surveyNewsCheckCombo.SelectedIndex) {
+        internal SurveyNewsPolicy SurveyNewsCheckCombo
+        {
+            get
+            {
+                switch (this._surveyNewsCheckCombo.SelectedIndex)
+                {
                     case SurveyNewsNeverIndex:
                         return SurveyNewsPolicy.Disabled;
                     case SurveyNewsOnceDayIndex:
@@ -42,38 +34,43 @@ namespace Microsoft.NodejsTools.Options {
                         return SurveyNewsPolicy.Disabled;
                 }
             }
-            set {
-                switch (value) {
+            set
+            {
+                switch (value)
+                {
                     case SurveyNewsPolicy.Disabled:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsNeverIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceDay:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceDayIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceWeek:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceWeekIndex;
                         break;
                     case SurveyNewsPolicy.CheckOnceMonth:
-                        _surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
+                        this._surveyNewsCheckCombo.SelectedIndex = SurveyNewsOnceMonthIndex;
                         break;
                 }
             }
         }
 
-        internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page) {
-            SurveyNewsCheckCombo = page.SurveyNewsCheck;
-            _waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
-            _waitOnNormalExit.Checked = page.WaitOnNormalExit;
-            _editAndContinue.Checked = page.EditAndContinue;
-            _checkForLongPaths.Checked = page.CheckForLongPaths;
+        internal void SyncControlWithPageSettings(NodejsGeneralOptionsPage page)
+        {
+            this.SurveyNewsCheckCombo = page.SurveyNewsCheck;
+            this._waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
+            this._waitOnNormalExit.Checked = page.WaitOnNormalExit;
+            this._editAndContinue.Checked = page.EditAndContinue;
+            this._checkForLongPaths.Checked = page.CheckForLongPaths;
         }
 
-        internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
-            page.SurveyNewsCheck = SurveyNewsCheckCombo;
-            page.WaitOnAbnormalExit = _waitOnAbnormalExit.Checked;
-            page.WaitOnNormalExit = _waitOnNormalExit.Checked;
-            page.EditAndContinue = _editAndContinue.Checked;
-            page.CheckForLongPaths = _checkForLongPaths.Checked;
+        internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page)
+        {
+            page.SurveyNewsCheck = this.SurveyNewsCheckCombo;
+            page.WaitOnAbnormalExit = this._waitOnAbnormalExit.Checked;
+            page.WaitOnNormalExit = this._waitOnNormalExit.Checked;
+            page.EditAndContinue = this._editAndContinue.Checked;
+            page.CheckForLongPaths = this._checkForLongPaths.Checked;
         }
     }
 }
+

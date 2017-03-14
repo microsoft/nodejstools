@@ -1,46 +1,29 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeStackFrame {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeStackFrame
+    {
         private readonly int _frameId;
 
-        public NodeStackFrame(int frameId) {
-            _frameId = frameId;
+        public NodeStackFrame(int frameId)
+        {
+            this._frameId = frameId;
         }
 
         /// <summary>
         /// The line number where the current function/class/module starts
         /// </summary>
-        public int StartLine {
-            get { return Line; }
-        }
-
+        public int StartLine => this.Line;
         /// <summary>
         /// The line number where the current function/class/module ends.
         /// </summary>
-        public int EndLine {
-            get { return Line; }
-        }
-
+        public int EndLine => this.Line;
         /// <summary>
         /// Gets a thread which executes stack frame.
         /// </summary>
@@ -64,10 +47,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets a script file name which holds a code segment of the frame.
         /// </summary>
-        public string FileName {
-            get { return Module != null ? Module.FileName : null; }
-        }
-
+        public string FileName => this.Module != null ? this.Module.FileName : null;
         /// <summary>
         /// Gets a script which holds a code segment of the frame.
         /// </summary>
@@ -77,10 +57,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Gets the ID of the frame.  Frame 0 is the currently executing frame, 1 is the caller of the currently executing frame,
         /// etc...
         /// </summary>
-        public int FrameId {
-            get { return _frameId; }
-        }
-
+        public int FrameId => this._frameId;
         /// <summary>
         /// Gets or sets a local variables of the frame.
         /// </summary>
@@ -95,7 +72,8 @@ namespace Microsoft.NodejsTools.Debugger {
         /// Attempts to parse the given text.  Returns true if the text is a valid expression.  Returns false if the text is not
         /// a valid expression and assigns the error messages produced to errorMsg.
         /// </summary>
-        public bool TryParseText(string text, out string errorMsg) {
+        public bool TryParseText(string text, out string errorMsg)
+        {
 #if NEEDS_UPDATING
             CollectingErrorSink errorSink = new CollectingErrorSink();
             Parser parser = Parser.CreateParser(new StringReader(text), _debugger.LanguageVersion, new ParserOptions() { ErrorSink = errorSink });
@@ -121,10 +99,11 @@ namespace Microsoft.NodejsTools.Debugger {
         /// </summary>
         /// <param name="text">Text expression.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken()) {
-            Utilities.CheckNotNull(Process);
+        public Task<NodeEvaluationResult> ExecuteTextAsync(string text, CancellationToken cancellationToken = new CancellationToken())
+        {
+            Utilities.CheckNotNull(this.Process);
 
-            return Process.ExecuteTextAsync(this, text, cancellationToken);
+            return this.Process.ExecuteTextAsync(this, text, cancellationToken);
         }
 
         /// <summary>
@@ -133,28 +112,34 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <param name="name">Variable name.</param>
         /// <param name="value">New value.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken()) {
-            Utilities.CheckNotNull(Process);
+        public async Task<NodeEvaluationResult> SetVariableValueAsync(string name, string value, CancellationToken cancellationToken = new CancellationToken())
+        {
+            Utilities.CheckNotNull(this.Process);
 
-            NodeEvaluationResult result = await Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
+            var result = await this.Process.SetVariableValueAsync(this, name, value, cancellationToken).ConfigureAwait(false);
 
-            if (result == null) {
+            if (result == null)
+            {
                 return null;
             }
 
             // Update variable in locals
-            for (int i = 0; i < Locals.Count; i++) {
-                NodeEvaluationResult evaluationResult = Locals[i];
-                if (evaluationResult.Expression == name) {
-                    Locals[i] = result;
+            for (var i = 0; i < this.Locals.Count; i++)
+            {
+                var evaluationResult = this.Locals[i];
+                if (evaluationResult.Expression == name)
+                {
+                    this.Locals[i] = result;
                 }
             }
 
             // Update variable in parameters
-            for (int i = 0; i < Parameters.Count; i++) {
-                NodeEvaluationResult evaluationResult = Parameters[i];
-                if (evaluationResult.Expression == name) {
-                    Parameters[i] = result;
+            for (var i = 0; i < this.Parameters.Count; i++)
+            {
+                var evaluationResult = this.Parameters[i];
+                if (evaluationResult.Expression == name)
+                {
+                    this.Parameters[i] = result;
                 }
             }
 
@@ -162,3 +147,4 @@ namespace Microsoft.NodejsTools.Debugger {
         }
     }
 }
+

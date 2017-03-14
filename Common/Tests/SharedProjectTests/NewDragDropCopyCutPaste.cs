@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Diagnostics;
 using System.IO;
@@ -24,25 +12,31 @@ using TestUtilities.UI;
 using Keyboard = TestUtilities.UI.Keyboard;
 using Mouse = TestUtilities.UI.Mouse;
 
-namespace Microsoft.VisualStudioTools.SharedProjectTests {
+namespace Microsoft.VisualStudioTools.SharedProjectTests
+{
     [TestClass]
-    public class NewDragDropCopyCutPaste : SharedProjectTest {
+    public class NewDragDropCopyCutPaste : SharedProjectTest
+    {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveToMissingFolderKeyboard() {
+        public void MoveToMissingFolderKeyboard()
+        {
             MoveToMissingFolder(MoveByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveToMissingFolderMouse() {
+        public void MoveToMissingFolderMouse()
+        {
             MoveToMissingFolder(MoveByMouse);
         }
 
-        private void MoveToMissingFolder(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveToMissingFolder(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveToMissingFolder",
                     projectType,
                     PropertyGroup(
@@ -54,7 +48,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveToMissingFolder", "Fob"),
@@ -69,18 +64,22 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveExcludedFolderKeyboard() {
+        public void MoveExcludedFolderKeyboard()
+        {
             MoveExcludedFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveExcludedFolderMouse() {
+        public void MoveExcludedFolderMouse()
+        {
             MoveExcludedFolder(MoveByMouse);
         }
 
-        private void MoveExcludedFolder(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveExcludedFolder(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveExcludedFolder",
                     projectType,
                     PropertyGroup(
@@ -93,7 +92,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveExcludedFolder", "Baz"),
@@ -108,19 +108,22 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveExcludedItemToFolderKeyboard() {
+        public void MoveExcludedItemToFolderKeyboard()
+        {
             MoveExcludedItemToFolder(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveExcludedItemToFolderMouse() {
+        public void MoveExcludedItemToFolderMouse()
+        {
             MoveExcludedItemToFolder(MoveByMouse);
         }
 
-        private void MoveExcludedItemToFolder(MoveDelegate mover) {
-
-            foreach (var projectType in ProjectTypes) {
+        private void MoveExcludedItemToFolder(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveExcludedItemToFolder",
                     projectType,
                     PropertyGroup(
@@ -132,7 +135,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveExcludedItemToFolder", "Folder"),
@@ -142,28 +146,31 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileDoesntExist("MoveExcludedItemToFolder", "codefile" + projectType.CodeExtension);
                     solution.AssertFileExists("MoveExcludedItemToFolder", "Folder", "codefile" + projectType.CodeExtension);
                     Assert.IsTrue(solution.GetProject("MoveExcludedItemToFolder").GetIsFolderExpanded("Folder"));
-
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameSkipMoveKeyboard() {
+        public void MoveDuplicateFileNameSkipMoveKeyboard()
+        {
             MoveDuplicateFileNameSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameSkipMoveMouse() {
+        public void MoveDuplicateFileNameSkipMoveMouse()
+        {
             MoveDuplicateFileNameSkipMove(MoveByMouse);
         }
 
         /// <summary>
         /// Move item within the project from one location to where it already exists, skipping the move.
         /// </summary>
-        private void MoveDuplicateFileNameSkipMove(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameSkipMove(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveDuplicateFileName",
                     projectType,
                     ItemGroup(
@@ -173,14 +180,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveDuplicateFileName", "Folder"),
                         solution.FindItem("MoveDuplicateFileName", "textfile.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.No();
                     }
 
@@ -194,13 +203,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNamesSkipOneKeyboard() {
+        public void MoveDuplicateFileNamesSkipOneKeyboard()
+        {
             MoveDuplicateFileNamesSkipOne(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNamesSkipOneMouse() {
+        public void MoveDuplicateFileNamesSkipOneMouse()
+        {
             MoveDuplicateFileNamesSkipOne(MoveByMouse);
         }
 
@@ -209,8 +220,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// The 1st item shouldn't be removed from the parent hierarchy, the 2nd should, and only the 2nd item should be overwritten.
         /// </summary>
-        private void MoveDuplicateFileNamesSkipOne(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNamesSkipOne(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveDuplicateFileName",
                     projectType,
                     ItemGroup(
@@ -222,7 +235,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveDuplicateFileName", "Folder"),
@@ -230,13 +244,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.FindItem("MoveDuplicateFileName", "textfile2.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.No();
                     }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.Yes();
                     }
 
@@ -253,14 +269,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VsTestHost")]
-        public void MoveDuplicateFileNamesFoldersSkipOneKeyboard() {
+        public void MoveDuplicateFileNamesFoldersSkipOneKeyboard()
+        {
             MoveDuplicateFileNamesFoldersSkipOne(MoveByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VsTestHost")]
-        public void MoveDuplicateFileNamesFoldersSkipOneMouse() {
+        public void MoveDuplicateFileNamesFoldersSkipOneMouse()
+        {
             MoveDuplicateFileNamesFoldersSkipOne(MoveByMouse);
         }
 
@@ -269,22 +287,25 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// The 1st item shouldn't be removed from the parent hierarchy, the 2nd should, and only the 2nd item should be overwritten.
         /// </summary>
-        private void MoveDuplicateFileNamesFoldersSkipOne(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNamesFoldersSkipOne(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var testDef = new ProjectDefinition("MoveDuplicateFileName",
                     projectType,
                     ItemGroup(
                         Folder("Source"),
                         Content("Source\\textfile1.txt", "source1"),
                         Content("Source\\textfile2.txt", "source2"),
-                        
+
                         Folder("Target"),
                         Content("Target\\textfile1.txt", "target1"),
                         Content("Target\\textfile2.txt", "target2")
                     )
                 );
 
-                using (var solution = testDef.Generate().ToVs()) {
+                using (var solution = testDef.Generate().ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveDuplicateFileName", "Target"),
@@ -292,13 +313,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         solution.FindItem("MoveDuplicateFileName", "Source", "textfile2.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.No();
                     }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.Yes();
                     }
 
@@ -314,13 +337,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNamesCrossProjectSkipOneKeyboard() {
+        public void MoveDuplicateFileNamesCrossProjectSkipOneKeyboard()
+        {
             MoveDuplicateFileNamesCrossProjectSkipOne(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNamesCrossProjectSkipOneMouse() {
+        public void MoveDuplicateFileNamesCrossProjectSkipOneMouse()
+        {
             MoveDuplicateFileNamesCrossProjectSkipOne(MoveByMouse);
         }
 
@@ -329,8 +354,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// The 1st item shouldn't be removed from the parent hierarchy, the 2nd should, and only the 2nd item should be overwritten.
         /// </summary>
-        private void MoveDuplicateFileNamesCrossProjectSkipOne(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNamesCrossProjectSkipOne(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projectDefs = new[] {
                     new ProjectDefinition("MoveDuplicateFileName",
                         projectType,
@@ -349,7 +376,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs())
+                {
                     var item1 = solution.FindItem("MoveDuplicateFileName", "textfile1.txt");
                     var item2 = solution.FindItem("MoveDuplicateFileName", "textfile2.txt");
                     mover(
@@ -359,13 +387,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                         item2
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.No();
                     }
 
                     System.Threading.Thread.Sleep(1000);
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.Yes();
                     }
 
@@ -381,13 +411,15 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCrossProjectSkipMoveKeyboard() {
+        public void MoveDuplicateFileNameCrossProjectSkipMoveKeyboard()
+        {
             MoveDuplicateFileNameCrossProjectSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCrossProjectSkipMoveMouse() {
+        public void MoveDuplicateFileNameCrossProjectSkipMoveMouse()
+        {
             MoveDuplicateFileNameCrossProjectSkipMove(MoveByMouse);
         }
 
@@ -396,8 +428,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// 
         /// https://pytools.codeplex.com/workitem/1967
         /// </summary>
-        private void MoveDuplicateFileNameCrossProjectSkipMove(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameCrossProjectSkipMove(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projectDefs = new[] {
                     new ProjectDefinition("MoveDuplicateFileName1",
                         projectType,
@@ -414,14 +448,16 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveDuplicateFileName2"),
                         solution.FindItem("MoveDuplicateFileName1", "textfile.txt")
                     );
 
-                    using (var dialog = solution.WaitForOverwriteFileDialog()) {
+                    using (var dialog = solution.WaitForOverwriteFileDialog())
+                    {
                         dialog.No();
                     }
 
@@ -430,27 +466,30 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName2", "MoveDuplicateFileName2", "textfile.txt");
                 }
-
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveKeyboard() {
+        public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveKeyboard()
+        {
             MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveByKeyboard);
         }
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveMouse() {
+        public void MoveDuplicateFileNameCrossProjectCSharpSkipMoveMouse()
+        {
             MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveByMouse);
         }
 
         /// <summary>
         /// Move item to where item exists across project types.
         /// </summary>
-        private void MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveDuplicateFileNameCrossProjectCSharpSkipMove(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projectDefs = new[] {
                     new ProjectDefinition("MoveDuplicateFileName1",
                         projectType,
@@ -467,7 +506,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs()) {
+                using (var solution = SolutionFile.Generate("MoveDuplicateFileName", projectDefs).ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveDuplicateFileNameCS"),
@@ -483,21 +523,22 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     solution.AssertFileExistsWithContent("MoveDuplicateFileName1", "MoveDuplicateFileName1", "textfile.txt");
                     solution.AssertFileExistsWithContent("MoveDuplicateFileNameCS", "MoveDuplicateFileNameCS", "textfile.txt");
                 }
-
             }
         }
 
         [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveFileFromFolderToLinkedFolderKeyboard() {
+        public void MoveFileFromFolderToLinkedFolderKeyboard()
+        {
             MoveFileFromFolderToLinkedFolder(MoveByKeyboard);
         }
 
         [Ignore]
         [TestMethod, Priority(2), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void MoveFileFromFolderToLinkedFolderMouse() {
+        public void MoveFileFromFolderToLinkedFolderMouse()
+        {
             MoveFileFromFolderToLinkedFolder(MoveByMouse);
         }
 
@@ -506,8 +547,10 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// ourselves to ourselves and that moves are reflected in both the folder and its symbolic link.
         /// NOTE: Because of symbolic link creation, this test must be run as administrator.
         /// </summary>
-        private void MoveFileFromFolderToLinkedFolder(MoveDelegate mover) {
-            foreach (var projectType in ProjectTypes) {
+        private void MoveFileFromFolderToLinkedFolder(MoveDelegate mover)
+        {
+            foreach (var projectType in ProjectTypes)
+            {
                 var projectDefs = new[] {
                     new ProjectDefinition("MoveLinkedFolder",
                         projectType,
@@ -520,7 +563,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                     )
                 };
 
-                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs()) {
+                using (var solution = SolutionFile.Generate("MoveLinkedFolder", projectDefs).ToVs())
+                {
                     mover(
                         solution,
                         solution.FindItem("MoveLinkedFolder", "FolderLink"),
@@ -553,7 +597,8 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// <summary>
         /// Moves one or more items in solution explorer to the destination using the mouse.
         /// </summary>
-        private static void MoveByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        private static void MoveByMouse(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             destination.DragOntoThis(Key.LeftShift, source);
         }
 
@@ -562,9 +607,11 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         /// </summary>
         /// <param name="destination"></param>
         /// <param name="source"></param>
-        private static void MoveByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source) {
+        private static void MoveByKeyboard(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source)
+        {
             AutomationWrapper.Select(source.First());
-            for (int i = 1; i < source.Length; i++) {
+            for (int i = 1; i < source.Length; i++)
+            {
                 AutomationWrapper.AddToSelection(source[i]);
             }
 
@@ -577,3 +624,4 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
         private delegate void MoveDelegate(IVisualStudioInstance vs, ITreeNode destination, params ITreeNode[] source);
     }
 }
+

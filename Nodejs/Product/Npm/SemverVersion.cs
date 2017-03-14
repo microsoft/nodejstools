@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -20,29 +6,33 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace Microsoft.NodejsTools.Npm {
+namespace Microsoft.NodejsTools.Npm
+{
     /// <summary>
     /// Represents a semantic version as defined at http://semver.org/
     /// and used by the npm semantic versioner: https://npmjs.org/doc/misc/semver.html.
     /// </summary>
-    public struct SemverVersion {
+    public struct SemverVersion
+    {
         public static readonly SemverVersion UnknownVersion = new SemverVersion(0, 0, 0);
 
         private static readonly Regex RegexSemver = new Regex(
             "^(?<major>[0-9]+)"
             + "\\.(?<minor>[0-9]+)"
-            + "\\.(?<patch>[…0-9]+)" // The '…' is there to handle the 'classy' library, which has a very long version number - see slightly snarky comment about that unadulterated bag of hilarity below.
-            + "(?:-(?<prerelease>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?"
-            + "(?:\\+(?<buildmetadata>[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*))?$",
+            + "\\.(?<patch>[\u20260-9]+)" // The '…' is there to handle the 'classy' library, which has a very long version number - see slightly snarky comment about that unadulterated bag of hilarity below.
+            + "(?:-(?<prerelease>[\u20260-9A-Za-z-]+(\\.[\u20260-9A-Za-z-]+)*))?"
+            + "(?:\\+(?<buildmetadata>[\u20260-9A-Za-z-]+(\\.[\u20260-9A-Za-z-]+)*))?$",
             RegexOptions.Singleline);
 
         private static readonly Regex RegexOptionalFragment = new Regex(
-            "^[…0-9A-Za-z-]+(\\.[…0-9A-Za-z-]+)*$",
+            "^[\u20260-9A-Za-z-]+(\\.[\u20260-9A-Za-z-]+)*$",
             RegexOptions.Singleline);
 
-        public static SemverVersion Parse(string versionString) {
+        public static SemverVersion Parse(string versionString)
+        {
             var matches = RegexSemver.Matches(versionString);
-            if (matches.Count != 1) {
+            if (matches.Count != 1)
+            {
                 throw new SemverVersionFormatException(
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid semantic version: '{0}'. The version number must consist of three non-negative numeric parts of the form MAJOR.MINOR.PATCH, with optional pre-release and/or build metadata. The optional parts may only contain characters in the set [0-9A-Za-z-].",
@@ -53,10 +43,12 @@ namespace Microsoft.NodejsTools.Npm {
             var preRelease = match.Groups["prerelease"];
             var buildMetadata = match.Groups["buildmetadata"];
 
-            try {
+            try
+            {
                 // Hack: To deal with patch truncation - e.g., seen with 'classy' package in npm v1.4.3 onwards
                 var patch = match.Groups["patch"].Value;
-                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("…", StringComparison.Ordinal)) {
+                while (!string.IsNullOrEmpty(patch) && patch.EndsWith("\u2026", StringComparison.Ordinal))
+                {
                     patch = patch.Length == 1 ? "0" : patch.Substring(0, patch.Length - 1);
                 }
                 // /Hack
@@ -67,7 +59,9 @@ namespace Microsoft.NodejsTools.Npm {
                     ulong.Parse(patch, CultureInfo.InvariantCulture),
                     preRelease.Success ? preRelease.Value : null,
                     buildMetadata.Success ? buildMetadata.Value : null);
-            } catch (OverflowException oe) {
+            }
+            catch (OverflowException oe)
+            {
                 throw new SemverVersionFormatException(
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid semantic version: '{0}'. One or more of the integer parts is large enough to overflow a 64-bit int.",
@@ -81,7 +75,8 @@ namespace Microsoft.NodejsTools.Npm {
         //  Wait! What?!? Does that mean there have been 130506190513601 previous patch releases of classy 0.3?
         //  No. No it doesn't. It means he can't read the semver spec.
 
-        private static bool IsValidOptionalFragment(string optional) {
+        private static bool IsValidOptionalFragment(string optional)
+        {
             return string.IsNullOrEmpty(optional) || RegexOptionalFragment.IsMatch(optional);
         }
 
@@ -90,8 +85,10 @@ namespace Microsoft.NodejsTools.Npm {
             ulong minor,
             ulong patch,
             string preReleaseVersion = null,
-            string buildMetadata = null) : this() {
-            if (!IsValidOptionalFragment(preReleaseVersion)) {
+            string buildMetadata = null) : this()
+        {
+            if (!IsValidOptionalFragment(preReleaseVersion))
+            {
                 throw new ArgumentException(
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
@@ -99,7 +96,8 @@ namespace Microsoft.NodejsTools.Npm {
                     "preReleaseVersion");
             }
 
-            if (!IsValidOptionalFragment(buildMetadata)) {
+            if (!IsValidOptionalFragment(buildMetadata))
+            {
                 throw new ArgumentException(
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
@@ -122,7 +120,7 @@ namespace Microsoft.NodejsTools.Npm {
 
         [JsonProperty]
         public ulong Patch { get; private set; }
-        
+
 
         //  N.B. Both PreReleaseVersion and BuildMetadata are series of dot separated identifiers, but since we don't really particularly
         //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
@@ -133,23 +131,28 @@ namespace Microsoft.NodejsTools.Npm {
         [JsonProperty]
         public string BuildMetadata { get; private set; }
 
-        public bool HasPreReleaseVersion {
+        public bool HasPreReleaseVersion
+        {
             get { return !string.IsNullOrEmpty(PreReleaseVersion); }
         }
 
-        public bool HasBuildMetadata {
+        public bool HasBuildMetadata
+        {
             get { return !string.IsNullOrEmpty(BuildMetadata); }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var builder = new StringBuilder(string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", Major, Minor, Patch));
 
-            if (HasPreReleaseVersion) {
+            if (HasPreReleaseVersion)
+            {
                 builder.Append('-');
                 builder.Append(PreReleaseVersion);
             }
 
-            if (HasBuildMetadata) {
+            if (HasBuildMetadata)
+            {
                 builder.Append('+');
                 builder.Append(BuildMetadata);
             }
@@ -157,12 +160,15 @@ namespace Microsoft.NodejsTools.Npm {
             return builder.ToString();
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return ToString().GetHashCode();
         }
 
-        public override bool Equals(object obj) {
-            if (!(obj is SemverVersion)) {
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SemverVersion))
+            {
                 return false;
             }
 
@@ -177,28 +183,35 @@ namespace Microsoft.NodejsTools.Npm {
                    && PreReleaseVersion == other.PreReleaseVersion;
         }
 
-        public static bool operator ==(SemverVersion v1, SemverVersion v2) {
+        public static bool operator ==(SemverVersion v1, SemverVersion v2)
+        {
             return v1.Equals(v2);
         }
 
-        public static bool operator !=(SemverVersion v1, SemverVersion v2) {
+        public static bool operator !=(SemverVersion v1, SemverVersion v2)
+        {
             return !(v1 == v2);
         }
 
-        public static bool operator >(SemverVersion v1, SemverVersion v2) {
+        public static bool operator >(SemverVersion v1, SemverVersion v2)
+        {
             return new SemverVersionComparer().Compare(v1, v2) == 1;
         }
 
-        public static bool operator <(SemverVersion v1, SemverVersion v2) {
+        public static bool operator <(SemverVersion v1, SemverVersion v2)
+        {
             return new SemverVersionComparer().Compare(v1, v2) == -1;
         }
 
-        public static bool operator >=(SemverVersion v1, SemverVersion v2) {
+        public static bool operator >=(SemverVersion v1, SemverVersion v2)
+        {
             return v1 == v2 || v1 > v2;
         }
 
-        public static bool operator <=(SemverVersion v1, SemverVersion v2) {
+        public static bool operator <=(SemverVersion v1, SemverVersion v2)
+        {
             return v1 == v2 || v1 < v2;
         }
     }
 }
+

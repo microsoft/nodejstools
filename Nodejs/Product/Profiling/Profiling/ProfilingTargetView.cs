@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,28 +7,32 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     /// <summary>
     /// Provides a view model for the ProfilingTarget class.
     /// </summary>
-    public sealed class ProfilingTargetView : INotifyPropertyChanged {
+    public sealed class ProfilingTargetView : INotifyPropertyChanged
+    {
         private ReadOnlyCollection<ProjectTargetView> _availableProjects;
-        
+
         private ProjectTargetView _project;
         private bool _isProjectSelected, _isStandaloneSelected;
         private StandaloneTargetView _standalone;
         private readonly string _startText;
 
         private bool _isValid;
-        
+
         /// <summary>
         /// Create a ProfilingTargetView with default values.
         /// </summary>
-        public ProfilingTargetView() {
+        public ProfilingTargetView()
+        {
             var solution = NodejsProfilingPackage.Instance.Solution;
-            
+
             var availableProjects = new List<ProjectTargetView>();
-            foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: true)) {
+            foreach (var project in solution.EnumerateLoadedProjects(onlyNodeProjects: true))
+            {
                 availableProjects.Add(new ProjectTargetView((IVsHierarchy)project));
             }
             _availableProjects = new ReadOnlyCollection<ProjectTargetView>(availableProjects);
@@ -59,10 +49,13 @@ namespace Microsoft.NodejsTools.Profiling {
             var startupProject = NodejsProfilingPackage.Instance.GetStartupProjectGuid();
             Project = AvailableProjects.FirstOrDefault(p => p.Guid == startupProject) ??
                 AvailableProjects.FirstOrDefault();
-            if (Project != null) {
+            if (Project != null)
+            {
                 IsStandaloneSelected = false;
                 IsProjectSelected = true;
-            } else {
+            }
+            else
+            {
                 IsProjectSelected = false;
                 IsStandaloneSelected = true;
             }
@@ -74,12 +67,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// </summary>
         /// <param name="template"></param>
         public ProfilingTargetView(ProfilingTarget template)
-            : this() {
-            if (template.ProjectTarget != null) {
+            : this()
+        {
+            if (template.ProjectTarget != null)
+            {
                 Project = new ProjectTargetView(template.ProjectTarget);
                 IsStandaloneSelected = false;
                 IsProjectSelected = true;
-            } else if (template.StandaloneTarget != null) {
+            }
+            else if (template.StandaloneTarget != null)
+            {
                 Standalone = new StandaloneTargetView(template.StandaloneTarget);
                 IsProjectSelected = false;
                 IsStandaloneSelected = true;
@@ -90,19 +87,26 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Returns a ProfilingTarget with the values set from the view model.
         /// </summary>
-        public ProfilingTarget GetTarget() {
-            if (IsValid) {
-                return new ProfilingTarget {
+        public ProfilingTarget GetTarget()
+        {
+            if (IsValid)
+            {
+                return new ProfilingTarget
+                {
                     ProjectTarget = IsProjectSelected ? Project.GetTarget() : null,
                     StandaloneTarget = IsStandaloneSelected ? Standalone.GetTarget() : null
                 };
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
 
-        public ReadOnlyCollection<ProjectTargetView> AvailableProjects {
-            get {
+        public ReadOnlyCollection<ProjectTargetView> AvailableProjects
+        {
+            get
+            {
                 return _availableProjects;
             }
         }
@@ -110,8 +114,10 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// True if AvailableProjects has at least one item.
         /// </summary>
-        public bool IsAnyAvailableProjects {
-            get {
+        public bool IsAnyAvailableProjects
+        {
+            get
+            {
                 return _availableProjects.Count > 0;
             }
         }
@@ -119,12 +125,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// A view of the details of the current project.
         /// </summary>
-        public ProjectTargetView Project {
-            get {
+        public ProjectTargetView Project
+        {
+            get
+            {
                 return _project;
             }
-            set {
-                if (_project != value) {
+            set
+            {
+                if (_project != value)
+                {
                     _project = value;
                     OnPropertyChanged(nameof(Project));
                 }
@@ -134,12 +144,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// True if a project is the currently selected target; otherwise, false.
         /// </summary>
-        public bool IsProjectSelected {
-            get {
+        public bool IsProjectSelected
+        {
+            get
+            {
                 return _isProjectSelected;
             }
-            set {
-                if (_isProjectSelected != value) {
+            set
+            {
+                if (_isProjectSelected != value)
+                {
                     _isProjectSelected = value;
                     OnPropertyChanged(nameof(IsProjectSelected));
                 }
@@ -149,17 +163,23 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// A view of the details of the current standalone script.
         /// </summary>
-        public StandaloneTargetView Standalone {
-            get {
+        public StandaloneTargetView Standalone
+        {
+            get
+            {
                 return _standalone;
             }
-            set {
-                if (_standalone != value) {
-                    if (_standalone != null) {
+            set
+            {
+                if (_standalone != value)
+                {
+                    if (_standalone != null)
+                    {
                         _standalone.PropertyChanged -= Standalone_PropertyChanged;
                     }
                     _standalone = value;
-                    if (_standalone != null) {
+                    if (_standalone != null)
+                    {
                         _standalone.PropertyChanged += Standalone_PropertyChanged;
                     }
 
@@ -171,12 +191,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// True if a standalone script is the currently selected target; otherwise, false.
         /// </summary>
-        public bool IsStandaloneSelected {
-            get {
+        public bool IsStandaloneSelected
+        {
+            get
+            {
                 return _isStandaloneSelected;
             }
-            set {
-                if (_isStandaloneSelected != value) {
+            set
+            {
+                if (_isStandaloneSelected != value)
+                {
                     _isStandaloneSelected = value;
                     OnPropertyChanged(nameof(IsStandaloneSelected));
                 }
@@ -186,10 +210,12 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Receives our own property change events to update IsValid.
         /// </summary>
-        void ProfilingTargetView_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        private void ProfilingTargetView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
             Debug.Assert(sender == this);
 
-            if (e.PropertyName != "IsValid") {
+            if (e.PropertyName != "IsValid")
+            {
                 IsValid = (IsProjectSelected != IsStandaloneSelected) &&
                     (IsProjectSelected ?
                         Project != null :
@@ -200,7 +226,8 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Propagate property change events from Standalone.
         /// </summary>
-        private void Standalone_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        private void Standalone_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
             Debug.Assert(Standalone == sender);
             OnPropertyChanged(nameof(Standalone));
         }
@@ -208,27 +235,35 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// True if all settings are valid; otherwise, false.
         /// </summary>
-        public bool IsValid {
-            get {
+        public bool IsValid
+        {
+            get
+            {
                 return _isValid;
             }
-            private set {
-                if (_isValid != value) {
+            private set
+            {
+                if (_isValid != value)
+                {
                     _isValid = value;
                     OnPropertyChanged(nameof(IsValid));
                 }
             }
         }
 
-        public string StartText {
-            get {
+        public string StartText
+        {
+            get
+            {
                 return _startText;
             }
         }
 
-        private void OnPropertyChanged(string propertyName) {
+        private void OnPropertyChanged(string propertyName)
+        {
             var evt = PropertyChanged;
-            if (evt != null) {
+            if (evt != null)
+            {
                 evt(this, new PropertyChangedEventArgs(propertyName));
             }
         }
@@ -239,4 +274,5 @@ namespace Microsoft.NodejsTools.Profiling {
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
- 
+
+

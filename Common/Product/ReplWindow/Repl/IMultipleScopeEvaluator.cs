@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +6,8 @@ using System.Linq;
 using System.Text;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -26,7 +15,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// Supports a REPL evaluator which enables the user to switch between
     /// multiple scopes of execution.
     /// </summary>
-    public interface IMultipleScopeEvaluator : IReplEvaluator {
+    public interface IMultipleScopeEvaluator : IReplEvaluator
+    {
         /// <summary>
         /// Sets the current scope to the given name.
         /// </summary>
@@ -40,7 +30,8 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Gets the current scope name.
         /// </summary>
-        string CurrentScopeName {
+        string CurrentScopeName
+        {
             get;
         }
 
@@ -57,8 +48,10 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Returns true if multiple scope support is currently enabled, false if not.
         /// </summary>
-        bool EnableMultipleScopes {
+        bool EnableMultipleScopes
+        {
             get;
         }
     }
 }
+

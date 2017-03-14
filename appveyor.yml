@@ -4,6 +4,7 @@
     except:
     - v1.1.x
     - v1.2.x
+    - future
   skip_tags: true
   image: Visual Studio 2015
   environment:

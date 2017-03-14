@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Drawing;
@@ -21,8 +9,10 @@ using System.Windows.Media.Imaging;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.VisualStudioTools.Wpf {
-    public static class Controls {
+namespace Microsoft.VisualStudioTools.Wpf
+{
+    public static class Controls
+    {
         public static readonly object BackgroundKey = VsBrushes.WindowKey;
         public static readonly object BackgroundColorKey = VsColors.WindowKey;
         public static readonly object BackgroundAccentKey = VsBrushes.ButtonFaceKey;
@@ -78,21 +68,28 @@ namespace Microsoft.VisualStudioTools.Wpf {
 
         public static readonly BitmapSource UacShield = CreateUacShield();
 
-        private static BitmapSource CreateUacShield() {
-            if (Environment.OSVersion.Version.Major >= 6) {
+        private static BitmapSource CreateUacShield()
+        {
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
                 var sii = new NativeMethods.SHSTOCKICONINFO();
                 sii.cbSize = (UInt32)Marshal.SizeOf(typeof(NativeMethods.SHSTOCKICONINFO));
 
                 Marshal.ThrowExceptionForHR(NativeMethods.SHGetStockIconInfo(77, 0x0101, ref sii));
-                try {
+                try
+                {
                     return Imaging.CreateBitmapSourceFromHIcon(
                         sii.hIcon,
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
-                } finally {
+                }
+                finally
+                {
                     NativeMethods.DestroyIcon(sii.hIcon);
                 }
-            } else {
+            }
+            else
+            {
                 return Imaging.CreateBitmapSourceFromHIcon(
                     SystemIcons.Shield.Handle,
                     Int32Rect.Empty,
@@ -101,3 +98,4 @@ namespace Microsoft.VisualStudioTools.Wpf {
         }
     }
 }
+

@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Windows.Media;
@@ -19,7 +7,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -27,20 +16,22 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveBlackFormatDefinition : ClassificationFormatDefinition {
+    internal class InteractiveBlackFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Black";
 #else
         public const string Name = "Interactive - Black";
 #endif
-        
+
 
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveBlackFormatDefinition() {
+
+        public InteractiveBlackFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Colors.Black;
         }
@@ -50,20 +41,22 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkRedFormatDefinition : ClassificationFormatDefinition {
+    internal class InteractiveDarkRedFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkRed";
 #else
         public const string Name = "Interactive - DarkRed";
 #endif
-        
+
 
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkRedFormatDefinition() {
+
+        public InteractiveDarkRedFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x7f, 0, 0);
         }
@@ -73,20 +66,22 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkGreenFormatDefinition : ClassificationFormatDefinition {
+    internal class InteractiveDarkGreenFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkGreen";
 #else
         public const string Name = "Interactive - DarkGreen";
 #endif
-        
+
 
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkGreenFormatDefinition() {
+
+        public InteractiveDarkGreenFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0x7f, 0);
         }
@@ -96,20 +91,22 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkYellowFormatDefinition : ClassificationFormatDefinition {
+    internal class InteractiveDarkYellowFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkYellow";
 #else
         public const string Name = "Interactive - DarkYellow";
 #endif
-        
+
 
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkYellowFormatDefinition() {
+
+        public InteractiveDarkYellowFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x7f, 0x7f, 0);
         }
@@ -119,7 +116,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkBlueFormatDefinition : ClassificationFormatDefinition {
+    internal class InteractiveDarkBlueFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkBlue";
 #else
@@ -130,8 +128,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkBlueFormatDefinition() {
+
+        public InteractiveDarkBlueFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0x00, 0x7f);
         }
@@ -141,7 +140,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkMagentaFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveDarkMagentaFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkMagenta";
 #else
@@ -151,8 +151,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkMagentaFormatDefinition() {
+
+        public InteractiveDarkMagentaFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x7f, 0x00, 0x7f);
         }
@@ -162,7 +163,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkCyanFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveDarkCyanFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkCyan";
 #else
@@ -172,8 +174,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveDarkCyanFormatDefinition() {
+
+        public InteractiveDarkCyanFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0x7f, 0x7f);
         }
@@ -185,7 +188,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveGrayFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveGrayFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Gray";
 #else
@@ -195,7 +199,8 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        public InteractiveGrayFormatDefinition() {
+        public InteractiveGrayFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0xC0, 0xC0, 0xC0);
         }
@@ -205,7 +210,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveDarkGrayFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveDarkGrayFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - DarkGray";
 #else
@@ -216,7 +222,8 @@ namespace Microsoft.VisualStudio.Repl {
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
 
-        public InteractiveDarkGrayFormatDefinition() {
+        public InteractiveDarkGrayFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x7f, 0x7f, 0x7f);
         }
@@ -226,7 +233,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveRedFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveRedFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Red";
 #else
@@ -236,8 +244,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveRedFormatDefinition() {
+
+        public InteractiveRedFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0xff, 0, 0);
         }
@@ -247,7 +256,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveGreenFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveGreenFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Green";
 #else
@@ -257,8 +267,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveGreenFormatDefinition() {
+
+        public InteractiveGreenFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0xff, 0);
         }
@@ -268,7 +279,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveYellowFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveYellowFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Yellow";
 #else
@@ -279,7 +291,8 @@ namespace Microsoft.VisualStudio.Repl {
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
 
-        public InteractiveYellowFormatDefinition() {
+        public InteractiveYellowFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0xff, 0xff, 0);
         }
@@ -290,7 +303,8 @@ namespace Microsoft.VisualStudio.Repl {
     [Name(Name)]
     [UserVisible(true)]
     [Order(After = Priority.Default, Before = Priority.High)]
-    internal class InteractiveBlueFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveBlueFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Blue";
 #else
@@ -300,8 +314,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveBlueFormatDefinition() {
+
+        public InteractiveBlueFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0x00, 0xff);
         }
@@ -311,7 +326,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveMagentaFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveMagentaFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Magenta";
 #else
@@ -321,8 +337,9 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveMagentaFormatDefinition() {
+
+        public InteractiveMagentaFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0xff, 0x00, 0xff);
         }
@@ -332,7 +349,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveCyanFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveCyanFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - Cyan";
 #else
@@ -343,7 +361,8 @@ namespace Microsoft.VisualStudio.Repl {
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
 
-        public InteractiveCyanFormatDefinition() {
+        public InteractiveCyanFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0x00, 0xff, 0xff);
         }
@@ -353,7 +372,8 @@ namespace Microsoft.VisualStudio.Repl {
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
-    internal class InteractiveWhiteFormatDefinition : ClassificationFormatDefinition {        
+    internal class InteractiveWhiteFormatDefinition : ClassificationFormatDefinition
+    {
 #if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string Name = "Node.js Interactive - White";
 #else
@@ -363,10 +383,12 @@ namespace Microsoft.VisualStudio.Repl {
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
         internal static ClassificationTypeDefinition Definition = null; // Set via MEF
-        
-        public InteractiveWhiteFormatDefinition() {
+
+        public InteractiveWhiteFormatDefinition()
+        {
             DisplayName = Name;
             ForegroundColor = Color.FromRgb(0xff, 0xff, 0xff);
         }
     }
 }
+

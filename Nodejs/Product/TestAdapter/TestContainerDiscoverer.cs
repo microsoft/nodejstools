@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -29,10 +15,12 @@ using Microsoft.VisualStudio.TestWindow.Extensibility;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.TestAdapter;
 
-namespace Microsoft.NodejsTools.TestAdapter {
+namespace Microsoft.NodejsTools.TestAdapter
+{
     [Export(typeof(ITestContainerDiscoverer))]
     [Export(typeof(TestContainerDiscoverer))]
-    class TestContainerDiscoverer : ITestContainerDiscoverer, IDisposable {
+    internal class TestContainerDiscoverer : ITestContainerDiscoverer, IDisposable
+    {
         private readonly IServiceProvider _serviceProvider;
         private readonly TestFileAddRemoveListener _testFilesAddRemoveListener;
         private readonly TestFilesUpdateWatcher _testFilesUpdateWatcher;
@@ -48,13 +36,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
                    new SolutionEventsListener(serviceProvider),
                    new TestFilesUpdateWatcher(),
                    new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
-                    operationState) { }
+                    operationState)
+        { }
 
         public TestContainerDiscoverer(IServiceProvider serviceProvider,
                                        SolutionEventsListener solutionListener,
                                        TestFilesUpdateWatcher testFilesUpdateWatcher,
                                        TestFileAddRemoveListener testFilesAddRemoveListener,
-                                       IOperationState operationState) {
+                                       IOperationState operationState)
+        {
             ValidateArg.NotNull(serviceProvider, "serviceProvider");
             ValidateArg.NotNull(solutionListener, "solutionListener");
             ValidateArg.NotNull(testFilesUpdateWatcher, "testFilesUpdateWatcher");
@@ -84,7 +74,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             _firstLoad = true;
         }
 
-        private static IEnumerable<IVsProject> EnumerateLoadedProjects(IVsSolution solution) {
+        private static IEnumerable<IVsProject> EnumerateLoadedProjects(IVsSolution solution)
+        {
             var guid = Guids.NodejsBaseProjectFactory;
             IEnumHierarchies hierarchies;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
@@ -93,24 +84,29 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 out hierarchies)));
             IVsHierarchy[] hierarchy = new IVsHierarchy[1];
             uint fetched;
-            while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out fetched)) && fetched == 1) {
+            while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out fetched)) && fetched == 1)
+            {
                 var project = hierarchy[0] as IVsProject;
-                if (project != null) {
+                if (project != null)
+                {
                     yield return project;
                 }
             }
         }
 
-        private static IEnumerable<uint> GetProjectItemIds(IVsProject project) {
+        private static IEnumerable<uint> GetProjectItemIds(IVsProject project)
+        {
             var hierarchy = (IVsHierarchy)project;
             return GetProjectItemIds(hierarchy, VSConstants.VSITEMID_ROOT);
         }
 
-        private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId) {
+        private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId)
+        {
             object pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
 
             uint childId = GetItemId(pVar);
-            while (childId != VSConstants.VSITEMID_NIL) {
+            while (childId != VSConstants.VSITEMID_NIL)
+            {
                 yield return childId;
 
                 foreach (var childNodePathId in GetProjectItemIds(project, childId))
@@ -121,7 +117,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        public static uint GetItemId(object pvar) {
+        public static uint GetItemId(object pvar)
+        {
             if (pvar == null)
                 return VSConstants.VSITEMID_NIL;
             if (pvar is int)
@@ -137,27 +134,32 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return VSConstants.VSITEMID_NIL;
         }
 
-        public static object GetPropertyValue(int propid, uint itemId, IVsHierarchy vsHierarchy) {
-            if (itemId == VSConstants.VSITEMID_NIL) {
+        public static object GetPropertyValue(int propid, uint itemId, IVsHierarchy vsHierarchy)
+        {
+            if (itemId == VSConstants.VSITEMID_NIL)
+            {
                 return null;
             }
 
             object o;
-            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out o))) {
+            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out o)))
+            {
                 return o;
             }
             return null;
         }
 
-        internal static bool IsValidTestFramework(string testFramework) {
+        internal static bool IsValidTestFramework(string testFramework)
+        {
             return !String.IsNullOrWhiteSpace(testFramework);
         }
 
-        internal bool IsTestFile(string pathToFile) {
-
+        internal bool IsTestFile(string pathToFile)
+        {
             string testCaseFile = pathToFile;
             IVsProject project = GetTestProjectFromFile(pathToFile);
-            if (null == project) {
+            if (null == project)
+            {
                 //The file is not included in the project.  
                 //Don't look for tests in it.
                 return false;
@@ -167,14 +169,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             //Check to see if we are dealing with a TypeScript file
             //  If we are then switch the test container to the underlying js file
             //
-            if (TypeScriptHelpers.IsTypeScriptFile(pathToFile)) {
+            if (TypeScriptHelpers.IsTypeScriptFile(pathToFile))
+            {
                 string jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
-                if (!File.Exists(jsFile)) {
+                if (!File.Exists(jsFile))
+                {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
                     return false;
                 }
-            } else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase)) {
+            }
+            else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase))
+            {
                 return false;
             }
 
@@ -184,55 +190,70 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return IsTestFile(itemId, project);
         }
 
-        private static bool IsTestFile(uint itemId, IVsProject project) {
+        private static bool IsTestFile(uint itemId, IVsProject project)
+        {
             IVsHierarchy hierarchy = project as IVsHierarchy;
 
-            if (hierarchy == null) {
+            if (hierarchy == null)
+            {
                 return false;
             }
             object extObject;
             hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
 
             var projectItem = extObject as EnvDTE.ProjectItem;
-            if (projectItem == null) {
+            if (projectItem == null)
+            {
                 return false;
             }
 
             var props = projectItem.Properties;
-            if (props == null) {
+            if (props == null)
+            {
                 return false;
             }
 
-            try {
+            try
+            {
                 var testFile = props.Item("TestFramework");
-                if (testFile == null || !(testFile.Value is string)) {
+                if (testFile == null || !(testFile.Value is string))
+                {
                     return false;
                 }
 
                 return IsValidTestFramework((string)testFile.Value);
-            } catch (ArgumentException) {
+            }
+            catch (ArgumentException)
+            {
                 //If we fail to retrieve the property then this isn't a test file
             }
             return false;
-
         }
 
-        private void OperationStateChanged(object sender, OperationStateChangedEventArgs e) {
-            if (e.State == TestOperationStates.ChangeDetectionStarting) {
+        private void OperationStateChanged(object sender, OperationStateChangedEventArgs e)
+        {
+            if (e.State == TestOperationStates.ChangeDetectionStarting)
+            {
                 _detectingChanges = true;
-            } else if (e.State == TestOperationStates.ChangeDetectionFinished) {
+            }
+            else if (e.State == TestOperationStates.ChangeDetectionFinished)
+            {
                 _detectingChanges = false;
             }
         }
 
-        private void OnBuildStarted(object sender, EventArgs e) {
+        private void OnBuildStarted(object sender, EventArgs e)
+        {
             _building = true;
         }
 
-        private void OnBuildCompleted(object sender, EventArgs e) {
+        private void OnBuildCompleted(object sender, EventArgs e)
+        {
             var solution = (IVsSolution)_serviceProvider.GetService(typeof(SVsSolution));
-            foreach (var project in EnumerateLoadedProjects(solution)) {
-                if (OnTestContainersChanged(project)) {
+            foreach (var project in EnumerateLoadedProjects(solution))
+            {
+                if (OnTestContainersChanged(project))
+                {
                     // We only need to fire the event once as the event 
                     // is not per-project, but we shouldn't fire it if 
                     // there's not yet any projects which we've been 
@@ -244,8 +265,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         #region IDispoable
-        void IDisposable.Dispose() {
-            if (!_isDisposed) {
+        void IDisposable.Dispose()
+        {
+            if (!_isDisposed)
+            {
                 _isDisposed = true;
                 _testFilesAddRemoveListener.Dispose();
                 _testFilesUpdateWatcher.Dispose();
@@ -257,22 +280,28 @@ namespace Microsoft.NodejsTools.TestAdapter {
         #region ITestContainerDiscoverer
         public event EventHandler TestContainersUpdated;
 
-        public Uri ExecutorUri {
-            get {
+        public Uri ExecutorUri
+        {
+            get
+            {
                 return TestExecutor.ExecutorUri;
             }
         }
 
-        public IEnumerable<ITestContainer> TestContainers {
-            get {
+        public IEnumerable<ITestContainer> TestContainers
+        {
+            get
+            {
                 // Get current solution
                 var solution = (IVsSolution)_serviceProvider.GetService(typeof(SVsSolution));
 
-                if (_firstLoad) {
+                if (_firstLoad)
+                {
                     // The first time through, we don't know about any loaded
                     // projects.
                     _firstLoad = false;
-                    foreach (var project in EnumerateLoadedProjects(solution)) {
+                    foreach (var project in EnumerateLoadedProjects(solution))
+                    {
                         OnProjectLoaded(null, new ProjectEventArgs(project));
                     }
                     _testFilesAddRemoveListener.StartListeningForTestFileChanges();
@@ -285,9 +314,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
         #endregion
 
-        public IEnumerable<ITestContainer> GetTestContainers(IVsProject project) {
-            if (!project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
-                if (EqtTrace.IsVerboseEnabled) {
+        public IEnumerable<ITestContainer> GetTestContainers(IVsProject project)
+        {
+            if (!project.IsTestProject(Guids.NodejsBaseProjectFactory))
+            {
+                if (EqtTrace.IsVerboseEnabled)
+                {
                     EqtTrace.Verbose("TestContainerDiscoverer: Ignoring project {0} as it is not a Node.js project.", project.GetProjectName());
                 }
 
@@ -297,12 +329,14 @@ namespace Microsoft.NodejsTools.TestAdapter {
             string path;
             project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path);
 
-            if (_detectingChanges) {
+            if (_detectingChanges)
+            {
                 SaveModifiedFiles(project);
             }
 
             ProjectInfo projectInfo;
-            if (!_knownProjects.TryGetValue(path, out projectInfo)) {
+            if (!_knownProjects.TryGetValue(path, out projectInfo))
+            {
                 // Don't return any containers for projects we don't know about.
                 yield break;
             }
@@ -310,13 +344,21 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
             var latestWrite = project.GetProjectItemPaths().Aggregate(
                 _lastWrite,
-                (latest, filePath) => {
-                    try {
+                (latest, filePath) =>
+                {
+                    try
+                    {
                         var ft = File.GetLastWriteTimeUtc(filePath);
                         return (ft > latest) ? ft : latest;
-                    } catch (UnauthorizedAccessException) {
-                    } catch (ArgumentException) {
-                    } catch (IOException) {
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                    }
+                    catch (ArgumentException)
+                    {
+                    }
+                    catch (IOException)
+                    {
                     }
                     return latest;
                 });
@@ -327,10 +369,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             yield return new TestContainer(this, path, latestWrite, architecture);
         }
 
-        private void SaveModifiedFiles(IVsProject project) {
+        private void SaveModifiedFiles(IVsProject project)
+        {
             // save all the open files in the project...
-            foreach (var itemPath in project.GetProjectItems()) {
-                if (String.IsNullOrEmpty(itemPath)) {
+            foreach (var itemPath in project.GetProjectItems())
+            {
+                if (String.IsNullOrEmpty(itemPath))
+                {
                     continue;
                 }
                 var solution = (IVsSolution)_serviceProvider.GetService(typeof(SVsSolution));
@@ -344,23 +389,29 @@ namespace Microsoft.NodejsTools.TestAdapter {
             }
         }
 
-        private bool ShouldDiscover(string pathToItem) {
-            if (string.IsNullOrEmpty(pathToItem)) {
+        private bool ShouldDiscover(string pathToItem)
+        {
+            if (string.IsNullOrEmpty(pathToItem))
+            {
                 return false;
             }
 
-            if (pathToItem.IndexOf("\\node_modules\\", StringComparison.OrdinalIgnoreCase) >= 0) {
+            if (pathToItem.IndexOf("\\node_modules\\", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
                 return false;
             }
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
             //so we need to re-discover when file change happens. 
-            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase)) {
+            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase))
+            {
                 return true;
             }
 
-            if (IsTestFile(pathToItem)) {
-                if (EqtTrace.IsVerboseEnabled) {
+            if (IsTestFile(pathToItem))
+            {
+                if (EqtTrace.IsVerboseEnabled)
+                {
                     EqtTrace.Verbose("TestContainerDiscoverer: Found a test {0}.", pathToItem);
                 }
                 return true;
@@ -368,13 +419,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return false;
         }
 
-        private void OnProjectLoaded(object sender, ProjectEventArgs e) {
-            if (e.Project != null) {
+        private void OnProjectLoaded(object sender, ProjectEventArgs e)
+        {
+            if (e.Project != null)
+            {
                 string root = null;
-                try {
+                try
+                {
                     root = e.Project.GetProjectHome();
-                } catch (Exception ex) {
-                    if (EqtTrace.IsVerboseEnabled) {
+                }
+                catch (Exception ex)
+                {
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
                         EqtTrace.Warning("TestContainerDiscoverer: Failed to get project home {0}", ex);
                     }
                     // If we fail to get ProjectHome, we still want to track the
@@ -384,7 +441,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                 string path;
                 if (e.Project.TryGetProjectPath(out path) &&
-                    !_knownProjects.ContainsKey(path)) {
+                    !_knownProjects.ContainsKey(path))
+                {
                     var dteProject = ((IVsHierarchy)e.Project).GetProject();
 
                     var projectInfo = new ProjectInfo(
@@ -394,11 +452,15 @@ namespace Microsoft.NodejsTools.TestAdapter {
 
                     _knownProjects.Add(path, projectInfo);
 
-                    foreach (var p in e.Project.GetProjectItemPaths()) {
-                        if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, p)) {
+                    foreach (var p in e.Project.GetProjectItemPaths())
+                    {
+                        if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, p))
+                        {
                             _testFilesUpdateWatcher.AddDirectoryWatch(root);
                             _fileRootMap[p] = root;
-                        } else {
+                        }
+                        else
+                        {
                             _testFilesUpdateWatcher.AddWatch(p);
                         }
                     }
@@ -408,13 +470,19 @@ namespace Microsoft.NodejsTools.TestAdapter {
             OnTestContainersChanged(e.Project);
         }
 
-        private void OnProjectUnloaded(object sender, ProjectEventArgs e) {
-            if (e.Project != null) {
+        private void OnProjectUnloaded(object sender, ProjectEventArgs e)
+        {
+            if (e.Project != null)
+            {
                 string root = null;
-                try {
+                try
+                {
                     root = e.Project.GetProjectHome();
-                } catch (Exception ex) {
-                    if (EqtTrace.IsVerboseEnabled) {
+                }
+                catch (Exception ex)
+                {
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
                         EqtTrace.Warning("TestContainerDiscoverer: Failed to get project home {0}", ex);
                     }
                     // If we fail to get ProjectHome, we still want to track the
@@ -425,16 +493,20 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 ProjectInfo projectInfo;
                 string projectPath;
                 if (e.Project.TryGetProjectPath(out projectPath) &&
-                    _knownProjects.TryGetValue(projectPath, out projectInfo)) {
+                    _knownProjects.TryGetValue(projectPath, out projectInfo))
+                {
                     _knownProjects.Remove(projectPath);
 
-                    foreach (var p in e.Project.GetProjectItemPaths()) {
-                        if (string.IsNullOrEmpty(root) || !CommonUtils.IsSubpathOf(root, p)) {
+                    foreach (var p in e.Project.GetProjectItemPaths())
+                    {
+                        if (string.IsNullOrEmpty(root) || !CommonUtils.IsSubpathOf(root, p))
+                        {
                             _testFilesUpdateWatcher.RemoveWatch(p);
                         }
                         _fileRootMap.Remove(p);
                     }
-                    if (!string.IsNullOrEmpty(root)) {
+                    if (!string.IsNullOrEmpty(root))
+                    {
                         _testFilesUpdateWatcher.RemoveWatch(root);
                     }
                 }
@@ -443,7 +515,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             OnTestContainersChanged(e.Project);
         }
 
-        private void OnProjectRenamed(object sender, ProjectEventArgs e) {
+        private void OnProjectRenamed(object sender, ProjectEventArgs e)
+        {
             OnProjectUnloaded(this, e);
             OnProjectLoaded(this, e);
         }
@@ -451,19 +524,26 @@ namespace Microsoft.NodejsTools.TestAdapter {
         /// <summary>
         /// Handler to react to test file Add/remove/rename events
         /// </summary>
-        private void OnProjectItemChanged(object sender, TestFileChangedEventArgs e) {
-            if (e != null && ShouldDiscover(e.File)) {
+        private void OnProjectItemChanged(object sender, TestFileChangedEventArgs e)
+        {
+            if (e != null && ShouldDiscover(e.File))
+            {
                 string root = null;
-                switch (e.ChangedReason) {
+                switch (e.ChangedReason)
+                {
                     case TestFileChangedReason.Added:
                         Debug.Assert(e.Project != null);
-                        if (e.Project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
+                        if (e.Project.IsTestProject(Guids.NodejsBaseProjectFactory))
+                        {
                             root = e.Project.GetProjectHome();
 
-                            if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File)) {
+                            if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
+                            {
                                 _testFilesUpdateWatcher.AddDirectoryWatch(root);
                                 _fileRootMap[e.File] = root;
-                            } else {
+                            }
+                            else
+                            {
                                 _testFilesUpdateWatcher.AddWatch(e.File);
                             }
 
@@ -473,12 +553,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     case TestFileChangedReason.Removed:
                         Debug.Assert(e.Project != null);
 
-                        if (_fileRootMap.TryGetValue(e.File, out root)) {
+                        if (_fileRootMap.TryGetValue(e.File, out root))
+                        {
                             _fileRootMap.Remove(e.File);
-                            if (!_fileRootMap.Values.Contains(root)) {
+                            if (!_fileRootMap.Values.Contains(root))
+                            {
                                 _testFilesUpdateWatcher.RemoveWatch(root);
                             }
-                        } else {
+                        }
+                        else
+                        {
                             _testFilesUpdateWatcher.RemoveWatch(e.File);
                         }
 
@@ -497,7 +581,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
                 }
-
             }
         }
 
@@ -505,11 +588,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
         /// Given a filename that might be in an open project returns the test
         /// project which contains it, or null if it is not in a test project.
         /// </summary>
-        private IVsProject GetTestProjectFromFile(string filename) {
+        private IVsProject GetTestProjectFromFile(string filename)
+        {
             var solution = (IVsSolution)_serviceProvider.GetService(typeof(SVsSolution));
 
-            foreach (var project in EnumerateLoadedProjects(solution)) {
-
+            foreach (var project in EnumerateLoadedProjects(solution))
+            {
                 IVsHierarchy hierarchy = project as IVsHierarchy;
                 uint itemid;
                 string projectPath;
@@ -517,7 +601,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     CommonUtils.IsSamePath(projectPath, filename) ||
                     (hierarchy != null &&
                     project.IsTestProject(Guids.NodejsBaseProjectFactory) &&
-                    ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out itemid)))) {
+                    ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out itemid))))
+                {
                     return project;
                 }
             }
@@ -529,7 +614,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
         /// or would be delivered and there were no listeners.
         /// </summary>
         /// <param name="project">The project which the event is being raised for</param>
-        private bool OnTestContainersChanged(IVsProject project) {
+        private bool OnTestContainersChanged(IVsProject project)
+        {
             // https://pytools.codeplex.com/workitem/1271
             // When test explorer kicks off a run it kicks off a test discovery
             // phase, which kicks off a build, which results in us saving files.
@@ -547,9 +633,10 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 project.TryGetProjectPath(out projectPath) &&
                 _knownProjects.TryGetValue(projectPath, out projectInfo) &&
                 projectInfo != null &&
-                projectInfo.HasRequestedContainers) {
-
-                if (!_building || !_detectingChanges) {
+                projectInfo.HasRequestedContainers)
+            {
+                if (!_building || !_detectingChanges)
+                {
                     TestContainersUpdated?.Invoke(this, EventArgs.Empty);
                     return true;
                 }
@@ -557,15 +644,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return false;
         }
 
-        internal bool IsProjectKnown(IVsProject project) {
+        internal bool IsProjectKnown(IVsProject project)
+        {
             string projectPath;
-            if (project.TryGetProjectPath(out projectPath)) {
+            if (project.TryGetProjectPath(out projectPath))
+            {
                 return _knownProjects.ContainsKey(projectPath);
             }
             return false;
         }
 
-        class ProjectInfo {
+        private class ProjectInfo
+        {
             public readonly IVsProject Project;
             public readonly TestContainerDiscoverer Discoverer;
             /// <summary>
@@ -576,10 +666,12 @@ namespace Microsoft.NodejsTools.TestAdapter {
             /// </summary>
             public bool HasRequestedContainers;
 
-            public ProjectInfo(IVsProject project, TestContainerDiscoverer discoverer) {
+            public ProjectInfo(IVsProject project, TestContainerDiscoverer discoverer)
+            {
                 Project = project;
                 Discoverer = discoverer;
             }
         }
     }
 }
+

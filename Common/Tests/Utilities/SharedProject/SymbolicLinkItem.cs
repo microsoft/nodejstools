@@ -1,25 +1,16 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
 using System;
 using System.IO;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace TestUtilities.SharedProject {
+namespace TestUtilities.SharedProject
+{
     /// <summary>
     /// Generates a folder and if not excluded adds it to the generated project.
     /// </summary>
-    public sealed class SymbolicLinkItem : ProjectContentGenerator {
+    public sealed class SymbolicLinkItem : ProjectContentGenerator
+    {
         public readonly string Name, ReferencePath;
         public readonly bool IsExcluded, IsMissing;
 
@@ -28,24 +19,29 @@ namespace TestUtilities.SharedProject {
         /// is excluded then it will be created on disk but not added to the
         /// project.
         /// </summary>
-        public SymbolicLinkItem(string name, string referencePath, bool isExcluded = false, bool isMissing = false) {
+        public SymbolicLinkItem(string name, string referencePath, bool isExcluded = false, bool isMissing = false)
+        {
             Name = name;
             ReferencePath = referencePath;
             IsExcluded = isExcluded;
             IsMissing = isMissing;
         }
 
-        public override void Generate(ProjectType projectType, MSBuild.Project project) {
-            if (!IsMissing) {
+        public override void Generate(ProjectType projectType, MSBuild.Project project)
+        {
+            if (!IsMissing)
+            {
                 var absName = Path.IsPathRooted(Name) ? Name : Path.Combine(project.DirectoryPath, Name);
                 var absReferencePath = Path.IsPathRooted(ReferencePath) ? ReferencePath : Path.Combine(project.DirectoryPath, ReferencePath);
-                
+
                 NativeMethods.CreateSymbolicLink(absName, absReferencePath);
             }
 
-            if (!IsExcluded) {
+            if (!IsExcluded)
+            {
                 project.AddItem("Folder", Name);
             }
         }
     }
 }
+

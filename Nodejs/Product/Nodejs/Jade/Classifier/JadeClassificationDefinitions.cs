@@ -1,33 +1,22 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// JScript Classification definitions
     /// </summary>
-    internal class JadeClassificationDefinitions {
+    internal class JadeClassificationDefinitions
+    {
         #region JadeKeyword
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.Keyword), Export]
-        internal ClassificationTypeDefinition KeywordClassificationType {
+        internal ClassificationTypeDefinition KeywordClassificationType
+        {
             get;
             set;
         }
@@ -37,9 +26,11 @@ namespace Microsoft.NodejsTools.Jade {
         [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.Keyword)]
         [Name("JadeKeywordFormatDefinition")]
         [Order]
-        internal sealed class KeywordClassificationFormat : ClassificationFormatDefinition {
-            internal KeywordClassificationFormat() {
-                ForegroundColor = Colors.OrangeRed;
+        internal sealed class KeywordClassificationFormat : ClassificationFormatDefinition
+        {
+            internal KeywordClassificationFormat()
+            {
+                this.ForegroundColor = Colors.OrangeRed;
                 this.DisplayName = "Jade Keyword";
             }
         }
@@ -48,7 +39,8 @@ namespace Microsoft.NodejsTools.Jade {
         #region JadeFilter
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.Filter), Export]
-        internal ClassificationTypeDefinition FilterClassificationType {
+        internal ClassificationTypeDefinition FilterClassificationType
+        {
             get;
             set;
         }
@@ -58,9 +50,11 @@ namespace Microsoft.NodejsTools.Jade {
         [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.Filter)]
         [Name("JadeFilterFormatDefinition")]
         [Order]
-        internal sealed class FilterClassificationFormat : ClassificationFormatDefinition {
-            internal FilterClassificationFormat() {
-                ForegroundColor = Colors.DarkRed;
+        internal sealed class FilterClassificationFormat : ClassificationFormatDefinition
+        {
+            internal FilterClassificationFormat()
+            {
+                this.ForegroundColor = Colors.DarkRed;
                 this.DisplayName = "Jade Filter";
             }
         }
@@ -70,7 +64,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.ClassLiteral), Export]
-        internal ClassificationTypeDefinition ClassLiteralClassificationType {
+        internal ClassificationTypeDefinition ClassLiteralClassificationType
+        {
             get;
             set;
         }
@@ -80,9 +75,11 @@ namespace Microsoft.NodejsTools.Jade {
         [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.ClassLiteral)]
         [Name("JadeClassLiteralFormatDefinition")]
         [Order]
-        internal sealed class ClassLiteralClassificationFormat : ClassificationFormatDefinition {
-            internal ClassLiteralClassificationFormat() {
-                ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
+        internal sealed class ClassLiteralClassificationFormat : ClassificationFormatDefinition
+        {
+            internal ClassLiteralClassificationFormat()
+            {
+                this.ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
                 this.DisplayName = "Jade Class Literal";
             }
         }
@@ -93,7 +90,8 @@ namespace Microsoft.NodejsTools.Jade {
 
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.IdLiteral), Export]
-        internal ClassificationTypeDefinition IdLiteralClassificationType {
+        internal ClassificationTypeDefinition IdLiteralClassificationType
+        {
             get;
             set;
         }
@@ -103,9 +101,11 @@ namespace Microsoft.NodejsTools.Jade {
         [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.IdLiteral)]
         [Name("JadeIdLiteralFormatDefinition")]
         [Order]
-        internal sealed class IdLiteralClassificationFormat : ClassificationFormatDefinition {
-            internal IdLiteralClassificationFormat() {
-                ForegroundColor = Colors.Maroon;
+        internal sealed class IdLiteralClassificationFormat : ClassificationFormatDefinition
+        {
+            internal IdLiteralClassificationFormat()
+            {
+                this.ForegroundColor = Colors.Maroon;
                 this.DisplayName = "Jade Id Literal";
             }
         }
@@ -115,7 +115,8 @@ namespace Microsoft.NodejsTools.Jade {
         #region JadeVariable
         [Export(typeof(ClassificationTypeDefinition))]
         [Name(JadeClassificationTypes.Variable), Export]
-        internal ClassificationTypeDefinition VariableClassificationType {
+        internal ClassificationTypeDefinition VariableClassificationType
+        {
             get;
             set;
         }
@@ -125,12 +126,15 @@ namespace Microsoft.NodejsTools.Jade {
         [ClassificationType(ClassificationTypeNames = JadeClassificationTypes.Variable)]
         [Name("JadeVariableFormatDefinition")]
         [Order]
-        internal sealed class VariableClassificationFormat : ClassificationFormatDefinition {
-            internal VariableClassificationFormat() {
-                ForegroundColor = Colors.Blue;
+        internal sealed class VariableClassificationFormat : ClassificationFormatDefinition
+        {
+            internal VariableClassificationFormat()
+            {
+                this.ForegroundColor = Colors.Blue;
                 this.DisplayName = "Jade Variable";
             }
         }
         #endregion
     }
 }
+

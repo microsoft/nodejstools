@@ -1,20 +1,7 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 extern alias ta;
+
 using System;
 using System.IO;
 using Microsoft.NodejsTools.TestAdapter;
@@ -24,8 +11,10 @@ using ta::Microsoft.VisualStudioTools;
 using TestUtilities;
 using Microsoft.NodejsTools.TestFrameworks;
 
-namespace TestAdapterTests {
-    class TestInfo {
+namespace TestAdapterTests
+{
+    internal class TestInfo
+    {
         public string ClassName { get; private set; }
         public string MethodName { get; private set; }
         public string ClassFilePath { get; private set; }
@@ -35,10 +24,12 @@ namespace TestAdapterTests {
         public int SourceCodeLineNumber { get; private set; }
         public TestOutcome Outcome { get; private set; }
 
-        private TestInfo() {
+        private TestInfo()
+        {
         }
 
-        public static TestInfo FromRelativePaths(string className, string methodName, string projectFilePath, string sourceCodeFilePath, int sourceCodeLineNumber, TestOutcome outcome, string classFilePath = null) {
+        public static TestInfo FromRelativePaths(string className, string methodName, string projectFilePath, string sourceCodeFilePath, int sourceCodeLineNumber, TestOutcome outcome, string classFilePath = null)
+        {
             return FromAbsolutePaths(className,
                 methodName,
                 TestData.GetPath(projectFilePath),
@@ -48,7 +39,8 @@ namespace TestAdapterTests {
                 classFilePath != null ? TestData.GetPath(classFilePath) : null);
         }
 
-        public static TestInfo FromAbsolutePaths(string className, string methodName, string projectFilePath, string sourceCodeFilePath, int sourceCodeLineNumber, TestOutcome outcome, string classFilePath = null) {
+        public static TestInfo FromAbsolutePaths(string className, string methodName, string projectFilePath, string sourceCodeFilePath, int sourceCodeLineNumber, TestOutcome outcome, string classFilePath = null)
+        {
             TestInfo ti = new TestInfo();
             ti.ClassName = className;
             ti.MethodName = methodName;
@@ -61,8 +53,10 @@ namespace TestAdapterTests {
             return ti;
         }
 
-        public TestCase TestCase {
-            get {
+        public TestCase TestCase
+        {
+            get
+            {
                 var expectedFullyQualifiedName = new NodejsTestInfo(RelativeClassFilePath, MethodName, TestFrameworkDirectories.ExportRunnerFramework, 0, 0).FullyQualifiedName;
                 var tc = new TestCase(expectedFullyQualifiedName, new Uri(TestExecutor.ExecutorUriString), this.ProjectFilePath);
                 tc.CodeFilePath = SourceCodeFilePath;
@@ -91,8 +85,10 @@ namespace TestAdapterTests {
         public static string TestAdapterBProjectFilePath = TestData.GetPath(@"TestData\TestAdapterTestB\TestAdapterTestB.pyproj");
         public static string TestAdapterLibProjectFilePath = TestData.GetPath(@"TestData\TestAdapterLibraryBar\TestAdapterLibraryBar.pyproj");
 
-        public static TestInfo[] TestAdapterATests {
-            get {
+        public static TestInfo[] TestAdapterATests
+        {
+            get
+            {
                 return new TestInfo[] {
                     OarSuccess,
                     OarFailure,
@@ -102,8 +98,10 @@ namespace TestAdapterTests {
             }
         }
 
-        public static TestInfo[] TestAdapterBTests {
-            get {
+        public static TestInfo[] TestAdapterBTests
+        {
+            get
+            {
                 return new TestInfo[] {
                     BaseSuccess,
                     BaseFailure,
@@ -121,3 +119,4 @@ namespace TestAdapterTests {
         }
     }
 }
+

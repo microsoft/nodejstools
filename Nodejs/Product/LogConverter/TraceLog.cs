@@ -1,25 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.NodejsTools.LogGeneration {
-    class TraceLog {
+namespace Microsoft.NodejsTools.LogGeneration
+{
+    internal class TraceLog
+    {
         private readonly ulong _handle;
         private readonly string _sessionName;
         private IntPtr _traceProps;
@@ -37,29 +25,35 @@ namespace Microsoft.NodejsTools.LogGeneration {
         internal const int EVENT_TRACE_PRIVATE_LOGGER_MODE = 0x800;
         internal const int EVENT_TRACE_FILE_MODE_SEQUENTIAL = 0x0001;
 
-        private TraceLog(ulong handle, string sessionName, IntPtr props) {
+        private TraceLog(ulong handle, string sessionName, IntPtr props)
+        {
             _handle = handle;
             _sessionName = sessionName;
             _traceProps = props;
         }
 
-        public static void WriteEvent() {
+        public static void WriteEvent()
+        {
         }
 
-        ~TraceLog() {
-            if (_traceProps != IntPtr.Zero) {
+        ~TraceLog()
+        {
+            if (_traceProps != IntPtr.Zero)
+            {
                 Marshal.FreeHGlobal(_traceProps);
             }
         }
 
-        public void Stop() {
+        public void Stop()
+        {
             var status = EtlNativeMethods.ControlTraceW(
                 _handle,
                 _sessionName,
                 _traceProps,
                 TraceControlCode.Stop
             );
-            if (status != 0 && status != 234 /*ERROR_MORE_DATA*/) {
+            if (status != 0 && status != 234 /*ERROR_MORE_DATA*/)
+            {
                 throw new Win32Exception((int)status);
             }
             GC.KeepAlive(this);
@@ -73,8 +67,10 @@ namespace Microsoft.NodejsTools.LogGeneration {
         /// <param name="sessionName"></param>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public static TraceLog Start(string filename, string sessionName = null) {
-            if (sessionName == null) {
+        public static TraceLog Start(string filename, string sessionName = null)
+        {
+            if (sessionName == null)
+            {
                 sessionName = Guid.NewGuid().ToString();
             }
             var bufferSize = Marshal.SizeOf(typeof(EVENT_TRACE_PROPERTIES)) +
@@ -82,11 +78,13 @@ namespace Microsoft.NodejsTools.LogGeneration {
                 (filename.Length + 1) * 2;
 
             var mem = Marshal.AllocHGlobal(bufferSize);
-            for (int i = 0; i < bufferSize; i++) {
+            for (int i = 0; i < bufferSize; i++)
+            {
                 Marshal.WriteByte(mem, i, 0);
             }
 
-            if (mem == IntPtr.Zero) {
+            if (mem == IntPtr.Zero)
+            {
                 throw new OutOfMemoryException();
             }
 
@@ -105,13 +103,15 @@ namespace Microsoft.NodejsTools.LogGeneration {
             Marshal.StructureToPtr(eventProps, mem, false);
 
             int offset = (int)eventProps.LogFileNameOffset;
-            for (int i = 0; i < filename.Length; i++, offset += 2) {
+            for (int i = 0; i < filename.Length; i++, offset += 2)
+            {
                 Marshal.WriteInt16(mem, offset, filename[i]);
             }
             Marshal.WriteInt16(mem, offset, 0);
 
             bool success = false;
-            try {
+            try
+            {
                 ulong handle;
                 var error = EtlNativeMethods.StartTraceW(
                     out handle,
@@ -119,15 +119,19 @@ namespace Microsoft.NodejsTools.LogGeneration {
                     mem
                 );
 
-                if (error != 0) {
+                if (error != 0)
+                {
                     throw new Win32Exception((int)error);
                 }
 
                 var res = new TraceLog(handle, sessionName, mem);
                 success = true;
                 return res;
-            } finally {
-                if (!success) {
+            }
+            finally
+            {
+                if (!success)
+                {
                     Marshal.FreeHGlobal(mem);
                 }
             }
@@ -138,47 +142,64 @@ namespace Microsoft.NodejsTools.LogGeneration {
         /// EVENT_TRACE_HEADER structure.
         /// </summary>
         /// <param name="data"></param>
-        public void Trace(EVENT_TRACE_HEADER header, params object[] data) {
+        public void Trace(EVENT_TRACE_HEADER header, params object[] data)
+        {
             IntPtr traceData;
             int size = Marshal.SizeOf(typeof(EVENT_TRACE_HEADER));
 
-            for (int i = 0; i < data.Length; i++) {
+            for (int i = 0; i < data.Length; i++)
+            {
                 string strData;
                 byte[] asciiStrData;
 
-                if ((strData = data[i] as string) != null) {
+                if ((strData = data[i] as string) != null)
+                {
                     size += strData.Length * 2 + 2;
-                } else if ((asciiStrData = data[i] as byte[]) != null) {
+                }
+                else if ((asciiStrData = data[i] as byte[]) != null)
+                {
                     size += asciiStrData.Length + 1;
-                } else {
+                }
+                else
+                {
                     size += Marshal.SizeOf(data[i]);
                 }
             }
 
             IntPtr tempData = traceData = Marshal.AllocHGlobal(size);
-            try {
-                if (traceData == IntPtr.Zero) {
+            try
+            {
+                if (traceData == IntPtr.Zero)
+                {
                     throw new OutOfMemoryException();
                 }
 
                 tempData = new IntPtr(tempData.ToInt64() + Marshal.SizeOf(typeof(EVENT_TRACE_HEADER)));
-                for (int i = 0; i < data.Length; i++) {
+                for (int i = 0; i < data.Length; i++)
+                {
                     string strData;
                     byte[] asciiStrData;
 
-                    if ((strData = data[i] as string) != null) {
-                        for (int j = 0; j < strData.Length; j++) {
+                    if ((strData = data[i] as string) != null)
+                    {
+                        for (int j = 0; j < strData.Length; j++)
+                        {
                             Marshal.WriteInt16(tempData, j * 2, strData[j]);
                         }
                         Marshal.WriteInt16(tempData, strData.Length * 2, 0);
                         tempData = new IntPtr(tempData.ToInt64() + strData.Length * 2 + 2);
-                    } else if ((asciiStrData = data[i] as byte[]) != null) {
-                        for (int j = 0; j < asciiStrData.Length; j++) {
+                    }
+                    else if ((asciiStrData = data[i] as byte[]) != null)
+                    {
+                        for (int j = 0; j < asciiStrData.Length; j++)
+                        {
                             Marshal.WriteByte(tempData, j, asciiStrData[j]);
                         }
                         Marshal.WriteByte(tempData, asciiStrData.Length, 0);
                         tempData = new IntPtr(tempData.ToInt64() + asciiStrData.Length + 1);
-                    } else {
+                    }
+                    else
+                    {
                         Marshal.StructureToPtr(data[i], tempData, false);
                         tempData = new IntPtr(tempData.ToInt64() + Marshal.SizeOf(data[i]));
                     }
@@ -188,12 +209,16 @@ namespace Microsoft.NodejsTools.LogGeneration {
                 Marshal.StructureToPtr(header, traceData, false);
 
                 var res = EtlNativeMethods.TraceEvent(_handle, traceData);
-                if (res != 0) {
+                if (res != 0)
+                {
                     throw new Win32Exception((int)res);
                 }
-            } finally {
+            }
+            finally
+            {
                 Marshal.FreeHGlobal(traceData);
             }
         }
     }
 }
+

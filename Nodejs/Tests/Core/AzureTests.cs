@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -22,11 +8,14 @@ using Microsoft.NodejsTools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class AzureTests {
+    public class AzureTests
+    {
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void UpdateWorkerRoleServiceDefinitionTest() {
+        public void UpdateWorkerRoleServiceDefinitionTest()
+        {
             var doc = new XmlDocument();
             doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <ServiceDefinition name=""Azure1"" xmlns=""http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition"" schemaVersion=""2014-01.2.3"">
@@ -69,7 +58,8 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0)]
-        public void UpdateWebRoleServiceDefinitionTest() {
+        public void UpdateWebRoleServiceDefinitionTest()
+        {
             var doc = new XmlDocument();
             doc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?>
 <ServiceDefinition name=""Azure1"" xmlns=""http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition"" schemaVersion=""2014-01.2.3"">
@@ -100,41 +90,51 @@ namespace NodejsTests {
 
         #region Compare XmlDocuments
 
-        public static void AreEqual(string expected, XmlDocument actual, string message = null) {
+        public static void AreEqual(string expected, XmlDocument actual, string message = null)
+        {
             var expectedDoc = new XmlDocument();
             expectedDoc.LoadXml(expected);
             AreEqual(expectedDoc, actual, message);
         }
 
-        public static void AreEqual(XmlDocument expected, XmlDocument actual, string message = null) {
+        public static void AreEqual(XmlDocument expected, XmlDocument actual, string message = null)
+        {
             Console.WriteLine(actual.OuterXml);
             var nav1 = expected.CreateNavigator();
             var nav2 = actual.CreateNavigator();
 
-            if (string.IsNullOrEmpty(message)) {
+            if (string.IsNullOrEmpty(message))
+            {
                 message = string.Empty;
-            } else {
+            }
+            else
+            {
                 message = " " + message;
             }
 
             AreXPathNavigatorsEqual(nav1, nav2, message);
         }
 
-        private static string GetFullPath(XPathNavigator nav) {
+        private static string GetFullPath(XPathNavigator nav)
+        {
             nav = nav.CreateNavigator();
             var names = new Stack<string>();
 
             names.Push(nav.Name);
-            while (nav.MoveToParent()) {
+            while (nav.MoveToParent())
+            {
                 names.Push(nav.Name);
             }
 
             return "/" + string.Join("/", names);
         }
 
-        private static void AreXPathNavigatorsEqual(XPathNavigator nav1, XPathNavigator nav2, string message) {
-            while (true) {
-                if (nav1.Name != nav2.Name) {
+        private static void AreXPathNavigatorsEqual(XPathNavigator nav1, XPathNavigator nav2, string message)
+        {
+            while (true)
+            {
+                if (nav1.Name != nav2.Name)
+                {
                     Assert.Fail("Expected element <{0}>. Actual element <{1}>.{2}", nav1.Name, nav2.Name, message);
                 }
                 var anav1 = nav1.CreateNavigator();
@@ -142,13 +142,17 @@ namespace NodejsTests {
                 var attr1 = new List<string>();
                 var attr2 = new List<string>();
 
-                if (anav1.MoveToFirstAttribute()) {
-                    do {
+                if (anav1.MoveToFirstAttribute())
+                {
+                    do
+                    {
                         attr1.Add(string.Format("{0}=\"{1}\"", anav1.Name, anav1.Value));
                     } while (anav1.MoveToNextAttribute());
                 }
-                if (anav2.MoveToFirstAttribute()) {
-                    do {
+                if (anav2.MoveToFirstAttribute())
+                {
+                    do
+                    {
                         attr2.Add(string.Format("{0}=\"{1}\"", anav2.Name, anav2.Value));
                     } while (anav2.MoveToNextAttribute());
                 }
@@ -157,23 +161,35 @@ namespace NodejsTests {
 
                 var cnav1 = nav1.CreateNavigator();
                 var cnav2 = nav2.CreateNavigator();
-                if (cnav1.MoveToFirstChild()) {
-                    if (cnav2.MoveToFirstChild()) {
+                if (cnav1.MoveToFirstChild())
+                {
+                    if (cnav2.MoveToFirstChild())
+                    {
                         AreXPathNavigatorsEqual(cnav1, cnav2, message);
-                    } else {
+                    }
+                    else
+                    {
                         Assert.Fail("Expected element {0}.{1}", GetFullPath(cnav1), message);
                     }
-                } else if (cnav2.MoveToFirstChild()) {
+                }
+                else if (cnav2.MoveToFirstChild())
+                {
                     Assert.Fail("Unexpected element {0}.{1}", GetFullPath(cnav2), message);
                 }
 
-                if (nav1.MoveToNext()) {
-                    if (nav2.MoveToNext()) {
+                if (nav1.MoveToNext())
+                {
+                    if (nav2.MoveToNext())
+                    {
                         continue;
-                    } else {
+                    }
+                    else
+                    {
                         Assert.Fail("Expected element {0}.{1}", GetFullPath(nav1), message);
                     }
-                } else if (nav2.MoveToNext()) {
+                }
+                else if (nav2.MoveToNext())
+                {
                     Assert.Fail("Unexpected element {0}.{1}", GetFullPath(nav2), message);
                 }
                 break;
@@ -183,3 +199,4 @@ namespace NodejsTests {
         #endregion
     }
 }
+

@@ -1,20 +1,7 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Represents a set of text ranges. It may or may not be actual collection
     /// internally, but it supports shifting its content according to the supplied start
@@ -22,7 +9,8 @@ namespace Microsoft.NodejsTools.Jade {
     /// it typically consists of left separator, inner range and right separator. However,
     /// artifact may not expose its inner parts as a collection of ranges.
     /// </summary>
-    interface ICompositeTextRange : ITextRange {
+    internal interface ICompositeTextRange : ITextRange
+    {
         /// <summary>
         /// Shifts items in collection starting from given position by the specified offset.
         /// </summary>
@@ -31,3 +19,4 @@ namespace Microsoft.NodejsTools.Jade {
         void ShiftStartingFrom(int start, int offset);
     }
 }
+

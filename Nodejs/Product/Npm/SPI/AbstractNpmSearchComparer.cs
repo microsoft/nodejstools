@@ -1,27 +1,16 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class AbstractNpmSearchComparer : IComparer<IPackage> {
-
-        protected int CompareBasedOnKeywords(IPackage x, IPackage y) {
-            if (x.Keywords != null && y.Keywords != null) {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal abstract class AbstractNpmSearchComparer : IComparer<IPackage>
+    {
+        protected int CompareBasedOnKeywords(IPackage x, IPackage y)
+        {
+            if (x.Keywords != null && y.Keywords != null)
+            {
                 return string.Compare(
                     string.Join(", ", x.Keywords),
                     string.Join(", ", y.Keywords),
@@ -34,3 +23,4 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         public abstract int Compare(IPackage x, IPackage y);
     }
 }
+

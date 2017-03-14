@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -23,21 +9,25 @@ using TestUtilities.Nodejs;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
 
-namespace AzurePublishingUITests {
+namespace AzurePublishingUITests
+{
     [TestClass]
-    public class AzureWebRoleTests {
+    public class AzureWebRoleTests
+    {
         private string _cloudServiceToDelete;
         private static string publishSettingsFilePath;
 
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
 
             // The tests currently only support Azure Tools v2.2.
             // Support for other versions will be added later.
             var azureToolsVersion = AzureUtility.ToolsVersion.V22;
-            if (!AzureUtility.AzureToolsInstalled(azureToolsVersion)) {
+            if (!AzureUtility.AzureToolsInstalled(azureToolsVersion))
+            {
                 Assert.Inconclusive(string.Format("Azure Tools v{0} required", azureToolsVersion));
             }
 
@@ -47,8 +37,10 @@ namespace AzurePublishingUITests {
         }
 
         [TestCleanup]
-        public void Cleanup() {
-            if (!string.IsNullOrEmpty(_cloudServiceToDelete)) {
+        public void Cleanup()
+        {
+            if (!string.IsNullOrEmpty(_cloudServiceToDelete))
+            {
                 Assert.IsTrue(AzureUtility.DeleteCloudServiceWithRetry(publishSettingsFilePath, _cloudServiceToDelete), "Failed to delete cloud service.");
             }
         }
@@ -62,8 +54,10 @@ namespace AzurePublishingUITests {
             string expectedProjectItem,
             string textInResponse,
             int publishTimeout
-        ) {
-            using (var app = new VisualStudioApp()) {
+        )
+        {
+            using (var app = new VisualStudioApp())
+            {
                 AzureWebSiteTests.CreateProject(
                     app,
                     languageName,
@@ -88,11 +82,12 @@ namespace AzurePublishingUITests {
             }
         }
 
-        const int JavaScriptWebAppPublishTimeout = 20 * 60 * 1000;
+        private const int JavaScriptWebAppPublishTimeout = 20 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(JavaScriptWebAppPublishTimeout)]
         [HostType("VSTestHost")]
-        public void JavaScriptWebAppPublish() {
+        public void JavaScriptWebAppPublish()
+        {
             TestPublishToWebRole(
                 NodejsVisualStudioApp.JavaScriptTemplateLanguageName,
                 NodejsVisualStudioApp.JavaScriptAzureWebAppTemplate,
@@ -103,11 +98,12 @@ namespace AzurePublishingUITests {
             );
         }
 
-        const int TypeScriptWebAppPublishTimeout = 20 * 60 * 1000;
+        private const int TypeScriptWebAppPublishTimeout = 20 * 60 * 1000;
 
         [TestMethod, Priority(0), TestCategory("Core"), Timeout(TypeScriptWebAppPublishTimeout)]
         [HostType("VSTestHost")]
-        public void TypeScriptWebAppPublish() {
+        public void TypeScriptWebAppPublish()
+        {
             TestPublishToWebRole(
                 NodejsVisualStudioApp.TypeScriptTemplateLanguageName,
                 NodejsVisualStudioApp.TypeScriptAzureWebAppTemplate,
@@ -119,3 +115,4 @@ namespace AzurePublishingUITests {
         }
     }
 }
+

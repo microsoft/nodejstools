@@ -1,25 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-// Guids.cs
 // MUST match guids.h
+
 using System;
 
-namespace Microsoft.NodejsTools {
-    static class Guids {
+namespace Microsoft.NodejsTools
+{
+    internal static class Guids
+    {
         public const string NodejsPackageString = "FE8A8C3D-328A-476D-99F9-2A24B75F8C7F";
         public const string NodejsCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
@@ -69,3 +57,4 @@ namespace Microsoft.NodejsTools {
         public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
     };
 }
+

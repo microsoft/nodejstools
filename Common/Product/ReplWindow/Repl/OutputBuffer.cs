@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -19,11 +7,13 @@ using System.Text;
 using System.Windows.Threading;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
-    internal sealed class OutputBuffer : IDisposable {
+    internal sealed class OutputBuffer : IDisposable
+    {
         private readonly DispatcherTimer _timer;
         private int _maxSize;
         private readonly object _lock;
@@ -36,12 +26,14 @@ namespace Microsoft.VisualStudio.Repl {
         private bool _processAnsiEscapes;
         private ConsoleColor _outColor = ConsoleColor.Black, _errColor = ConsoleColor.Red;
 
-        static OutputBuffer() {
+        static OutputBuffer()
+        {
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
         }
 
-        public OutputBuffer(ReplWindow window) {
+        public OutputBuffer(ReplWindow window)
+        {
             _maxSize = _initialMaxSize;
             _lock = new object();
             _timer = new DispatcherTimer();
@@ -52,33 +44,42 @@ namespace Microsoft.VisualStudio.Repl {
             ResetColors();
         }
 
-        public void ResetColors() {
-            _outColor = ConsoleColor.Black; 
+        public void ResetColors()
+        {
+            _outColor = ConsoleColor.Black;
             _errColor = ConsoleColor.Red;
         }
 
-        public void Write(string text, bool isError = false) {
+        public void Write(string text, bool isError = false)
+        {
             bool needsFlush = false;
-            lock (_lock) {
+            lock (_lock)
+            {
                 int escape;
-                if (_processAnsiEscapes && (escape = text.IndexOf('\x1b')) != -1) {
+                if (_processAnsiEscapes && (escape = text.IndexOf('\x1b')) != -1)
+                {
                     AppendEscapedText(text, isError, escape);
-                } else {
+                }
+                else
+                {
                     AppendText(text, isError ? OutputEntryKind.StdErr : OutputEntryKind.StdOut, isError ? _errColor : _outColor);
                 }
 
                 _bufferLength += text.Length;
                 needsFlush = (_bufferLength > _maxSize);
-                if (!needsFlush && !_timer.IsEnabled) {
+                if (!needsFlush && !_timer.IsEnabled)
+                {
                     _timer.IsEnabled = true;
                 }
             }
-            if (needsFlush) {
+            if (needsFlush)
+            {
                 Flush();
             }
         }
 
-        private void AppendEscapedText(string text, bool isError, int escape) {
+        private void AppendEscapedText(string text, bool isError, int escape)
+        {
             OutputEntryKind kind = isError ? OutputEntryKind.StdErr : OutputEntryKind.StdOut;
             ConsoleColor color = isError ? _errColor : _outColor;
 
@@ -87,47 +88,66 @@ namespace Microsoft.VisualStudio.Repl {
 
             int start = 0;
             List<int> codes = new List<int>();
-            do {
-                if (escape != start) {
+            do
+            {
+                if (escape != start)
+                {
                     // add unescaped text
                     AppendText(text.Substring(start, escape - start), kind, color);
                 }
 
                 // process the escape sequence                
-                if (escape < text.Length - 1 && text[escape + 1] == '[') {
+                if (escape < text.Length - 1 && text[escape + 1] == '[')
+                {
                     // We have the Control Sequence Introducer (CSI) - ESC [
 
                     codes.Clear();
                     int? value = 0;
 
-                    for (int i = escape + 2; i < text.Length; i++) { // skip esc + [
-                        if (text[i] >= '0' && text[i] <= '9') {
+                    for (int i = escape + 2; i < text.Length; i++)
+                    { // skip esc + [
+                        if (text[i] >= '0' && text[i] <= '9')
+                        {
                             // continue parsing the integer...
-                            if (value == null) {
+                            if (value == null)
+                            {
                                 value = 0;
                             }
                             value = 10 * value.Value + (text[i] - '0');
-                        } else if (text[i] == ';') {
-                            if (value != null) {
+                        }
+                        else if (text[i] == ';')
+                        {
+                            if (value != null)
+                            {
                                 codes.Add(value.Value);
                                 value = null;
-                            } else {
+                            }
+                            else
+                            {
                                 // CSI ; - invalid or CSI ### ;;, both invalid
                                 break;
                             }
-                        } else if (text[i] == 'm') {
-                            if (value != null) {
+                        }
+                        else if (text[i] == 'm')
+                        {
+                            if (value != null)
+                            {
                                 codes.Add(value.Value);
                             }
 
                             // parsed a valid code
                             start = i + 1;
-                            if (codes.Count == 0) {
+                            if (codes.Count == 0)
+                            {
                                 // reset
                                 color = isError ? ConsoleColor.Red : ConsoleColor.White;
-                            } else {
-                                for (int j = 0; j < codes.Count; j++) {
-                                    switch (codes[j]) {
+                            }
+                            else
+                            {
+                                for (int j = 0; j < codes.Count; j++)
+                                {
+                                    switch (codes[j])
+                                    {
                                         case 0: color = ConsoleColor.White; break;
                                         case 1: // bright/bold
                                             color |= ConsoleColor.DarkGray;
@@ -170,11 +190,11 @@ namespace Microsoft.VisualStudio.Repl {
                                             color = _outColor;
                                             break;
                                         case 40: // background colors
-                                        case 41: 
-                                        case 42: 
-                                        case 43: 
-                                        case 44: 
-                                        case 45: 
+                                        case 41:
+                                        case 42:
+                                        case 43:
+                                        case 44:
+                                        case 45:
                                         case 46:
                                         case 47: break;
                                         case 90: color = ConsoleColor.DarkGray; break;
@@ -189,7 +209,9 @@ namespace Microsoft.VisualStudio.Repl {
                                 }
                             }
                             break;
-                        } else {
+                        }
+                        else
+                        {
                             // unknown char, invalid escape
                             break;
                         }
@@ -197,23 +219,26 @@ namespace Microsoft.VisualStudio.Repl {
 
                     escape = text.IndexOf('\x1b', escape + 1);
                 }// else not an escape sequence, process as text
-
             } while (escape != -1);
-            if (start != text.Length) {
+            if (start != text.Length)
+            {
                 AppendText(text.Substring(start), kind, color);
             }
         }
 
-        private void AppendText(string text, OutputEntryKind kind, ConsoleColor color) {
+        private void AppendText(string text, OutputEntryKind kind, ConsoleColor color)
+        {
             var newProps = new OutputEntryProperties(kind, color);
-            if (_outputEntries.Count == 0 || _outputEntries[_outputEntries.Count - 1].Properties != newProps) {
+            if (_outputEntries.Count == 0 || _outputEntries[_outputEntries.Count - 1].Properties != newProps)
+            {
                 _outputEntries.Add(new OutputEntry(newProps));
             }
             var buffer = _outputEntries[_outputEntries.Count - 1].Buffer;
             buffer.Append(text);
         }
 
-        public bool ProcessAnsiEscapes {
+        public bool ProcessAnsiEscapes
+        {
             get { return _processAnsiEscapes; }
             set { _processAnsiEscapes = value; }
         }
@@ -221,18 +246,22 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Flushes the buffer, should always be called from the UI thread.
         /// </summary>
-        public void Flush() {
+        public void Flush()
+        {
             // if we're rapidly outputting grow the output buffer.
             long curTime = _stopwatch.ElapsedMilliseconds;
-            if (curTime - _lastFlush < 1000) {
-                if (_maxSize < 1024 * 1024) {
+            if (curTime - _lastFlush < 1000)
+            {
+                if (_maxSize < 1024 * 1024)
+                {
                     _maxSize *= 2;
                 }
             }
             _lastFlush = _stopwatch.ElapsedMilliseconds;
 
             OutputEntry[] entries;
-            lock (_lock) {
+            lock (_lock)
+            {
                 entries = _outputEntries.ToArray();
 
                 _outputEntries.Clear();
@@ -240,21 +269,25 @@ namespace Microsoft.VisualStudio.Repl {
                 _timer.IsEnabled = false;
             }
 
-            if (entries.Length > 0) {
+            if (entries.Length > 0)
+            {
                 _window.AppendOutput(entries);
                 _window.TextView.Caret.EnsureVisible();
             }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             _timer.IsEnabled = false;
         }
 
-        public struct OutputEntry {
+        public struct OutputEntry
+        {
             public readonly StringBuilder Buffer;
             public readonly OutputEntryProperties Properties;
 
-            public OutputEntry(OutputEntryProperties properties) {
+            public OutputEntry(OutputEntryProperties properties)
+            {
                 Properties = properties;
                 Buffer = new StringBuilder();
             }
@@ -263,25 +296,31 @@ namespace Microsoft.VisualStudio.Repl {
         /// <summary>
         /// Properties for a run of text - includes destination (stdout/stderr) and color
         /// </summary>
-        internal struct OutputEntryProperties {
+        internal struct OutputEntryProperties
+        {
             public readonly OutputEntryKind Kind;
             public readonly ConsoleColor Color;
 
-            public OutputEntryProperties(OutputEntryKind kind, ConsoleColor color) {
+            public OutputEntryProperties(OutputEntryKind kind, ConsoleColor color)
+            {
                 Kind = kind;
                 Color = color;
             }
 
-            public static bool operator ==(OutputEntryProperties l, OutputEntryProperties r) {
-                return l.Kind == r.Kind && l.Color == r.Color; 
+            public static bool operator ==(OutputEntryProperties l, OutputEntryProperties r)
+            {
+                return l.Kind == r.Kind && l.Color == r.Color;
             }
 
-            public static bool operator !=(OutputEntryProperties l, OutputEntryProperties r) {
+            public static bool operator !=(OutputEntryProperties l, OutputEntryProperties r)
+            {
                 return l.Kind != r.Kind || l.Color != r.Color;
             }
 
-            public override bool Equals(object obj) {
-                if (!(obj is OutputEntryProperties)) {
+            public override bool Equals(object obj)
+            {
+                if (!(obj is OutputEntryProperties))
+                {
                     return false;
                 }
 
@@ -289,14 +328,17 @@ namespace Microsoft.VisualStudio.Repl {
                 return other == this;
             }
 
-            public override int GetHashCode() {
-                return (int)Kind  ^ ((int)Color) << 1;
+            public override int GetHashCode()
+            {
+                return (int)Kind ^ ((int)Color) << 1;
             }
         }
 
-        internal enum OutputEntryKind {
+        internal enum OutputEntryKind
+        {
             StdOut,
             StdErr
         }
     }
 }
+

@@ -1,25 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Threading;
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.NodejsTools.Jade {
-    abstract class OutlineRegionBuilder : IDisposable {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal abstract class OutlineRegionBuilder : IDisposable
+    {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
         public EventHandler<OutlineRegionsChangedEventArgs> RegionsChanged;
 
@@ -30,46 +18,57 @@ namespace Microsoft.NodejsTools.Jade {
         private long _disposed = 0;
         private object _regionsLock = new object();
 
-        protected OutlineRegionBuilder(ITextBuffer textBuffer) {
-            CurrentRegions = new OutlineRegionCollection(0);
+        protected OutlineRegionBuilder(ITextBuffer textBuffer)
+        {
+            this.CurrentRegions = new OutlineRegionCollection(0);
 
-            TextBuffer = textBuffer;
-            TextBuffer.Changed += OnTextBufferChanged;
+            this.TextBuffer = textBuffer;
+            this.TextBuffer.Changed += this.OnTextBufferChanged;
 
-            BackgroundTask = new IdleTimeAsyncTask(TaskAction, MainThreadAction);
-            BackgroundTask.DoTaskOnIdle(300);
+            this.BackgroundTask = new IdleTimeAsyncTask(this.TaskAction, this.MainThreadAction);
+            this.BackgroundTask.DoTaskOnIdle(300);
         }
 
-        protected virtual void OnTextBufferChanged(object sender, TextContentChangedEventArgs e) {
+        protected virtual void OnTextBufferChanged(object sender, TextContentChangedEventArgs e)
+        {
             // In order to provide nicer experience when user presser and holds
             // ENTER or DELETE or just types really fast, we are going to track
             // regions optimistically and report changes without going through
             // async or idle processing. Idle/async is still going to hit later.
 
-            if (e.Changes.Count > 0) {
+            if (e.Changes.Count > 0)
+            {
                 int start, oldLength, newLength;
                 TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
 
-                int changeStart = Int32.MaxValue;
-                int changeEnd = 0;
+                var changeStart = Int32.MaxValue;
+                var changeEnd = 0;
 
-                lock (_regionsLock) {
+                lock (this._regionsLock)
+                {
                     // Remove affected regions and shift the remaining ones. Outlining 
                     // regions are not sorted and can overlap. Hence linear search.
 
-                    for (int i = 0; i < CurrentRegions.Count; i++) {
-                        var region = CurrentRegions[i];
+                    for (var i = 0; i < this.CurrentRegions.Count; i++)
+                    {
+                        var region = this.CurrentRegions[i];
 
-                        if (region.End <= start) {
+                        if (region.End <= start)
+                        {
                             continue;
                         }
 
-                        if (region.Contains(start) && region.Contains(start + oldLength)) {
+                        if (region.Contains(start) && region.Contains(start + oldLength))
+                        {
                             region.Expand(0, newLength - oldLength);
-                        } else if (region.Start >= start + oldLength) {
+                        }
+                        else if (region.Start >= start + oldLength)
+                        {
                             region.Shift(newLength - oldLength);
-                        } else {
-                            CurrentRegions.RemoveAt(i);
+                        }
+                        else
+                        {
+                            this.CurrentRegions.RemoveAt(i);
                             i--;
                         }
 
@@ -78,32 +77,36 @@ namespace Microsoft.NodejsTools.Jade {
                     }
 
                     if (changeStart < Int32.MaxValue)
-                        CurrentRegions.TextBufferVersion = TextBuffer.CurrentSnapshot.Version.VersionNumber;
+                        this.CurrentRegions.TextBufferVersion = this.TextBuffer.CurrentSnapshot.Version.VersionNumber;
                 }
 
-                if (changeStart < Int32.MaxValue) {
-                    if (RegionsChanged != null)
-                        RegionsChanged(this, new OutlineRegionsChangedEventArgs(CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
-
+                if (changeStart < Int32.MaxValue)
+                {
+                    if (this.RegionsChanged != null)
+                        this.RegionsChanged(this, new OutlineRegionsChangedEventArgs(this.CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
                 }
             }
         }
 
         protected abstract void BuildRegions(OutlineRegionCollection newRegions);
 
-        protected bool IsDisposed() {
-            return Interlocked.Read(ref _disposed) > 0;
+        protected bool IsDisposed()
+        {
+            return Interlocked.Read(ref this._disposed) > 0;
         }
 
-        protected virtual object TaskAction() {
-            if (!IsDisposed()) {
-                var snapshot = TextBuffer.CurrentSnapshot;
+        protected virtual object TaskAction()
+        {
+            if (!IsDisposed())
+            {
+                var snapshot = this.TextBuffer.CurrentSnapshot;
                 var newRegions = new OutlineRegionCollection(snapshot.Version.VersionNumber);
 
                 BuildRegions(newRegions);
 
-                lock (_regionsLock) {
-                    var changedRange = CompareRegions(newRegions, CurrentRegions, snapshot.Length);
+                lock (this._regionsLock)
+                {
+                    var changedRange = CompareRegions(newRegions, this.CurrentRegions, snapshot.Length);
                     return new OutlineRegionsChange(changedRange, newRegions);
                 }
             }
@@ -111,18 +114,23 @@ namespace Microsoft.NodejsTools.Jade {
             return null;
         }
 
-        protected virtual void MainThreadAction(object backgroundProcessingResult) {
-            if (!IsDisposed()) {
+        protected virtual void MainThreadAction(object backgroundProcessingResult)
+        {
+            if (!IsDisposed())
+            {
                 var result = backgroundProcessingResult as OutlineRegionsChange;
 
-                if (result != null && TextRange.IsValid(result.ChangedRange)) {
-                    lock (_regionsLock) {
-                        CurrentRegions = result.NewRegions;
+                if (result != null && TextRange.IsValid(result.ChangedRange))
+                {
+                    lock (this._regionsLock)
+                    {
+                        this.CurrentRegions = result.NewRegions;
                     }
 
-                    if (RegionsChanged != null) {
-                        RegionsChanged(this,
-                            new OutlineRegionsChangedEventArgs(CurrentRegions.Clone() as OutlineRegionCollection,
+                    if (this.RegionsChanged != null)
+                    {
+                        this.RegionsChanged(this,
+                            new OutlineRegionsChangedEventArgs(this.CurrentRegions.Clone() as OutlineRegionCollection,
                             result.ChangedRange)
                          );
                     }
@@ -132,11 +140,13 @@ namespace Microsoft.NodejsTools.Jade {
 
         protected static ITextRange CompareRegions(
             OutlineRegionCollection newRegions,
-            OutlineRegionCollection oldRegions, int upperBound) {
+            OutlineRegionCollection oldRegions, int upperBound)
+        {
             TextRangeCollection<OutlineRegion> oldClone = null;
             TextRangeCollection<OutlineRegion> newClone = null;
 
-            if (oldRegions != null) {
+            if (oldRegions != null)
+            {
                 oldClone = oldRegions.Clone() as OutlineRegionCollection;
                 oldClone.Sort();
             }
@@ -148,25 +158,31 @@ namespace Microsoft.NodejsTools.Jade {
         }
 
         #region IDisposable Members
-        public void Dispose() {
+        public void Dispose()
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing) {
-            if (Interlocked.Read(ref _disposed) == 0) {
-                Interlocked.Exchange(ref _disposed, 1);
-                if (TextBuffer != null) {
-                    TextBuffer.Changed -= OnTextBufferChanged;
-                    TextBuffer = null;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (Interlocked.Read(ref this._disposed) == 0)
+            {
+                Interlocked.Exchange(ref this._disposed, 1);
+                if (this.TextBuffer != null)
+                {
+                    this.TextBuffer.Changed -= this.OnTextBufferChanged;
+                    this.TextBuffer = null;
                 }
 
-                if (BackgroundTask != null) {
-                    BackgroundTask.Dispose();
-                    BackgroundTask = null;
+                if (this.BackgroundTask != null)
+                {
+                    this.BackgroundTask.Dispose();
+                    this.BackgroundTask = null;
                 }
             }
         }
         #endregion
     }
 }
+

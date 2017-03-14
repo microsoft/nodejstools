@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -26,14 +14,15 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.VisualStudioTools.Navigation {
-
+namespace Microsoft.VisualStudioTools.Navigation
+{
     /// <summary>
     /// Inplementation of the service that builds the information to expose to the symbols
     /// navigation tools (class view or object browser) from the source files inside a
     /// hierarchy.
     /// </summary>
-    internal abstract partial class LibraryManager : IDisposable, IVsRunningDocTableEvents {
+    internal abstract partial class LibraryManager : IDisposable, IVsRunningDocTableEvents
+    {
         private readonly CommonPackage/*!*/ _package;
         private readonly Dictionary<uint, TextLineEventListener> _documents;
         private readonly Dictionary<IVsHierarchy, HierarchyInfo> _hierarchies = new Dictionary<IVsHierarchy, HierarchyInfo>();
@@ -43,129 +32,151 @@ namespace Microsoft.VisualStudioTools.Navigation {
         private uint _objectManagerCookie;
         private uint _runningDocTableCookie;
 
-        public LibraryManager(CommonPackage/*!*/ package) {
+        public LibraryManager(CommonPackage/*!*/ package)
+        {
             Contract.Assert(package != null);
-            _package = package;
-            _documents = new Dictionary<uint, TextLineEventListener>();
-            _library = new Library(new Guid(CommonConstants.LibraryGuid));
-            _library.LibraryCapabilities = (_LIB_FLAGS2)_LIB_FLAGS.LF_PROJECT;
-            _files = new Dictionary<ModuleId, LibraryNode>();
+            this._package = package;
+            this._documents = new Dictionary<uint, TextLineEventListener>();
+            this._library = new Library(new Guid(CommonConstants.LibraryGuid));
+            this._library.LibraryCapabilities = (_LIB_FLAGS2)_LIB_FLAGS.LF_PROJECT;
+            this._files = new Dictionary<ModuleId, LibraryNode>();
 
             var model = ((IServiceContainer)package).GetService(typeof(SComponentModel)) as IComponentModel;
-            _adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
+            this._adapterFactory = model.GetService<IVsEditorAdaptersFactoryService>();
 
             // Register our library now so it'll be available for find all references
             RegisterLibrary();
         }
 
-        public Library Library {
-            get { return _library; }
-        }
-
+        public Library Library => this._library;
         protected abstract LibraryNode CreateLibraryNode(LibraryNode parent, IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid);
 
-        public virtual LibraryNode CreateFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType) {
+        public virtual LibraryNode CreateFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType)
+        {
             return new LibraryNode(null, name, filename, libraryNodeType);
         }
 
-        private object GetPackageService(Type/*!*/ type) {
-            return ((System.IServiceProvider)_package).GetService(type);
+        private object GetPackageService(Type/*!*/ type)
+        {
+            return ((System.IServiceProvider)this._package).GetService(type);
         }
 
-        private void RegisterForRDTEvents() {
-            if (0 != _runningDocTableCookie) {
+        private void RegisterForRDTEvents()
+        {
+            if (0 != this._runningDocTableCookie)
+            {
                 return;
             }
-            IVsRunningDocumentTable rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt) {
+            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            if (null != rdt)
+            {
                 // Do not throw here in case of error, simply skip the registration.
-                rdt.AdviseRunningDocTableEvents(this, out _runningDocTableCookie);
+                rdt.AdviseRunningDocTableEvents(this, out this._runningDocTableCookie);
             }
         }
 
-        private void UnregisterRDTEvents() {
-            if (0 == _runningDocTableCookie) {
+        private void UnregisterRDTEvents()
+        {
+            if (0 == this._runningDocTableCookie)
+            {
                 return;
             }
-            IVsRunningDocumentTable rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt) {
+            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            if (null != rdt)
+            {
                 // Do not throw in case of error.
-                rdt.UnadviseRunningDocTableEvents(_runningDocTableCookie);
+                rdt.UnadviseRunningDocTableEvents(this._runningDocTableCookie);
             }
-            _runningDocTableCookie = 0;
+            this._runningDocTableCookie = 0;
         }
 
         #region ILibraryManager Members
 
-        public void RegisterHierarchy(IVsHierarchy hierarchy) {
-            if ((null == hierarchy) || _hierarchies.ContainsKey(hierarchy)) {
+        public void RegisterHierarchy(IVsHierarchy hierarchy)
+        {
+            if ((null == hierarchy) || this._hierarchies.ContainsKey(hierarchy))
+            {
                 return;
             }
 
             RegisterLibrary();
             var commonProject = hierarchy.GetProject().GetCommonProject();
-            HierarchyListener listener = new HierarchyListener(hierarchy, this);
-            var node = _hierarchies[hierarchy] = new HierarchyInfo(
+            var listener = new HierarchyListener(hierarchy, this);
+            var node = this._hierarchies[hierarchy] = new HierarchyInfo(
                 listener,
                 new ProjectLibraryNode(commonProject)
             );
-            _library.AddNode(node.ProjectLibraryNode);
+            this._library.AddNode(node.ProjectLibraryNode);
             listener.StartListening(true);
             RegisterForRDTEvents();
         }
 
-        private void RegisterLibrary() {
-            if (0 == _objectManagerCookie) {
-                IVsObjectManager2 objManager = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
-                if (null == objManager) {
+        private void RegisterLibrary()
+        {
+            if (0 == this._objectManagerCookie)
+            {
+                var objManager = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
+                if (null == objManager)
+                {
                     return;
                 }
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(
-                    objManager.RegisterSimpleLibrary(_library, out _objectManagerCookie));
+                    objManager.RegisterSimpleLibrary(this._library, out this._objectManagerCookie));
             }
         }
 
-        public void UnregisterHierarchy(IVsHierarchy hierarchy) {
-            if ((null == hierarchy) || !_hierarchies.ContainsKey(hierarchy)) {
+        public void UnregisterHierarchy(IVsHierarchy hierarchy)
+        {
+            if ((null == hierarchy) || !this._hierarchies.ContainsKey(hierarchy))
+            {
                 return;
             }
-            HierarchyInfo info = _hierarchies[hierarchy];
-            if (null != info) {
+            var info = this._hierarchies[hierarchy];
+            if (null != info)
+            {
                 info.Listener.Dispose();
             }
-            _hierarchies.Remove(hierarchy);
-            _library.RemoveNode(info.ProjectLibraryNode);
-            if (0 == _hierarchies.Count) {
+            this._hierarchies.Remove(hierarchy);
+            this._library.RemoveNode(info.ProjectLibraryNode);
+            if (0 == this._hierarchies.Count)
+            {
                 UnregisterRDTEvents();
             }
-            lock (_files) {
-                ModuleId[] keys = new ModuleId[_files.Keys.Count];
-                _files.Keys.CopyTo(keys, 0);
-                foreach (ModuleId id in keys) {
-                    if (hierarchy.Equals(id.Hierarchy)) {
-                        _library.RemoveNode(_files[id]);
-                        _files.Remove(id);
+            lock (this._files)
+            {
+                var keys = new ModuleId[this._files.Keys.Count];
+                this._files.Keys.CopyTo(keys, 0);
+                foreach (var id in keys)
+                {
+                    if (hierarchy.Equals(id.Hierarchy))
+                    {
+                        this._library.RemoveNode(this._files[id]);
+                        this._files.Remove(id);
                     }
                 }
             }
             // Remove the document listeners.
-            uint[] docKeys = new uint[_documents.Keys.Count];
-            _documents.Keys.CopyTo(docKeys, 0);
-            foreach (uint id in docKeys) {
-                TextLineEventListener docListener = _documents[id];
-                if (hierarchy.Equals(docListener.FileID.Hierarchy)) {
-                    _documents.Remove(id);
+            var docKeys = new uint[this._documents.Keys.Count];
+            this._documents.Keys.CopyTo(docKeys, 0);
+            foreach (var id in docKeys)
+            {
+                var docListener = this._documents[id];
+                if (hierarchy.Equals(docListener.FileID.Hierarchy))
+                {
+                    this._documents.Remove(id);
                     docListener.Dispose();
                 }
             }
         }
 
         public void RegisterLineChangeHandler(uint document,
-            TextLineChangeEvent lineChanged, Action<IVsTextLines> onIdle) {
-            _documents[document].OnFileChangedImmediate += delegate(object sender, TextLineChange[] changes, int fLast) {
+            TextLineChangeEvent lineChanged, Action<IVsTextLines> onIdle)
+        {
+            this._documents[document].OnFileChangedImmediate += delegate (object sender, TextLineChange[] changes, int fLast)
+            {
                 lineChanged(sender, changes, fLast);
             };
-            _documents[document].OnFileChanged += (sender, args) => onIdle(args.TextBuffer);
+            this._documents[document].OnFileChanged += (sender, args) => onIdle(args.TextBuffer);
         }
 
         #endregion
@@ -179,7 +190,8 @@ namespace Microsoft.VisualStudioTools.Navigation {
         /// with the provided LibraryTask and an IScopeNode which provides information
         /// about the members of the file.
         /// </summary>
-        protected virtual void OnNewFile(LibraryTask task) {
+        protected virtual void OnNewFile(LibraryTask task)
+        {
         }
 
         /// <summary>
@@ -189,17 +201,20 @@ namespace Microsoft.VisualStudioTools.Navigation {
         /// 
         /// It is safe to call this method from any thread.
         /// </summary>
-        protected void FileParsed(LibraryTask task, IScopeNode scope) {
-            try {
+        protected void FileParsed(LibraryTask task, IScopeNode scope)
+        {
+            try
+            {
                 var project = task.ModuleID.Hierarchy.GetProject().GetCommonProject();
 
                 HierarchyNode fileNode = fileNode = project.NodeFromItemId(task.ModuleID.ItemID);
                 HierarchyInfo parent;
-                if (fileNode == null || !_hierarchies.TryGetValue(task.ModuleID.Hierarchy, out parent)) {
+                if (fileNode == null || !this._hierarchies.TryGetValue(task.ModuleID.Hierarchy, out parent))
+                {
                     return;
                 }
 
-                LibraryNode module = CreateFileLibraryNode(
+                var module = CreateFileLibraryNode(
                     parent.ProjectLibraryNode,
                     fileNode,
                     System.IO.Path.GetFileName(task.FileName),
@@ -214,38 +229,49 @@ namespace Microsoft.VisualStudioTools.Navigation {
                 // need to make sure we're not mutating lists which are handed out.
 
                 CreateModuleTree(module, scope, task.FileName + ":", task.ModuleID);
-                if (null != task.ModuleID) {
+                if (null != task.ModuleID)
+                {
                     LibraryNode previousItem = null;
-                    lock (_files) {
-                        if (_files.TryGetValue(task.ModuleID, out previousItem)) {
-                            _files.Remove(task.ModuleID);
+                    lock (this._files)
+                    {
+                        if (this._files.TryGetValue(task.ModuleID, out previousItem))
+                        {
+                            this._files.Remove(task.ModuleID);
                             parent.ProjectLibraryNode.RemoveNode(previousItem);
                         }
                     }
                 }
                 parent.ProjectLibraryNode.AddNode(module);
-                _library.Update();
-                if (null != task.ModuleID) {
-                    lock (_files) {
-                        _files.Add(task.ModuleID, module);
+                this._library.Update();
+                if (null != task.ModuleID)
+                {
+                    lock (this._files)
+                    {
+                        this._files.Add(task.ModuleID, module);
                     }
                 }
-            } catch (COMException) {
+            }
+            catch (COMException)
+            {
                 // we're shutting down and can't get the project
             }
         }
 
-        private void CreateModuleTree(LibraryNode current, IScopeNode scope, string namePrefix, ModuleId moduleId) {
-            if ((null == scope) || (null == scope.NestedScopes)) {
+        private void CreateModuleTree(LibraryNode current, IScopeNode scope, string namePrefix, ModuleId moduleId)
+        {
+            if ((null == scope) || (null == scope.NestedScopes))
+            {
                 return;
             }
 
-            foreach (IScopeNode subItem in scope.NestedScopes) {
-                LibraryNode newNode = CreateLibraryNode(current, subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemID);
-                string newNamePrefix = namePrefix;
+            foreach (var subItem in scope.NestedScopes)
+            {
+                var newNode = CreateLibraryNode(current, subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemID);
+                var newNamePrefix = namePrefix;
 
                 current.AddNode(newNode);
-                if ((newNode.NodeType & LibraryNodeType.Classes) != LibraryNodeType.None) {
+                if ((newNode.NodeType & LibraryNodeType.Classes) != LibraryNodeType.None)
+                {
                     newNamePrefix = namePrefix + newNode.Name + ".";
                 }
 
@@ -257,15 +283,18 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #region Hierarchy Events
 
-        private void OnNewFile(object sender, HierarchyEventArgs args) {
-            IVsHierarchy hierarchy = sender as IVsHierarchy;
-            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID)) {
+        private void OnNewFile(object sender, HierarchyEventArgs args)
+        {
+            var hierarchy = sender as IVsHierarchy;
+            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID))
+            {
                 return;
             }
 
             ITextBuffer buffer = null;
-            if (null != args.TextBuffer) {
-                buffer = _adapterFactory.GetDocumentBuffer(args.TextBuffer);
+            if (null != args.TextBuffer)
+            {
+                buffer = this._adapterFactory.GetDocumentBuffer(args.TextBuffer);
             }
 
             var id = new ModuleId(hierarchy, args.ItemID);
@@ -277,9 +306,11 @@ namespace Microsoft.VisualStudioTools.Navigation {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void OnDeleteFile(object sender, HierarchyEventArgs args) {
-            IVsHierarchy hierarchy = sender as IVsHierarchy;
-            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID)) {
+        private void OnDeleteFile(object sender, HierarchyEventArgs args)
+        {
+            var hierarchy = sender as IVsHierarchy;
+            if (null == hierarchy || IsNonMemberItem(hierarchy, args.ItemID))
+            {
                 return;
             }
 
@@ -290,32 +321,42 @@ namespace Microsoft.VisualStudioTools.Navigation {
         /// Does a delete w/o checking if it's a non-meber item, for handling the
         /// transition from member item to non-member item.
         /// </summary>
-        private void OnDeleteFile(IVsHierarchy hierarchy, HierarchyEventArgs args) {
-            ModuleId id = new ModuleId(hierarchy, args.ItemID);
+        private void OnDeleteFile(IVsHierarchy hierarchy, HierarchyEventArgs args)
+        {
+            var id = new ModuleId(hierarchy, args.ItemID);
             LibraryNode node = null;
-            lock (_files) {
-                if (_files.TryGetValue(id, out node)) {
-                    _files.Remove(id);
+            lock (this._files)
+            {
+                if (this._files.TryGetValue(id, out node))
+                {
+                    this._files.Remove(id);
                     HierarchyInfo parent;
-                    if (_hierarchies.TryGetValue(hierarchy, out parent)) {
+                    if (this._hierarchies.TryGetValue(hierarchy, out parent))
+                    {
                         parent.ProjectLibraryNode.RemoveNode(node);
                     }
                 }
             }
-            if (null != node) {
-                _library.RemoveNode(node);
+            if (null != node)
+            {
+                this._library.RemoveNode(node);
             }
         }
 
-        private void IsNonMemberItemChanged(object sender, HierarchyEventArgs args) {
-            IVsHierarchy hierarchy = sender as IVsHierarchy;
-            if (null == hierarchy) {
+        private void IsNonMemberItemChanged(object sender, HierarchyEventArgs args)
+        {
+            var hierarchy = sender as IVsHierarchy;
+            if (null == hierarchy)
+            {
                 return;
             }
 
-            if (!IsNonMemberItem(hierarchy, args.ItemID)) {
+            if (!IsNonMemberItem(hierarchy, args.ItemID))
+            {
                 OnNewFile(hierarchy, args);
-            } else {
+            }
+            else
+            {
                 OnDeleteFile(hierarchy, args);
             }
         }
@@ -324,9 +365,10 @@ namespace Microsoft.VisualStudioTools.Navigation {
         /// Checks whether this hierarchy item is a project member (on disk items from show all
         /// files aren't considered project members).
         /// </summary>
-        protected bool IsNonMemberItem(IVsHierarchy hierarchy, uint itemId) {
+        protected bool IsNonMemberItem(IVsHierarchy hierarchy, uint itemId)
+        {
             object val;
-            int hr = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out val);
+            var hr = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out val);
             return ErrorHandler.Succeeded(hr) && (bool)val;
         }
 
@@ -334,23 +376,31 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #region IVsRunningDocTableEvents Members
 
-        public int OnAfterAttributeChange(uint docCookie, uint grfAttribs) {
-            if ((grfAttribs & (uint)(__VSRDTATTRIB.RDTA_MkDocument)) == (uint)__VSRDTATTRIB.RDTA_MkDocument) {
-                IVsRunningDocumentTable rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-                if (rdt != null) {
+        public int OnAfterAttributeChange(uint docCookie, uint grfAttribs)
+        {
+            if ((grfAttribs & (uint)(__VSRDTATTRIB.RDTA_MkDocument)) == (uint)__VSRDTATTRIB.RDTA_MkDocument)
+            {
+                var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+                if (rdt != null)
+                {
                     uint flags, readLocks, editLocks, itemid;
                     IVsHierarchy hier;
-                    IntPtr docData = IntPtr.Zero;
+                    var docData = IntPtr.Zero;
                     string moniker;
                     int hr;
-                    try {
+                    try
+                    {
                         hr = rdt.GetDocumentInfo(docCookie, out flags, out readLocks, out editLocks, out moniker, out hier, out itemid, out docData);
                         TextLineEventListener listner;
-                        if (_documents.TryGetValue(docCookie, out listner)) {
+                        if (this._documents.TryGetValue(docCookie, out listner))
+                        {
                             listner.FileName = moniker;
                         }
-                    } finally {
-                        if (IntPtr.Zero != docData) {
+                    }
+                    finally
+                    {
+                        if (IntPtr.Zero != docData)
+                        {
                             Marshal.Release(docData);
                         }
                     }
@@ -359,26 +409,32 @@ namespace Microsoft.VisualStudioTools.Navigation {
             return VSConstants.S_OK;
         }
 
-        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame) {
+        public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame)
+        {
             return VSConstants.S_OK;
         }
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) {
+        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        {
             return VSConstants.S_OK;
         }
 
-        public int OnAfterSave(uint docCookie) {
+        public int OnAfterSave(uint docCookie)
+        {
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame) {
+        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame)
+        {
             // Check if this document is in the list of the documents.
-            if (_documents.ContainsKey(docCookie)) {
+            if (this._documents.ContainsKey(docCookie))
+            {
                 return VSConstants.S_OK;
             }
             // Get the information about this document from the RDT.
-            IVsRunningDocumentTable rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt) {
+            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            if (null != rdt)
+            {
                 // Note that here we don't want to throw in case of error.
                 uint flags;
                 uint readLocks;
@@ -387,38 +443,45 @@ namespace Microsoft.VisualStudioTools.Navigation {
                 IVsHierarchy hierarchy;
                 uint itemId;
                 IntPtr unkDocData;
-                int hr = rdt.GetDocumentInfo(docCookie, out flags, out readLocks, out writeLoks,
+                var hr = rdt.GetDocumentInfo(docCookie, out flags, out readLocks, out writeLoks,
                                              out documentMoniker, out hierarchy, out itemId, out unkDocData);
-                try {
-                    if (Microsoft.VisualStudio.ErrorHandler.Failed(hr) || (IntPtr.Zero == unkDocData)) {
+                try
+                {
+                    if (Microsoft.VisualStudio.ErrorHandler.Failed(hr) || (IntPtr.Zero == unkDocData))
+                    {
                         return VSConstants.S_OK;
                     }
                     // Check if the herarchy is one of the hierarchies this service is monitoring.
-                    if (!_hierarchies.ContainsKey(hierarchy)) {
+                    if (!this._hierarchies.ContainsKey(hierarchy))
+                    {
                         // This hierarchy is not monitored, we can exit now.
                         return VSConstants.S_OK;
                     }
 
                     // Check the file to see if a listener is required.
-                    if (_package.IsRecognizedFile(documentMoniker)) {
+                    if (this._package.IsRecognizedFile(documentMoniker))
+                    {
                         return VSConstants.S_OK;
                     }
 
                     // Create the module id for this document.
-                    ModuleId docId = new ModuleId(hierarchy, itemId);
+                    var docId = new ModuleId(hierarchy, itemId);
 
                     // Try to get the text buffer.
-                    IVsTextLines buffer = Marshal.GetObjectForIUnknown(unkDocData) as IVsTextLines;
+                    var buffer = Marshal.GetObjectForIUnknown(unkDocData) as IVsTextLines;
 
                     // Create the listener.
-                    TextLineEventListener listener = new TextLineEventListener(buffer, documentMoniker, docId);
+                    var listener = new TextLineEventListener(buffer, documentMoniker, docId);
                     // Set the event handler for the change event. Note that there is no difference
                     // between the AddFile and FileChanged operation, so we can use the same handler.
-                    listener.OnFileChanged += new EventHandler<HierarchyEventArgs>(OnNewFile);
+                    listener.OnFileChanged += new EventHandler<HierarchyEventArgs>(this.OnNewFile);
                     // Add the listener to the dictionary, so we will not create it anymore.
-                    _documents.Add(docCookie, listener);
-                } finally {
-                    if (IntPtr.Zero != unkDocData) {
+                    this._documents.Add(docCookie, listener);
+                }
+                finally
+                {
+                    if (IntPtr.Zero != unkDocData)
+                    {
                         Marshal.Release(unkDocData);
                     }
                 }
@@ -427,20 +490,24 @@ namespace Microsoft.VisualStudioTools.Navigation {
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) {
-            if ((0 != dwEditLocksRemaining) || (0 != dwReadLocksRemaining)) {
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining)
+        {
+            if ((0 != dwEditLocksRemaining) || (0 != dwReadLocksRemaining))
+            {
                 return VSConstants.S_OK;
             }
             TextLineEventListener listener;
-            if (!_documents.TryGetValue(docCookie, out listener) || (null == listener)) {
+            if (!this._documents.TryGetValue(docCookie, out listener) || (null == listener))
+            {
                 return VSConstants.S_OK;
             }
-            using (listener) {
-                _documents.Remove(docCookie);
+            using (listener)
+            {
+                this._documents.Remove(docCookie);
                 // Now make sure that the information about this file are up to date (e.g. it is
                 // possible that Class View shows something strange if the file was closed without
                 // saving the changes).
-                HierarchyEventArgs args = new HierarchyEventArgs(listener.FileID.ItemID, listener.FileName);
+                var args = new HierarchyEventArgs(listener.FileID.ItemID, listener.FileName);
                 OnNewFile(listener.FileID.Hierarchy, args);
             }
             return VSConstants.S_OK;
@@ -448,9 +515,12 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #endregion
 
-        public void OnIdle(IOleComponentManager compMgr) {
-            foreach (TextLineEventListener listener in _documents.Values) {
-                if (compMgr.FContinueIdle() == 0) {
+        public void OnIdle(IOleComponentManager compMgr)
+        {
+            foreach (var listener in this._documents.Values)
+            {
+                if (compMgr.FContinueIdle() == 0)
+                {
                     break;
                 }
 
@@ -460,25 +530,30 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #region IDisposable Members
 
-        public void Dispose() {
+        public void Dispose()
+        {
             // Dispose all the listeners.
-            foreach (var info in _hierarchies.Values) {
+            foreach (var info in this._hierarchies.Values)
+            {
                 info.Listener.Dispose();
             }
-            _hierarchies.Clear();
+            this._hierarchies.Clear();
 
-            foreach (TextLineEventListener textListener in _documents.Values) {
+            foreach (var textListener in this._documents.Values)
+            {
                 textListener.Dispose();
             }
-            _documents.Clear();
+            this._documents.Clear();
 
             // Remove this library from the object manager.
-            if (0 != _objectManagerCookie) {
-                IVsObjectManager2 mgr = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
-                if (null != mgr) {
-                    mgr.UnregisterLibrary(_objectManagerCookie);
+            if (0 != this._objectManagerCookie)
+            {
+                var mgr = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
+                if (null != mgr)
+                {
+                    mgr.UnregisterLibrary(this._objectManagerCookie);
                 }
-                _objectManagerCookie = 0;
+                this._objectManagerCookie = 0;
             }
 
             // Unregister this object from the RDT events.
@@ -487,14 +562,17 @@ namespace Microsoft.VisualStudioTools.Navigation {
 
         #endregion
 
-        class HierarchyInfo {
+        private class HierarchyInfo
+        {
             public readonly HierarchyListener Listener;
             public readonly ProjectLibraryNode ProjectLibraryNode;
 
-            public HierarchyInfo(HierarchyListener listener, ProjectLibraryNode projectLibNode) {
-                Listener = listener;
-                ProjectLibraryNode = projectLibNode;
+            public HierarchyInfo(HierarchyListener listener, ProjectLibraryNode projectLibNode)
+            {
+                this.Listener = listener;
+                this.ProjectLibraryNode = projectLibNode;
             }
         }
     }
 }
+

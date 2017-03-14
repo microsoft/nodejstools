@@ -1,31 +1,19 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Text change event arguments. This class abstracts text change information 
     /// allowing code that handles text changes to use <seealso cref="ITextProvider"/>
     /// rather than Visual Studio ITextBuffer or some other editor specific types.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    class TextChangeEventArgs : EventArgs {
+    internal class TextChangeEventArgs : EventArgs
+    {
         /// <summary>
         /// Start position of the change
         /// </summary>
@@ -53,16 +41,19 @@ namespace Microsoft.NodejsTools.Jade {
         public ITextProvider NewText { get; private set; }
 
         public TextChangeEventArgs(int start, int oldLength, int newLength)
-            : this(start, oldLength, newLength, null, null) {
+            : this(start, oldLength, newLength, null, null)
+        {
         }
 
         [DebuggerStepThrough]
-        public TextChangeEventArgs(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText) {
-            Start = start;
-            OldLength = oldLength;
-            NewLength = newLength;
-            OldText = oldText;
-            NewText = newText;
+        public TextChangeEventArgs(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
+        {
+            this.Start = start;
+            this.OldLength = oldLength;
+            this.NewLength = newLength;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
     }
 }
+

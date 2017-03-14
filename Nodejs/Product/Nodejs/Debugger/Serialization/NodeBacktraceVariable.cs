@@ -1,44 +1,36 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Debugger.Serialization {
-    sealed class NodeBacktraceVariable : INodeVariable {
-        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter) {
+namespace Microsoft.NodejsTools.Debugger.Serialization
+{
+    internal sealed class NodeBacktraceVariable : INodeVariable
+    {
+        public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter)
+        {
             Utilities.ArgumentNotNull("stackFrame", stackFrame);
             Utilities.ArgumentNotNull("parameter", parameter);
 
-            JToken value = parameter["value"];
-            Id = (int)value["ref"];
-            Parent = null;
-            StackFrame = stackFrame;
-            Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
-            TypeName = (string)value["type"];
-            Value = (string)value["value"];
-            Class = (string)value["className"];
-            try {
-                Text = (string)value["text"];
-            } catch (ArgumentException) {
-                Text = String.Empty;
+            var value = parameter["value"];
+            this.Id = (int)value["ref"];
+            this.Parent = null;
+            this.StackFrame = stackFrame;
+            this.Name = (string)parameter["name"] ?? NodeVariableType.AnonymousVariable;
+            this.TypeName = (string)value["type"];
+            this.Value = (string)value["value"];
+            this.Class = (string)value["className"];
+            try
+            {
+                this.Text = (string)value["text"];
             }
-            Attributes = NodePropertyAttributes.None;
-            Type = NodePropertyType.Normal;
+            catch (ArgumentException)
+            {
+                this.Text = String.Empty;
+            }
+            this.Attributes = NodePropertyAttributes.None;
+            this.Type = NodePropertyType.Normal;
         }
 
         public int Id { get; private set; }
@@ -53,3 +45,4 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
         public NodeStackFrame StackFrame { get; private set; }
     }
 }
+

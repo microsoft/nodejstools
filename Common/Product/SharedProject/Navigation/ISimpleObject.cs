@@ -1,23 +1,13 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.VisualStudioTools.Navigation {
-    public interface ISimpleObject {
+namespace Microsoft.VisualStudioTools.Navigation
+{
+    public interface ISimpleObject
+    {
         bool CanDelete { get; }
         bool CanGoToSource { get; }
         bool CanRename { get; }
@@ -44,3 +34,4 @@ namespace Microsoft.VisualStudioTools.Navigation {
         IVsSimpleObjectList2 FilterView(uint ListType);
     }
 }
+

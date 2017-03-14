@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -33,7 +21,6 @@ namespace TestUtilities
             {
                 Assert.Inconclusive("Test requires MTA appartment to call COM reliably. Add solution item <root>\\Build\\Default.testsettings.");
             }
-
         }
 
         public static void Throws<TExpected>(Action throwingAction)
@@ -64,15 +51,19 @@ namespace TestUtilities
             }
         }
 
-        public static void MissingDependency(string dependency) {
+        public static void MissingDependency(string dependency)
+        {
             Assert.Inconclusive("Missing Dependency: {0}", dependency);
         }
 
-        public static void ArrayEquals<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
-            if (expected == null) {
+        public static void ArrayEquals<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        {
+            if (expected == null)
+            {
                 throw new ArgumentNullException("expected");
             }
-            if (actual == null) {
+            if (actual == null)
+            {
                 Assert.Fail("Actual collection is null.");
             }
 
@@ -80,7 +71,8 @@ namespace TestUtilities
 
             var expectedIt = expected.GetEnumerator();
             var actualIt = actual.GetEnumerator();
-            for (var i = 0; expectedIt.MoveNext() && actualIt.MoveNext(); ++i) {
+            for (var i = 0; expectedIt.MoveNext() && actualIt.MoveNext(); ++i)
+            {
                 Assert.AreEqual(expectedIt.Current, actualIt.Current, string.Format("Assetion failed at index {0}", i));
             }
         }
@@ -142,18 +134,24 @@ namespace TestUtilities
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void Contains(string source, params string[] values) {
-            foreach (var v in values) {
-                if (!source.Contains(v)) {
+        public static void Contains(string source, params string[] values)
+        {
+            foreach (var v in values)
+            {
+                if (!source.Contains(v))
+                {
                     Assert.Fail(String.Format("{0} does not contain {1}", source, v));
                 }
             }
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void Contains<T>(IEnumerable<T> source, T value) {
-            foreach (var v in source) {
-                if (v.Equals(value)) {
+        public static void Contains<T>(IEnumerable<T> source, T value)
+        {
+            foreach (var v in source)
+            {
+                if (v.Equals(value))
+                {
                     return;
                 }
             }
@@ -162,7 +160,8 @@ namespace TestUtilities
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void AreEqual<T>(IEnumerable<T> source, params T[] value) {
+        public static void AreEqual<T>(IEnumerable<T> source, params T[] value)
+        {
             var items = source.ToArray();
             var message = string.Format(
                 "Expected: <\n{0}\n>.\nActual: <\n{1}\n>.",
@@ -172,34 +171,41 @@ namespace TestUtilities
             Console.WriteLine(message);
 
             Assert.AreEqual(value.Length, items.Length, message);
-            for (int i = 0; i < value.Length; i++) {
+            for (int i = 0; i < value.Length; i++)
+            {
                 Assert.AreEqual(value[i], items[i]);
             }
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void DoesntContain<T>(IEnumerable<T> source, T value) {
-            foreach (var v in source) {
-                if (v.Equals(value)) {
+        public static void DoesntContain<T>(IEnumerable<T> source, T value)
+        {
+            foreach (var v in source)
+            {
+                if (v.Equals(value))
+                {
                     Assert.Fail(String.Format("{0} contains {1}", MakeText(source), value));
                 }
             }
-
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsExactly<T>(IEnumerable<T> source, IEnumerable<T> expected) {
+        public static void ContainsExactly<T>(IEnumerable<T> source, IEnumerable<T> expected)
+        {
             ContainsExactly(new HashSet<T>(source), expected.ToArray());
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsExactly<T>(IEnumerable<T> source, params T[] expected) {
+        public static void ContainsExactly<T>(IEnumerable<T> source, params T[] expected)
+        {
             ContainsExactly(new HashSet<T>(source), expected);
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsExactly<T>(HashSet<T> set, params T[] expected) {
-            if (set.ContainsExactly(expected)) {
+        public static void ContainsExactly<T>(HashSet<T> set, params T[] expected)
+        {
+            if (set.ContainsExactly(expected))
+            {
                 return;
             }
 
@@ -211,18 +217,22 @@ namespace TestUtilities
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsAtLeast<T>(IEnumerable<T> source, IEnumerable<T> values) {
+        public static void ContainsAtLeast<T>(IEnumerable<T> source, IEnumerable<T> values)
+        {
             ContainsAtLeast(new HashSet<T>(source), values.ToArray());
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsAtLeast<T>(IEnumerable<T> source, params T[] values) {
+        public static void ContainsAtLeast<T>(IEnumerable<T> source, params T[] values)
+        {
             ContainsAtLeast(new HashSet<T>(source), values);
         }
 
         [System.Diagnostics.DebuggerStepThrough]
-        public static void ContainsAtLeast<T>(HashSet<T> set, params T[] values) {
-            if (set.IsSupersetOf(values)) {
+        public static void ContainsAtLeast<T>(HashSet<T> set, params T[] values)
+        {
+            if (set.IsSupersetOf(values))
+            {
                 return;
             }
             var missing = new HashSet<T>(values);
@@ -234,26 +244,33 @@ namespace TestUtilities
             ));
         }
 
-        public static string MakeText<T>(IEnumerable<T> values) {
+        public static string MakeText<T>(IEnumerable<T> values)
+        {
             var ss = values.Select(x => x == null ? "(null)" : x.ToString()).ToArray();
             bool multiline = ss.Sum(s => s.Length) > 60;
 
             var sb = new StringBuilder("{");
-            if (multiline) {
+            if (multiline)
+            {
                 sb.Append("\n");
             }
 
             bool first = true;
-            foreach (var s in ss) {
-                if (first) {
+            foreach (var s in ss)
+            {
+                if (first)
+                {
                     first = false;
-                } else {
+                }
+                else
+                {
                     sb.Append(multiline ? ",\n" : ", ");
                 }
                 sb.Append(s);
             }
 
-            if (multiline) {
+            if (multiline)
+            {
                 sb.Append("\n");
             }
             sb.Append("}");
@@ -262,46 +279,58 @@ namespace TestUtilities
         }
 
 
-        public static void AreEqual(Regex expected, string actual, string message = null) {
-            if (!expected.IsMatch(actual)) {
+        public static void AreEqual(Regex expected, string actual, string message = null)
+        {
+            if (!expected.IsMatch(actual))
+            {
                 Assert.Fail(string.Format("Expected <{0}>. Actual <{1}>. {2}", expected, actual, message ?? ""));
             }
         }
 
-        public static void AreEqual(string expected, XmlDocument actual, string message = null) {
+        public static void AreEqual(string expected, XmlDocument actual, string message = null)
+        {
             var expectedDoc = new XmlDocument();
             expectedDoc.LoadXml(expected);
             AreEqual(expectedDoc, actual, message);
         }
 
-        public static void AreEqual(XmlDocument expected, XmlDocument actual, string message = null) {
+        public static void AreEqual(XmlDocument expected, XmlDocument actual, string message = null)
+        {
             var nav1 = expected.CreateNavigator();
             var nav2 = actual.CreateNavigator();
 
-            if (string.IsNullOrEmpty(message)) {
+            if (string.IsNullOrEmpty(message))
+            {
                 message = string.Empty;
-            } else {
+            }
+            else
+            {
                 message = " " + message;
             }
 
             AreXPathNavigatorsEqual(nav1, nav2, message);
         }
 
-        private static string GetFullPath(XPathNavigator nav) {
+        private static string GetFullPath(XPathNavigator nav)
+        {
             nav = nav.CreateNavigator();
             var names = new Stack<string>();
 
             names.Push(nav.Name);
-            while (nav.MoveToParent()) {
+            while (nav.MoveToParent())
+            {
                 names.Push(nav.Name);
             }
 
             return "/" + string.Join("/", names);
         }
 
-        private static void AreXPathNavigatorsEqual(XPathNavigator nav1, XPathNavigator nav2, string message) {
-            while (true) {
-                if (nav1.Name != nav2.Name) {
+        private static void AreXPathNavigatorsEqual(XPathNavigator nav1, XPathNavigator nav2, string message)
+        {
+            while (true)
+            {
+                if (nav1.Name != nav2.Name)
+                {
                     Assert.Fail("Expected element <{0}>. Actual element <{1}>.{2}", nav1.Name, nav2.Name, message);
                 }
                 var anav1 = nav1.CreateNavigator();
@@ -309,13 +338,17 @@ namespace TestUtilities
                 var attr1 = new List<string>();
                 var attr2 = new List<string>();
 
-                if (anav1.MoveToFirstAttribute()) {
-                    do {
+                if (anav1.MoveToFirstAttribute())
+                {
+                    do
+                    {
                         attr1.Add(string.Format("{0}=\"{1}\"", anav1.Name, anav1.Value));
                     } while (anav1.MoveToNextAttribute());
                 }
-                if (anav2.MoveToFirstAttribute()) {
-                    do {
+                if (anav2.MoveToFirstAttribute())
+                {
+                    do
+                    {
                         attr2.Add(string.Format("{0}=\"{1}\"", anav2.Name, anav2.Value));
                     } while (anav2.MoveToNextAttribute());
                 }
@@ -324,23 +357,35 @@ namespace TestUtilities
 
                 var cnav1 = nav1.CreateNavigator();
                 var cnav2 = nav2.CreateNavigator();
-                if (cnav1.MoveToFirstChild()) {
-                    if (cnav2.MoveToFirstChild()) {
+                if (cnav1.MoveToFirstChild())
+                {
+                    if (cnav2.MoveToFirstChild())
+                    {
                         AreXPathNavigatorsEqual(cnav1, cnav2, message);
-                    } else {
+                    }
+                    else
+                    {
                         Assert.Fail("Expected element {0}.{1}", GetFullPath(cnav1), message);
                     }
-                } else if (cnav2.MoveToFirstChild()) {
+                }
+                else if (cnav2.MoveToFirstChild())
+                {
                     Assert.Fail("Unexpected element {0}.{1}", GetFullPath(cnav2), message);
                 }
 
-                if (nav1.MoveToNext()) {
-                    if (nav2.MoveToNext()) {
+                if (nav1.MoveToNext())
+                {
+                    if (nav2.MoveToNext())
+                    {
                         continue;
-                    } else {
+                    }
+                    else
+                    {
                         Assert.Fail("Expected element {0}.{1}", GetFullPath(nav1), message);
                     }
-                } else if (nav2.MoveToNext()) {
+                }
+                else if (nav2.MoveToNext())
+                {
                     Assert.Fail("Unexpected element {0}.{1}", GetFullPath(nav2), message);
                 }
                 break;
@@ -348,3 +393,4 @@ namespace TestUtilities
         }
     }
 }
+

@@ -1,26 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Person : IPerson {
-
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Person : IPerson
+    {
         // We cannot rely on the ordering of any of these fields,
         // so we should match them separately.
         private static readonly Regex ObjectPersonRegex = new Regex(
@@ -32,17 +19,20 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             RegexOptions.Singleline);
 
         [JsonConstructor]
-        private Person() {
+        private Person()
+        {
             // Enables Json deserialization
         }
 
-        private Person(string name, string email = null, string url = null) {
+        private Person(string name, string email = null, string url = null)
+        {
             Name = name;
             Email = email;
             Url = url;
         }
 
-        public static Person CreateFromJsonSource(string source) {
+        public static Person CreateFromJsonSource(string source)
+        {
             if (source == null)
                 return new Person(string.Empty);
             return TryCreatePersonFromObject(source) ?? CreatePersonFromString(source);
@@ -54,7 +44,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         /// This can either be a json object or a string: https://docs.npmjs.com/files/package.json#people-fields-author-contributors
         /// </summary>
         /// <param name="source">Json source</param>
-        private static Person TryCreatePersonFromObject(string source) {
+        private static Person TryCreatePersonFromObject(string source)
+        {
             string name = null;
             string email = null;
             string url = null;
@@ -62,22 +53,27 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             // We parse using a regex because JObject.Parse throws exceptions for malformatted json,
             // and simply handling them causes performance issues.
             var matches = ObjectPersonRegex.Matches(source);
-            if (matches.Count >= 1) {
-                foreach (Match match in matches) {
+            if (matches.Count >= 1)
+            {
+                foreach (Match match in matches)
+                {
                     var group = match.Groups["name"];
-                    if (group.Success) {
+                    if (group.Success)
+                    {
                         name = group.Value;
                         continue;
                     }
 
                     group = match.Groups["email"];
-                    if (group.Success) {
+                    if (group.Success)
+                    {
                         email = group.Value;
                         continue;
                     }
 
                     group = match.Groups["url"];
-                    if (group.Success) {
+                    if (group.Success)
+                    {
                         url = group.Value;
                         continue;
                     }
@@ -92,7 +88,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         /// TODO: currently does not try to parse the string to extract the email or url.
         /// </summary>
         /// <param name="source">Json source</param>
-        private static Person CreatePersonFromString(string source) {
+        private static Person CreatePersonFromString(string source)
+        {
             return new Person(source);
         }
 
@@ -105,14 +102,18 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         [JsonProperty]
         public string Url { get; private set; }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var buff = new StringBuilder();
-            if (!string.IsNullOrEmpty(Name)) {
+            if (!string.IsNullOrEmpty(Name))
+            {
                 buff.Append(Name);
             }
 
-            if (!string.IsNullOrEmpty(Email)) {
-                if (buff.Length > 0) {
+            if (!string.IsNullOrEmpty(Email))
+            {
+                if (buff.Length > 0)
+                {
                     buff.Append(' ');
                 }
                 buff.Append('<');
@@ -120,8 +121,10 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 buff.Append('>');
             }
 
-            if (!string.IsNullOrEmpty(Url)) {
-                if (buff.Length > 0) {
+            if (!string.IsNullOrEmpty(Url))
+            {
+                if (buff.Length > 0)
+                {
                     buff.Append(' ');
                 }
                 buff.Append('(');
@@ -132,3 +135,4 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
     }
 }
+

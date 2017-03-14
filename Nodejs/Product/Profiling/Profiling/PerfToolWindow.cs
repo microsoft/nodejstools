@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -20,21 +6,25 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [Guid(WindowGuid)]
-    class PerfToolWindow : ToolWindowPane {
+    internal class PerfToolWindow : ToolWindowPane
+    {
         internal const string Title = "Node.js Performance";
         internal const string WindowGuid = "FB2AB212-5D1F-4101-A442-2231B4195E97";
         private SessionsNode _sessions;
         internal static PerfToolWindow Instance;
 
-        public PerfToolWindow() {
+        public PerfToolWindow()
+        {
             ToolClsid = Guids.VsUIHierarchyWindow;
             Caption = Title;
             Instance = this;
         }
 
-        public override void OnToolWindowCreated() {
+        public override void OnToolWindowCreated()
+        {
             base.OnToolWindowCreated();
 
             var frame = (IVsWindowFrame)Frame;
@@ -61,10 +51,13 @@ namespace Microsoft.NodejsTools.Profiling {
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdPerfToolbar));
         }
 
-        public SessionsNode Sessions {
-            get {
+        public SessionsNode Sessions
+        {
+            get
+            {
                 return _sessions;
             }
         }
     }
 }
+

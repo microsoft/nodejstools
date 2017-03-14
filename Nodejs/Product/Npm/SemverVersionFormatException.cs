@@ -1,25 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.NodejsTools.Npm {
+namespace Microsoft.NodejsTools.Npm
+{
     [Serializable]
-    public class SemverVersionFormatException : FormatException {
+    public class SemverVersionFormatException : FormatException
+    {
         //  I created this class mainly for the purposes of testability. Semver parsing might fail for any
         //  number of reasons with a format exception, which is what I originally used, but since that may
         //  also be thrown by methods called by SemverVersion.Parse, tests can't differentiate correct handling
@@ -32,6 +20,6 @@ namespace Microsoft.NodejsTools.Npm {
         public SemverVersionFormatException(string message, Exception innerException) : base(message, innerException) { }
 
         protected SemverVersionFormatException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-
     }
 }
+

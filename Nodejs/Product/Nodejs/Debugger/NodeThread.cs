@@ -1,86 +1,61 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 
-namespace Microsoft.NodejsTools.Debugger {
-    sealed class NodeThread {
+namespace Microsoft.NodejsTools.Debugger
+{
+    internal sealed class NodeThread
+    {
         private readonly int _identity;
         private readonly NodeDebugger _process;
         private readonly bool _isWorkerThread;
 
-        internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread) {
-            _process = process;
-            _identity = identity;
-            _isWorkerThread = isWorkerThread;
-            Name = "main thread";
+        internal NodeThread(NodeDebugger process, int identity, bool isWorkerThread)
+        {
+            this._process = process;
+            this._identity = identity;
+            this._isWorkerThread = isWorkerThread;
+            this.Name = "main thread";
         }
 
-        public void StepInto() {
-            _process.SendStepInto(_identity);
+        public void StepInto()
+        {
+            this._process.SendStepInto(this._identity);
         }
 
-        public void StepOver() {
-            _process.SendStepOver(_identity);
+        public void StepOver()
+        {
+            this._process.SendStepOver(this._identity);
         }
 
-        public void StepOut() {
-            _process.SendStepOut(_identity);
+        public void StepOut()
+        {
+            this._process.SendStepOut(this._identity);
         }
 
-        public void Resume() {
-            _process.SendResumeThread(_identity);
+        public void Resume()
+        {
+            this._process.SendResumeThread(this._identity);
         }
 
-        public bool IsWorkerThread {
-            get {
-                return _isWorkerThread;
-            }
-        }
+        public bool IsWorkerThread => this._isWorkerThread;
 
-        internal void ClearSteppingState() {
-            _process.SendClearStepping(_identity);
+        internal void ClearSteppingState()
+        {
+            this._process.SendClearStepping(this._identity);
         }
 
         public IList<NodeStackFrame> Frames { get; set; }
 
-        public int CallstackDepth {
-            get {
-                return Frames != null ? Frames.Count : 0;
-            }
-        }
+        public int CallstackDepth => this.Frames != null ? this.Frames.Count : 0;
 
-        public NodeStackFrame TopStackFrame {
-            get {
-                return Frames != null && Frames.Count > 0 ? Frames[0] : null;
-            }
-        }
+        public NodeStackFrame TopStackFrame => this.Frames != null && this.Frames.Count > 0 ? this.Frames[0] : null;
 
-        public NodeDebugger Process {
-            get {
-                return _process;
-            }
-        }
+        public NodeDebugger Process => this._process;
 
         public string Name { get; set; }
 
-        internal int Id {
-            get {
-                return _identity;
-            }
-        }
+        internal int Id => this._identity;
     }
 }
+

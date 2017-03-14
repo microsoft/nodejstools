@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -31,47 +17,56 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio.Text;
 
-namespace Microsoft.NodejsTools.Repl {
+namespace Microsoft.NodejsTools.Repl
+{
     [ReplRole("Reset"), ReplRole("Execution")]
-    sealed class NodejsReplEvaluator : IReplEvaluator {
+    internal sealed class NodejsReplEvaluator : IReplEvaluator
+    {
         private ListenerThread _listener;
         private IReplWindow _window;
         private readonly INodejsReplSite _site;
         internal static readonly object InputBeforeReset = new object();    // used to mark buffers which are no longer valid because we've done a reset
 
         public NodejsReplEvaluator()
-            : this(VsNodejsReplSite.Site) {
+            : this(VsNodejsReplSite.Site)
+        {
         }
 
-        public NodejsReplEvaluator(INodejsReplSite site) {
-            _site = site;
+        public NodejsReplEvaluator(INodejsReplSite site)
+        {
+            this._site = site;
         }
 
         #region IReplEvaluator Members
 
-        public Task<ExecutionResult> Initialize(IReplWindow window) {
-            _window = window;
-            _window.SetOptionValue(ReplOptions.CommandPrefix, ".");
-            _window.SetOptionValue(ReplOptions.PrimaryPrompt, "> ");
-            _window.SetOptionValue(ReplOptions.SecondaryPrompt, ". ");
-            _window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
-            _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
-            _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
+        public Task<ExecutionResult> Initialize(IReplWindow window)
+        {
+            this._window = window;
+            this._window.SetOptionValue(ReplOptions.CommandPrefix, ".");
+            this._window.SetOptionValue(ReplOptions.PrimaryPrompt, "> ");
+            this._window.SetOptionValue(ReplOptions.SecondaryPrompt, ". ");
+            this._window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
+            this._window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
+            this._window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
 
-            _window.WriteLine(Resources.ReplInitializationMessage);
+            this._window.WriteLine(Resources.ReplInitializationMessage);
 
             return ExecutionResult.Succeeded;
         }
 
-        public void ActiveLanguageBufferChanged(ITextBuffer currentBuffer, ITextBuffer previousBuffer) {
+        public void ActiveLanguageBufferChanged(ITextBuffer currentBuffer, ITextBuffer previousBuffer)
+        {
         }
 
-        public Task<ExecutionResult> Reset() {
-            var buffersBeforeReset = _window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
-            for (int i = 0; i < buffersBeforeReset.Count - 1; i++) {
+        public Task<ExecutionResult> Reset()
+        {
+            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
+            for (var i = 0; i < buffersBeforeReset.Count - 1; i++)
+            {
                 var buffer = buffersBeforeReset[i];
 
-                if (!buffer.Properties.ContainsProperty(InputBeforeReset)) {
+                if (!buffer.Properties.ContainsProperty(InputBeforeReset))
+                {
                     buffer.Properties.AddProperty(InputBeforeReset, InputBeforeReset);
                 }
             }
@@ -80,33 +75,39 @@ namespace Microsoft.NodejsTools.Repl {
             return ExecutionResult.Succeeded;
         }
 
-        private static bool TruePredicate(ITextBuffer buffer) {
+        private static bool TruePredicate(ITextBuffer buffer)
+        {
             return true;
         }
 
-        public bool CanExecuteText(string text) {
+        public bool CanExecuteText(string text)
+        {
             return true;
-         
         }
 
-        public Task<ExecutionResult> ExecuteText(string text) {
+        public Task<ExecutionResult> ExecuteText(string text)
+        {
             EnsureConnected();
-            if (_listener == null) {
+            if (this._listener == null)
+            {
                 return ExecutionResult.Failed;
             }
 
-            return _listener.ExecuteText(text);
+            return this._listener.ExecuteText(text);
         }
 
-        public void ExecuteFile(string filename) {
+        public void ExecuteFile(string filename)
+        {
             throw new NotImplementedException();
         }
 
-        public string FormatClipboard() {
+        public string FormatClipboard()
+        {
             return Clipboard.GetText();
         }
 
-        public void AbortCommand() {
+        public void AbortCommand()
+        {
             throw new NotImplementedException();
         }
 
@@ -114,35 +115,44 @@ namespace Microsoft.NodejsTools.Repl {
 
         #region IDisposable Members
 
-        public void Dispose() {
-            if (_listener != null) {
-                _listener.Dispose();
+        public void Dispose()
+        {
+            if (this._listener != null)
+            {
+                this._listener.Dispose();
             }
         }
 
         #endregion
 
-        private void EnsureConnected() {
-            if (_listener == null) {
+        private void EnsureConnected()
+        {
+            if (this._listener == null)
+            {
                 Connect();
             }
         }
 
-        private void Connect() {
-            if (_listener != null) {
-                _listener.Disconnect();
-                _listener.Dispose();
-                _listener = null;
+        private void Connect()
+        {
+            if (this._listener != null)
+            {
+                this._listener.Disconnect();
+                this._listener.Dispose();
+                this._listener = null;
             }
 
-            string nodeExePath = GetNodeExePath();
-            if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                _window.WriteError(Resources.NodejsNotInstalled);
-                _window.WriteError(Environment.NewLine);
+            var nodeExePath = GetNodeExePath();
+            if (String.IsNullOrWhiteSpace(nodeExePath))
+            {
+                this._window.WriteError(Resources.NodejsNotInstalled);
+                this._window.WriteError(Environment.NewLine);
                 return;
-            } else if (!File.Exists(nodeExePath)) {
-                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
-                _window.WriteError(Environment.NewLine);
+            }
+            else if (!File.Exists(nodeExePath))
+            {
+                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
+                this._window.WriteError(Environment.NewLine);
                 return;
             }
 
@@ -161,49 +171,59 @@ namespace Microsoft.NodejsTools.Repl {
             psi.UseShellExecute = false;
             psi.RedirectStandardError = true;
             psi.RedirectStandardOutput = true;
-                
+
 
             string fileName, directory = null;
 
-            if (_site.TryGetStartupFileAndDirectory(out fileName, out directory)) {
+            if (this._site.TryGetStartupFileAndDirectory(out fileName, out directory))
+            {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
             }
 
             var process = new Process();
             process.StartInfo = psi;
-            try {
+            try
+            {
                 process.Start();
-            } catch (Exception e) {
-                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
+            }
+            catch (Exception e)
+            {
+                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
-            _listener = new ListenerThread(this, process, socket);
+            this._listener = new ListenerThread(this, process, socket);
         }
 
-        private string GetNodeExePath() {
-            var startupProject = _site.GetStartupProject();
+        private string GetNodeExePath()
+        {
+            var startupProject = this._site.GetStartupProject();
             string nodeExePath;
-            if (startupProject != null) {
+            if (startupProject != null)
+            {
                 nodeExePath = Nodejs.GetAbsoluteNodeExePath(
                     startupProject.ProjectHome,
                     startupProject.GetProjectProperty(NodeProjectProperty.NodeExePath)
                 );
-            } else {
+            }
+            else
+            {
                 nodeExePath = Nodejs.NodeExePath;
             }
             return nodeExePath;
         }
 
-        private static void CreateConnection(out Socket conn, out int portNum) {
+        private static void CreateConnection(out Socket conn, out int portNum)
+        {
             conn = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             conn.Bind(new IPEndPoint(IPAddress.Loopback, 0));
             conn.Listen(0);
             portNum = ((IPEndPoint)conn.LocalEndPoint).Port;
         }
 
-        internal class ListenerThread : JsonListener, IDisposable {
+        internal class ListenerThread : JsonListener, IDisposable
+        {
             private readonly NodejsReplEvaluator _eval;
             private readonly Process _process;
             private readonly object _socketLock = new object();
@@ -218,90 +238,110 @@ namespace Microsoft.NodejsTools.Repl {
 #endif
             private static string _noReplProcess = Resources.InteractiveWindowNoProcessErrorMessage + Environment.NewLine;
 
-            public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket) {
-                _eval = eval;
-                _process = process;
-                _acceptSocket = socket;
+            public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket)
+            {
+                this._eval = eval;
+                this._process = process;
+                this._acceptSocket = socket;
 
-                _acceptSocket.BeginAccept(SocketConnectionAccepted, null);
+                this._acceptSocket.BeginAccept(this.SocketConnectionAccepted, null);
 
-                _process.OutputDataReceived += new DataReceivedEventHandler(StdOutReceived);
-                _process.ErrorDataReceived += new DataReceivedEventHandler(StdErrReceived);
-                _process.EnableRaisingEvents = true;
-                _process.Exited += ProcessExited;
+                this._process.OutputDataReceived += new DataReceivedEventHandler(this.StdOutReceived);
+                this._process.ErrorDataReceived += new DataReceivedEventHandler(this.StdErrReceived);
+                this._process.EnableRaisingEvents = true;
+                this._process.Exited += this.ProcessExited;
 
-                _process.BeginOutputReadLine();
-                _process.BeginErrorReadLine();
+                this._process.BeginOutputReadLine();
+                this._process.BeginErrorReadLine();
             }
 
-            private void StdOutReceived(object sender, DataReceivedEventArgs args) {
-                if (args.Data != null) {
-                    _eval._window.WriteOutput(args.Data + Environment.NewLine);
+            private void StdOutReceived(object sender, DataReceivedEventArgs args)
+            {
+                if (args.Data != null)
+                {
+                    this._eval._window.WriteOutput(args.Data + Environment.NewLine);
                 }
             }
 
-            private void StdErrReceived(object sender, DataReceivedEventArgs args) {
-                if (args.Data != null) {
-                    _eval._window.WriteError(args.Data + Environment.NewLine);
+            private void StdErrReceived(object sender, DataReceivedEventArgs args)
+            {
+                if (args.Data != null)
+                {
+                    this._eval._window.WriteError(args.Data + Environment.NewLine);
                 }
             }
 
-            private void ProcessExited(object sender, EventArgs args) {
+            private void ProcessExited(object sender, EventArgs args)
+            {
                 ProcessExitedWorker();
             }
 
-            private void ProcessExitedWorker() {
-                _eval._window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
-                using (new SocketLock(this)) {
-                    if (_completion != null) {
-                        _completion.SetResult(ExecutionResult.Failure);
+            private void ProcessExitedWorker()
+            {
+                this._eval._window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
+                using (new SocketLock(this))
+                {
+                    if (this._completion != null)
+                    {
+                        this._completion.SetResult(ExecutionResult.Failure);
                     }
-                    _completion = null;
-                }            
+                    this._completion = null;
+                }
             }
 
-            private void SocketConnectionAccepted(IAsyncResult result) {
-                Socket = _acceptSocket.EndAccept(result);
-                _acceptSocket.Close();
+            private void SocketConnectionAccepted(IAsyncResult result)
+            {
+                this.Socket = this._acceptSocket.EndAccept(result);
+                this._acceptSocket.Close();
 
-                using (new SocketLock(this)) {
-                    _connected = true;
+                using (new SocketLock(this))
+                {
+                    this._connected = true;
                 }
 
-                using (new SocketLock(this)) {
-                    if (_executionText != null) {
-                        Debug.WriteLine("Executing delayed text: " + _executionText);
-                        SendExecuteText(_executionText);
-                        _executionText = null;
+                using (new SocketLock(this))
+                {
+                    if (this._executionText != null)
+                    {
+                        Debug.WriteLine("Executing delayed text: " + this._executionText);
+                        SendExecuteText(this._executionText);
+                        this._executionText = null;
                     }
                 }
 
                 StartListenerThread();
             }
 
-            public Task<ExecutionResult> ExecuteText(string text) {
+            public Task<ExecutionResult> ExecuteText(string text)
+            {
                 TaskCompletionSource<ExecutionResult> completion;
                 Debug.WriteLine("Executing text: " + text);
-                using (new SocketLock(this)) {
-                    if (!_connected) {
+                using (new SocketLock(this))
+                {
+                    if (!this._connected)
+                    {
                         // delay executing the text until we're connected
                         Debug.WriteLine("Delayed executing text");
-                        _completion = completion = new TaskCompletionSource<ExecutionResult>();
-                        _executionText = text;
+                        this._completion = completion = new TaskCompletionSource<ExecutionResult>();
+                        this._executionText = text;
                         return completion.Task;
                     }
 
-                    try {
-                        if (!Socket.Connected) {
-                            _eval._window.WriteError(_noReplProcess);
+                    try
+                    {
+                        if (!this.Socket.Connected)
+                        {
+                            this._eval._window.WriteError(_noReplProcess);
                             return ExecutionResult.Failed;
                         }
 
-                        _completion = completion = new TaskCompletionSource<ExecutionResult>();
-                        
+                        this._completion = completion = new TaskCompletionSource<ExecutionResult>();
+
                         SendExecuteText(text);
-                    } catch (SocketException) {
-                        _eval._window.WriteError(_noReplProcess);
+                    }
+                    catch (SocketException)
+                    {
+                        this._eval._window.WriteError(_noReplProcess);
                         return ExecutionResult.Failed;
                     }
 
@@ -310,10 +350,11 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             [DllImport("user32", CallingConvention = CallingConvention.Winapi)]
-            static extern bool AllowSetForegroundWindow(int dwProcessId);
+            private static extern bool AllowSetForegroundWindow(int dwProcessId);
 
-            private void SendExecuteText(string text) {
-                AllowSetForegroundWindow(_process.Id);
+            private void SendExecuteText(string text)
+            {
+                AllowSetForegroundWindow(this._process.Id);
                 var request = new Dictionary<string, object>() {
                     { "type", "execute" },
                     { "code", text },
@@ -322,44 +363,54 @@ namespace Microsoft.NodejsTools.Repl {
                 SendRequest(request);
             }
 
-            internal void SendRequest(Dictionary<string, object> request) {
-                string json = _serializer.Serialize(request);
+            internal void SendRequest(Dictionary<string, object> request)
+            {
+                var json = this._serializer.Serialize(request);
 
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(json);
+                var bytes = System.Text.Encoding.UTF8.GetBytes(json);
                 var length = "Content-length: " + bytes.Length + "\r\n\r\n";
                 var lengthBytes = System.Text.Encoding.UTF8.GetBytes(length);
-                Socket.Send(lengthBytes);
-                Socket.Send(bytes);
+                this.Socket.Send(lengthBytes);
+                this.Socket.Send(bytes);
             }
 
-            protected override void OnSocketDisconnected() {
+            protected override void OnSocketDisconnected()
+            {
             }
 
-            protected override void ProcessPacket(JsonResponse response) {
-                var cmd = _serializer.Deserialize<Dictionary<string, object>>(response.Body);
+            protected override void ProcessPacket(JsonResponse response)
+            {
+                var cmd = this._serializer.Deserialize<Dictionary<string, object>>(response.Body);
 
                 object type;
-                if (cmd.TryGetValue("type", out type) && type is string) {
-                    switch ((string)type) {
+                if (cmd.TryGetValue("type", out type) && type is string)
+                {
+                    switch ((string)type)
+                    {
                         case "execute":
                             object result;
-                            if (cmd.TryGetValue("result", out result)) {
-                                _eval._window.WriteLine(result.ToString());
-                                _completion.SetResult(ExecutionResult.Success);
-                            } else if (cmd.TryGetValue("error", out result)) {
-                                _eval._window.WriteError(result.ToString());
-                                _completion.SetResult(ExecutionResult.Failure);
+                            if (cmd.TryGetValue("result", out result))
+                            {
+                                this._eval._window.WriteLine(result.ToString());
+                                this._completion.SetResult(ExecutionResult.Success);
                             }
-                            _completion = null;
+                            else if (cmd.TryGetValue("error", out result))
+                            {
+                                this._eval._window.WriteError(result.ToString());
+                                this._completion.SetResult(ExecutionResult.Failure);
+                            }
+                            this._completion = null;
                             break;
                         case "output":
-                            if (cmd.TryGetValue("output", out result)) {
-                                _eval._window.WriteOutput(FixOutput(result));
+                            if (cmd.TryGetValue("output", out result))
+                            {
+                                this._eval._window.WriteOutput(FixOutput(result));
                             }
                             break;
                         case "output_error":
-                            if (cmd.TryGetValue("output", out result)) {
-                                _eval._window.WriteError(FixOutput(result));
+                            if (cmd.TryGetValue("output", out result))
+                            {
+                                this._eval._window.WriteError(FixOutput(result));
                             }
                             break;
 #if DEBUG
@@ -371,21 +422,32 @@ namespace Microsoft.NodejsTools.Repl {
                 }
             }
 
-            private static string FixOutput(object result) {
+            private static string FixOutput(object result)
+            {
                 var res = result.ToString();
-                if (res.IndexOf('\n') != -1) {
-                    StringBuilder fixedStr = new StringBuilder();
-                    for (int i = 0; i < res.Length; i++) {
-                        if (res[i] == '\r') {
-                            if (i + 1 < res.Length && res[i + 1] == '\n') {
+                if (res.IndexOf('\n') != -1)
+                {
+                    var fixedStr = new StringBuilder();
+                    for (var i = 0; i < res.Length; i++)
+                    {
+                        if (res[i] == '\r')
+                        {
+                            if (i + 1 < res.Length && res[i + 1] == '\n')
+                            {
                                 i++;
                                 fixedStr.Append("\r\n");
-                            } else {
+                            }
+                            else
+                            {
                                 fixedStr.Append("\r\n");
                             }
-                        } else if (res[i] == '\n') {
+                        }
+                        else if (res[i] == '\n')
+                        {
                             fixedStr.Append("\r\n");
-                        } else {
+                        }
+                        else
+                        {
                             fixedStr.Append(res[i]);
                         }
                     }
@@ -394,37 +456,51 @@ namespace Microsoft.NodejsTools.Repl {
                 return res;
             }
 
-            internal void Disconnect() {
-                if (_completion != null) {
-                    _completion.SetResult(ExecutionResult.Failure);
-                    _completion = null;
+            internal void Disconnect()
+            {
+                if (this._completion != null)
+                {
+                    this._completion.SetResult(ExecutionResult.Failure);
+                    this._completion = null;
                 }
             }
 
-            public void Dispose() {
+            public void Dispose()
+            {
                 Dispose(true);
-                GC.SuppressFinalize(this);                
+                GC.SuppressFinalize(this);
             }
 
-            protected virtual void Dispose(bool disposing) {
-                if (!_disposed) {
-                    if (_process != null && !_process.HasExited) {
-                        try {
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!this._disposed)
+                {
+                    if (this._process != null && !this._process.HasExited)
+                    {
+                        try
+                        {
                             //Disconnect our event since we are forceably killing the process off
                             //  We'll synchronously send the message to the user
-                            _process.Exited -= ProcessExited;
-                            _process.Kill();
-                        } catch (InvalidOperationException) {
-                        } catch (NotSupportedException) {
-                        } catch (System.ComponentModel.Win32Exception) {
+                            this._process.Exited -= this.ProcessExited;
+                            this._process.Kill();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
+                        catch (NotSupportedException)
+                        {
+                        }
+                        catch (System.ComponentModel.Win32Exception)
+                        {
                         }
                         ProcessExitedWorker();
                     }
-                    
-                    if(_process != null) {
-                        _process.Dispose();                    
-                    }                    
-                    _disposed = true;
+
+                    if (this._process != null)
+                    {
+                        this._process.Dispose();
+                    }
+                    this._disposed = true;
                 }
             }
 
@@ -437,30 +513,35 @@ namespace Microsoft.NodejsTools.Repl {
             /// </summary>
             #region SocketLock
 
-            struct SocketLock : IDisposable {
+            private struct SocketLock : IDisposable
+            {
                 private readonly ListenerThread _evaluator;
 
-                public SocketLock(ListenerThread evaluator) {
+                public SocketLock(ListenerThread evaluator)
+                {
                     Monitor.Enter(evaluator._socketLock);
 #if DEBUG
                     Debug.Assert(evaluator._socketLockedThread == null);
                     evaluator._socketLockedThread = Thread.CurrentThread;
 #endif
-                    _evaluator = evaluator;
+                    this._evaluator = evaluator;
                 }
 
-                public void Dispose() {
+                public void Dispose()
+                {
 #if DEBUG
-                    _evaluator._socketLockedThread = null;
+                    this._evaluator._socketLockedThread = null;
 #endif
-                    Monitor.Exit(_evaluator._socketLock);
+                    Monitor.Exit(this._evaluator._socketLock);
                 }
             }
             #endregion
         }
 
-        internal void Clear() {
-            _listener.SendRequest(new Dictionary<string,object>() { { "type", "clear" }});
+        internal void Clear()
+        {
+            this._listener.SendRequest(new Dictionary<string, object>() { { "type", "clear" } });
         }
     }
 }
+

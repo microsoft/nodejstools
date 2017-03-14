@@ -1,6 +1,4 @@
-﻿// <copyright>
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Reflection;
 
@@ -10,6 +8,6 @@ using System.Reflection;
 // (See also AssemblyVersion.cs in this same directory.)
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Node.js Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Microsoft 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

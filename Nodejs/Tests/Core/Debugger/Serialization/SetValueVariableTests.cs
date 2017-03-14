@@ -1,29 +1,18 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class SetValueVariableTests {
+    public class SetValueVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateSetVariableValue() {
+        public void CreateSetVariableValue()
+        {
             // Arrange
             JObject json = SerializationTestData.GetSetVariableValueResponse();
             const int frameId = 3;
@@ -48,3 +37,4 @@ namespace NodejsTests.Debugger.Serialization {
         }
     }
 }
+

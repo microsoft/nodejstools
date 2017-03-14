@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -21,7 +9,9 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 #if NTVS_FEATURE_INTERACTIVEWINDOW
 using Microsoft.VisualStudio;
-namespace Microsoft.NodejsTools.Repl {
+
+namespace Microsoft.NodejsTools.Repl
+{
 #else
 namespace Microsoft.VisualStudio.Repl {
 #endif
@@ -48,9 +38,12 @@ namespace Microsoft.VisualStudio.Repl {
     [ProvideToolWindow(typeof(ReplWindow), Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow, MultiInstances = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidReplWindowPkgString)]
-    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory {
-        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id) {
-            if (toolWindowType == typeof(ReplWindow).GUID) {
+    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory
+    {
+        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id)
+        {
+            if (toolWindowType == typeof(ReplWindow).GUID)
+            {
                 var model = (IComponentModel)GetService(typeof(SComponentModel));
                 var replProvider = (ReplWindowProvider)model.GetService<IReplWindowProvider>();
 
@@ -61,3 +54,4 @@ namespace Microsoft.VisualStudio.Repl {
         }
     }
 }
+
