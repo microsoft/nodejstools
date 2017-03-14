@@ -265,15 +265,6 @@
           <CommandName>Node.js Hata Ayıklayıcı Ekle</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
-        <Strings>
-          <ButtonText>&amp;Tanılama Bilgisi...</ButtonText>
-          <MenuText>&amp;Tanılama Bilgisi...</MenuText>
-          <ToolTipText>Tanılama Bilgisi...</ToolTipText>
-          <CommandName>Tanılama Bilgisi...</CommandName>
-        </Strings>
-      </Button>
     </Buttons>
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -327,7 +318,6 @@
       <IDSymbol name="cmdidImportWizard" value="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
-      <IDSymbol name="cmdidDiagnostics" value="0x0208" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
       <IDSymbol name="cmdidSendFeedback" value="0x0215" />
       <IDSymbol name="cmdidDocumentation" value="0x0216" />

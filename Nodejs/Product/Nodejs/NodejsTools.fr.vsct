@@ -265,15 +265,6 @@
           <CommandName>Attacher le débogueur Node.js</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
-        <Strings>
-          <ButtonText>Informations de &amp;diagnostic...</ButtonText>
-          <MenuText>Informations de &amp;diagnostic...</MenuText>
-          <ToolTipText>Informations de diagnostic...</ToolTipText>
-          <CommandName>Informations de diagnostic...</CommandName>
-        </Strings>
-      </Button>
     </Buttons>
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -327,7 +318,6 @@
       <IDSymbol name="cmdidImportWizard" value="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
-      <IDSymbol name="cmdidDiagnostics" value="0x0208" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
       <IDSymbol name="cmdidSendFeedback" value="0x0215" />
       <IDSymbol name="cmdidDocumentation" value="0x0216" />

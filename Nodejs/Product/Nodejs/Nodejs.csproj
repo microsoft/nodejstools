@@ -204,13 +204,6 @@
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
-    <Compile Include="Commands\DiagnosticsCommand.cs" />
-    <Compile Include="Commands\DiagnosticsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Commands\DiagnosticsForm.Designer.cs">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\SendFeedbackCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
@@ -225,7 +218,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportWizardResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
     <Compile Include="Debugger\IFileNameMapper.cs" />
@@ -234,6 +226,7 @@
     <Compile Include="Debugger\ScriptTree.cs" />
     <Compile Include="Logging\InMemoryLogger.cs" />
     <Compile Include="Logging\INodejsToolsLogger.cs" />
+    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
@@ -721,12 +714,6 @@
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.tr.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hans.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.en.resx">
