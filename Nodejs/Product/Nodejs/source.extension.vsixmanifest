@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" Version="1.3.0.5" Language="en-US" Publisher="Microsoft" />
+    <Identity Id="FE8A8C3D-328A-476D-99F9-2A24B75F8C7F" Version="1.3.0.6" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Node.js Tools</DisplayName>
     <Description xml:space="preserve">Provides support for editing and debugging Node.js programs.</Description>
     <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
