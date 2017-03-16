@@ -305,7 +305,7 @@ namespace Microsoft.NodejsTools
         {
             var ext = Path.GetExtension(filename);
 
-            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension);
         }
 
         internal new object GetService(Type serviceType)

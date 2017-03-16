@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudioTools.Project
                         var found = false;
                         for (var n = this.FirstChild; n != null && !found; n = n.NextSibling)
                         {
-                            if (String.Compare(n.Caption, node.Caption, StringComparison.OrdinalIgnoreCase) == 0)
+                            if (StringComparer.OrdinalIgnoreCase.Equals(n.Caption, node.Caption))
                             {
                                 found = true;
                             }

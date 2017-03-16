@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools
         public static string GetAbsoluteNodeExePath(string root, string relativePath)
         {
             var overridePath = CommonUtils.UnquotePath(relativePath ?? string.Empty);
-            if (!String.IsNullOrWhiteSpace(overridePath))
+            if (!string.IsNullOrWhiteSpace(overridePath))
             {
                 if (string.IsNullOrWhiteSpace(root))
                 {
@@ -114,7 +114,7 @@ namespace Microsoft.NodejsTools
 
             // It wasn't in the users path.  Check Program Files x86 for the nodejs folder.
             var x86path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if (!String.IsNullOrEmpty(x86path))
+            if (!string.IsNullOrEmpty(x86path))
             {
                 path = Path.Combine(x86path, "nodejs", executable);
                 if (File.Exists(path))

@@ -217,11 +217,13 @@ namespace Microsoft.NodejsTools.Jade
                 // that is implemented on class Bar but Bar was added as Bar, not as IFoo
                 foreach (var kvp in this._servicesByContentType)
                 {
-                    if (String.Compare(kvp.Key.Item2, contentType.TypeName, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (StringComparer.OrdinalIgnoreCase.Equals(kvp.Key.Item2, contentType.TypeName))
                     {
                         service = kvp.Value as T;
                         if (service != null)
+                        {
                             return service as T;
+                        }
                     }
                 }
 

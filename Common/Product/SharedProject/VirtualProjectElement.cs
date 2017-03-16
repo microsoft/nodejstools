@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="attributeValue">Value to give to the attribute</param>
         public override void SetMetadata(string attributeName, string attributeValue)
         {
-            Debug.Assert(String.Compare(attributeName, ProjectFileConstants.Include, StringComparison.OrdinalIgnoreCase) != 0, "Use rename as this won't work");
+            Debug.Assert(!StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.Include), "Use rename as this won't work");
 
             // For virtual node, use our virtual property collection
             this._virtualProperties[attributeName] = attributeValue;
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudioTools.Project
             // For virtual items, use our virtual property collection
             if (!this._virtualProperties.ContainsKey(attributeName))
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             return this._virtualProperties[attributeName];

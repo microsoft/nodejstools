@@ -576,7 +576,7 @@ namespace Microsoft.VisualStudioTools.Project
             ICreateErrorInfo errInfo;
             ErrorHandler.ThrowOnFailure(CreateErrorInfo(out errInfo));
 
-            errInfo.SetDescription(String.Format(description, args));
+            errInfo.SetDescription(string.Format(description, args));
             var guidNull = Guid.Empty;
             errInfo.SetGUID(ref guidNull);
             errInfo.SetHelpFile(null);

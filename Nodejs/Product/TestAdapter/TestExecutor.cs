@@ -314,9 +314,9 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             public NodejsProjectSettings()
             {
-                NodeExePath = String.Empty;
-                SearchPath = String.Empty;
-                WorkingDir = String.Empty;
+                NodeExePath = string.Empty;
+                SearchPath = string.Empty;
+                WorkingDir = string.Empty;
             }
 
             public string NodeExePath { get; set; }

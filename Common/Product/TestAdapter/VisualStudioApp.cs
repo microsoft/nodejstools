@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudioTools
                 prefix = "VisualStudio";
             }
 
-            string progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
+            var progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
             object runningObject = null;
 
             IBindCtx bindCtx = null;
@@ -99,12 +99,11 @@ namespace Microsoft.VisualStudioTools
                 bindCtx.GetRunningObjectTable(out rot);
                 rot.EnumRunning(out enumMonikers);
 
-                IMoniker[] moniker = new IMoniker[1];
+                var moniker = new IMoniker[1];
                 uint numberFetched = 0;
                 while (enumMonikers.Next(1, moniker, out numberFetched) == 0)
                 {
-                    IMoniker runningObjectMoniker = moniker[0];
-
+                    var runningObjectMoniker = moniker[0];
                     string name = null;
 
                     try
@@ -119,7 +118,7 @@ namespace Microsoft.VisualStudioTools
                         // Do nothing, there is something in the ROT that we do not have access to.
                     }
 
-                    if (!string.IsNullOrEmpty(name) && string.Equals(name, progId, StringComparison.Ordinal))
+                    if (StringComparer.Ordinal.Equals(name, progId))
                     {
                         rot.GetObject(runningObjectMoniker, out runningObject);
                         break;
@@ -152,7 +151,7 @@ namespace Microsoft.VisualStudioTools
             var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;
-            for (int i = 1; i <= transports.Count; ++i)
+            for (var i = 1; i <= transports.Count; ++i)
             {
                 var t = transports.Item(i);
                 if (Guid.Parse(t.ID) == portSupplier)
@@ -180,7 +179,7 @@ namespace Microsoft.VisualStudioTools
         {
             var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
             var processes = debugger3.LocalProcesses;
-            for (int i = 1; i < processes.Count; ++i)
+            for (var i = 1; i < processes.Count; ++i)
             {
                 var process = processes.Item(i);
                 if (process.ProcessID == processOutput.ProcessId)

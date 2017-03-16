@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override int Open(ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
         {
             var editorGuid = VSConstants.GUID_ProjectDesignerEditor;
-            return this.OpenWithSpecific(0, ref editorGuid, String.Empty, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
+            return this.OpenWithSpecific(0, ref editorGuid, string.Empty, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
         }
 
         public override int OpenWithSpecific(uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame, WindowFrameShowAction windowFrameAction)

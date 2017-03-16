@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Get the output assembly path (including the name)
             pbstrCanonicalName = this.output.GetMetadataValue("FullPath");
-            Debug.Assert(!String.IsNullOrEmpty(pbstrCanonicalName), "Output Assembly not defined");
+            Debug.Assert(!string.IsNullOrEmpty(pbstrCanonicalName), "Output Assembly not defined");
 
             // Make sure we have a full path
             pbstrCanonicalName = CommonUtils.GetAbsoluteFilePath(this.project.ProjectHome, pbstrCanonicalName);
@@ -83,8 +83,10 @@ namespace Microsoft.VisualStudioTools.Project
                 pbstrDeploySourceURL = new Url(this.output.GetMetadataValue("FullPath")).Uri.AbsoluteUri;
                 return VSConstants.S_OK;
             }
-            if (path.Length < 9 || String.Compare(path.Substring(0, 8), "file:///", StringComparison.OrdinalIgnoreCase) != 0)
+            if (path.Length < 9 || !StringComparer.OrdinalIgnoreCase.Equals(path.Substring(0, 8), "file:///"))
+            {
                 path = "file:///" + path;
+            }
             pbstrDeploySourceURL = path;
             return VSConstants.S_OK;
         }
@@ -111,7 +113,7 @@ namespace Microsoft.VisualStudioTools.Project
             pvar = value;
 
             // If we don't have a value, we are expected to return unimplemented
-            return String.IsNullOrEmpty(value) ? VSConstants.E_NOTIMPL : VSConstants.S_OK;
+            return string.IsNullOrEmpty(value) ? VSConstants.E_NOTIMPL : VSConstants.S_OK;
         }
 
         public int get_RootRelativeURL(out string pbstrRelativePath)
@@ -122,7 +124,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.E_FAIL;
             }
 
-            pbstrRelativePath = String.Empty;
+            pbstrRelativePath = string.Empty;
             object variant;
             // get the corresponding property
 

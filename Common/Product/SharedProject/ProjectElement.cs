@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (HasItemBeenDeleted())
                 {
-                    return String.Empty;
+                    return string.Empty;
                 }
                 else
                 {

@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         continue;
                     }
                     var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                    if (item != null && String.Compare(item.Name, name, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (item != null && StringComparer.OrdinalIgnoreCase.Equals(item.Name, name))
                     {
                         return item;
                     }

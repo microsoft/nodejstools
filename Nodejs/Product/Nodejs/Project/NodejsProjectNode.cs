@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Project
                 SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
                 SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
 
-                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind)))
+                if (string.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind)))
                 {
                     SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
@@ -188,8 +188,8 @@ namespace Microsoft.NodejsTools.Project
 
         private static bool IsProjectTypeScriptSourceFile(string path)
         {
-            return string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension, StringComparison.OrdinalIgnoreCase)
+            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension)
+                && !StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension)
                 && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
         }
 
@@ -197,7 +197,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var ext = Path.GetExtension(strFileName);
 
-            return String.Equals(ext, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension);
         }
 
         internal override string GetItemType(string filename)
@@ -213,7 +213,7 @@ namespace Microsoft.NodejsTools.Project
                 return node.ItemNode.ItemTypeName;
             }
 
-            if (string.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
+            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension))
             {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
@@ -266,7 +266,7 @@ namespace Microsoft.NodejsTools.Project
         public override CommonFileNode CreateCodeFileNode(ProjectElement item)
         {
             var fileName = item.Url;
-            if (!String.IsNullOrWhiteSpace(fileName)
+            if (!string.IsNullOrWhiteSpace(fileName)
                 && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
             {
                 return new NodejsTypeScriptFileNode(this, item);
@@ -705,7 +705,7 @@ namespace Microsoft.NodejsTools.Project
                     var isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
 
                     var childPath = path;
-                    if (childPath != String.Empty)
+                    if (childPath != string.Empty)
                     {
                         childPath += "\\";
                     }

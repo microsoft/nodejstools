@@ -287,12 +287,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected string GetFullPathForDocument()
         {
-            var fullPath = String.Empty;
+            var fullPath = string.Empty;
 
             // Get the URL representing the item
             fullPath = this.node.GetMkDocument();
 
-            Debug.Assert(!String.IsNullOrEmpty(fullPath), "Could not retrive the fullpath for the node" + this.Node.ID.ToString(CultureInfo.CurrentCulture));
+            Debug.Assert(!string.IsNullOrEmpty(fullPath), "Could not retrive the fullpath for the node" + this.Node.ID.ToString(CultureInfo.CurrentCulture));
             return fullPath;
         }
 
@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("site", site);
 
-            if (String.IsNullOrEmpty(caption))
+            if (string.IsNullOrEmpty(caption))
             {
                 throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "caption");
             }
@@ -355,12 +355,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Utilities.ArgumentNotNull("site", site);
 
-            if (String.IsNullOrEmpty(oldName))
+            if (string.IsNullOrEmpty(oldName))
             {
                 throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "oldName");
             }
 
-            if (String.IsNullOrEmpty(newName))
+            if (string.IsNullOrEmpty(newName))
             {
                 throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "newName");
             }

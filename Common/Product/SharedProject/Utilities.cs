@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (guids == null || guids.Length == 0)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             // Create a StringBuilder with a pre-allocated buffer big enough for the
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudioTools.Project
             var guidsStrings = guidList.Split(';');
             foreach (var guid in guidsStrings)
             {
-                if (!String.IsNullOrEmpty(guid))
+                if (!string.IsNullOrEmpty(guid))
                     guids.Add(new Guid(guid.Trim(curlyBraces)));
             }
 
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudioTools.Project
         }
         internal static void ArgumentNotNullOrEmpty(string name, string value)
         {
-            if (String.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
             {
                 throw new ArgumentNullException(name);
             }
@@ -197,8 +197,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <exception cref="InvalidOperationException">In case of failure an InvalidOperationException is thrown.</exception>
         public static void ValidateFileName(IServiceProvider serviceProvider, string filePath)
         {
-            var errorMessage = String.Empty;
-            if (String.IsNullOrEmpty(filePath))
+            var errorMessage = string.Empty;
+            if (string.IsNullOrEmpty(filePath))
             {
                 errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
             }
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (errorMessage.Length == 0)
             {
                 var fileName = Path.GetFileName(filePath);
-                if (String.IsNullOrEmpty(fileName) || IsFileNameInvalid(fileName))
+                if (string.IsNullOrEmpty(fileName) || IsFileNameInvalid(fileName))
                 {
                     errorMessage = SR.GetString(SR.ErrorInvalidFileName, filePath);
                 }
@@ -444,7 +444,7 @@ namespace Microsoft.VisualStudioTools.Project
             Justification = "The name is validated.")]
         public static bool ContainsInvalidFileNameChars(string name)
         {
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
                 return true;
             }
@@ -510,7 +510,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>True if the file is valid.</returns>
         public static bool IsFileNameInvalid(string fileName)
         {
-            if (String.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(fileName))
             {
                 return true;
             }
@@ -604,7 +604,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         private static bool IsFilePartInValid(string filePart)
         {
-            if (String.IsNullOrEmpty(filePart))
+            if (string.IsNullOrEmpty(filePart))
             {
                 return true;
             }
@@ -614,7 +614,7 @@ namespace Microsoft.VisualStudioTools.Project
             // It is compiled for performance.
 
             // The filePart might still be a file and extension. If it is like that then we must check them separately, since different rules apply
-            var extension = String.Empty;
+            var extension = string.Empty;
             try
             {
                 extension = Path.GetExtension(filePart);
@@ -625,7 +625,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            if (!String.IsNullOrEmpty(extension))
+            if (!string.IsNullOrEmpty(extension))
             {
                 // Check the extension first
                 var isMatch = _unsafeCharactersRegex.IsMatch(extension);
@@ -638,7 +638,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // We cannot use GetFileNameWithoutExtension because it might be that for example (..\\filename.txt) is passed in and that should fail, since that is not a valid filename.
                 fileNameToVerify = filePart.Substring(0, filePart.Length - extension.Length);
 
-                if (String.IsNullOrEmpty(fileNameToVerify))
+                if (string.IsNullOrEmpty(fileNameToVerify))
                 {
                     // http://pytools.codeplex.com/workitem/497
                     // .fob is ok
@@ -647,7 +647,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // We verify CLOCK$ outside the regex since for some reason the regex is not matching the clock\\$ added.
-            if (String.Equals(fileNameToVerify, "CLOCK$", StringComparison.OrdinalIgnoreCase))
+            if (StringComparer.OrdinalIgnoreCase.Equals(fileNameToVerify, "CLOCK$"))
             {
                 return true;
             }
@@ -712,13 +712,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>true if the file is a template file</returns>
         internal static bool IsTemplateFile(string fileName)
         {
-            if (String.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(fileName))
             {
                 return false;
             }
 
             var extension = Path.GetExtension(fileName);
-            return (String.Equals(extension, ".vstemplate", StringComparison.OrdinalIgnoreCase) || string.Equals(extension, ".vsz", StringComparison.OrdinalIgnoreCase));
+            return StringComparer.OrdinalIgnoreCase.Equals(extension, ".vstemplate") || StringComparer.OrdinalIgnoreCase.Equals(extension, ".vsz");
         }
 
         /// <summary>

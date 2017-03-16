@@ -391,7 +391,7 @@ namespace Microsoft.NodejsTools
             if (strName != null)
             {
                 var ext = Path.GetExtension(strName);
-                if (String.Equals(ext, ".js", StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(ext, ".js"))
                 {
                     return true;
                 }
@@ -684,7 +684,7 @@ namespace Microsoft.NodejsTools
                         (uint)__VSSPECIFICEDITORFLAGS.VSSPECIFICEDITOR_DoOpen :
                         0,
                     ref ourEditor,
-                    String.Empty,
+                    string.Empty,
                     ref view,
                     pResult
                 );

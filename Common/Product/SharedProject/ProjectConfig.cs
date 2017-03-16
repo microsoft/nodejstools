@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
 
-            var condition = String.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName);
+            var condition = string.Format(CultureInfo.InvariantCulture, ConfigProvider.configString, this.ConfigName);
 
             SetPropertyUnderCondition(propertyName, propertyValue, condition);
 
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private void SetPropertyUnderCondition(string propertyName, string propertyValue, string condition)
         {
-            var conditionTrimmed = (condition == null) ? String.Empty : condition.Trim();
+            var conditionTrimmed = (condition == null) ? string.Empty : condition.Trim();
 
             if (conditionTrimmed.Length == 0)
             {
@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             foreach (var group in this.project.BuildProject.Xml.PropertyGroups)
             {
-                if (String.Equals(group.Condition.Trim(), conditionTrimmed, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(group.Condition.Trim(), conditionTrimmed))
                 {
                     newGroup = group;
                     break;
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             foreach (var property in newGroup.PropertiesReversed) // If there's dupes, pick the last one so we win
             {
-                if (String.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase) && property.Condition.Length == 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(property.Name, propertyName) && property.Condition.Length == 0)
                 {
                     property.Value = propertyValue;
                     return;
@@ -435,7 +435,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 string groupName;
                 group.get_CanonicalName(out groupName);
-                if (String.Compare(groupName, szCanonicalName, StringComparison.OrdinalIgnoreCase) == 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(groupName, szCanonicalName))
                 {
                     ppIVsOutputGroup = group;
                     break;
@@ -616,7 +616,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Retrive the list of guids from hierarchy properties.
             // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
-            var guidsList = String.Empty;
+            var guidsList = string.Empty;
             var hierarchy = this.project.GetOuterInterface<IVsHierarchy>();
             object variant = null;
             ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList, out variant), new int[] { VSConstants.DISP_E_MEMBERNOTFOUND, VSConstants.E_NOTIMPL });

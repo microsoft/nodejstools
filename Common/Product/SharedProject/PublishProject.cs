@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudioTools.Project
             bool? publish = null;
             var pubValue = item.GetMetadataValue("Publish");
             bool pubSetting;
-            if (!String.IsNullOrWhiteSpace(pubValue) && Boolean.TryParse(pubValue, out pubSetting))
+            if (!string.IsNullOrWhiteSpace(pubValue) && Boolean.TryParse(pubValue, out pubSetting))
             {
                 publish = pubSetting;
             }
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudioTools.Project
             set
             {
                 this._progress = value;
-                this._statusBar.SetText(String.Format("Publish {0}% done...", this._progress));
+                this._statusBar.SetText(string.Format("Publish {0}% done...", this._progress));
             }
         }
 

@@ -44,9 +44,9 @@ namespace Microsoft.VisualStudioTools.Project
         #region overridden properties
         public override int MenuCommandId => VsMenus.IDM_VS_CTXT_REFERENCE;
         public override Guid ItemTypeGuid => Guid.Empty;
-        public override string Url => String.Empty;
+        public override string Url => string.Empty;
 
-        public override string Caption => String.Empty;
+        public override string Caption => string.Empty;
         #endregion
 
         #region overridden methods

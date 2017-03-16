@@ -37,7 +37,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             try
             {
                 string stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
-                if (!String.IsNullOrWhiteSpace(stdout))
+                if (!string.IsNullOrWhiteSpace(stdout))
                 {
                     IEnumerable<String> stdoutLines = stdout.Split(new string[] { Environment.NewLine },
                         StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("NTVS_ERROR:")).Select(s => s.Trim().Remove(0, 11));
@@ -143,7 +143,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
 
-            string stdout = String.Empty;
+            string stdout = string.Empty;
             try
             {
                 using (var process = Process.Start(processStartInfo))

@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         public Library(Guid libraryGuid)
         {
             this._guid = libraryGuid;
-            this._root = new LibraryNode(null, String.Empty, String.Empty, LibraryNodeType.Package);
+            this._root = new LibraryNode(null, string.Empty, string.Empty, LibraryNodeType.Package);
         }
 
         public _LIB_FLAGS2 LibraryCapabilities

@@ -3,11 +3,10 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-
-using MSBuild = Microsoft.Build.Evaluation;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
+using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TypeScript
 {
@@ -15,7 +14,7 @@ namespace Microsoft.NodejsTools.TypeScript
     {
         internal static bool IsTypeScriptFile(string filename)
         {
-            return String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension);
         }
 
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
@@ -40,7 +39,7 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             var jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
 
-            if (String.IsNullOrEmpty(typeScriptOutDir))
+            if (string.IsNullOrEmpty(typeScriptOutDir))
             {
                 //No setting for OutDir
                 //  .js file is created next to .ts file
