@@ -11,10 +11,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             if (x.Keywords != null && y.Keywords != null)
             {
-                return string.Compare(
+                return StringComparer.CurrentCulture.Compare(
                     string.Join(", ", x.Keywords),
-                    string.Join(", ", y.Keywords),
-                    StringComparison.CurrentCulture);
+                    string.Join(", ", y.Keywords));
             }
 
             return 0;

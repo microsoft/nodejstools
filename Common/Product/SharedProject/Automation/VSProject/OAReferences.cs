@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             foreach (Reference refNode in this)
             {
-                if (0 == string.Compare(refNode.Name, stringIndex, StringComparison.Ordinal))
+                if (StringComparer.Ordinal.Equals(refNode.Name, stringIndex))
                 {
                     return refNode;
                 }
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 if (null != refNode)
                 {
-                    if (0 == string.Compare(bstrIdentity, refNode.Identity, StringComparison.Ordinal))
+                    if (StringComparer.Ordinal.Equals(bstrIdentity, refNode.Identity))
                     {
                         return refNode;
                     }

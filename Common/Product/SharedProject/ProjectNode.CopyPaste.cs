@@ -596,7 +596,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Ensure we don't end up in an endless recursion
                 if (Utilities.IsSameComObject(this.Project, sourceHierarchy))
                 {
-                    if (String.Equals(folder, targetFolderNode.FullPathToChildren, StringComparison.OrdinalIgnoreCase))
+                    if (StringComparer.OrdinalIgnoreCase.Equals(folder, targetFolderNode.FullPathToChildren))
                     {
                         if (this.DropEffect == DropEffect.Move &&
                             IsBadMove(targetFolderNode.FullPathToChildren, folder, false))
@@ -606,7 +606,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
 
                     if (targetFolderNode.FullPathToChildren.StartsWith(folder, StringComparison.OrdinalIgnoreCase) &&
-                        !String.Equals(targetFolderNode.FullPathToChildren, folder, StringComparison.OrdinalIgnoreCase))
+                        !StringComparer.OrdinalIgnoreCase.Equals(targetFolderNode.FullPathToChildren, folder))
                     {
                         // dragging a folder into a child, that's not allowed
                         Utilities.ShowMessageBox(
@@ -675,7 +675,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 var targetFileName = CommonUtils.GetFileOrDirectoryName(folder);
                 if (Utilities.IsSameComObject(this.Project, sourceHierarchy) &&
-                    String.Equals(targetFolderNode.FullPathToChildren, folder, StringComparison.OrdinalIgnoreCase))
+                    StringComparer.OrdinalIgnoreCase.Equals(targetFolderNode.FullPathToChildren, folder))
                 {
                     // copying a folder onto its self, make a copy
                     targetFileName = GetCopyName(targetFolderNode.FullPathToChildren);
@@ -954,7 +954,7 @@ namespace Microsoft.VisualStudioTools.Project
                         var trimmedPath = CommonUtils.TrimEndSeparator(path);
                         foreach (var dir in Directory.GetDirectories(Path.GetDirectoryName(trimmedPath), Path.GetFileName(trimmedPath)))
                         {
-                            if (String.Equals(dir, trimmedPath, StringComparison.OrdinalIgnoreCase))
+                            if (StringComparer.OrdinalIgnoreCase.Equals(dir, trimmedPath))
                             {
                                 path = dir + Path.DirectorySeparatorChar;
                                 break;
@@ -971,7 +971,7 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         foreach (var file in Directory.GetFiles(Path.GetDirectoryName(path)))
                         {
-                            if (String.Equals(file, path, StringComparison.OrdinalIgnoreCase))
+                            if (StringComparer.OrdinalIgnoreCase.Equals(file, path))
                             {
                                 path = file;
                                 break;
@@ -1061,7 +1061,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     Utilities.ShowMessageBox(
                             this.Project.Site,
-                            String.Format("The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.", Path.GetFileName(moniker)),
+                            string.Format("The item '{0}' does not exist in the project directory. It may have been moved, renamed or deleted.", Path.GetFileName(moniker)),
                             null,
                             OLEMSGICON.OLEMSGICON_CRITICAL,
                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -1090,7 +1090,7 @@ namespace Microsoft.VisualStudioTools.Project
                                 // This can occur if the user had a symlink'd directory and deleted the backing directory.
                                 Utilities.ShowMessageBox(
                                             this.Project.Site,
-                                            String.Format(
+                                            string.Format(
                                                 "Unable to find the destination folder."),
                                             null,
                                             OLEMSGICON.OLEMSGICON_CRITICAL,
@@ -1113,7 +1113,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             throw;
                         }
-                        TaskDialog.ForException(this.Project.Site, e, String.Empty, this.Project.IssueTrackerUrl).ShowModal();
+                        TaskDialog.ForException(this.Project.Site, e, string.Empty, this.Project.IssueTrackerUrl).ShowModal();
                         return null;
                     }
                 }
@@ -1131,7 +1131,7 @@ namespace Microsoft.VisualStudioTools.Project
                             {
                                 Utilities.ShowMessageBox(
                                         this.Project.Site,
-                                        String.Format("Cannot copy linked files within the same project. You cannot have more than one link to the same file in a project."),
+                                        string.Format("Cannot copy linked files within the same project. You cannot have more than one link to the same file in a project."),
                                         null,
                                         OLEMSGICON.OLEMSGICON_CRITICAL,
                                         OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -1143,7 +1143,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             Utilities.ShowMessageBox(
                                     this.Project.Site,
-                                    String.Format("There is already a link to '{0}'. You cannot have more than one link to the same file in a project.", moniker),
+                                    string.Format("There is already a link to '{0}'. You cannot have more than one link to the same file in a project.", moniker),
                                     null,
                                     OLEMSGICON.OLEMSGICON_CRITICAL,
                                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -1540,7 +1540,7 @@ namespace Microsoft.VisualStudioTools.Project
                         if (existing == null)
                         {
                             var fileNode = this.Project.CreateFileNode(newPath);
-                            if (String.Equals(this.TargetFolder, this.Project.FullPathToChildren, StringComparison.OrdinalIgnoreCase))
+                            if (StringComparer.OrdinalIgnoreCase.Equals(this.TargetFolder, this.Project.FullPathToChildren))
                             {
                                 this.Project.AddChild(fileNode);
                             }
@@ -1908,7 +1908,7 @@ namespace Microsoft.VisualStudioTools.Project
                 foreach (var droppedFile in filesDropped)
                 {
                     if (!Directory.Exists(droppedFile) ||
-                        !String.Equals(Path.GetDirectoryName(droppedFile), nodePath, StringComparison.OrdinalIgnoreCase))
+                        !StringComparer.OrdinalIgnoreCase.Equals(Path.GetDirectoryName(droppedFile), nodePath))
                     {
                         droppingExistingDirectory = false;
                         break;
@@ -2151,7 +2151,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             var sourceProjectPath = DragDropHelper.GetSourceProjectPath(oleDataObject);
 
-            if (!String.IsNullOrEmpty(sourceProjectPath) && CommonUtils.IsSamePath(sourceProjectPath, this.GetMkDocument()))
+            if (!string.IsNullOrEmpty(sourceProjectPath) && CommonUtils.IsSamePath(sourceProjectPath, this.GetMkDocument()))
             {
                 clippy.FlushClipboard();
                 var opened = false;

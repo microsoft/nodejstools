@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudioTools.Project
             var configs = GetPropertiesConditionedOn(ProjectFileConstants.Configuration);
             foreach (var config in configs)
             {
-                if (string.Compare(config, name, StringComparison.OrdinalIgnoreCase) == 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(config, name))
                 {
                     // Create condition of config to remove
                     var condition = string.Format(CultureInfo.InvariantCulture, configString, config);

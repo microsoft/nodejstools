@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
                     string projName = replacementsDictionary["$projectname$"];
                     string solnName = replacementsDictionary["$specifiedsolutionname$"];
                     string directory;
-                    if (String.IsNullOrWhiteSpace(solnName))
+                    if (string.IsNullOrWhiteSpace(solnName))
                     {
                         // Create directory is unchecked, destinationdirectory is the
                         // directory name the user entered plus the project name, we want

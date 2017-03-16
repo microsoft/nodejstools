@@ -110,11 +110,13 @@ namespace Microsoft.NodejsTools.Jade
         public bool CompareTo(int position, int length, string text, bool ignoreCase)
         {
             if (text.Length != length)
+            {
                 return false;
+            }
 
             UpdateCachedBlock(position, Math.Max(length, text.Length));
 
-            return String.Compare(this._cachedBlock, position - this._basePosition,
+            return string.Compare(this._cachedBlock, position - this._basePosition,
                                   text, 0, text.Length,
                                   ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal) == 0;
         }

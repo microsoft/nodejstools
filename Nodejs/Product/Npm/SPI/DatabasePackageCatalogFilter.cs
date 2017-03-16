@@ -64,9 +64,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (string.IsNullOrEmpty(_filterText))
                 {
-                    return String.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+                    return StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name);
                 }
-                return CompareEntryStrings(x.Name, y.Name) ?? CompareEntryStrings(x.Keywords, y.Keywords) ?? String.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+                return CompareEntryStrings(x.Name, y.Name) ?? CompareEntryStrings(x.Keywords, y.Keywords) ?? StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name);
             }
 
             private int? CompareEntryStrings(string x, string y)

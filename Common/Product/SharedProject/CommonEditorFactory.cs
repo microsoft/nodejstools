@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // create code window as default physical view
                 return CreateCodeView(documentMoniker, textLines, ref editorCaption, ref cmdUI);
             }
-            else if (string.Compare(physicalView, "design", true, CultureInfo.InvariantCulture) == 0)
+            else if (StringComparer.InvariantCultureIgnoreCase.Equals(physicalView, "design"))
             {
                 // Create Form view
                 return CreateFormView(hierarchy, itemid, textLines, ref editorCaption, ref cmdUI);

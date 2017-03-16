@@ -91,8 +91,8 @@ namespace Microsoft.NodejsTools.LogParsing
                 return 1;
             }
 
-            bool jmc = false;
-            if (string.Equals(args[0], "/jmc", StringComparison.OrdinalIgnoreCase))
+            var jmc = false;
+            if (StringComparer.OrdinalIgnoreCase.Equals(args[0], "/jmc"))
             {
                 args = args.Skip(1).ToArray();
                 jmc = true;
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.LogParsing
                     processInfo.ProcessId = ProcessId;
                     processInfo.ParentId = 100;
 
-                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), String.Empty);
+                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), string.Empty);
 
                     //////////////////////////////////////
                     header = NewHeader();
@@ -225,7 +225,7 @@ namespace Microsoft.NodejsTools.LogParsing
                         dllPath.Substring(0, dllPath.Length - 4) + ".pdb",  // path to PDB,
                         Guid.Empty,
                         0,
-                        String.Empty
+                        string.Empty
                     );
 
                     while ((line = reader.ReadLine()) != null)
@@ -274,7 +274,7 @@ namespace Microsoft.NodejsTools.LogParsing
                                 }
 
                                 _codeAddresses[new AddressRange(startAddr, methodLoad.MethodSize)] = IsMyCode(funcInfo);
-                                log.Trace(header, methodLoad, funcInfo.Namespace, functionName, String.Empty /* signature*/);
+                                log.Trace(header, methodLoad, funcInfo.Namespace, functionName, string.Empty /* signature*/);
 
                                 methodToken++;
                                 break;
@@ -352,7 +352,7 @@ namespace Microsoft.NodejsTools.LogParsing
                     processInfo.ProcessId = ProcessId;
                     processInfo.ParentId = 100;
 
-                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), String.Empty);
+                    log.Trace(header, processInfo, Encoding.ASCII.GetBytes("node.exe"), string.Empty);
                 }
                 finally
                 {
@@ -396,7 +396,7 @@ namespace Microsoft.NodejsTools.LogParsing
 
         private static bool IsMyCode(FunctionInformation funcInfo)
         {
-            return !String.IsNullOrWhiteSpace(funcInfo.Filename) &&
+            return !string.IsNullOrWhiteSpace(funcInfo.Filename) &&
                 funcInfo.Filename.IndexOfAny(_invalidPathChars) == -1 &&
                 funcInfo.Filename.IndexOf("\\node_modules\\") == -1 &&
                 Path.IsPathRooted(funcInfo.Filename);
@@ -678,7 +678,7 @@ namespace Microsoft.NodejsTools.LogParsing
                         case "code-creation":
                             int shift = (_nodeVersion >= v012 ? 1 : 0);
                             var funcInfo = ExtractNamespaceAndMethodName(records[shift + 4]);
-                            if (funcInfo.LineNumber != null && !String.IsNullOrWhiteSpace(funcInfo.Filename))
+                            if (funcInfo.LineNumber != null && !string.IsNullOrWhiteSpace(funcInfo.Filename))
                             {
                                 pdbCode.Append(string.Format(CultureInfo.InvariantCulture, @"
 #line {0} ""{1}""
@@ -689,7 +689,7 @@ public static void X{2:X}() {{
                             else
                             {
                                 // we need to keep outputting methods just to keep tokens lined up.
-                                pdbCode.Append(String.Format(CultureInfo.InvariantCulture, @"
+                                pdbCode.Append(string.Format(CultureInfo.InvariantCulture, @"
 public static void X{0:X}() {{
 }}
 ", methodToken));
@@ -969,7 +969,7 @@ public static void X{0:X}() {{
 
             public override string ToString()
             {
-                return String.Format("AddressRange: {0} {1}", Start, Length);
+                return string.Format("AddressRange: {0} {1}", Start, Length);
             }
             public override int GetHashCode()
             {

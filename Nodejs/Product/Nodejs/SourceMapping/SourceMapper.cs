@@ -109,7 +109,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     // map to the 1st non-whitespace character on the line
                     // This ensures we get the correct line number, mapping to column 0
                     // can give us the previous line.
-                    if (!String.IsNullOrWhiteSpace(lineText))
+                    if (!string.IsNullOrWhiteSpace(lineText))
                     {
                         for (; column < lineText.Length; column++)
                         {
@@ -253,10 +253,10 @@ namespace Microsoft.NodejsTools.SourceMapping
                 }
                 catch (ArgumentException)
                 {
-                    extension = String.Empty;
+                    extension = string.Empty;
                 }
 
-                if (!string.Equals(extension, NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase))
+                if (!StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.JavaScriptExtension))
                 {
                     var baseFile = fileName.Substring(0, fileName.Length - extension.Length);
                     var jsFile = baseFile + NodejsConstants.JavaScriptExtension;

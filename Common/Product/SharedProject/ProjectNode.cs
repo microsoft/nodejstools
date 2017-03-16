@@ -17,7 +17,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using IServiceProvider = System.IServiceProvider;
 using MSBuild = Microsoft.Build.Evaluation;
 using MSBuildConstruction = Microsoft.Build.Construction;
@@ -869,7 +868,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Nothing to do if the name is the same
             var oldFileName = Path.GetFileNameWithoutExtension(this.Url);
-            if (string.Equals(oldFileName, label, StringComparison.Ordinal))
+            if (StringComparer.Ordinal.Equals(oldFileName, label))
             {
                 return VSConstants.S_FALSE;
             }
@@ -1717,20 +1716,11 @@ namespace Microsoft.VisualStudioTools.Project
                         // We have to be sure that we are not going to lose data here. If the project name is a.b.c then for a project that was based on a zipped template(the wizard calls us) GetFileNameWithoutExtension will suppress "c".
                         // We are going to check if the parameter "name" is extension based and the extension is the same as the one from the "filename" parameter.
                         var tempExtension = Path.GetExtension(name);
-                        if (!string.IsNullOrEmpty(tempExtension))
+                        if (!string.IsNullOrEmpty(tempExtension) && StringComparer.OrdinalIgnoreCase.Equals(tempExtension, extension))
                         {
-                            var isSameExtension = (string.Equals(tempExtension, extension, StringComparison.OrdinalIgnoreCase));
-
-                            if (isSameExtension)
-                            {
-                                tempName = Path.GetFileNameWithoutExtension(name);
-                            }
-                            // If the tempExtension is not the same as the extension that the project name comes from then assume that the project name is a dotted name.
-                            else
-                            {
-                                tempName = Path.GetFileName(name);
-                            }
+                            tempName = Path.GetFileNameWithoutExtension(name);
                         }
+                        // If the tempExtension is not the same as the extension that the project name comes from then assume that the project name is a dotted name.
                         else
                         {
                             tempName = Path.GetFileName(name);
@@ -1913,7 +1903,7 @@ namespace Microsoft.VisualStudioTools.Project
             HierarchyNode parent = null;
 
             var dependentOf = item.GetMetadataValue(ProjectFileConstants.DependentUpon);
-            Debug.Assert(string.Compare(dependentOf, key, StringComparison.OrdinalIgnoreCase) != 0, "File dependent upon itself is not valid. Ignoring the DependentUpon metadata");
+            Debug.Assert(!StringComparer.OrdinalIgnoreCase.Equals(dependentOf, key), "File dependent upon itself is not valid. Ignoring the DependentUpon metadata");
             if (subitems.ContainsKey(dependentOf))
             {
                 // The parent item is an other subitem, so recurse into this method to add the parent first
@@ -2637,13 +2627,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected virtual bool FilterItemTypeToBeAddedToHierarchy(string itemType)
         {
-            return (string.Compare(itemType, ProjectFileConstants.Reference, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.ProjectReference, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.COMReference, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.Folder, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.WebReference, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.WebReferenceFolder, StringComparison.OrdinalIgnoreCase) == 0
-                    || string.Compare(itemType, ProjectFileConstants.WebPiReference, StringComparison.OrdinalIgnoreCase) == 0);
+            return (StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.Reference)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.ProjectReference)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.COMReference)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.Folder)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.WebReference)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.WebReferenceFolder)
+                    || StringComparer.OrdinalIgnoreCase.Equals(itemType, ProjectFileConstants.WebPiReference));
         }
 
         /// <summary>
@@ -3112,7 +3102,7 @@ namespace Microsoft.VisualStudioTools.Project
                 child.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, parentNode.ItemNode.GetMetadata(ProjectFileConstants.Include));
 
                 // Make sure to set the HasNameRelation flag on the dependent node if it is related to the parent by name
-                if (!child.HasParentNodeNameRelation && string.Compare(child.GetRelationalName(), parentNode.GetRelationalName(), StringComparison.OrdinalIgnoreCase) == 0)
+                if (!child.HasParentNodeNameRelation && StringComparer.OrdinalIgnoreCase.Equals(child.GetRelationalName(), parentNode.GetRelationalName()))
                 {
                     child.HasParentNodeNameRelation = true;
                 }
@@ -3395,8 +3385,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var isVisibleItem = true;
             var visible = item.GetMetadataValue(CommonConstants.Visible);
-            if ((item.IsImported && !string.Equals(visible, "true", StringComparison.OrdinalIgnoreCase)) ||
-                string.Equals(visible, "false", StringComparison.OrdinalIgnoreCase))
+            if ((item.IsImported && !StringComparer.OrdinalIgnoreCase.Equals(visible, "true")) ||
+                StringComparer.OrdinalIgnoreCase.Equals(visible, "false"))
             {
                 isVisibleItem = false;
             }
@@ -3449,7 +3439,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (node1.SortPriority == node2.SortPriority)
             {
-                return string.Compare(node2.Caption, node1.Caption, true, CultureInfo.CurrentCulture);
+                return StringComparer.CurrentCultureIgnoreCase.Compare(node2.Caption, node1.Caption);
             }
             else
             {
@@ -3971,12 +3961,12 @@ namespace Microsoft.VisualStudioTools.Project
                             platform = child.Attributes[ProjectFileConstants.Platform].Value;
                         }
 
-                        if (string.Compare(child.Name, ProjectFileConstants.FlavorProperties, StringComparison.OrdinalIgnoreCase) == 0
-                                && string.Compare(guid, flavorGuidString, StringComparison.OrdinalIgnoreCase) == 0
+                        if (StringComparer.OrdinalIgnoreCase.Equals(child.Name, ProjectFileConstants.FlavorProperties)
+                                && StringComparer.OrdinalIgnoreCase.Equals(guid, flavorGuidString)
                                 && ((string.IsNullOrEmpty(configName) && string.IsNullOrEmpty(configuration))
-                                    || (string.Compare(configuration, configName, StringComparison.OrdinalIgnoreCase) == 0))
+                                    || (StringComparer.OrdinalIgnoreCase.Equals(configuration, configName)))
                                 && ((string.IsNullOrEmpty(platformName) && string.IsNullOrEmpty(platform))
-                                    || (string.Compare(platform, platformName, StringComparison.OrdinalIgnoreCase) == 0)))
+                                    || (StringComparer.OrdinalIgnoreCase.Equals(platform, platformName))))
                         {
                             // we found the matching fragment
                             fragment = child.InnerXml;
@@ -5841,7 +5831,7 @@ If the files in the existing folder have the same names as files in the folder y
             parentNode.AddChild(node);
 
             // Make sure to set the HasNameRelation flag on the dependent node if it is related to the parent by name
-            if (!node.HasParentNodeNameRelation && string.Compare(node.GetRelationalName(), parentNode.GetRelationalName(), StringComparison.OrdinalIgnoreCase) == 0)
+            if (!node.HasParentNodeNameRelation && StringComparer.OrdinalIgnoreCase.Equals(node.GetRelationalName(), parentNode.GetRelationalName()))
             {
                 node.HasParentNodeNameRelation = true;
             }
@@ -5943,10 +5933,10 @@ If the files in the existing folder have the same names as files in the folder y
         {
             var changed = false;
             Debug.Assert(sccProjectName != null && sccLocalPath != null && sccAuxPath != null && sccProvider != null);
-            if (string.Compare(sccProjectName, this.sccProjectName, StringComparison.OrdinalIgnoreCase) != 0 ||
-                string.Compare(sccLocalPath, this.sccLocalPath, StringComparison.OrdinalIgnoreCase) != 0 ||
-                string.Compare(sccAuxPath, this.sccAuxPath, StringComparison.OrdinalIgnoreCase) != 0 ||
-                string.Compare(sccProvider, this.sccProvider, StringComparison.OrdinalIgnoreCase) != 0)
+            if (!StringComparer.OrdinalIgnoreCase.Equals(sccProjectName, this.sccProjectName) ||
+                !StringComparer.OrdinalIgnoreCase.Equals(sccLocalPath, this.sccLocalPath) ||
+                !StringComparer.OrdinalIgnoreCase.Equals(sccAuxPath, this.sccAuxPath) ||
+                !StringComparer.OrdinalIgnoreCase.Equals(sccProvider, this.sccProvider))
             {
                 changed = true;
                 this.sccProjectName = sccProjectName;

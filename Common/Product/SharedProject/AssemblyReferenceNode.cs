@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudioTools.Project
         private System.Reflection.AssemblyName assemblyName;
         private AssemblyName resolvedAssemblyName;
 
-        private string assemblyPath = String.Empty;
+        private string assemblyPath = string.Empty;
 
         /// <summary>
         /// Defines the listener that would listen on file changes on the nested project node.
@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Use MsBuild to resolve the assemblyname 
             this.ResolveAssemblyReference();
 
-            if (String.IsNullOrEmpty(this.assemblyPath) && (this.ItemNode is MsBuildProjectElement))
+            if (string.IsNullOrEmpty(this.assemblyPath) && (this.ItemNode is MsBuildProjectElement))
             {
                 // Try to get the assmbly name from the hintpath.
                 this.GetPathNameFromProjectFile();
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (null != assemblyRefererenceNode)
                 {
                     // We will check if the full assemblynames are the same or if the Url of the assemblies is the same.
-                    if (String.Compare(assemblyRefererenceNode.AssemblyName.FullName, this.assemblyName.FullName, StringComparison.OrdinalIgnoreCase) == 0 ||
+                    if (StringComparer.OrdinalIgnoreCase.Equals(assemblyRefererenceNode.AssemblyName.FullName, this.assemblyName.FullName) ||
                         (shouldCheckPath && CommonUtils.IsSamePath(assemblyRefererenceNode.Url, this.Url)))
                     {
                         return true;
@@ -237,12 +237,12 @@ namespace Microsoft.VisualStudioTools.Project
         private void GetPathNameFromProjectFile()
         {
             var result = this.ItemNode.GetMetadata(ProjectFileConstants.HintPath);
-            if (String.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty(result))
             {
                 result = this.ItemNode.GetMetadata(ProjectFileConstants.AssemblyName);
-                if (String.IsNullOrEmpty(result))
+                if (string.IsNullOrEmpty(result))
                 {
-                    this.assemblyPath = String.Empty;
+                    this.assemblyPath = string.Empty;
                 }
                 else if (!result.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                 {
@@ -273,24 +273,24 @@ namespace Microsoft.VisualStudioTools.Project
             foreach (var reference in references)
             {
                 var fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
-                if (String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(fileName, this.assemblyName.Name))
                 {
                     // We found it, now set some properties based on this.
 
                     // Remove the HintPath, we will re-add it below if it is needed
-                    if (!String.IsNullOrEmpty(this.assemblyPath))
+                    if (!string.IsNullOrEmpty(this.assemblyPath))
                     {
                         this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
                     }
 
                     var hintPath = reference.GetMetadataValue(ProjectFileConstants.HintPath);
-                    if (!String.IsNullOrEmpty(hintPath))
+                    if (!string.IsNullOrEmpty(hintPath))
                     {
                         hintPath = CommonUtils.GetRelativeFilePath(this.ProjectMgr.ProjectHome, hintPath);
 
                         this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, hintPath);
                         // If this is not already set, we default to true
-                        if (String.IsNullOrEmpty(privateValue))
+                        if (string.IsNullOrEmpty(privateValue))
                         {
                             this.ItemNode.SetMetadata(ProjectFileConstants.Private, true.ToString());
                         }
@@ -351,7 +351,7 @@ namespace Microsoft.VisualStudioTools.Project
                 var name = System.Reflection.AssemblyName.GetAssemblyName(fullPath);
 
                 // Try with full assembly name and then with weak assembly name.
-                if (String.Equals(name.FullName, this.assemblyName.FullName, StringComparison.OrdinalIgnoreCase) || String.Equals(name.Name, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase))
+                if (StringComparer.OrdinalIgnoreCase.Equals(name.FullName, this.assemblyName.FullName) || StringComparer.OrdinalIgnoreCase.Equals(name.Name, this.assemblyName.Name))
                 {
                     if (!CommonUtils.IsSamePath(fullPath, this.assemblyPath))
                     {

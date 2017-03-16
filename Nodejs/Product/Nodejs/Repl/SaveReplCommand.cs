@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
         {
-            if (String.IsNullOrWhiteSpace(arguments))
+            if (string.IsNullOrWhiteSpace(arguments))
             {
                 window.WriteError("save requires a filename");
                 return ExecutionResult.Failed;

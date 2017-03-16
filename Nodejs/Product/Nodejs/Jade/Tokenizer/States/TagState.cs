@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.Jade
     {
         private void OnTag()
         {
-            var ident = String.Empty;
+            var ident = string.Empty;
             var blockIndent = CalculateLineIndent();
 
             // regular tag like
@@ -25,12 +25,14 @@ namespace Microsoft.NodejsTools.Jade
                     var length = this._cs.CurrentChar == ':' ? range.Length + 1 : range.Length;
                     AddToken(JadeTokenType.TagKeyword, range.Start, length);
 
-                    if (this._cs.CurrentChar != ':' && String.Compare(ident, "mixin", StringComparison.Ordinal) == 0)
+                    if (this._cs.CurrentChar != ':' && StringComparer.Ordinal.Equals(ident, "mixin"))
                     {
                         SkipWhiteSpace();
 
                         if (!this._cs.IsAtNewLine())
+                        {
                             OnTag();
+                        }
                     }
                     else
                     {
@@ -70,12 +72,12 @@ namespace Microsoft.NodejsTools.Jade
                 if (this._cs.CurrentChar == '.' && Char.IsWhiteSpace(this._cs.NextChar))
                 {
                     // If this is last ., then what follows is a text literal
-                    if (String.Compare(ident, "script", StringComparison.OrdinalIgnoreCase) == 0)
+                    if (StringComparer.OrdinalIgnoreCase.Equals(ident, "script"))
                     {
                         this._cs.MoveToNextChar();
                         OnScript(blockIndent);
                     }
-                    else if (String.Compare(ident, "style", StringComparison.OrdinalIgnoreCase) == 0)
+                    else if (StringComparer.OrdinalIgnoreCase.Equals(ident, "style"))
                     {
                         this._cs.MoveToNextChar();
                         OnStyle(blockIndent);
@@ -159,11 +161,11 @@ namespace Microsoft.NodejsTools.Jade
             }
             else
             {
-                if (String.Compare(ident, "script", StringComparison.OrdinalIgnoreCase) == 0)
+                if (StringComparer.OrdinalIgnoreCase.Equals(ident, "script"))
                 {
                     OnScript(blockIndent);
                 }
-                else if (String.Compare(ident, "style", StringComparison.OrdinalIgnoreCase) == 0)
+                else if (StringComparer.OrdinalIgnoreCase.Equals(ident, "style"))
                 {
                     OnStyle(blockIndent);
                 }

@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudioTools.Project
         SearchPathContainer,
         SearchPath,
         MissingSearchPath,
-        StartupFile
+        StartupFile,
     }
 
     internal abstract class CommonProjectNode : ProjectNode, IVsProjectSpecificEditorMap2, IVsDeferredSaveProject
@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudioTools.Project
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
 
-        private bool IsPublishingEnabled => !String.IsNullOrWhiteSpace(GetProjectProperty(CommonConstants.PublishUrl));
+        private bool IsPublishingEnabled => !string.IsNullOrWhiteSpace(GetProjectProperty(CommonConstants.PublishUrl));
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudioTools.Project
             var dir = Dialogs.BrowseForDirectory(
                 IntPtr.Zero,
                 parent.FullPathToChildren,
-                String.Format("Add Existing Folder - {0}", this.Caption)
+                string.Format("Add Existing Folder - {0}", this.Caption)
             );
             if (dir != null)
             {
@@ -326,7 +326,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var publishUrl = publishOptions.DestinationUrl ?? GetProjectProperty(CommonConstants.PublishUrl);
             var found = false;
-            if (!String.IsNullOrWhiteSpace(publishUrl))
+            if (!string.IsNullOrWhiteSpace(publishUrl))
             {
                 var url = new Url(publishUrl);
 
@@ -360,7 +360,7 @@ namespace Microsoft.VisualStudioTools.Project
                             Dispatcher.PushFrame(frame);
                             if (failure != null)
                             {
-                                throw new PublishFailedException(String.Format("Publishing of the project {0} failed", this.Caption), failure);
+                                throw new PublishFailedException(string.Format("Publishing of the project {0} failed", this.Caption), failure);
                             }
                         }
                         break;
@@ -370,13 +370,13 @@ namespace Microsoft.VisualStudioTools.Project
                 if (!found)
                 {
                     var statusBar = (IVsStatusbar)this.Site.GetService(typeof(SVsStatusbar));
-                    statusBar.SetText(String.Format("Publish failed: Unknown publish scheme ({0})", url.Uri.Scheme));
+                    statusBar.SetText(string.Format("Publish failed: Unknown publish scheme ({0})", url.Uri.Scheme));
                 }
             }
             else
             {
                 var statusBar = (IVsStatusbar)this.Site.GetService(typeof(SVsStatusbar));
-                statusBar.SetText(String.Format("Project is not configured for publishing in project properties."));
+                statusBar.SetText(string.Format("Project is not configured for publishing in project properties."));
             }
             return found;
         }
@@ -595,7 +595,7 @@ namespace Microsoft.VisualStudioTools.Project
             var projProperty = this.BuildProject.GetProperty(CommonConstants.ProjectView);
             if (projProperty != null &&
                 !projProperty.IsImported &&
-                !String.IsNullOrWhiteSpace(projProperty.EvaluatedValue))
+                !string.IsNullOrWhiteSpace(projProperty.EvaluatedValue))
             {
                 // setting is persisted in main project file, update it there.
                 this.BuildProject.SetProperty(CommonConstants.ProjectView, newPropValue);
@@ -636,11 +636,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             bool? showAllFiles = null;
             var showAllFilesSetting = showAllFilesValue.Trim();
-            if (String.Equals(showAllFilesSetting, CommonConstants.ProjectFiles))
+            if (StringComparer.Ordinal.Equals(showAllFilesSetting, CommonConstants.ProjectFiles))
             {
                 showAllFiles = false;
             }
-            else if (String.Equals(showAllFilesSetting, CommonConstants.ShowAllFiles))
+            else if (StringComparer.Ordinal.Equals(showAllFilesSetting, CommonConstants.ShowAllFiles))
             {
                 showAllFiles = true;
             }
@@ -896,10 +896,10 @@ namespace Microsoft.VisualStudioTools.Project
 
         private bool IsFileHidden(string path)
         {
-            if (String.Equals(path, this.FileName, StringComparison.OrdinalIgnoreCase) ||
-                String.Equals(path, this.FileName + ".user", StringComparison.OrdinalIgnoreCase) ||
-                String.Equals(Path.GetExtension(path), ".sln") ||
-                String.Equals(Path.GetExtension(path), ".suo"))
+            if (StringComparer.OrdinalIgnoreCase.Equals(path, this.FileName) ||
+                StringComparer.OrdinalIgnoreCase.Equals(path, this.FileName + ".user") ||
+                StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), ".sln") ||
+                StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), ".suo"))
             {
                 return true;
             }
@@ -1350,7 +1350,7 @@ namespace Microsoft.VisualStudioTools.Project
                     else if (File.Exists(this._path))
                     { // rapid changes can arrive out of order, make sure the file still exists
                         this._project.AddAllFilesFile(parent, this._path);
-                        if (String.Equals(this._project.GetStartupFile(), this._path, StringComparison.OrdinalIgnoreCase))
+                        if (StringComparer.OrdinalIgnoreCase.Equals(this._project.GetStartupFile(), this._path))
                         {
                             this._project.BoldStartupItem();
                         }
@@ -1605,7 +1605,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             var link = item.GetMetadata(ProjectFileConstants.Link);
-            if (!String.IsNullOrWhiteSpace(link) ||
+            if (!string.IsNullOrWhiteSpace(link) ||
                 !CommonUtils.IsSubpathOf(this.ProjectHome, url))
             {
                 newNode.SetIsLinkFile(true);
@@ -1832,7 +1832,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this._userBuildProject = new MSBuild.Project(root, null, null, this.BuildProject.ProjectCollection);
                 this._userBuildProject.FullPath = this.FileName + PerUserFileExtension;
             }
-            this._userBuildProject.SetProperty(propertyName, propertyValue ?? String.Empty);
+            this._userBuildProject.SetProperty(propertyName, propertyValue ?? string.Empty);
         }
 
         /// <summary>

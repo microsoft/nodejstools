@@ -343,13 +343,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             out string pbstrError,
             out uint pichError)
         {
-            pbstrError = String.Empty;
+            pbstrError = string.Empty;
             pichError = 0;
 
             var evaluationResults = this._stackFrame.Locals.Union(this._stackFrame.Parameters);
             foreach (var currVariable in evaluationResults)
             {
-                if (String.CompareOrdinal(currVariable.Expression, pszCode) == 0)
+                if (StringComparer.Ordinal.Equals(currVariable.Expression, pszCode))
                 {
                     ppExpr = new UncalculatedAD7Expression(this, currVariable.Expression);
                     return VSConstants.S_OK;

@@ -79,7 +79,7 @@ namespace Microsoft.NodejsTools.Npm
                 }
                 else
                 {
-                    var result = string.Compare(xs[index], ys[index], StringComparison.CurrentCulture);
+                    var result = StringComparer.CurrentCulture.Compare(xs[index], ys[index]);
                     if (0 != result)
                     {
                         return result;

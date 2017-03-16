@@ -169,7 +169,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             // Not necessary to implement in the debug engine. Instead
             // it is implemented in the SDM, which calls GetThreadProperties100()
-            name = String.Empty;
+            name = string.Empty;
             return VSConstants.E_NOTIMPL;
         }
 

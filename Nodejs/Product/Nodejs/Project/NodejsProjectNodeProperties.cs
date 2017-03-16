@@ -117,7 +117,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : String.Empty);
+                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : string.Empty);
                 });
             }
         }

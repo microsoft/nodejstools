@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                     // See if it is our key output
                     if (this._keyOutput == null ||
-                        String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                        StringComparer.OrdinalIgnoreCase.Equals(assembly.GetMetadataValue("IsKeyOutput"), true.ToString()))
                     {
                         this._keyOutput = output;
                     }
@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudioTools.Project
                 Refresh();
             if (this._keyOutput == null)
             {
-                pbstrCanonicalName = String.Empty;
+                pbstrCanonicalName = string.Empty;
                 return VSConstants.S_FALSE;
             }
             return this._keyOutput.get_CanonicalName(out pbstrCanonicalName);

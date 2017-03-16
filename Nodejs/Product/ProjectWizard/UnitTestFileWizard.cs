@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             if (!replacementsDictionary.TryGetValue("TestFramework", out _framework) ||
-                String.IsNullOrWhiteSpace(_framework))
+                string.IsNullOrWhiteSpace(_framework))
             {
                 _framework = TestFrameworkDirectories.ExportRunnerFramework;
             }

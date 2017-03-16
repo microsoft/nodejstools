@@ -13,8 +13,8 @@ namespace Microsoft.VisualStudioTools.Navigation
         public virtual bool CanDelete => false;
         public virtual bool CanGoToSource => false;
         public virtual bool CanRename => false;
-        public virtual string Name => String.Empty;
-        public virtual string UniqueName => String.Empty;
+        public virtual string Name => string.Empty;
+        public virtual string UniqueName => string.Empty;
         public virtual string FullName => this.Name;
 
         public virtual string GetTextRepresentation(VSTREETEXTOPTIONS options)
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             return this.Name;
         }
 
-        public virtual string TooltipText => String.Empty;
+        public virtual string TooltipText => string.Empty;
         public virtual object BrowseObject => null;
         public virtual System.ComponentModel.Design.CommandID ContextMenuID => null;
         public virtual VSTREEDISPLAYDATA DisplayData => new VSTREEDISPLAYDATA();

@@ -43,7 +43,9 @@ namespace Microsoft.NodejsTools.Jade
             get
             {
                 if (position < 0 || position >= this._text.Length)
+                {
                     return '\0';
+                }
 
                 return this._text[position];
             }
@@ -55,7 +57,9 @@ namespace Microsoft.NodejsTools.Jade
         public string GetText(int position, int length)
         {
             if (length == 0)
-                return String.Empty;
+            {
+                return string.Empty;
+            }
 
             Debug.Assert(position >= 0 && length >= 0 && position + length <= this._text.Length);
             return this._text.Substring(position, length);
@@ -93,10 +97,14 @@ namespace Microsoft.NodejsTools.Jade
         public int IndexOf(string stringToFind, ITextRange range, bool ignoreCase)
         {
             if (range.Start + stringToFind.Length > this._text.Length)
+            {
                 return -1;
+            }
 
             if (range.End > this._text.Length)
+            {
                 return -1;
+            }
 
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
@@ -107,7 +115,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
-            return String.Compare(this._text, position, compareTo, 0, length, comparison) == 0;
+            return string.Compare(this._text, position, compareTo, 0, length, comparison) == 0;
         }
 
         public ITextProvider Clone()
@@ -131,4 +139,3 @@ namespace Microsoft.NodejsTools.Jade
         #endregion
     }
 }
-

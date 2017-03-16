@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path))
             {
                 var directoryName = Path.GetDirectoryName(path);
                 var filter = Path.GetFileName(path);
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path))
             {
                 if (!_fileWatchers.ContainsKey(path) && Directory.Exists(path))
                 {
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(path, "path");
 
-            if (!String.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path))
             {
                 FileSystemWatcher watcher;
 

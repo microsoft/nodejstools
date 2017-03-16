@@ -333,7 +333,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
             }
             else
             {
-                writer.WriteElementString("StartupFile", String.Empty);
+                writer.WriteElementString("StartupFile", string.Empty);
             }
             writer.WriteElementString("WorkingDirectory", ".");
             writer.WriteElementString("OutputPath", ".");

@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Jade
                 var line = snapshot.GetLineFromLineNumber(i);
 
                 var lineText = line.GetText();
-                if (String.IsNullOrWhiteSpace(lineText))
+                if (string.IsNullOrWhiteSpace(lineText))
                 {
                     lineLengths[i] = 0;
                     continue;

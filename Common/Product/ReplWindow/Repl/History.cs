@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.Repl {
                     // no search in progress, start our search at the end
                     _pos = Length - 1;
                 }
-                else if (!wasLive && String.IsNullOrWhiteSpace(search))
+                else if (!wasLive && string.IsNullOrWhiteSpace(search))
                 {
                     // Handles up up up enter up
                     // Do nothing
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.Repl {
 
         private bool SearchDoesntMatch(string search)
         {
-            return !String.IsNullOrWhiteSpace(search) && GetHistoryText(_pos).IndexOf(search) == -1;
+            return !string.IsNullOrWhiteSpace(search) && GetHistoryText(_pos).IndexOf(search) == -1;
         }
 
         private string GetHistoryMatch(string search)

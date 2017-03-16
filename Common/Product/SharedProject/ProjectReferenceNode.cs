@@ -21,11 +21,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private Guid referencedProjectGuid;
 
-        private string referencedProjectName = String.Empty;
+        private string referencedProjectName = string.Empty;
 
-        private string referencedProjectRelativePath = String.Empty;
+        private string referencedProjectRelativePath = string.Empty;
 
-        private string referencedProjectFullPath = String.Empty;
+        private string referencedProjectFullPath = string.Empty;
 
         private BuildDependency buildDependency;
 
@@ -255,7 +255,7 @@ namespace Microsoft.VisualStudioTools.Project
             : base(root, element)
         {
             this.referencedProjectRelativePath = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
-            Debug.Assert(!String.IsNullOrEmpty(this.referencedProjectRelativePath), "Could not retrieve referenced project path form project file");
+            Debug.Assert(!string.IsNullOrEmpty(this.referencedProjectRelativePath), "Could not retrieve referenced project path form project file");
 
             var guidString = this.ItemNode.GetMetadata(ProjectFileConstants.Project);
 
@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 this.referencedProjectName = this.ItemNode.GetMetadata(ProjectFileConstants.Name);
 
-                Debug.Assert(!String.IsNullOrEmpty(this.referencedProjectName), "Could not retrive referenced project name form project file");
+                Debug.Assert(!string.IsNullOrEmpty(this.referencedProjectName), "Could not retrive referenced project name form project file");
             }
 
             // TODO: Maybe referenced projects should be relative to ProjectDir?
@@ -286,8 +286,8 @@ namespace Microsoft.VisualStudioTools.Project
         public ProjectReferenceNode(ProjectNode root, string referencedProjectName, string projectPath, string projectReference)
             : base(root)
         {
-            Debug.Assert(root != null && !String.IsNullOrEmpty(referencedProjectName) && !String.IsNullOrEmpty(projectReference)
-                && !String.IsNullOrEmpty(projectPath), "Can not add a reference because the input for adding one is invalid.");
+            Debug.Assert(root != null && !string.IsNullOrEmpty(referencedProjectName) && !string.IsNullOrEmpty(projectReference)
+                && !string.IsNullOrEmpty(projectPath), "Can not add a reference because the input for adding one is invalid.");
 
             if (projectReference == null)
             {
@@ -298,7 +298,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             var indexOfSeparator = projectReference.IndexOf('|');
 
-            var fileName = String.Empty;
+            var fileName = string.Empty;
 
             // Unfortunately we cannot use the path part of the projectReference string since it is not resolving correctly relative pathes.
             if (indexOfSeparator != -1)
@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            Debug.Assert(!String.IsNullOrEmpty(fileName), "Can not add a project reference because the input for adding one is invalid.");
+            Debug.Assert(!string.IsNullOrEmpty(fileName), "Can not add a project reference because the input for adding one is invalid.");
 
             var justTheFileName = Path.GetFileName(fileName);
             this.referencedProjectFullPath = CommonUtils.GetAbsoluteFilePath(projectPath, justTheFileName);
@@ -372,7 +372,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected override void BindReferenceData()
         {
-            Debug.Assert(!String.IsNullOrEmpty(this.referencedProjectName), "The referencedProjectName field has not been initialized");
+            Debug.Assert(!string.IsNullOrEmpty(this.referencedProjectName), "The referencedProjectName field has not been initialized");
             Debug.Assert(this.referencedProjectGuid != Guid.Empty, "The referencedProjectName field has not been initialized");
 
             this.ItemNode = new MsBuildProjectElement(this.ProjectMgr, this.referencedProjectRelativePath, ProjectFileConstants.ProjectReference);

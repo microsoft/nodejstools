@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // Retrieve the list of GUIDs, if it is not specify, make it our GUID
             var guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
-            if (String.IsNullOrEmpty(guids))
+            if (string.IsNullOrEmpty(guids))
                 guids = this.GetType().GUID.ToString("B");
 
             return guids;
@@ -274,7 +274,7 @@ namespace Microsoft.VisualStudioTools.Project
             out string pbstrProvider
         )
         {
-            if (string.Equals(this._cachedSccProject, bstrProjectFileName, StringComparison.OrdinalIgnoreCase))
+            if (StringComparer.OrdinalIgnoreCase.Equals(this._cachedSccProject, bstrProjectFileName))
             {
                 pbstrSccProjectName = this._cachedSccProjectName;
                 pbstrSccAuxPath = this._cachedSccAuxPath;

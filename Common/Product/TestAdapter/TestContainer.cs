@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 return -1;
             }
 
-            var result = String.Compare(Source, container.Source, StringComparison.OrdinalIgnoreCase);
+            var result = StringComparer.OrdinalIgnoreCase.Compare(Source, container.Source);
             if (result != 0)
             {
                 return result;

@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.Repl {
 
         public override string ToString()
         {
-            return String.Format("{0}: {1}", Kind, _span);
+            return string.Format("{0}: {1}", Kind, _span);
         }
     }
 
