@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudioTools
                 prefix = "VisualStudio";
             }
 
-            string progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
+            var progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
             object runningObject = null;
 
             IBindCtx bindCtx = null;
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudioTools
                         // Do nothing, there is something in the ROT that we do not have access to.
                     }
 
-                    if (!string.IsNullOrEmpty(name) && !StringComparer.Ordinal.Equals(name, progId))
+                    if (StringComparer.Ordinal.Equals(name, progId))
                     {
                         rot.GetObject(runningObjectMoniker, out runningObject);
                         break;
