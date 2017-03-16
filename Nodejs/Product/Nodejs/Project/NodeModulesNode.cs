@@ -149,23 +149,9 @@ namespace Microsoft.NodejsTools.Project
 
         public INpmController NpmController => this._npmController;
 
-        internal IRootPackage RootPackage
-        {
-            get
-            {
-                var controller = this.NpmController;
-                return null == controller ? null : controller.RootPackage;
-            }
-        }
+        internal IRootPackage RootPackage => this.NpmController?.RootPackage;
 
-        private INodeModules RootModules
-        {
-            get
-            {
-                var root = this.RootPackage;
-                return null == root ? null : root.Modules;
-            }
-        }
+        private INodeModules RootModules => this.RootPackage?.Modules;
 
         private bool HasMissingModules
         {

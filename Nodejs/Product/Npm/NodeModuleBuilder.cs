@@ -10,15 +10,13 @@ namespace Microsoft.NodejsTools.Npm
     /// <summary>
     /// Mutable class for building immutable node module descriptions
     /// </summary>
-    internal class NodeModuleBuilder
+    public sealed class NodeModuleBuilder
     {
         private List<IPackage> _dependencies = new List<IPackage>();
         private readonly StringBuilder _descriptionBuff = new StringBuilder();
         private readonly StringBuilder _authorBuff = new StringBuilder();
-        private readonly StringBuilder _publishDateTime = new StringBuilder();
         private List<string> _keywords = new List<string>();
         private List<string> _homepages = new List<string>();
-        private List<SemverVersion> _availableVersions = new List<SemverVersion>();
 
         public NodeModuleBuilder()
         {
@@ -28,12 +26,8 @@ namespace Microsoft.NodejsTools.Npm
         public void Reset()
         {
             this.Name = null;
-
-            // We should double check, but I believe that the package no longer exists when "latest" is not set.
-            // If that's the case, we should include an option to filter out those packages.
-            // https://nodejstools.codeplex.com/workitem/1452
-            this.LatestVersion = SemverVersion.UnknownVersion;
-            this._availableVersions = new List<SemverVersion>();
+            
+            this.AvailableVersions = new List<SemverVersion>();
 
             this.Flags = PackageFlags.None;
             this.RequestedVersionRange = null;
@@ -47,7 +41,7 @@ namespace Microsoft.NodejsTools.Npm
 
             this._descriptionBuff.Length = 0;
             this._authorBuff.Length = 0;
-            this._publishDateTime.Length = 0;
+            this.PublishDateTimeString = null;
         }
 
         public void AddAuthor(string text)
@@ -70,20 +64,15 @@ namespace Microsoft.NodejsTools.Npm
 
         public string Name { get; set; }
 
-        public SemverVersion LatestVersion { get; set; }
+        public SemverVersion LatestVersion => this.AvailableVersions.FirstOrDefault();
 
-        public IEnumerable<SemverVersion> AvailableVersions
-        {
-            get { return this._availableVersions; }
-            set { this._availableVersions = value != null ? value.ToList() : new List<SemverVersion>(); }
-        }
+        public IList<SemverVersion> AvailableVersions { get; private set; }
 
-        public IEnumerable<string> Homepages
+        public IEnumerable<string> Homepages => this._homepages;
+
+        public void AddVersion(SemverVersion version)
         {
-            get
-            {
-                return this._homepages;
-            }
+            this.AvailableVersions.Add(version);
         }
 
         public void AddHomepage(string homepage)
@@ -105,23 +94,12 @@ namespace Microsoft.NodejsTools.Npm
             }
         }
 
-        public void AppendToDate(string text)
+        public void SetDate(string text)
         {
-            if (this._publishDateTime.Length > 0)
-            {
-                this._publishDateTime.Append(' ');
-            }
-            this._publishDateTime.Append(text);
+            this.PublishDateTimeString = text;
         }
 
-        public string PublishDateTimeString
-        {
-            get
-            {
-                var text = this._publishDateTime.ToString().Trim();
-                return string.IsNullOrEmpty(text) ? null : text;
-            }
-        }
+        public string PublishDateTimeString { get; private set; }
 
         public IEnumerable<IPackage> Dependencies
         {

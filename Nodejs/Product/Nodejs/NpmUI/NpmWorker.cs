@@ -2,14 +2,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
     internal sealed class NpmWorker : IDisposable
     {
+        private static readonly Uri defaultRegistryUri = new Uri("https://registry.npmjs.org/");
+
         private readonly INpmController npmController;
         private readonly Queue<QueuedNpmCommandInfo> commandQueue = new Queue<QueuedNpmCommandInfo>();
         private readonly object queuelock = new object();
@@ -135,6 +143,144 @@ namespace Microsoft.NodejsTools.NpmUI
                 {
                     Execute(this.currentCommand);
                 }
+            }
+        }
+
+        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText)
+        {
+            var relativeUri = string.Format("/-/v1/search?text={0}", filterText);
+            var searchUri = new Uri(defaultRegistryUri, relativeUri);
+
+            var request = WebRequest.Create(searchUri);
+            using (var response = await request.GetResponseAsync())
+            {
+                var reader = new StreamReader(response.GetResponseStream());
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    while (jsonReader.Read())
+                    {
+                        switch (jsonReader.TokenType)
+                        {
+                            case JsonToken.StartObject:
+                            case JsonToken.PropertyName:
+                                continue;
+                            case JsonToken.StartArray:
+                                return ReadPackagesFromArray(jsonReader);
+                            default:
+                                throw new InvalidOperationException("Unexpected json token.");
+                        }
+                    }
+                }
+            }
+
+            // should never get here
+            throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private IEnumerable<IPackage> ReadPackagesFromArray(JsonTextReader jsonReader)
+        {
+            var pkgList = new List<IPackage>();
+
+            // Inside the array, each object is an NPM package
+            var builder = new NodeModuleBuilder();
+            while (jsonReader.Read())
+            {
+                switch (jsonReader.TokenType)
+                {
+                    case JsonToken.PropertyName:
+                        if (StringComparer.OrdinalIgnoreCase.Equals(jsonReader.Value, "package"))
+                        {
+                            var token = (JProperty)JToken.ReadFrom(jsonReader);
+                            var package = ReadPackage(token.Value, builder);
+                            if (package != null)
+                            {
+                                pkgList.Add(package);
+                            }
+                        }
+                        continue;
+                    case JsonToken.EndArray:
+                        // This is the spot the function should always exit on valid data
+                        return pkgList;
+                    default:
+                        continue;
+                }
+            }
+            throw new JsonException("Unexpected end of stream reading the NPM catalog data array");
+        }
+
+        private IPackage ReadPackage(JToken package, NodeModuleBuilder builder)
+        {
+            builder.Reset();
+
+            try
+            {
+                builder.Name = (string)package["name"];
+                if (string.IsNullOrEmpty(builder.Name))
+                {
+                    // I don't believe this should ever happen if the data returned is
+                    // well formed. Could throw an exception, but just skip instead for
+                    // resiliency on the NTVS side.
+                    return null;
+                }
+
+                builder.AppendToDescription((string)package["description"] ?? string.Empty);
+
+                var date = package["date"];
+                if (date != null)
+                {
+                    builder.SetDate((string)date);
+                }
+
+                var version = package["version"];
+                if (version != null)
+                {
+                    var semver = SemverVersion.Parse((string)version);
+                    builder.AddVersion(semver);
+                }
+
+                AddKeywords(builder, package["keywords"]);
+                AddAuthor(builder, package["author"]);
+                AddHomepage(builder, package["links"]);
+
+                return builder.Build();
+            }
+            catch (InvalidOperationException)
+            {
+                // Occurs if a JValue appears where we expect JProperty
+                return null;
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+        }
+
+        private static void AddKeywords(NodeModuleBuilder builder, JToken keywords)
+        {
+            if (keywords != null)
+            {
+                foreach (var keyword in keywords.Select(v => (string)v))
+                {
+                    builder.AddKeyword(keyword);
+                }
+            }
+        }
+
+        private static void AddHomepage(NodeModuleBuilder builder, JToken links)
+        {
+            var homepage = links?["homepage"];
+            if (homepage != null)
+            {
+                builder.AddHomepage((string)homepage);
+            }
+        }
+
+        private static void AddAuthor(NodeModuleBuilder builder, JToken author)
+        {
+            var name = author?["name"];
+            if (author != null)
+            {
+                builder.AddAuthor((string)name);
             }
         }
 

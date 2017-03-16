@@ -37,7 +37,6 @@ namespace Microsoft.NodejsTools.NpmUI
         private INpmController npmController;
 
         private bool isFiltering = false;
-        private IPackageCatalog allPackages;
         private IList<PackageCatalogEntryViewModel> filteredPackages = new List<PackageCatalogEntryViewModel>();
         private PackageCatalogEntryViewModel selectedPackage;
 
@@ -92,11 +91,8 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void LoadCatalog()
         {
-            this.allPackages = EmptyPackageCatalog.Instance;
             // Reset the filter text, otherwise the results will be outdated.
-
             this.FilterText = string.Empty;
-
             StartFilter();
         }
 
@@ -200,7 +196,7 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 try
                 {
-                    filtered = await this.allPackages.GetCatalogPackagesAsync(filterText);
+                    filtered = await this.npmWorker.GetCatalogPackagesAsync(filterText);
                 }
                 catch (Exception ex)
                 {

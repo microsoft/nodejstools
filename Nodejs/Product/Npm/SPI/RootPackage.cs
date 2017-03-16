@@ -60,7 +60,7 @@ The following error was reported:
 
         public string Name => this.HasPackageJson ? new DirectoryInfo(this.Path).Name : this.PackageJson.Name;
 
-        public SemverVersion Version => this.HasPackageJson ? new SemverVersion() : this.PackageJson.Version;
+        public SemverVersion Version => this.PackageJson?.Version ?? new SemverVersion();
 
         public IPerson Author => this.PackageJson?.Author;
 

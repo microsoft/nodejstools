@@ -74,7 +74,6 @@
     <Compile Include="INpmLogSource.cs" />
     <Compile Include="INpmPathProvider.cs" />
     <Compile Include="IPackage.cs" />
-    <Compile Include="IPackageCatalog.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
