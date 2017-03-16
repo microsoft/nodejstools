@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>新しい NodeJs デバッガー プロトコルを使用する (v6.8 以降試験的)</value>
+   <value>新しい NodeJs デバッガー プロトコルを使用する (v7.0 以降試験的)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>

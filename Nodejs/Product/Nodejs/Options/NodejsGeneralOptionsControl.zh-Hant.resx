@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>使用新的 NodeJs 偵錯工具通訊協定 (實驗性，自 v6.8 開始)</value>
+   <value>使用新的 NodeJs 偵錯工具通訊協定 (實驗性，自 v7.0 開始)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>
