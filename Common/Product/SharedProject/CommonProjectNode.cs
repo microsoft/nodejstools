@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudioTools.Project
         SearchPathContainer,
         SearchPath,
         MissingSearchPath,
-        StartupFile
+        StartupFile,
     }
 
     internal abstract class CommonProjectNode : ProjectNode, IVsProjectSpecificEditorMap2, IVsDeferredSaveProject
@@ -636,11 +636,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             bool? showAllFiles = null;
             var showAllFilesSetting = showAllFilesValue.Trim();
-            if (StringComparer.OrdinalIgnoreCase.Equals(showAllFilesSetting, CommonConstants.ProjectFiles))
+            if (StringComparer.Ordinal.Equals(showAllFilesSetting, CommonConstants.ProjectFiles))
             {
                 showAllFiles = false;
             }
-            else if (StringComparer.OrdinalIgnoreCase.Equals(showAllFilesSetting, CommonConstants.ShowAllFiles))
+            else if (StringComparer.Ordinal.Equals(showAllFilesSetting, CommonConstants.ShowAllFiles))
             {
                 showAllFiles = true;
             }

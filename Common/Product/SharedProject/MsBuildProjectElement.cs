@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="attributeValue">Value to give to the attribute</param>
         public override void SetMetadata(string attributeName, string attributeValue)
         {
-            Debug.Assert(StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.Include), "Use rename as this won't work");
+            Debug.Assert(!StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.Include), "Use rename as this won't work");
 
             // Build Action is the type, not a property, so intercept
             if (StringComparer.OrdinalIgnoreCase.Equals(attributeName, ProjectFileConstants.BuildAction))
@@ -164,24 +164,31 @@ namespace Microsoft.VisualStudioTools.Project
         public override bool Equals(object obj)
         {
             // Do they reference the same element?
-            if (Object.ReferenceEquals(this, obj))
+            if (object.ReferenceEquals(this, obj))
             {
                 return true;
             }
 
             var msBuildProjElem = obj as MsBuildProjectElement;
-            if (Object.ReferenceEquals(msBuildProjElem, null))
+            if (object.ReferenceEquals(msBuildProjElem, null))
             {
                 return false;
             }
 
             // Do they reference the same project?
             if (!this.ItemProject.Equals(msBuildProjElem.ItemProject))
+            {
                 return false;
+            }
 
             // Do they have the same include?
             var include1 = GetMetadata(ProjectFileConstants.Include);
             var include2 = msBuildProjElem.GetMetadata(ProjectFileConstants.Include);
+
+            if (include1 == null || include2 == null)
+            {
+                return false;
+            }
 
             return StringComparer.OrdinalIgnoreCase.Equals(include1, include2);
         }

@@ -17,7 +17,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using IServiceProvider = System.IServiceProvider;
 using MSBuild = Microsoft.Build.Evaluation;
 using MSBuildConstruction = Microsoft.Build.Construction;
@@ -1717,7 +1716,7 @@ namespace Microsoft.VisualStudioTools.Project
                         // We have to be sure that we are not going to lose data here. If the project name is a.b.c then for a project that was based on a zipped template(the wizard calls us) GetFileNameWithoutExtension will suppress "c".
                         // We are going to check if the parameter "name" is extension based and the extension is the same as the one from the "filename" parameter.
                         var tempExtension = Path.GetExtension(name);
-                        if (StringComparer.OrdinalIgnoreCase.Equals(tempExtension, extension))
+                        if (!string.IsNullOrEmpty(tempExtension) && StringComparer.OrdinalIgnoreCase.Equals(tempExtension, extension))
                         {
                             tempName = Path.GetFileNameWithoutExtension(name);
                         }
