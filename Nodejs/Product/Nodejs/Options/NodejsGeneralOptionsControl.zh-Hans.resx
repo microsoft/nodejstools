@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>Use the new NodeJs debugger protocol (experimental since v6.8)</value>
+   <value>使用新的 NodeJs 调试器协议(自 v6.8 起推出试验性功能)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>
