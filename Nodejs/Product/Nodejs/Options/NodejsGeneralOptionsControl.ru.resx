@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>Использовать новый протокол отладчика NodeJs (экспериментальная версия, начиная с v6.8)</value>
+   <value>Использовать новый протокол отладчика NodeJs (экспериментальная версия, начиная с v7.0)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>

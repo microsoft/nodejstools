@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>새로운 NodeJs 디버거 프로토콜 사용(v6.8부터 실험적임)</value>
+   <value>새로운 NodeJs 디버거 프로토콜 사용(v7.0부터 실험적임)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>

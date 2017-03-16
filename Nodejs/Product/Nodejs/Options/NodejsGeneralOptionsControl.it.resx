@@ -250,7 +250,7 @@
     <value>5</value>
   </data>
   <data name="_webkitDebugger.Text" xml:space="preserve">
-   <value>Usa il protocollo del nuovo debugger NodeJS (sperimentale a partire dalla versione 6.8)</value>
+   <value>Usa il protocollo del nuovo debugger NodeJS (sperimentale a partire dalla versione 7.0)</value>
   </data>
   <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
     <value>_webkitDebugger</value>
