@@ -1424,15 +1424,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed.
-        /// </summary>
-        public static string TypeScriptMinVersionNotInstalled {
-            get {
-                return ResourceManager.GetString("TypeScriptMinVersionNotInstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Node.js IntelliSense added a .
         /// </summary>
         public static string TypingsInfoBarSpan1 {
