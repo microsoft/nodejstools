@@ -110,6 +110,18 @@ namespace Microsoft.NodejsTools {
         // after the initialization
         private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
+#if DEV14
+        private static readonly Version _minRequiredTypescriptVersion = new Version("1.8");
+
+        private readonly Lazy<bool> _hasRequiredTypescriptVersion = new Lazy<bool>(() => {
+            Version version;
+            var versionString = GetTypeScriptToolsVersion();
+            return !string.IsNullOrEmpty(versionString)
+                && Version.TryParse(versionString, out version)
+                && version.CompareTo(_minRequiredTypescriptVersion) > -1;
+        });
+#endif
+
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -164,6 +176,16 @@ namespace Microsoft.NodejsTools {
         protected override void Initialize() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
+
+#if DEV14
+            if (!_hasRequiredTypescriptVersion.Value) {
+                MessageBox.Show(
+                   string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
+                   Project.SR.ProductName,
+                   MessageBoxButtons.OK,
+                   MessageBoxIcon.Error);
+            }
+#endif
 
             SubscribeToVsCommandEvents(
                 (int)VSConstants.VSStd97CmdID.AddNewProject,
@@ -531,5 +553,45 @@ namespace Microsoft.NodejsTools {
         internal static void NavigateTo(string filename, int pos) {
             VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
+
+#if DEV14
+        private static string GetTypeScriptToolsVersion() {
+            var toolsVersion = string.Empty;
+            try {
+                object installDirAsObject = null;
+                var shell = NodejsPackage.Instance.GetService(typeof(SVsShell)) as IVsShell;
+                if (shell != null) {
+                    shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
+                }
+
+                var idePath = CommonUtils.NormalizeDirectoryPath((string)installDirAsObject) ?? string.Empty;
+                if (string.IsNullOrEmpty(idePath)) {
+                    return toolsVersion;
+                }
+
+                var typeScriptServicesPath = Path.Combine(idePath, @"CommonExtensions\Microsoft\TypeScript\typescriptServices.js");
+                if (!File.Exists(typeScriptServicesPath)) {
+                    return toolsVersion;
+                }
+
+                var regex = new Regex(@"toolsVersion = ""(?<version>\d.\d?)"";");
+                var fileText = File.ReadAllText(typeScriptServicesPath);
+                var match = regex.Match(fileText);
+
+                var version = match.Groups["version"].Value;
+                if (!string.IsNullOrWhiteSpace(version)) {
+                    toolsVersion = version;
+                }
+            } catch (Exception ex) {
+                if (ex.IsCriticalException()) {
+                    throw;
+                }
+
+                Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Failed to obtain TypeScript tools version: {0}", ex.ToString()));
+            }
+
+            return toolsVersion;
+        }
+#endif
     }
 }
