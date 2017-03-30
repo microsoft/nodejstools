@@ -44,7 +44,11 @@
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootSuffix Exp /Log</StartArguments>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <UICulture>en</UICulture>
+    <!--
+    Setting the UICulture places the resources in satellite assemblies, so only do this for Dev15 and later
+    For details on WPF localization, see https://msdn.microsoft.com/en-us/library/ms788718(v=vs.110).aspx
+    -->
+    <UICulture Condition="'$(VSTarget)'=='15.0'">en</UICulture>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
