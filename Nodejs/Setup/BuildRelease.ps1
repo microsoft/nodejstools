@@ -166,7 +166,7 @@ $symbol_contacts = "$env:username;dinov;smortaz;jinglou"
 $vcs_contact = "ntvscore"
 
 # These options are passed to all MSBuild processes
-$global_msbuild_options = @("/v:q", "/m", "/nologo", "/flp:verbosity=diagnostic")
+$global_msbuild_options = @("/v:q", "/m", "/nologo", "/flp:verbosity=detailed")
 
 if ($skiptests) {
     $global_msbuild_options += "/p:IncludeTests=false"
