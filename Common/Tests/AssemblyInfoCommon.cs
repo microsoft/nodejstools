@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
+[assembly: AssemblyCopyright("Copyright © Microsoft")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion(AssemblyVersionInfo.StableVersion)]
