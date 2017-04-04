@@ -166,7 +166,7 @@ $symbol_contacts = "$env:username;dinov;smortaz;jinglou"
 $vcs_contact = "ntvscore"
 
 # These options are passed to all MSBuild processes
-$global_msbuild_options = @("/v:m", "/m", "/nologo", "/flp:verbosity=detailed")
+$global_msbuild_options = @("/v:q", "/m", "/nologo", "/flp:verbosity=detailed")
 
 if ($skiptests) {
     $global_msbuild_options += "/p:IncludeTests=false"
@@ -217,6 +217,7 @@ function msbuild-exe($target) {
 #   signed_bindir       Output directory for signed binaries
 #   signed_msidir       Output directory for signed installers
 #   signed_unsigned_msidir  Output directory for unsigned installers containing signed binaries
+#   signed_swix_logfile Log file for vsman project
 function msbuild-options($target) {
     @(
         "/p:VSTarget=$($target.VSTarget)",
@@ -546,6 +547,7 @@ try {
                 $i.signed_msidir = mkdir "$($i.destdir)\SignedMsi" -Force
                 $i.final_msidir = $i.signed_msidir
                 $i.signed_logfile = "$logdir\BuildRelease_Signed.$config.$($_.number).log"
+                $i.signed_swix_logfile = "$logdir\BuildRelease_Swix_Signed.$config.$($_.number).log"
             } else {
                 $i.final_msidir = $i.unsigned_msidir
             }
@@ -633,7 +635,7 @@ try {
                     $setup_project
 
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
-                    /fl /flp:logfile=$($i.signed_logfile) `
+                    /fl /flp:logfile=$($i.signed_swix_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
