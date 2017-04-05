@@ -195,7 +195,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             if (messageId != null && _messages.TryGetValue((int)messageId, out promise)) {
                 promise.SetResult(message);
             } else {
-                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId));
+                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId ?? "<null>"));
             }
         }
     }
