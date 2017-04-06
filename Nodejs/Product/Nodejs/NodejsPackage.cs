@@ -110,6 +110,7 @@ namespace Microsoft.NodejsTools {
         // after the initialization
         private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
+#if DEV14
         private static readonly Version _minRequiredTypescriptVersion = new Version("1.8");
 
         private readonly Lazy<bool> _hasRequiredTypescriptVersion = new Lazy<bool>(() => {
@@ -119,6 +120,7 @@ namespace Microsoft.NodejsTools {
                 && Version.TryParse(versionString, out version)
                 && version.CompareTo(_minRequiredTypescriptVersion) > -1;
         });
+#endif
 
         /// <summary>
         /// Default constructor of the package.
@@ -175,6 +177,7 @@ namespace Microsoft.NodejsTools {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
 
+#if DEV14
             if (!_hasRequiredTypescriptVersion.Value) {
                 MessageBox.Show(
                    string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
@@ -182,6 +185,7 @@ namespace Microsoft.NodejsTools {
                    MessageBoxButtons.OK,
                    MessageBoxIcon.Error);
             }
+#endif
 
             SubscribeToVsCommandEvents(
                 (int)VSConstants.VSStd97CmdID.AddNewProject,
@@ -550,6 +554,7 @@ namespace Microsoft.NodejsTools {
             VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
 
+#if DEV14
         private static string GetTypeScriptToolsVersion() {
             var toolsVersion = string.Empty;
             try {
@@ -587,5 +592,6 @@ namespace Microsoft.NodejsTools {
 
             return toolsVersion;
         }
+#endif
     }
 }
