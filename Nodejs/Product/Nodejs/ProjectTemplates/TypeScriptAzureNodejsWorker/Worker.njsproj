@@ -35,9 +35,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
     <TypeScriptCompile Include="startup.ts" />
-    <Content Include="download.ps1" />
-    <Content Include="setup_worker.cmd" />
-    <Content Include="node.cmd" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
