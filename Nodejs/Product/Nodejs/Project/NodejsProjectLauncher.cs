@@ -81,17 +81,13 @@ namespace Microsoft.NodejsTools.Project {
                 Nodejs.ShowNodeVersionNotSupported();
                 return VSConstants.S_OK;
             }
-
-            bool useWebKitDebugger = false;
-#else
-            bool useWebKitDebugger = chromeProtocolRequired || NodejsPackage.Instance.GeneralOptionsPage.UseWebKitDebugger;
 #endif
 
             bool startBrowser = ShouldStartBrowser();
 
-            if (debug && !useWebKitDebugger) {
+            if (debug && !chromeProtocolRequired) {
                 StartWithDebugger(file);
-            } else if (debug && useWebKitDebugger) {
+            } else if (debug && chromeProtocolRequired) {
                 StartAndAttachDebugger(file, nodePath);
             } else {
                 StartNodeProcess(file, nodePath, startBrowser);
