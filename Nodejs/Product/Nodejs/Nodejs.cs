@@ -156,7 +156,7 @@ namespace Microsoft.NodejsTools {
 #if !DEV15
         public static void ShowNodeVersionNotSupported() {
             MessageBox.Show(
-                SR.GetString(SR.NodejsNotInstalled),
+                SR.GetString(SR.NodejsVersionNotSupported),
                 SR.ProductName,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error

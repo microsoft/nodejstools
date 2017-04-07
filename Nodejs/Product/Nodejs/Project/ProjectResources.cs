@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Project {
         internal const string NodeExeDoesntExist = "NodeExeDoesntExist";
         internal const string NodejsNotInstalled = "NodejsNotInstalled";
 #if !DEV15
-        internal const string NodejsNotInstalled = "NodejsVersionNotSupported";
+        internal const string NodejsVersionNotSupported = "NodejsVersionNotSupported";
 #endif
         internal const string TestFramework = "TestFramework";
 
