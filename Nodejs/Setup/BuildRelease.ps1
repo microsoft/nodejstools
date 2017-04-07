@@ -461,7 +461,7 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 $msi_version = "$release_version.$buildnumber"
 
 if ($internal -or $release -or $mockrelease) {
-    $serverBuildNumber = Get-ChildItem ENV:Build_BuildNumber
+    $serverBuildNumber = ${ENV:Build_BuildNumber}
     if (-not $serverBuildNumber) {
        $outdir = "$outdir\$buildnumber"
     } else {
