@@ -461,7 +461,12 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 $msi_version = "$release_version.$buildnumber"
 
 if ($internal -or $release -or $mockrelease) {
-    $outdir = "$outdir\$buildnumber"
+    $serverBuildNumber = Get-ChildItem ENV:Build_BuildNumber
+    if (-not $serverBuildNumber) {
+       $outdir = "$outdir\$buildnumber"
+    } else {
+       $outdir = "$outdir\$serverBuildNumber"
+    }
 }
 
 Import-Module -Force $buildroot\Build\VisualStudioHelpers.psm1
@@ -481,7 +486,7 @@ if ($name) {
 }
 Write-Output "Output Dir: $outdir"
 if ($mockrelease) {
-    Write-Output "Auto-generated release outdir: $base_outdir\$release_version\$buildnumber"
+    Write-Output "Auto-generated release outdir: $outdir"
 }
 Write-Output ""
 Write-Output "Product version: $assembly_version.`$(VS version)"
