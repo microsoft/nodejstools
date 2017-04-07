@@ -32,14 +32,12 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this._surveyNewsCheckLabel = new System.Windows.Forms.Label();
             this._surveyNewsCheckCombo = new System.Windows.Forms.ComboBox();
-            this._webkitDebugger = new System.Windows.Forms.CheckBox();
             this._topOptionsPanel.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // _topOptionsPanel
             // 
-            this._topOptionsPanel.Controls.Add(this._webkitDebugger);
             this._topOptionsPanel.Controls.Add(this._checkForLongPaths);
             this._topOptionsPanel.Controls.Add(this._editAndContinue);
             this._topOptionsPanel.Controls.Add(this._waitOnNormalExit);
@@ -96,12 +94,6 @@
             resources.GetString("_surveyNewsCheckCombo.Items3")});
             this._surveyNewsCheckCombo.Name = "_surveyNewsCheckCombo";
             // 
-            // _webkitDebugger
-            // 
-            resources.ApplyResources(this._webkitDebugger, "_webkitDebugger");
-            this._webkitDebugger.Name = "_webkitDebugger";
-            this._webkitDebugger.UseVisualStyleBackColor = true;
-            // 
             // NodejsGeneralOptionsControl
             // 
             resources.ApplyResources(this, "$this");
@@ -127,6 +119,5 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Label _surveyNewsCheckLabel;
         private System.Windows.Forms.ComboBox _surveyNewsCheckCombo;
-        private System.Windows.Forms.CheckBox _webkitDebugger;
     }
 }
