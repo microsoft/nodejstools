@@ -33,14 +33,14 @@ namespace Microsoft.NodejsTools {
 
         public static Version GetNodeVersion(string path)
         {
-            if (string.IsNullOrEmpty(path)) {
-                throw new ArgumentException("\'path\' is not set", "path");
-            }
-
-            var versionString = FileVersionInfo.GetVersionInfo(path).ProductVersion;
-            Version version;
-            if (Version.TryParse(versionString, out version)) {
-                return version;
+            if (!string.IsNullOrEmpty(path))
+            {
+                var versionString = FileVersionInfo.GetVersionInfo(path).ProductVersion;
+                Version version;
+                if (Version.TryParse(versionString, out version))
+                {
+                    return version;
+                }
             }
 
             return default(Version);
