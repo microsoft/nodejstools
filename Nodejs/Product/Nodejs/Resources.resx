@@ -621,6 +621,6 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Launch url '{0}' is not valid </value>
   </data>
   <data name="NodejsVersionNotSupported" xml:space="preserve">
-    <value>Your project is configured to use Node V8 or newer. Debugging Node V8 is not supported in VS 2015, please upgrade to VS 2017.</value>
+    <value>Your project is configured to use Node.js 8 or newer. Debugging Node.js 8 is not supported in VS 2015, please upgrade to VS 2017.</value>
   </data>
 </root>
