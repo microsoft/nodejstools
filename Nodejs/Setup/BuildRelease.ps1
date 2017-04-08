@@ -440,9 +440,17 @@ if (-not $outdir) {
     $outdir = $base_outdir
 }
 
-$buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), 0)
+$serverBuildNumber = ${ENV:Build_BuildNumber}
+if (-not $serverBuildNumber) {
+    $buildindex = 0
+} else {
+    $buildindex = "$serverBuildNumber".Split(".")[1]
+}
+
+$buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
+
 if ($release -or $mockrelease -or $internal) {
-    for ($buildindex = 0; $buildindex -lt 10000; $buildindex += 1) {
+    for (; $buildindex -lt 10000; $buildindex += 1) {
         $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
         if (-not (Test-Path $outdir\$buildnumber)) {
             break
@@ -461,7 +469,7 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 $msi_version = "$release_version.$buildnumber"
 
 if ($internal -or $release -or $mockrelease) {
-    $serverBuildNumber = ${ENV:Build_BuildNumber}
+
     if (-not $serverBuildNumber) {
        $outdir = "$outdir\$buildnumber"
     } else {
@@ -492,7 +500,6 @@ Write-Output ""
 Write-Output "Product version: $assembly_version.`$(VS version)"
 Write-Output "MSI version: $msi_version"
 Write-Output "Building for $([String]::Join(", ", ($target_versions | % { $_.name })))"
-Write-Output ""
 Write-Output "============================================================"
 Write-Output ""
 
