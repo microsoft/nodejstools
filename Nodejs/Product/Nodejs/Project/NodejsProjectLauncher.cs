@@ -68,21 +68,26 @@ namespace Microsoft.NodejsTools.Project {
 
         private int Start(string file, bool debug) {
             var nodePath = GetNodePath();
+
             if (nodePath == null) {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
             }
 
-            bool startBrowser = ShouldStartBrowser();
+            var chromeProtocolRequired = Nodejs.GetNodeVersion(nodePath) >= new Version(8, 0);
+
 #if !DEV15
-            bool useWebKitDebugger = false;
-#else
-            bool useWebKitDebugger = NodejsPackage.Instance.GeneralOptionsPage.UseWebKitDebugger;
+            if (chromeProtocolRequired) {
+                Nodejs.ShowNodeVersionNotSupported();
+                return VSConstants.S_OK;
+            }
 #endif
 
-            if (debug && !useWebKitDebugger) {
+            bool startBrowser = ShouldStartBrowser();
+
+            if (debug && !chromeProtocolRequired) {
                 StartWithDebugger(file);
-            } else if (debug && useWebKitDebugger) {
+            } else if (debug && chromeProtocolRequired) {
                 StartAndAttachDebugger(file, nodePath);
             } else {
                 StartNodeProcess(file, nodePath, startBrowser);

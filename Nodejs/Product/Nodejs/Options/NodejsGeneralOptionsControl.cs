@@ -66,11 +66,6 @@ namespace Microsoft.NodejsTools.Options {
             _waitOnNormalExit.Checked = page.WaitOnNormalExit;
             _editAndContinue.Checked = page.EditAndContinue;
             _checkForLongPaths.Checked = page.CheckForLongPaths;
-            _webkitDebugger.Checked = page.UseWebKitDebugger;
-
-#if !DEV15
-            _webkitDebugger.Enabled = false;
-#endif
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
@@ -79,7 +74,6 @@ namespace Microsoft.NodejsTools.Options {
             page.WaitOnNormalExit = _waitOnNormalExit.Checked;
             page.EditAndContinue = _editAndContinue.Checked;
             page.CheckForLongPaths = _checkForLongPaths.Checked;
-            page.UseWebKitDebugger = _webkitDebugger.Checked;
         }
     }
 }

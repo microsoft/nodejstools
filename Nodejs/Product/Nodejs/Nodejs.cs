@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
@@ -29,6 +30,21 @@ namespace Microsoft.NodejsTools {
     public sealed class Nodejs {
         private const string NodejsRegPath = "Software\\Node.js";
         private const string InstallPath = "InstallPath";
+
+        public static Version GetNodeVersion(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                var versionString = FileVersionInfo.GetVersionInfo(path).ProductVersion;
+                Version version;
+                if (Version.TryParse(versionString, out version))
+                {
+                    return version;
+                }
+            }
+
+            return default(Version);
+        }
 
         public static string NodeExePath {
             get {
@@ -137,6 +153,16 @@ namespace Microsoft.NodejsTools {
                 MessageBoxIcon.Error
             );
         }
+#if !DEV15
+        public static void ShowNodeVersionNotSupported() {
+            MessageBox.Show(
+                SR.GetString(SR.NodejsVersionNotSupported),
+                SR.ProductName,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+#endif
 #endif
     }
 }

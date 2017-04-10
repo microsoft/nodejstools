@@ -660,7 +660,16 @@ namespace Microsoft.NodejsTools {
                 return ResourceManager.GetString("NodejsToolsForVisualStudio", resourceCulture);
             }
         }
-        
+#if !DEV15
+        /// <summary>
+        ///   Looks up a localized string similar to Your project is configured to use Node V8 or newer. Debugging Node V8 is not supported in VS 2015, please upgrade to VS 2017..
+        /// </summary>
+        public static string NodejsVersionNotSupported {
+            get {
+                return ResourceManager.GetString("NodejsVersionNotSupported", resourceCulture);
+            }
+        }
+#endif
         /// <summary>
         ///   Looks up a localized string similar to Unable to parse {0} from your project.  Please fix any errors and try again..
         /// </summary>
@@ -1422,8 +1431,7 @@ namespace Microsoft.NodejsTools {
                 return ResourceManager.GetString("TestFrameworkDescription", resourceCulture);
             }
         }
-
-#if DEV14
+#if !DEV15
         /// <summary>
         ///   Looks up a localized string similar to Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed.
         /// </summary>
@@ -1433,7 +1441,6 @@ namespace Microsoft.NodejsTools {
             }
         }
 #endif
-        
         /// <summary>
         ///   Looks up a localized string similar to Node.js IntelliSense added a .
         /// </summary>
