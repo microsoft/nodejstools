@@ -104,8 +104,9 @@ namespace Microsoft.NodejsTools.Project {
             var env = GetEnvironmentVariablesString(url);
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             var debugOptions = this.GetDebugOptions();
+            var script = GetFullArguments(file, includeNodeArgs: false);
 
-            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: file, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
+            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: script, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
             process.Start();
 
             // setup debug info and attach
@@ -184,7 +185,7 @@ namespace Microsoft.NodejsTools.Project {
                 UseShellExecute = false,
 
                 FileName = nodePath,
-                Arguments = GetFullArguments(file),
+                Arguments = GetFullArguments(file, includeNodeArgs: true),
                 WorkingDirectory = _project.GetWorkingDirectory()
             };
 
@@ -216,7 +217,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private string GetFullArguments(string file, bool includeNodeArgs = true) {
+        private string GetFullArguments(string file, bool includeNodeArgs) {
             string res = String.Empty;
             if (includeNodeArgs) {
                 var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
