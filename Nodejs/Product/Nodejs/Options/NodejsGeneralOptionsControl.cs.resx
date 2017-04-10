@@ -208,7 +208,7 @@
     <value>Fill</value>
   </data>
   <data name="tableLayoutPanel3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 97</value>
+    <value>0, 120</value>
   </data>
   <data name="tableLayoutPanel3.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 4, 3, 4</value>
@@ -217,7 +217,7 @@
     <value>9</value>
   </data>
   <data name="tableLayoutPanel3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>381, 193</value>
+    <value>381, 170</value>
   </data>
   <data name="tableLayoutPanel3.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -236,6 +236,33 @@
   </data>
   <data name="tableLayoutPanel3.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
     <value>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name=&quot;_surveyNewsCheckLabel&quot; Row=&quot;7&quot; RowSpan=&quot;1&quot; Column=&quot;0&quot; ColumnSpan=&quot;1&quot; /&gt;&lt;Control Name=&quot;_surveyNewsCheckCombo&quot; Row=&quot;7&quot; RowSpan=&quot;1&quot; Column=&quot;1&quot; ColumnSpan=&quot;1&quot; /&gt;&lt;/Controls&gt;&lt;Columns Styles=&quot;AutoSize,0,Percent,100&quot; /&gt;&lt;Rows Styles=&quot;AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,AutoSize,0,Absolute,20&quot; /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="_webkitDebugger.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_webkitDebugger.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 96</value>
+  </data>
+  <data name="_webkitDebugger.Size" type="System.Drawing.Size, System.Drawing">
+    <value>96, 17</value>
+  </data>
+  <data name="_webkitDebugger.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="_webkitDebugger.Text" xml:space="preserve">
+    <value>Používat nový protokol ladicího programu NodeJs (experimentální od verze 7.0)</value>
+  </data>
+  <data name="&gt;&gt;_webkitDebugger.Name" xml:space="preserve">
+    <value>_webkitDebugger</value>
+  </data>
+  <data name="&gt;&gt;_webkitDebugger.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_webkitDebugger.Parent" xml:space="preserve">
+    <value>_topOptionsPanel</value>
+  </data>
+  <data name="&gt;&gt;_webkitDebugger.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="_checkForLongPaths.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -262,7 +289,7 @@
     <value>_topOptionsPanel</value>
   </data>
   <data name="&gt;&gt;_checkForLongPaths.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="_editAndContinue.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -289,7 +316,7 @@
     <value>_topOptionsPanel</value>
   </data>
   <data name="&gt;&gt;_editAndContinue.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="_waitOnNormalExit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -316,7 +343,7 @@
     <value>_topOptionsPanel</value>
   </data>
   <data name="&gt;&gt;_waitOnNormalExit.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="_waitOnAbnormalExit.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -343,7 +370,7 @@
     <value>_topOptionsPanel</value>
   </data>
   <data name="&gt;&gt;_waitOnAbnormalExit.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="_topOptionsPanel.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Top</value>
@@ -352,7 +379,7 @@
     <value>0, 0</value>
   </data>
   <data name="_topOptionsPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>381, 97</value>
+    <value>381, 120</value>
   </data>
   <data name="_topOptionsPanel.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>

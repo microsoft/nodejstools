@@ -63,6 +63,13 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
+            const string MdhaPrefix = "mdha:";
+
+            // webkit debugger prepends with 'mdha'
+            if (path.StartsWith(MdhaPrefix, StringComparison.OrdinalIgnoreCase)) {
+                path = path.Substring(MdhaPrefix.Length);
+            }
+
             var uri = MakeUri(path, false, UriKind.RelativeOrAbsolute);
             if (uri.IsAbsoluteUri)
             {
