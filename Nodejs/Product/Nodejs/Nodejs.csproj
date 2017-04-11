@@ -1323,6 +1323,7 @@
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\error.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
@@ -1343,6 +1344,7 @@
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\error.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
