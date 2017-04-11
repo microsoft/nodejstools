@@ -1028,7 +1028,6 @@
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
@@ -1046,7 +1045,6 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\package.json" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\main.css" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
     <ZipItem Include="Templates\Files\TypeScriptJSX\EmptyTsx.tsx" />
@@ -1311,7 +1309,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -1323,7 +1320,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
