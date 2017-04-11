@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
@@ -17,6 +18,21 @@ namespace Microsoft.NodejsTools
     {
         private const string NodejsRegPath = "Software\\Node.js";
         private const string InstallPath = "InstallPath";
+
+        public static Version GetNodeVersion(string path)
+        {
+            if (!string.IsNullOrEmpty(path))
+            {
+                var versionString = FileVersionInfo.GetVersionInfo(path).ProductVersion;
+                Version version;
+                if (Version.TryParse(versionString, out version))
+                {
+                    return version;
+                }
+            }
+
+            return default(Version);
+        }
 
         public static string NodeExePath => GetPathToNodeExecutableFromEnvironment();
 
@@ -148,6 +164,6 @@ namespace Microsoft.NodejsTools
             );
         }
 #endif
-    }
+   }
 }
 

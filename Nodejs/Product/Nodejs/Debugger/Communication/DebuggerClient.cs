@@ -199,18 +199,17 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <param name="message">Message.</param>
         private void HandleResponseMessage(JObject message)
         {
-            TaskCompletionSource<JObject> promise;
-            var messageId = (int)message["request_seq"];
+            var messageId = message["request_seq"];
 
-            if (this._messages.TryGetValue(messageId, out promise))
+            TaskCompletionSource<JObject> promise;
+            if (messageId != null && _messages.TryGetValue((int)messageId, out promise))
             {
                 promise.SetResult(message);
             }
             else
             {
-                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId));
+                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId ?? "<null>"));
             }
         }
     }
 }
-

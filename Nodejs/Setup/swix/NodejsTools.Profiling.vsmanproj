@@ -17,10 +17,6 @@
         <BuildNumber>$(BuildVersion)</BuildNumber>
         <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\Product\Profiling\Profiling.csproj" />
-    </ItemGroup>
     
     <ItemGroup>
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\Profiling\Microsoft.VisualStudio.NodejsTools.Profiling.json"/>

@@ -17,14 +17,18 @@ namespace Microsoft.NodejsTools.Debugger
     {
         private readonly ProcessStartInfo _psi;
         private readonly bool _waitOnAbnormal, _waitOnNormal, _enableRaisingEvents;
-        private Process _process, _pressAnyKeyProcess;
+        private Process _process;
+        private Process _pressAnyKeyProcess;
 
-        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents)
+        public ushort DebuggerPort { get; }
+
+        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents, ushort debuggerPort = 0) 
         {
             this._psi = psi;
             this._waitOnAbnormal = waitOnAbnormal;
             this._waitOnNormal = waitOnNormal;
             this._enableRaisingEvents = enableRaisingEvents;
+            DebuggerPort = debuggerPort;
         }
 
         public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal)

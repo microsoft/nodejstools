@@ -104,9 +104,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -329,7 +327,6 @@
     <Compile Include="Debugger\Commands\SetBreakpointCommand.cs" />
     <Compile Include="Debugger\Commands\SetExceptionBreakCommand.cs" />
     <Compile Include="Debugger\Commands\SuspendCommand.cs" />
-    <Compile Include="Debugger\NodeEventEventArgs.cs" />
     <Compile Include="Debugger\NodeExpressionType.cs" />
     <Compile Include="Debugger\Serialization\IEvaluationResultFactory.cs" />
     <Compile Include="Debugger\Serialization\NaturalSortComparer.cs" />
@@ -795,6 +792,7 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.cs.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.de.resx" />

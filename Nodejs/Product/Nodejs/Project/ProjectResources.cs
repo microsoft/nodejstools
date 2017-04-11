@@ -13,6 +13,9 @@ namespace Microsoft.NodejsTools.Project
 
         internal const string NodeExeDoesntExist = "NodeExeDoesntExist";
         internal const string NodejsNotInstalled = "NodejsNotInstalled";
+#if !DEV15
+        internal const string NodejsVersionNotSupported = "NodejsVersionNotSupported";
+#endif
         internal const string TestFramework = "TestFramework";
 
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(
