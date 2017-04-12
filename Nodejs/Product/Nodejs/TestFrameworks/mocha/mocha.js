@@ -6,8 +6,7 @@ var result = {
     'title': '',
     'passed': false,
     'stdOut': '',
-    'stdErr': '',
-    'time': 0
+    'stdErr': ''
 };
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
@@ -19,8 +18,12 @@ function append_stdout(string, encoding, fd) {
 function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
-process.stdout.write = append_stdout;
-process.stderr.write = append_stderr;
+function hook_outputs() {
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
+}
+
+hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -71,6 +74,11 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testCases, callback) {
+    function post(event) {
+        callback(event);
+        hook_outputs();
+    }
+
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
@@ -86,49 +94,95 @@ var run_tests = function (testCases, callback) {
     var testGrepString = '^(' + testCases.map(function (testCase) {
         return testCase.testName
     }).join('|') + ')$';
-
+    
     if (testGrepString) {
         mocha.grep(new RegExp(testGrepString));
     }
-
     mocha.addFile(testCases[0].testFile);
 
-    // run tests
-    var runner = mocha.run(function (code) { });
+    var runner = mocha.run(function (code) {
+        process.exit(code);
+    });
+
+    runner.on('suite', function (suite) {
+        post({
+            type: 'suite start',
+            result: result
+        });
+    });
+
+    runner.on('suite end', function (suite) {
+        post({
+            type: 'suite end',
+            result: result
+        });
+    });
+
+    runner.on('hook', function (hook) {
+        post({
+            type: 'hook start',
+            title: hook.title,
+            result: result
+        });
+    });
+
+    runner.on('hook end', function (hook) {
+        post({
+            type: 'hook end',
+            title: hook.title,
+            result: result
+        });
+    });
 
     runner.on('start', function () {
+        post({
+            type: 'start',
+            result: result
+        });
     });
+
     runner.on('test', function (test) {
         result.title = test.fullTitle();
-        result.time = Date.now();
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
+        post({
+            type: 'test start',
+            title: result.title
+        });
     });
+
     runner.on('end', function () {
-        callback(testResults);
+        post({
+            type: 'end',
+            result: result
+        });
     });
+
     runner.on('pass', function (test) {
         result.passed = true;
-        result.time = Date.now() - result.time;
-        testResults.push(result);
+        post({
+            type: 'result',
+            title: result.title,
+            result: result
+        });
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': ''
+            'stdErr': ''
         }
     });
+
     runner.on('fail', function (test, err) {
         result.passed = false;
-        result.time = Date.now() - result.time;
-        testResults.push(result);
+        post({
+            type: 'result',
+            title: result.title,
+            result: result
+        });
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': ''
+            'stdErr': ''
         }
     });
 };

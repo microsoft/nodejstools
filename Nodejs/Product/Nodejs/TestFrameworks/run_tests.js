@@ -23,18 +23,16 @@ rl.on('line', (line) => {
         process.exit(1);
     }
     
-    function returnResult(result) {
+    function postResult(result) {
         // unhook stdout and stderr
         process.stdout.write = old_stdout;
         process.stderr.write = old_stderr;
         if (result) {
             console.log(JSON.stringify(result));
         }
-        // end process, tests are done running.
-        process.exit(0);
     }
     // run the test
-    framework.run_tests(testCases, returnResult);
+    framework.run_tests(testCases, postResult);
     
     // close readline interface
     rl.close();

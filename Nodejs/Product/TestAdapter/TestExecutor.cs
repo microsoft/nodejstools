@@ -34,22 +34,6 @@ using Newtonsoft.Json;
 using System.Globalization;
 
 namespace Microsoft.NodejsTools.TestAdapter {
-
-    class ResultObject {
-        public ResultObject() {
-            title = String.Empty;
-            passed = false;
-            stdout = String.Empty;
-            stderr = String.Empty;
-            time = 0;
-        }
-        public string title { get; set; }
-        public bool passed { get; set; }
-        public string stdout { get; set; }
-        public string stderr { get; set; }
-        public int time { get; set; }
-    }
-
     [ExtensionUri(TestExecutor.ExecutorUriString)]
     class TestExecutor : ITestExecutor {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
@@ -63,12 +47,37 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private ProcessStartInfo _psi;
         private Process _nodeProcess;
         private object _syncObject = new object();
+        private List<TestCase> _currentTests;
+        private IFrameworkHandle _frameworkHandle;
+        private TestResult _currentResult = null;
+        private ResultObject _currentResultObject = null;
 
         public void Cancel() {
             //let us just kill the node process there, rather do it late, because VS engine process 
             //could exit right after this call and our node process will be left running.
             KillNodeProcess();
             _cancelRequested.Set();
+        }
+
+        private void ProcessTestEvent(object sender, DataReceivedEventArgs e) {
+            try {
+                if (e.Data != null) {
+                    TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(e.Data);
+                    // Extract test from list of tests
+                    var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
+                    if (test.Count() > 0) {
+                        if (testEvent.type == "test start") {
+                            _currentResult = new TestResult(test.First());
+                            _currentResult.StartTime = DateTimeOffset.Now;
+                            _frameworkHandle.RecordStart(test.First());
+                        } else if (testEvent.type == "result") {
+                            RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
+                        }
+                    } else if (testEvent.type == "suite end") {
+                        _currentResultObject = testEvent.result;
+                    }
+                }
+            } catch (Exception) { }
         }
 
         /// <summary>
@@ -95,37 +104,40 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // No VS instance just means no debugging, but everything else is
             // okay.
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
-                // .njsproj file path -> project settings
-                var projectToTests = new Dictionary<string, List<TestCase>>();
+                // .ts file path -> project settings
+                var fileToTests = new Dictionary<string, List<TestCase>>();
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
                 NodejsProjectSettings settings = null;
 
-                // put tests into dictionary where key is their project working directory
+                // put tests into dictionary where key is their source file
                 foreach (var test in receiver.Tests) {
-                    if (!sourceToSettings.TryGetValue(test.Source, out settings)) {
-                        sourceToSettings[test.Source] = settings = LoadProjectSettings(test.Source);
+                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
+                        fileToTests[test.CodeFilePath] = new List<TestCase>();
                     }
-                    if (!projectToTests.ContainsKey(settings.WorkingDir)) {
-                        projectToTests[settings.WorkingDir] = new List<TestCase>();
-                    }
-                    projectToTests[settings.WorkingDir].Add(test);
+                    fileToTests[test.CodeFilePath].Add(test);
                 }
 
-                // where key is the workingDir and value is a list of tests
-                foreach (KeyValuePair<string, List<TestCase>> entry in projectToTests) {
+                // where key is the file and value is a list of tests
+                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
                     List<string> args = new List<string>();
                     TestCase firstTest = entry.Value.ElementAt(0);
+                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
+                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
+                    }
                     int port = 0;
                     if (runContext.IsBeingDebugged && app != null) {
                         app.GetDTE().Debugger.DetachAll();
                         args.AddRange(GetDebugArgs(settings, out port));
                     }
 
-                    args.AddRange(GetInterpreterArgs(firstTest, entry.Key, settings.ProjectRootDir));
+                    _currentTests = entry.Value;
+                    _frameworkHandle = frameworkHandle;
+
+                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
 
                     // launch node process
                     LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-                    // Run all test cases in a given project
+                    // Run all test cases in a given file
                     RunTestCases(entry.Value, runContext, frameworkHandle, settings);
                     // dispose node process
                     _nodeProcess.Dispose();
@@ -145,15 +157,46 @@ namespace Microsoft.NodejsTools.TestAdapter {
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
             _cancelRequested.Reset();
 
-            TestCase firstTest = tests.First();
-            NodejsProjectSettings settings = LoadProjectSettings(firstTest.Source);
-            List<string> args = new List<string>();
-            args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
+            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
+                // .ts file path -> project settings
+                var fileToTests = new Dictionary<string, List<TestCase>>();
+                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+                NodejsProjectSettings settings = null;
 
-            LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-            // Run all test cases selected
-            RunTestCases(tests, runContext, frameworkHandle, settings);
-            _nodeProcess.Dispose();
+                // put tests into dictionary where key is their source file
+                foreach (var test in tests) {
+                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
+                        fileToTests[test.CodeFilePath] = new List<TestCase>();
+                    }
+                    fileToTests[test.CodeFilePath].Add(test);
+                }
+
+                // where key is the file and value is a list of tests
+                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
+                    List<string> args = new List<string>();
+                    TestCase firstTest = entry.Value.ElementAt(0);
+                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
+                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
+                    }
+                    int port = 0;
+                    if (runContext.IsBeingDebugged && app != null) {
+                        app.GetDTE().Debugger.DetachAll();
+                        args.AddRange(GetDebugArgs(settings, out port));
+                    }
+
+                    _currentTests = entry.Value;
+                    _frameworkHandle = frameworkHandle;
+
+                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
+
+                    // launch node process
+                    LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
+                    // Run all test cases in a given file
+                    RunTestCases(entry.Value, runContext, frameworkHandle, settings);
+                    // dispose node process
+                    _nodeProcess.Dispose();
+                }
+            }
         }
 
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings) {
@@ -170,7 +213,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     if (_cancelRequested.WaitOne(0)) {
                         break;
                     }
-                    frameworkHandle.RecordStart(test);
 
                     if (settings == null) {
                         frameworkHandle.SendMessage(
@@ -205,6 +247,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     _nodeProcess.WaitForExit();
                 }
 
+                // Automatically fail tests that haven't been run by this point (failures in before() hooks)
+                foreach(TestCase notRunTest in _currentTests) {
+                    TestResult result = new TestResult(notRunTest);
+                    result.Outcome = TestOutcome.Failed;
+                    if(_currentResultObject != null) {
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
+                    }
+                    frameworkHandle.RecordResult(result);
+                    frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
+                }
+
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
@@ -228,16 +282,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                     }
 #endif
                 }
-            }
-            var results = GetTestResultFromProcess(_nodeProcess.StandardOutput);
-
-            bool runCancelled = _cancelRequested.WaitOne(0);
-
-            if (results != null) {
-                RecordEnd(frameworkHandle, tests, results);
-            }
-            else {
-                frameworkHandle.SendMessage(TestMessageLevel.Error, "Failed to obtain results");
             }
         }
 
@@ -270,27 +314,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
             };
         }
 
-        private List<ResultObject> ParseTestResult(string line) {
-            List<ResultObject> jsonResults = null;
-            try {
-                jsonResults = JsonConvert.DeserializeObject<List<ResultObject>>(line);
-            } catch (Exception) { }
-            return jsonResults;
-        }
-
-        private List<ResultObject> GetTestResultFromProcess(StreamReader sr) {
-            List<ResultObject> results = null;
-            while (sr.Peek() >= 0) {
-                results = ParseTestResult(sr.ReadLine());
-                if (results == null) {
-                    continue;
-                }
-                break;
-            }
-            sr.DiscardBufferedData();
-            return results;
-        }
-
         private void LaunchNodeProcess(string workingDir, string nodeExePath, List<string> args) {
             _psi = new ProcessStartInfo("cmd.exe") {
                 Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
@@ -303,6 +326,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             _psi.RedirectStandardInput = true;
             _psi.RedirectStandardOutput = true;
             _nodeProcess = Process.Start(_psi);
+            _nodeProcess.BeginOutputReadLine();
+            _nodeProcess.OutputDataReceived += ProcessTestEvent;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {
@@ -330,25 +355,18 @@ namespace Microsoft.NodejsTools.TestAdapter {
             };
         }
 
-        private static void RecordEnd(IFrameworkHandle frameworkHandle, IEnumerable<TestCase> tests, List<ResultObject> results) {
-            if (tests.Count() == results.Count()) {
-                TestResult result;
-                foreach(var res in results) {
-                    // If tests were run using "Run Selected Tests", the `tests` and `results` lists 
-                    // may not have the tests in the same order --so we query the test title from the `tests` list.
-                    var test = tests.Where(n => n.DisplayName == res.title);
-                    if(test.Count() == 1) {
-                        result = new TestResult(test.First());
-                        result.Outcome = res.passed ? TestOutcome.Passed : TestOutcome.Failed;
-                        result.Duration = new TimeSpan(0, 0, 0, 0, res.time);
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, res.stdout));
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, res.stderr));
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, res.stderr));
-                        frameworkHandle.RecordResult(result);
-                        frameworkHandle.RecordEnd(test.First(), result.Outcome);
-                    }
-                }
-            }
+        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
+            String[] standardOutputLines = resultObject.stdout.Split('\n');
+            String[] standardErrorLines = resultObject.stderr.Split('\n');
+            result.EndTime = DateTimeOffset.Now;
+            result.Duration = result.EndTime - result.StartTime;
+            result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, String.Join(Environment.NewLine, standardOutputLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, String.Join(Environment.NewLine, standardErrorLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, String.Join(Environment.NewLine, standardErrorLines)));
+            frameworkHandle.RecordResult(result);
+            frameworkHandle.RecordEnd(test, result.Outcome);
+            _currentTests.Remove(test);
         }
     }
 }
@@ -388,6 +406,25 @@ class NodejsProjectSettings {
     public string ProjectRootDir { get; set; }
 }
 
+class ResultObject {
+    public ResultObject() {
+        title = String.Empty;
+        passed = false;
+        stdout = String.Empty;
+        stderr = String.Empty;
+    }
+    public string title { get; set; }
+    public bool passed { get; set; }
+    public string stdout { get; set; }
+    public string stderr { get; set; }
+}
+
+class TestEvent {
+    public string type { get; set; }
+    public string title { get; set; }
+    public ResultObject result { get; set; }
+}
+
 class TestCaseObject {
     public TestCaseObject() {
         framework = String.Empty;
@@ -409,5 +446,4 @@ class TestCaseObject {
     public string testFile { get; set; }
     public string workingFolder { get; set; }
     public string projectFolder { get; set; }
-
 }

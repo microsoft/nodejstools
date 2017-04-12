@@ -5,8 +5,7 @@ var result = {
     'title': '',
     'passed': false,
     'stdOut': '',
-    'stdErr': '',
-    'time': 0
+    'stdErr': ''
 };
 
 function append_stdout(string, encoding, fd) {
@@ -15,8 +14,13 @@ function append_stdout(string, encoding, fd) {
 function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
-process.stdout.write = append_stdout;
-process.stderr.write = append_stderr;
+function hook_outputs() {
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
+}
+
+
+hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
@@ -67,30 +71,41 @@ var find_tests = function (testFileList, discoverResultFile) {
 module.exports.find_tests = find_tests;
 
 var run_tests = function (testCases, callback) {
-    var test_results = [];
-    for (var test in testCases) {
+    function post(event) {
+        callback(event);
+        hook_outputs();
+    }
+
+    for (var test of testCases) {
+        post({
+            type: 'test start',
+            title: test.testName
+        });
         try {
-            var testCase = require(testCases[test].testFile);
-            result.title = testCases[test].testName;
-            result.time = Date.now();
-            testCase[testCases[test].testName]();
-            result.time = Date.now() - result.time;
+            var testCase = require(test.testFile);
+            testCase[test.testName]();
+            result.title = test.testName;
             result.passed = true;
         } catch (err) {
-            result.time = Date.now() - result.time;
             result.passed = false;
             console.error(err.name);
             console.error(err.message);
         }
-        test_results.push(result)
+        post({
+            type: 'result',
+            title: test.testName,
+            result: result
+        });
         result = {
             'title': '',
             'passed': false,
             'stdOut': '',
-            'stdErr': '',
-            'time': 0
+            'stdErr': ''
         };
     }
-    callback(test_results);
+    callback({
+        type: 'suite end',
+        result: result
+    });
 };
 module.exports.run_tests = run_tests;

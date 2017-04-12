@@ -6,13 +6,13 @@ var result = {
     'title': '',
     'passed': false,
     'stdOut': '',
-    'stdErr': '',
-    'time': 0
+    'stdErr': ''
 };
 
 function append_stdout(string, encoding, fd) {
     result.stdOut += string;
 }
+
 function append_stderr(string, encoding, fd) {
     result.stdErr += string;
 }
@@ -52,42 +52,63 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 module.exports.find_tests = find_tests;
 
 function run_tests(testInfo, callback) {
-    var testResults = [];
-    var testCases = loadTestCases(testInfo[0].testFile);
-    process.stdout.write = append_stdout;
-    process.stderr.write = append_stderr;
-    if (testCases === null) {
-        return;
-    }
-
     var tape = findTape(testInfo[0].projectFolder);
     if (tape === null) {
         return;
     }
 
-    for (var test in testInfo) {
-        result.title = testInfo[test].testName;
-        try {
-            result.time = Date.now();
-            var harness = tape.getHarness();
-            harness(testInfo[test].testName);
-            result.passed = true;
-        } catch (e) {
-            result.passed = false;
-            logError('Error running test:', testInfo[test].testName, 'in', testInfo[test].testFile, e);
-        }
-        result.time = Date.now() - result.time;
-        testResults.push(result);
-        result = {
-            'title': '',
-            'passed': false,
-            'stdOut': '',
-            'stdErr': '',
-            'time': 0
-        };
-    }
+    var harness = tape.getHarness();
 
-    callback(testResults);
+    testInfo.forEach(function (info) {
+        runTest(info, harness, function (result) {
+            callback(result);
+        });
+    });
+
+    tape.onFinish(function () {
+        // executes when all tests are done running
+    });
+
+    function runTest(testInfo, harness, done) {
+        var stream = harness.createStream({ objectMode: true });
+        var title = testInfo.testName;
+
+        stream.on(('data'), function (result) {
+            if (result.type === 'test') {
+                done({
+                    type: 'test start',
+                    title: title
+                });
+            }
+        });
+
+        try {
+            var htest = tape.test(title, {}, function (result) {
+                done({
+                    type: 'result',
+                    title: title,
+                    result: {
+                        'title': title,
+                        'passed': result._ok,
+                        'stdOut': '',
+                        'stdErr': ''
+                    }
+                });
+            });
+        } catch (e) {
+            console.error('NTVS_ERROR:', e);
+            done({
+                type: 'result',
+                title: title,
+                result: {
+                    'title': title,
+                    'passed': false,
+                    'stdOut': '',
+                    'stdErr': e.message
+                }
+            });
+        }
+    }
 }
 module.exports.run_tests = run_tests;
 
