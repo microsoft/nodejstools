@@ -18,11 +18,8 @@
     <Project File="Worker.njsproj" ReplaceParameters="true">
       <ProjectItem>startup.js</ProjectItem>
       <ProjectItem OpenInEditor="true">worker.js</ProjectItem>
-      <ProjectItem>download.ps1</ProjectItem>
-      <ProjectItem>setup_worker.cmd</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
-      <ProjectItem>node.cmd</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>
