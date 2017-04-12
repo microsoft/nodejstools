@@ -10,7 +10,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>bin\www</StartupFile>
+    <StartupFile>app.js</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -42,13 +42,9 @@
     <Content Include="README.md" />
     <Content Include="views\index.pug" />
     <Content Include="views\layout.pug" />
+    <Content Include="views\error.pug" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config" />
-    <Content Include="bin\ChangeConfig.ps1" />
-    <Content Include="bin\download.ps1" />
-    <Content Include="bin\setup_web.cmd" />
-    <Content Include="bin\node.cmd" />
-    <Content Include="bin\www" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\" />

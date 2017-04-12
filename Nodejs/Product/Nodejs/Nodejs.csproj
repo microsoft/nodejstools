@@ -858,19 +858,11 @@
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceDefinition.csdef" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\download.ps1" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\node.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\setup_worker.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\download.ps1" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\iisnode.yml" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\node.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
     <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
@@ -886,12 +878,6 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\package.json" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\README.md" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\main.css" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\www" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\download.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\iisnode.yml" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\node.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.config" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Web.Debug.config" />
     <ZipItem Include="Templates\Files\TypeScriptJSX\EmptyTsx.tsx" />
@@ -908,12 +894,10 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mine.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\www" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mine.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\www" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
@@ -1024,7 +1008,6 @@
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
-    <ZipProject Include="ProjectTemplates\Express4App\www" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\app.js" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
@@ -1070,11 +1053,8 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\download.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\node.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\package.json" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\setup_worker.cmd" />
     <ZipItem Include="Templates\Files\MochaUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
@@ -1126,20 +1106,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\ChangeConfig.ps1" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\download.ps1" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\README.md" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\setup_web.cmd" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.Debug.config">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Web.config" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\node.cmd" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsApp\iisnode.yml" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -1157,6 +1132,7 @@
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\error.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
@@ -1166,28 +1142,19 @@
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\ChangeConfig.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\download.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\setup_web.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\error.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\ChangeConfig.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\download.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.cmd" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\setup_web.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\iisnode.yml" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
@@ -1197,11 +1164,8 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\download.ps1" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\node.cmd" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\setup_worker.cmd" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
