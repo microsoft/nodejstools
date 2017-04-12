@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Project;
@@ -42,8 +43,8 @@ namespace Microsoft.NodejsTools.Options {
 
             if (!didClearNpmCache || !didClearTools) {
                 MessageBox.Show(
-                   SR.GetString(SR.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
-                   SR.GetString(SR.CacheDirectoryClearFailedTitle),
+                   string.Format(CultureInfo.CurrentCulture, Resources.CacheDirectoryClearFailedCaption, NodejsConstants.NtvsLocalAppData),
+                   Resources.CacheDirectoryClearFailedTitle,
                    MessageBoxButtons.OK,
                    MessageBoxIcon.Information);
             }
@@ -60,7 +61,7 @@ namespace Microsoft.NodejsTools.Options {
                 // To handle long paths, nuke the directory contents with robocopy
                 string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectory);
-                var psi = new ProcessStartInfo("cmd.exe", string.Format(@"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath)) {
+                var psi = new ProcessStartInfo("cmd.exe", string.Format(CultureInfo.InvariantCulture, @"/C robocopy /mir ""{0}"" ""{1}""", tempDirectory, cachePath)) {
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };

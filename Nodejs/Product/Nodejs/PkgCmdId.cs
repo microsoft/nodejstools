@@ -29,12 +29,7 @@ namespace Microsoft.NodejsTools {
         public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
 
         public const int cmdidDiagnostics                   = 0x208;
-        public const int cmdidSetAsContent                  = 0x209;
-        public const int cmdidSetAsCompile                  = 0x210;
-        public const int cmdidAddNewJavaScriptFileCommand   = 0x211;
-        public const int cmdidAddNewTypeScriptFileCommand   = 0x212;
-        public const int cmdidAddNewHTMLFileCommand         = 0x213;
-        public const int cmdidAddNewCSSFileCommand          = 0x214;
+        public const int cmdidAddFileCommand                = 0x211;
         public const int cmdidSendFeedback                  = 0x215;
         public const int cmdidShowDocumentation             = 0x216;
 

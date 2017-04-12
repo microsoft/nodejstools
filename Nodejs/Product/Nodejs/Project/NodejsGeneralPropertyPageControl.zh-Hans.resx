@@ -1,0 +1,780 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"/>
+  <data name="_nodeExePathLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"/>
+  <data name="_nodeExePathLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodeExePathLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 42</value>
+  </data>
+  <data name="_nodeExePathLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>80, 13</value>
+  </data>
+  <data name="_nodeExePathLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="_nodeExePathLabel.Text" xml:space="preserve">
+    <value>Node.exe 路径(&amp;P):</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePathLabel.Name" xml:space="preserve">
+    <value>_nodeExePathLabel</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePathLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePathLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePathLabel.ZOrder" xml:space="preserve">
+    <value>13</value>
+  </data>
+  <data name="_nodeArguments.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_nodeArguments.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodeArguments.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 86</value>
+  </data>
+  <data name="_nodeArguments.Size" type="System.Drawing.Size, System.Drawing">
+    <value>93, 13</value>
+  </data>
+  <data name="_nodeArguments.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="_nodeArguments.Text" xml:space="preserve">
+    <value>Node.exe 选项(&amp;O):</value>
+  </data>
+  <data name="&gt;&gt;_nodeArguments.Name" xml:space="preserve">
+    <value>_nodeArguments</value>
+  </data>
+  <data name="&gt;&gt;_nodeArguments.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodeArguments.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodeArguments.ZOrder" xml:space="preserve">
+    <value>12</value>
+  </data>
+  <data name="_startBrowser.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_startBrowser.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_startBrowser.Location" type="System.Drawing.Point, System.Drawing">
+    <value>22, 500</value>
+  </data>
+  <data name="_startBrowser.Size" type="System.Drawing.Size, System.Drawing">
+    <value>161, 17</value>
+  </data>
+  <data name="_startBrowser.TabIndex" type="System.Int32, mscorlib">
+    <value>20</value>
+  </data>
+  <data name="_startBrowser.Text" xml:space="preserve">
+    <value>启动时启动 web 浏览器(&amp;A)</value>
+  </data>
+  <data name="&gt;&gt;_startBrowser.Name" xml:space="preserve">
+    <value>_startBrowser</value>
+  </data>
+  <data name="&gt;&gt;_startBrowser.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_startBrowser.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_startBrowser.ZOrder" xml:space="preserve">
+    <value>14</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"/>
+  <data name="_nodeExePath.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_nodeExePath.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodeExePath.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 42</value>
+  </data>
+  <data name="_nodeExePath.Size" type="System.Drawing.Size, System.Drawing">
+    <value>843, 20</value>
+  </data>
+  <data name="_nodeExePath.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePath.Name" xml:space="preserve">
+    <value>_nodeExePath</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePath.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePath.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodeExePath.ZOrder" xml:space="preserve">
+    <value>20</value>
+  </data>
+  <data name="_nodeExeArguments.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_nodeExeArguments.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodeExeArguments.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 86</value>
+  </data>
+  <data name="_nodeExeArguments.Size" type="System.Drawing.Size, System.Drawing">
+    <value>889, 20</value>
+  </data>
+  <data name="_nodeExeArguments.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeArguments.Name" xml:space="preserve">
+    <value>_nodeExeArguments</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeArguments.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeArguments.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeArguments.ZOrder" xml:space="preserve">
+    <value>19</value>
+  </data>
+  <data name="_nodejsPort.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodejsPort.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 303</value>
+  </data>
+  <data name="_nodejsPort.Size" type="System.Drawing.Size, System.Drawing">
+    <value>105, 20</value>
+  </data>
+  <data name="_nodejsPort.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="&gt;&gt;_nodejsPort.Name" xml:space="preserve">
+    <value>_nodejsPort</value>
+  </data>
+  <data name="&gt;&gt;_nodejsPort.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodejsPort.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodejsPort.ZOrder" xml:space="preserve">
+    <value>15</value>
+  </data>
+  <data name="_nodePortLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_nodePortLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_nodePortLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 303</value>
+  </data>
+  <data name="_nodePortLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 13</value>
+  </data>
+  <data name="_nodePortLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="_nodePortLabel.Text" xml:space="preserve">
+    <value>Node.js 端口(&amp;J):</value>
+  </data>
+  <data name="&gt;&gt;_nodePortLabel.Name" xml:space="preserve">
+    <value>_nodePortLabel</value>
+  </data>
+  <data name="&gt;&gt;_nodePortLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodePortLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_nodePortLabel.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="_scriptArgsLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_scriptArgsLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_scriptArgsLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 173</value>
+  </data>
+  <data name="_scriptArgsLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>89, 13</value>
+  </data>
+  <data name="_scriptArgsLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="_scriptArgsLabel.Text" xml:space="preserve">
+    <value>脚本参数(&amp;G):</value>
+  </data>
+  <data name="&gt;&gt;_scriptArgsLabel.Name" xml:space="preserve">
+    <value>_scriptArgsLabel</value>
+  </data>
+  <data name="&gt;&gt;_scriptArgsLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_scriptArgsLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_scriptArgsLabel.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="_scriptArguments.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_scriptArguments.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_scriptArguments.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 173</value>
+  </data>
+  <data name="_scriptArguments.Size" type="System.Drawing.Size, System.Drawing">
+    <value>889, 20</value>
+  </data>
+  <data name="_scriptArguments.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;_scriptArguments.Name" xml:space="preserve">
+    <value>_scriptArguments</value>
+  </data>
+  <data name="&gt;&gt;_scriptArguments.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_scriptArguments.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_scriptArguments.ZOrder" xml:space="preserve">
+    <value>18</value>
+  </data>
+  <data name="_workingDirLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_workingDirLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_workingDirLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 216</value>
+  </data>
+  <data name="_workingDirLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>93, 13</value>
+  </data>
+  <data name="_workingDirLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="_workingDirLabel.Text" xml:space="preserve">
+    <value>工作目录(&amp;Y):</value>
+  </data>
+  <data name="&gt;&gt;_workingDirLabel.Name" xml:space="preserve">
+    <value>_workingDirLabel</value>
+  </data>
+  <data name="&gt;&gt;_workingDirLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_workingDirLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_workingDirLabel.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="_workingDir.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_workingDir.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_workingDir.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 216</value>
+  </data>
+  <data name="_workingDir.Size" type="System.Drawing.Size, System.Drawing">
+    <value>843, 20</value>
+  </data>
+  <data name="_workingDir.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;_workingDir.Name" xml:space="preserve">
+    <value>_workingDir</value>
+  </data>
+  <data name="&gt;&gt;_workingDir.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_workingDir.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_workingDir.ZOrder" xml:space="preserve">
+    <value>17</value>
+  </data>
+  <data name="_launchUrl.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_launchUrl.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_launchUrl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 260</value>
+  </data>
+  <data name="_launchUrl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>889, 20</value>
+  </data>
+  <data name="_launchUrl.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="&gt;&gt;_launchUrl.Name" xml:space="preserve">
+    <value>_launchUrl</value>
+  </data>
+  <data name="&gt;&gt;_launchUrl.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_launchUrl.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_launchUrl.ZOrder" xml:space="preserve">
+    <value>16</value>
+  </data>
+  <data name="_launchUrlLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_launchUrlLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_launchUrlLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 260</value>
+  </data>
+  <data name="_launchUrlLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>71, 13</value>
+  </data>
+  <data name="_launchUrlLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="_launchUrlLabel.Text" xml:space="preserve">
+    <value>启动 URL (&amp;U):</value>
+  </data>
+  <data name="&gt;&gt;_launchUrlLabel.Name" xml:space="preserve">
+    <value>_launchUrlLabel</value>
+  </data>
+  <data name="&gt;&gt;_launchUrlLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_launchUrlLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_launchUrlLabel.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <metadata name="_tooltip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="_envVars.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_envVars.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_envVars.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 390</value>
+  </data>
+  <data name="_envVars.Multiline" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_envVars.ScrollBars" type="System.Windows.Forms.ScrollBars, System.Windows.Forms">
+    <value>Both</value>
+  </data>
+  <data name="_envVars.Size" type="System.Drawing.Size, System.Drawing">
+    <value>889, 84</value>
+  </data>
+  <data name="_envVars.TabIndex" type="System.Int32, mscorlib">
+    <value>19</value>
+  </data>
+  <data name="&gt;&gt;_envVars.Name" xml:space="preserve">
+    <value>_envVars</value>
+  </data>
+  <data name="&gt;&gt;_envVars.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_envVars.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_envVars.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="_browsePath.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="_browsePath.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_browsePath.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="_browsePath.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_browsePath.Location" type="System.Drawing.Point, System.Drawing">
+    <value>1140, 42</value>
+  </data>
+  <data name="_browsePath.Size" type="System.Drawing.Size, System.Drawing">
+    <value>26, 23</value>
+  </data>
+  <data name="_browsePath.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="_browsePath.Text" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="&gt;&gt;_browsePath.Name" xml:space="preserve">
+    <value>_browsePath</value>
+  </data>
+  <data name="&gt;&gt;_browsePath.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_browsePath.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_browsePath.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="_browseDirectory.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="_browseDirectory.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_browseDirectory.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="_browseDirectory.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_browseDirectory.Location" type="System.Drawing.Point, System.Drawing">
+    <value>1140, 216</value>
+  </data>
+  <data name="_browseDirectory.Size" type="System.Drawing.Size, System.Drawing">
+    <value>26, 23</value>
+  </data>
+  <data name="_browseDirectory.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="_browseDirectory.Text" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="&gt;&gt;_browseDirectory.Name" xml:space="preserve">
+    <value>_browseDirectory</value>
+  </data>
+  <data name="&gt;&gt;_browseDirectory.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_browseDirectory.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_browseDirectory.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <metadata name="_nodeExeErrorProvider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>110, 17</value>
+  </metadata>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="$this.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
+    <value>GrowAndShrink</value>
+  </data>
+  <data name="_scriptLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_scriptLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_scriptLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 130</value>
+  </data>
+  <data name="_scriptLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>94, 13</value>
+  </data>
+  <data name="_scriptLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="_scriptLabel.Text" xml:space="preserve">
+    <value>脚本(启动文件) (&amp;S):</value>
+  </data>
+  <data name="&gt;&gt;_scriptLabel.Name" xml:space="preserve">
+    <value>_scriptLabel</value>
+  </data>
+  <data name="&gt;&gt;_scriptLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_scriptLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_scriptLabel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="_scriptFile.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="_scriptFile.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_scriptFile.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 130</value>
+  </data>
+  <data name="_scriptFile.Size" type="System.Drawing.Size, System.Drawing">
+    <value>889, 20</value>
+  </data>
+  <data name="_scriptFile.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;_scriptFile.Name" xml:space="preserve">
+    <value>_scriptFile</value>
+  </data>
+  <data name="&gt;&gt;_scriptFile.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_scriptFile.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_scriptFile.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="_envVarsLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_envVarsLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_envVarsLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 390</value>
+  </data>
+  <data name="_envVarsLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>115, 13</value>
+  </data>
+  <data name="_envVarsLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>18</value>
+  </data>
+  <data name="_envVarsLabel.Text" xml:space="preserve">
+    <value>环境变量(&amp;V):</value>
+  </data>
+  <data name="&gt;&gt;_envVarsLabel.Name" xml:space="preserve">
+    <value>_envVarsLabel</value>
+  </data>
+  <data name="&gt;&gt;_envVarsLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_envVarsLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_envVarsLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="_debuggerPort.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_debuggerPort.Location" type="System.Drawing.Point, System.Drawing">
+    <value>277, 346</value>
+  </data>
+  <data name="_debuggerPort.Size" type="System.Drawing.Size, System.Drawing">
+    <value>105, 20</value>
+  </data>
+  <data name="_debuggerPort.TabIndex" type="System.Int32, mscorlib">
+    <value>17</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPort.Name" xml:space="preserve">
+    <value>_debuggerPort</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPort.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPort.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPort.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="_debuggerPortLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="_debuggerPortLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="_debuggerPortLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>20, 346</value>
+  </data>
+  <data name="_debuggerPortLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>78, 13</value>
+  </data>
+  <data name="_debuggerPortLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>16</value>
+  </data>
+  <data name="_debuggerPortLabel.Text" xml:space="preserve">
+    <value>调试程序端口(&amp;D):</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPortLabel.Name" xml:space="preserve">
+    <value>_debuggerPortLabel</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPortLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPortLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;_debuggerPortLabel.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>1200, 550</value>
+  </data>
+  <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1200, 550</value>
+  </data>
+  <data name="&gt;&gt;_tooltip.Name" xml:space="preserve">
+    <value>_tooltip</value>
+  </data>
+  <data name="&gt;&gt;_tooltip.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolTip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeErrorProvider.Name" xml:space="preserve">
+    <value>_nodeExeErrorProvider</value>
+  </data>
+  <data name="&gt;&gt;_nodeExeErrorProvider.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ErrorProvider, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>NodejsGeneralPropertyPageControl</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.UserControl, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+</root>

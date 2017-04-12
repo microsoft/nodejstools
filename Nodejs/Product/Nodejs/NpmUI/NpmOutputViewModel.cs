@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -49,7 +50,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             style.Setters.Add(new Setter(Block.MarginProperty, new Thickness(0)));
             _output.Resources.Add(typeof(Paragraph), style);
 
-            _statusText = SR.GetString(SR.NpmStatusReady);
+            _statusText = Resources.NpmStatusReady;
 
             _worker = new Thread(Run);
             _worker.Name = "npm UI Execution";
@@ -98,9 +99,9 @@ namespace Microsoft.NodejsTools.NpmUI {
                     Pulse();
                 }
                 OnPropertyChanged();
-                OnPropertyChanged("ExecutionProgressVisibility");
-                OnPropertyChanged("ExecutionIdleVisibility");
-                OnPropertyChanged("IsCancellable");
+                OnPropertyChanged(nameof(ExecutionProgressVisibility));
+                OnPropertyChanged(nameof(ExecutionIdleVisibility));
+                OnPropertyChanged(nameof(IsCancellable));
             }
         }
 
@@ -147,7 +148,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             UpdateStatusMessage();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         private void QueueCommand(QueuedNpmCommandInfo info) {
@@ -161,7 +162,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             }
 
             UpdateStatusMessageSafe();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         public void QueueCommand(string arguments) {
@@ -169,7 +170,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         public void QueueCommand(string command, string arguments) {
-            QueueCommand(string.Format("{0} {1}", command, arguments));
+            QueueCommand(string.Format(CultureInfo.InvariantCulture, "{0} {1}", command, arguments));
         }
 
         public void QueueInstallPackage(
@@ -216,7 +217,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
         private void HandleCompletionSafe() {
             UpdateStatusMessage();
-            OnPropertyChanged("IsCancellable");
+            OnPropertyChanged(nameof(IsCancellable));
         }
 
         private void commander_CommandCompleted(object sender, NpmCommandCompletedEventArgs e) {
@@ -239,7 +240,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
 
         private string Preprocess(string source) {
-            return source.EndsWith(Environment.NewLine) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
+            return source.EndsWith(Environment.NewLine, StringComparison.Ordinal) ? source.Substring(0, source.Length - Environment.NewLine.Length) : source;
         }
 
         private void WriteLines(string text, bool forceError) {
@@ -306,21 +307,21 @@ namespace Microsoft.NodejsTools.NpmUI {
             if (executingCommand && null != command) {
                 var commandText = command.ToString();
                 if (count > 0) {
-                    status = SR.GetString(
-                        WithErrors ? SR.NpmStatusExecutingQueuedErrors : SR.NpmStatusExecutingQueued,
+                    status = string.Format(CultureInfo.CurrentCulture,
+                        WithErrors ? Resources.NpmStatusExecutingQueuedErrors : Resources.NpmStatusExecutingQueued,
                         commandText,
                         count,
-                        errorsInfo
-                    );
+                        errorsInfo);
                 } else {
-                    status = SR.GetString(
-                        WithErrors ? SR.NpmStatusExecutingErrors : SR.NpmStatusExecuting,
+                    status = string.Format(CultureInfo.CurrentCulture,
+                        WithErrors ? Resources.NpmStatusExecutingErrors : Resources.NpmStatusExecuting,
                         commandText,
-                        errorsInfo
-                    );
+                        errorsInfo);
                 }
             } else {
-                status = SR.GetString(WithErrors ? SR.NpmStatusReadyWithErrors : SR.NpmStatusReady, errorsInfo);
+                status = string.Format(CultureInfo.CurrentCulture,
+                    WithErrors ? Resources.NpmStatusReadyWithErrors : Resources.NpmStatusReady,
+                    errorsInfo);
             }
 
             StatusText = status;

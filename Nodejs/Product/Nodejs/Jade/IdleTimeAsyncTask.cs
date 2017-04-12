@@ -16,6 +16,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -158,7 +159,7 @@ namespace Microsoft.NodejsTools.Jade {
                             result = _taskAction();
                         } catch (Exception ex) {
                             Debug.Fail(
-                                String.Format("Background task exception {0}. Inner exception: {1}",
+                                string.Format(CultureInfo.CurrentCulture, "Background task exception {0}. Inner exception: {1}",
                                                            ex.Message,
                                                            ex.InnerException != null ? ex.InnerException.Message : "(none)")
                             );
@@ -184,7 +185,7 @@ namespace Microsoft.NodejsTools.Jade {
                 }
             } catch (Exception ex) {
                 Debug.Fail(
-                    String.Format("Background task UI thread callback exception {0}. Inner exception: {1}",
+                    string.Format(CultureInfo.CurrentCulture, "Background task UI thread callback exception {0}. Inner exception: {1}",
                                   ex.Message, ex.InnerException != null ? ex.InnerException.Message : "(none)"));
             }
 

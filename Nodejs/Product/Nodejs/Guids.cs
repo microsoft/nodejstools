@@ -18,16 +18,14 @@
 // MUST match guids.h
 using System;
 
-namespace Microsoft.NodejsTools
-{
+namespace Microsoft.NodejsTools {
     static class Guids {
         public const string NodejsPackageString = "FE8A8C3D-328A-476D-99F9-2A24B75F8C7F";
         public const string NodejsCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
-        //do not remove the curly braces. Without curly braces, in certain cases some language service features (e.g. snippets)  will fail to load because
-        //some comparisons in native code surround the guid string with curlies, and they'll fail to match unless we also surround the guid string with curlies.
+#if DEV14
         public const string NodejsLanguageInfoGuidString = "ABD5E8A5-5A35-4BE9-BCAF-E10C1212CB40";
-        public const string NodejsLanguageInfoString = "{" + NodejsLanguageInfoGuidString + "}";
+#endif
         public const string NodejsNpmCmdSetString = "9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA";
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
@@ -36,18 +34,12 @@ namespace Microsoft.NodejsTools
         public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
         public const string DefaultLanguageServiceString = "{8239BEC4-EE87-11D0-8C98-00C04FC2AB22}";
 
-        internal static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
-        internal static readonly Guid NodejsLanguageInfo = new Guid(NodejsLanguageInfoString);
- 
+        public static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
+
         //Guid for our formatting service
         internal const string JavaScriptFormattingServiceString = "F414C260-6AC0-11CF-B6D1-00AA00BBBB58";
 
         public const string ScriptDebugLanguageString = "{F7FA31DA-C32A-11D0-B442-00A0244A1DD2}";
-
-        // Profiling guids
-        public const string NodejsProfilingPkgString = "B515653F-FB69-4B64-9D3F-F1FCF8421DD0";
-        public const string NodejsProfilingCmdSetString = "3F2BC93C-CA2D-450B-9BFC-0C96288F1ED6";
-        public const string ProfilingEditorFactoryString = "3585dc22-81a0-409e-85ae-cae5d02d99cd";
 
         // Debug guids
         public const string DebugEngine = "FC5B45BA-5B9C-46EA-887A-82073AE065FE";
@@ -60,7 +52,7 @@ namespace Microsoft.NodejsTools
         public static readonly Guid NodejsNpmCmdSet = new Guid(NodejsNpmCmdSetString);
         public static readonly Guid TypeScriptLanguageInfo = new Guid(TypeScriptLanguageInfoString);
         public static readonly Guid TypeScriptDebugLanguage = new Guid(TypeScriptDebuggerLanguageInfoString);
-        
+
         public static readonly Guid ScriptDebugLanguage = new Guid(ScriptDebugLanguageString);
 
         public static readonly Guid VenusCommandId = new Guid("c7547851-4e3a-4e5b-9173-fa6e9c8bd82c");
@@ -68,13 +60,15 @@ namespace Microsoft.NodejsTools
         public static readonly Guid WebPackageCommandId = new Guid("822e3603-e573-47d2-acf0-520e4ce641c2");
         public static readonly Guid WebPackage = new Guid("d9a342d1-a429-4059-808a-e55ee6351f7f");
         public static readonly Guid WebAppCmdId = new Guid("CB26E292-901A-419c-B79D-49BD45C43929");
-                        
-        public static readonly Guid NodejsProfilingCmdSet = new Guid(NodejsProfilingCmdSetString);
+
         public static readonly Guid VsUIHierarchyWindow = new Guid("{7D960B07-7AF8-11D0-8E5E-00A0C911005A}");
-        public static readonly Guid ProfilingEditorFactory = new Guid(ProfilingEditorFactoryString);
+
         public static readonly Guid PerfPkg = new Guid("{F4A63B2A-49AB-4b2d-AA59-A10F01026C89}");
 
         public const string OfficeToolsBootstrapperCmdSetString = "{D26C976C-8EE8-4EC4-8746-F5F7702A17C5}";
         public static readonly Guid OfficeToolsBootstrapperCmdSet = new Guid(OfficeToolsBootstrapperCmdSetString);
+
+        // UWP project flavor guid
+        public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
     };
 }

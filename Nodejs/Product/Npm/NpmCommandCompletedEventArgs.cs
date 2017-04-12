@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 
 namespace Microsoft.NodejsTools.Npm {
 
@@ -32,7 +33,7 @@ namespace Microsoft.NodejsTools.Npm {
         public string Arguments { get; private set; }
 
         public string CommandText {
-            get { return string.IsNullOrEmpty(Arguments) ? "npm" : string.Format("npm {0}", Arguments); }
+            get { return string.IsNullOrEmpty(Arguments) ? "npm" : string.Format(CultureInfo.InvariantCulture, "npm {0}", Arguments); }
         }
 
         /// <summary>

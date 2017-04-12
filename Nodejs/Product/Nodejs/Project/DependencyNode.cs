@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Npm;
@@ -229,7 +230,7 @@ namespace Microsoft.NodejsTools.Project {
                         } catch (Exception ex) {
                             if (ex is InvalidOperationException || ex is Win32Exception) {
                                 MessageBox.Show(
-                                    String.Format("Path to module does not exist:\n {0}", path),
+                                    string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeModuleDoesNotExist, path),
                                     SR.ProductName,
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
@@ -249,13 +250,14 @@ namespace Microsoft.NodejsTools.Project {
         private static string GetInitialPackageDisplayString(IPackage package) {
             var buff = new StringBuilder(package.Name);
             if (package.IsMissing) {
-                buff.Append(" (missing)");
+                buff.Append(string.Format(CultureInfo.CurrentCulture, " ({0})", Resources.DependencyNodeLabelMissing));
             } else {
                 buff.Append('@');
                 buff.Append(package.Version);
 
                 if (!package.IsListedInParentPackageJson) {
-                    buff.AppendFormat(" (not listed in {0})", NodejsConstants.PackageJsonFile);
+                    buff.AppendFormat(string.Format(CultureInfo.CurrentCulture, " ({0})",
+                        string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeLabelNotListed, NodejsConstants.PackageJsonFile)));
                 } else {
                     var dependencyTypes = GetDependencyTypeNames(package);
                     if (package.IsDevDependency || package.IsOptionalDependency) {
@@ -267,7 +269,8 @@ namespace Microsoft.NodejsTools.Project {
             }
 
             if (package.IsBundledDependency) {
-                buff.Append("[bundled]");
+                buff.Append(string.Format(CultureInfo.CurrentCulture, "[{0}]",
+                    Resources.DependencyNodeLabelBundled));
             }
             return buff.ToString();
         }

@@ -67,8 +67,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.$(VSTarget), Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="PerfPkg, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <Private>false</Private>
       <SpecificVersion>False</SpecificVersion>
@@ -86,6 +84,19 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <Choose>
+    <When Condition="$(VSTarget) == '15.0'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+        <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" Condition="'$(VSTarget)' != '10.0'" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <Choose>
     <When Condition="'$(VSTarget)' == '14.0' Or '$(VSTarget)' == '15.0'">
       <ItemGroup>
@@ -106,6 +117,10 @@
     <Compile Include="..\Nodejs\Guids.cs">
       <Link>Guids.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\NodejsConstants.cs">
+      <Link>NodejsConstants.cs</Link>
+    </Compile>
+    <Compile Include="ProfilingGuids.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DialogWindowVersioningWorkaround.cs" />
     <Compile Include="NativeMethods.cs" />
@@ -147,7 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
@@ -211,6 +226,9 @@
     <RegisterWithCodebase>true</RegisterWithCodebase>
   </PropertyGroup>
   <PropertyGroup>
+    <IsProductComponent>true</IsProductComponent>
+    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
+    <ExtensionInstallationFolder>Microsoft\NodeJsTools\Profiling</ExtensionInstallationFolder>
     <CreateVsixContainer>True</CreateVsixContainer>
     <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
   </PropertyGroup>

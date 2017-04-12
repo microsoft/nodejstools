@@ -66,12 +66,22 @@ namespace Microsoft.NodejsTools {
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
     [ProvideOptionPage(typeof(NodejsNpmOptionsPage), "Node.js Tools", "Npm", 114, 116, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId, setNextStatement: false, hitCountBp: true, justMyCodeStepping: false)]
+#if DEV14
     [ProvideLanguageService(typeof(NodejsLanguageInfo), NodejsConstants.Nodejs, 106, RequestStockColors = true, ShowSmartIndent = true, ShowCompletion = true, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = true, EnableAdvancedMembersOption = true, ShowDropDownOptions = true)]
+#endif
     [ProvideDebugLanguage(NodejsConstants.Nodejs, Guids.NodejsDebugLanguageString, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
-    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.JavaScript, SortPriority=0x17)]   // outer flavor, no file extension
+    [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath",
+#if DEV14
+        LanguageVsTemplate = NodejsConstants.JavaScript,
+#else
+        LanguageVsTemplate = NodejsConstants.Nodejs,
+#endif
+        SortPriority = 0x17)]   // outer flavor, no file extension
     [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
-    [ProvideMenuResource(1000, 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
+    [ProvideMenuResource("Menus.ctmenu", 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
+    [WebSiteProject("JavaScript", "JavaScript")]
+    [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
     [ProvideTextEditorAutomation(NodejsConstants.Nodejs, 106, 102, ProfileMigrationType.PassThrough)]
     [ProvideLanguageService(typeof(JadeLanguageInfo), JadeContentTypeDefinition.JadeLanguageName, 3041, RequestStockColors = true, ShowSmartIndent = false, ShowCompletion = false, DefaultToInsertSpaces = true, HideAdvancedMembersByDefault = false, EnableAdvancedMembersOption = false, ShowDropDownOptions = false)]
@@ -155,7 +165,7 @@ namespace Microsoft.NodejsTools {
 
         /////////////////////////////////////////////////////////////////////////////
         // Overridden Package Implementation
-        #region Package Members
+#region Package Members
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -167,7 +177,7 @@ namespace Microsoft.NodejsTools {
 
             if (!_hasRequiredTypescriptVersion.Value) {
                 MessageBox.Show(
-                   Project.SR.GetString(Project.SR.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
+                   string.Format(CultureInfo.CurrentCulture, Resources.TypeScriptMinVersionNotInstalled, _minRequiredTypescriptVersion.ToString()),
                    Project.SR.ProductName,
                    MessageBoxButtons.OK,
                    MessageBoxIcon.Error);
@@ -178,10 +188,10 @@ namespace Microsoft.NodejsTools {
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = true; },
                 delegate { NewProjectFromExistingWizard.IsAddNewProjectCmd = false; }
             );
-
+#if DEV14
             var langService = new NodejsLanguageInfo(this);
             ((IServiceContainer)this).AddService(langService.GetType(), langService, true);
-
+#endif
             ((IServiceContainer)this).AddService(typeof(ClipboardServiceBase), new ClipboardService(), true);
 
             RegisterProjectFactory(new NodejsProjectFactory(this));
@@ -215,9 +225,14 @@ namespace Microsoft.NodejsTools {
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
 
 #if DEV15
-            var root = Environment.GetEnvironmentVariable("VsInstallRoot");
-            if (!string.IsNullOrEmpty(root)) {
-                Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
+            var devenvPath = Environment.GetEnvironmentVariable("VSAPPIDDIR");
+            if (!string.IsNullOrEmpty(devenvPath)) {
+                try {
+                    var root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(devenvPath), @"..\.."));
+                    Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable, root);
+                } catch (Exception) {
+                    // noop
+                }
             }
 #endif
         }
@@ -292,8 +307,8 @@ namespace Microsoft.NodejsTools {
             if (window == null) {
                 window = (IReplWindow2)provider.CreateReplWindow(
                     ReplContentType,
-                    "Node.js Interactive Window",
-                    typeof(NodejsLanguageInfo).GUID,
+                    Resources.InteractiveWindowTitle,
+                    Guids.TypeScriptLanguageInfo,
                     NodejsReplEvaluatorProvider.NodeReplId
                 );
             }
@@ -329,13 +344,13 @@ namespace Microsoft.NodejsTools {
         private IContentType ReplContentType {
             get {
                 if (_contentType == null) {
-                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.Nodejs);
+                    _contentType = ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
                 return _contentType;
             }
         }
 
-        #endregion
+#endregion
 
         internal override VisualStudioTools.Navigation.LibraryManager CreateLibraryManager(CommonPackage package) {
             return new NodejsLibraryManager(this);
@@ -522,7 +537,7 @@ namespace Microsoft.NodejsTools {
                 case SurveyNewsPolicy.CheckOnceMonth:
                     return elapsedTime.TotalDays >= 30;
                 default:
-                    Debug.Assert(false, String.Format("Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
+                    Debug.Assert(false, string.Format(CultureInfo.CurrentCulture, "Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
                     return false;
             }
         }
@@ -567,7 +582,7 @@ namespace Microsoft.NodejsTools {
                     throw;
                 }
 
-                Debug.WriteLine(string.Format("Failed to obtain TypeScript tools version: {0}", ex.ToString()));
+                Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Failed to obtain TypeScript tools version: {0}", ex.ToString()));
             }
 
             return toolsVersion;

@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
@@ -26,15 +27,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         private int GetExactKeywordMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower() == _filterString);
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture) == _filterString);
         }
 
         private int GetStartsWithMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().StartsWith(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).StartsWith(_filterString, StringComparison.Ordinal));
         }
 
         private int GetPartialKeywordMatchCount(IPackage source) {
-            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower().Contains(_filterString));
+            return source.Keywords == null ? 0 : source.Keywords.Count(keyword => keyword.ToLower(CultureInfo.InvariantCulture).Contains(_filterString));
         }
 
         private new int CompareBasedOnKeywords(IPackage x, IPackage y) {
@@ -105,8 +106,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             }
 
             // Matches at the beginning are better than matches in the string
-            if (x.Name.StartsWith(_filterString)) {
-                if (y.Name.StartsWith(_filterString)) {
+            if (x.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
+                if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
                     var result = string.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
                     return 0 == result ? CompareBasedOnDescriptions(x, y) : result;
                 }
@@ -114,7 +115,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                 return -1;
             }
                 
-            if (y.Name.StartsWith(_filterString)) {
+            if (y.Name.StartsWith(_filterString, StringComparison.CurrentCulture)) {
                 return 1;
             }
                 

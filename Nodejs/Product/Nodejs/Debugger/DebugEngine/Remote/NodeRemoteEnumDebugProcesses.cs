@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -87,7 +88,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
                         // Send "disconnect" request.
                         string request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
-                        request = string.Format("Content-Length: {0}\r\n\r\n{1}", request.Length, request);
+                        request = string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n{1}", request.Length, request);
                         buffer = Encoding.UTF8.GetBytes(request);
                         stream.WriteAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
 
@@ -125,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                 } catch (PlatformNotSupportedException) {
                     LiveLogger.WriteLine("PlatformNotSupportedException connecting to remote debugger");
                     MessageBox.Show(
-                        "Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.",
+                        Resources.RemoteDebugUnsupportedPlatformErrorMessage,
                         null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
@@ -136,20 +137,15 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     }
                 }
 
-                string errText = string.Format(
-                    "Could not attach to Node.js process at {0}{1}\r\n\r\n",
+                string errText = string.Format(CultureInfo.CurrentCulture,
+                    Resources.RemoteDebugCouldNotAttachErrorMessage,
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
                 if (!(exception is DebuggerAlreadyAttachedException)) {
                     if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss") {
-                        errText +=
-                            "Make sure that the Azure web site is deployed in the Debug configuration, and web sockets " +
-                            "are enabled for it in the Azure management portal.";
+                        errText += Resources.RemoteDebugEnableWebSocketsErrorMessage;
                     } else {
-                        errText += string.Format(
-                            "Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), " +
-                            "and the debugger port (default {0}) is open on the target host.",
-                            NodejsConstants.DefaultDebuggerPort);
+                        errText += string.Format(CultureInfo.CurrentCulture, Resources.RemoteDebugCheckProxyAndPortErrorMessage, NodejsConstants.DefaultDebuggerPort);
                     }
                 }
 

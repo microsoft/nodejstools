@@ -54,64 +54,64 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodeExePath)]
-        [SRDescriptionAttribute(SR.NodeExePathDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NodeExePath))]
+        [ResourcesDescription(nameof(Resources.NodeExePathDescription))]
         public string NodeExePath {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     return Nodejs.GetAbsoluteNodeExePath(
                         ProjectHome,
-                        Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExePath, true));
+                        Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExePath, true));
                 });
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExePath, value);
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
                 });
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodeExeArguments)]
-        [SRDescriptionAttribute(SR.NodeExeArgumentsDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NodeExeArguments))]
+        [ResourcesDescription(nameof(Resources.NodeExeArgumentsDescription))]
         public string NodeExeArguments {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodeExeArguments, true);
+                    return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodeExeArguments, true);
                 });
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodeExeArguments, value);
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
                 });
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
+        [SRCategory(SR.General)]
         [SRDisplayName(SR.ScriptArguments)]
-        [SRDescriptionAttribute(SR.ScriptArgumentsDescription)]
+        [SRDescription(SR.ScriptArgumentsDescription)]
         public string ScriptArguments {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.ScriptArguments, true);
+                    return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.ScriptArguments, true);
                 });
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.ScriptArguments, value);
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.ScriptArguments, value);
                 });
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NodejsPort)]
-        [SRDescriptionAttribute(SR.NodejsPortDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NodejsPort))]
+        [ResourcesDescription(nameof(Resources.NodejsPortDescription))]
         public int? NodejsPort {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() => {
                     int port;
-                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.NodejsPort, true), out port)) {
+                    if (Int32.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port)) {
                         return port;
                     }
                     return null;
@@ -119,35 +119,35 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.NodejsPort, value != null ? value.ToString() : String.Empty);
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodejsPort, value != null ? value.ToString() : String.Empty);
                 });
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
+        [SRCategory(SR.General)]
         [SRDisplayName(SR.LaunchUrl)]
-        [SRDescriptionAttribute(SR.LaunchUrlDescription)]
+        [SRDescription(SR.LaunchUrlDescription)]
         public string LaunchUrl {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    return this.Node.ProjectMgr.GetProjectProperty(NodejsConstants.LaunchUrl, true);
+                    return this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.LaunchUrl, true);
                 });
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.LaunchUrl, value);
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.LaunchUrl, value);
                 });
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
+        [SRCategory(SR.General)]
         [SRDisplayName(SR.StartWebBrowser)]
-        [SRDescriptionAttribute(SR.StartWebBrowserDescription)]
+        [SRDescription(SR.StartWebBrowserDescription)]
         public bool StartWebBrowser {
             get {
                 return HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
                     bool res;
-                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodejsConstants.StartWebBrowser, true), out res)) {
+                    if (Boolean.TryParse(Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res)) {
                         return res;
                     }
                     return true;
@@ -155,7 +155,7 @@ namespace Microsoft.NodejsTools.Project {
             }
             set {
                 HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() => {
-                    Node.ProjectMgr.SetProjectProperty(NodejsConstants.StartWebBrowser, value.ToString());
+                    Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.StartWebBrowser, value.ToString());
                 });
             }
         }

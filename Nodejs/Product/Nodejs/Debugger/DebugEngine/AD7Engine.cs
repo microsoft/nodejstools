@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -31,7 +32,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     // AD7Engine is the primary entrypoint object for the debugging engine. 
@@ -84,11 +84,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         /// Specifies whether the process should prompt for input before exiting on a normal exit.
         /// </summary>
         public const string WaitOnNormalExitSetting = "WAIT_ON_NORMAL_EXIT";
-
-        /// <summary>
-        /// Specifies if the output should be redirected to the visual studio output window.
-        /// </summary>
-        public const string RedirectOutputSetting = "REDIRECT_OUTPUT";
 
         /// <summary>
         /// Specifies options which should be passed to the Node runtime before the script.  If
@@ -517,18 +512,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                                     debugOptions |= NodeDebugOptions.WaitOnNormalExit;
                                 }
                                 break;
-                            case RedirectOutputSetting:
-                                if (Boolean.TryParse(setting[1], out value) && value) {
-                                    debugOptions |= NodeDebugOptions.RedirectOutput;
-                                }
-                                break;
                             case DirMappingSetting:
                                 string[] dirs = setting[1].Split('|');
                                 if (dirs.Length == 2) {
                                     if (dirMapping == null) {
                                         dirMapping = new List<string[]>();
                                     }
-                                    LiveLogger.WriteLine(String.Format("Mapping dir {0} to {1}", dirs[0], dirs[1]));
+                                    LiveLogger.WriteLine(string.Format(CultureInfo.CurrentCulture, "Mapping dir {0} to {1}", dirs[0], dirs[1]));
                                     dirMapping.Add(dirs);
                                 }
                                 break;
@@ -565,9 +555,10 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
 
             AttachEvents(_process);
 
-            var adProcessId = new AD_PROCESS_ID();
-            adProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-            adProcessId.dwProcessId = (uint)_process.Id;
+            var adProcessId = new AD_PROCESS_ID() {
+                ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM,
+                dwProcessId = (uint)_process.Id
+            };
 
             EngineUtils.RequireOk(port.GetProcess(adProcessId, out process));
             LiveLogger.WriteLine("AD7Engine LaunchSuspended returning S_OK");
@@ -1243,7 +1234,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if (String.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase)) {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
-                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
+                    statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
                     return;
                 }
             }
@@ -1252,7 +1243,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 var currentProcess = Process;
                 if (currentProcess == null || !await currentProcess.UpdateModuleSourceAsync(module).ConfigureAwait(false)) {
                     var statusBar = (IVsStatusbar)ServiceProvider.GlobalProvider.GetService(typeof(SVsStatusbar));
-                    statusBar.SetText(SR.GetString(SR.DebuggerModuleUpdateFailed));
+                    statusBar.SetText(Resources.DebuggerModuleUpdateFailed);
                 }
             });
         }

@@ -14,6 +14,8 @@
 //
 //*********************************************************//
 
+using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudioTools.Project;
 
@@ -58,7 +60,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     typeName = NodeVariableType.Number;
                     int intValue;
                     if (int.TryParse(stringValue, out intValue)) {
-                        hexValue = string.Format("0x{0:x}", intValue);
+                        hexValue = string.Format(CultureInfo.InvariantCulture, "0x{0:x}", intValue);
                     }
                     break;
 
@@ -75,7 +77,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 case "function":
-                    stringValue = string.IsNullOrEmpty(variable.Text) ? string.Format("{{{0}}}", NodeVariableType.Function) : variable.Text;
+                    stringValue = string.IsNullOrEmpty(variable.Text) ? string.Format(CultureInfo.InvariantCulture, "{{{0}}}", NodeVariableType.Function) : variable.Text;
                     typeName = NodeVariableType.Function;
                     type |= NodeExpressionType.Function | NodeExpressionType.Expandable;
                     break;
@@ -87,14 +89,14 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
                     break;
 
                 case "object":
-                    stringValue = variable.Class == NodeVariableType.Object ? "{...}" : string.Format("{{{0}}}", variable.Class);
+                    stringValue = variable.Class == NodeVariableType.Object ? "{...}" : string.Format(CultureInfo.InvariantCulture, "{{{0}}}", variable.Class);
                     typeName = NodeVariableType.Object;
                     type |= NodeExpressionType.Expandable;
                     break;
 
                 case "error":
                     stringValue = variable.Value ?? variable.Text;
-                    if (!string.IsNullOrEmpty(stringValue) && stringValue.StartsWith("Error: ")) {
+                    if (!string.IsNullOrEmpty(stringValue) && stringValue.StartsWith("Error: ", StringComparison.Ordinal)) {
                         stringValue = stringValue.Substring(7);
                     }
                     typeName = NodeVariableType.Error;
@@ -126,12 +128,12 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             // Generates a parent name
             const string prototypeSuffix = "." + NodeVariableType.Prototype;
             var parentName = parent.FullName;
-            if (parentName.EndsWith(prototypeSuffix)) {
+            if (parentName.EndsWith(prototypeSuffix, StringComparison.Ordinal)) {
                 parentName = parentName.Remove(parentName.Length - prototypeSuffix.Length);
             }
 
             // Generates a full name
-            fullName = string.Format(VariableNameValidator.IsMatch(name) ? @"{0}.{1}" : @"{0}[""{1}""]", parentName, name);
+            fullName = string.Format(CultureInfo.InvariantCulture, VariableNameValidator.IsMatch(name) ? @"{0}.{1}" : @"{0}[""{1}""]", parentName, name);
 
             if (parent.TypeName != NodeVariableType.Object) {
                 return fullName;
@@ -140,7 +142,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization {
             // Checks whether name points on array element
             int indexer;
             if (int.TryParse(name, out indexer)) {
-                name = string.Format("[{0}]", indexer);
+                name = string.Format(CultureInfo.InvariantCulture, "[{0}]", indexer);
                 fullName = parent.FullName + name;
             }
 

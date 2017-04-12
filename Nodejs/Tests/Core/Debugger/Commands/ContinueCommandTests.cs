@@ -17,6 +17,7 @@
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Globalization;
 
 namespace NodejsTests.Debugger.Commands {
     [TestClass]
@@ -35,7 +36,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"continue\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"stepaction\":\"{1}\",\"stepcount\":1}}}}",
-                    commandId, stepping.ToString().ToLower()),
+                    commandId, stepping.ToString().ToLower(CultureInfo.InvariantCulture)),
                 continueCommand.ToString());
         }
 
@@ -54,7 +55,7 @@ namespace NodejsTests.Debugger.Commands {
             Assert.AreEqual(
                 string.Format(
                     "{{\"command\":\"continue\",\"seq\":{0},\"type\":\"request\",\"arguments\":{{\"stepaction\":\"{1}\",\"stepcount\":{2}}}}}",
-                    commandId, stepping.ToString().ToLower(), stepCount),
+                    commandId, stepping.ToString().ToLower(CultureInfo.InvariantCulture), stepCount),
                 continueCommand.ToString());
         }
     }

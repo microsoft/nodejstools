@@ -84,6 +84,10 @@ namespace Microsoft.NodejsTools.Options {
             }
 
             // Save settings.
+#if DEV14
+            // This setting needs to be present for the TypeScript editor to handle .js files in NTVS
+            SaveString("AnalysisLevel", "Preview");
+#endif
             SaveBool(EnableAutomaticTypingsAcquisitionSetting, EnableAutomaticTypingsAcquisition);
             SaveBool(ShowTypingsInfoBarSetting, ShowTypingsInfoBar);
             SaveBool(SaveChangesToConfigFileSetting, SaveChangesToConfigFile);

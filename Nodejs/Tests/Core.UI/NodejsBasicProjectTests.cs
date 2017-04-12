@@ -111,7 +111,7 @@ while(true) {{
 
             var project = Project("DebuggerPort",
                 Compile("server", code),
-                Property(NodejsConstants.DebuggerPort, "1234"),
+                Property(NodeProjectProperty.DebuggerPort, "1234"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -144,7 +144,7 @@ while(true) {{
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
+                Property(NodeProjectProperty.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -176,7 +176,7 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
             var project = Project("EnvironmentVariables",
                 Compile("server", code),
-                Property(NodejsConstants.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
+                Property(NodeProjectProperty.Environment, "fob=1\nbar=2;3\r\nbaz=4"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -202,8 +202,8 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
             var project = Project("ProjectProperties",
                 Compile("server"),
-                Property(NodejsConstants.Environment, "fob=1\r\nbar=2;3\nbaz=4"),
-                Property(NodejsConstants.DebuggerPort, "1234"),
+                Property(NodeProjectProperty.Environment, "fob=1\r\nbar=2;3\nbaz=4"),
+                Property(NodeProjectProperty.DebuggerPort, "1234"),
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
@@ -246,274 +246,6 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
                 var projFile = File.ReadAllText(solution.GetProject("ProjectProperties").FullName);
                 Assert.AreNotEqual(-1, projFile.IndexOf("<DebuggerPort>2468</DebuggerPort>"));
                 Assert.AreNotEqual(-1, projFile.IndexOf("<Environment>fob=0\r\nbar=0;0\r\nbaz=0</Environment>"));
-            }
-        }
-
-        [TestMethod, Priority(0), TestCategory("Core")]
-        [HostType("VSTestHost")]
-        public void ClientServerIntelliSenseModes() {
-            string
-                solutionLabel = "Solution 'ClientServerCode' (1 project)",
-                projectLabel = "ClientServerCode",
-                nodeDirectoryLabel = NodejsFolderNode.AppendLabel("NodeDirectory", FolderContentType.Node),
-                nodeSubDirectoryLabel = NodejsFolderNode.AppendLabel("NodeSubDirectory", FolderContentType.Node),
-                browserDirectoryLabel = NodejsFolderNode.AppendLabel("BrowserDirectory", FolderContentType.Browser),
-                emptyBrowserSubDirectoryLabel = "BrowserSubDirectory",
-                browserSubDirectoryLabel = NodejsFolderNode.AppendLabel("BrowserSubDirectory", FolderContentType.Browser),
-                mixedDirectoryLabel = NodejsFolderNode.AppendLabel("MixedDirectory", FolderContentType.Mixed),
-                mixedDirectoryBrowserDirectoryLabel = NodejsFolderNode.AppendLabel("BrowserDirectory", FolderContentType.Browser),
-                mixedDirectoryNodeDirectoryLabel = NodejsFolderNode.AppendLabel("NodeDirectory", FolderContentType.Node),
-                browserCodeLabel = "browserCode.js",
-                mixedDirectoryRenamedLabel = NodejsFolderNode.AppendLabel("MixedDirectoryRenamed", FolderContentType.Mixed);
-
-            using (var app = new VisualStudioApp()) {
-                var project = app.OpenProject(@"TestData\ClientServerCode\ClientServerCode.sln");
-
-                using (new NodejsOptionHolder(NodejsPackage.Instance.GeneralOptionsPage, "ShowBrowserAndNodeLabels", true)) {
-                    // Wait until project is loaded
-                    var solutionExplorer = app.OpenSolutionExplorer();
-
-                    solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        "app.js");
-
-                    var nodejsProject = app.GetProject("ClientServerCode").GetNodejsProject();
-
-                    var projectNode = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel);
-
-                    var browserDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel
-                        );
-                    Assert.IsNotNull(
-                        browserDirectory,
-                        "Browser directories should be labeled as such. Could not find " + browserDirectoryLabel);
-
-                    var browserSubDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel,
-                        emptyBrowserSubDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        browserSubDirectory,
-                        "Project initialization: could not find " + emptyBrowserSubDirectoryLabel);
-
-                    var nodeDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        nodeDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        nodeDirectory,
-                        "Node directories should be labeled as such. Could not find " + nodeDirectoryLabel);
-
-                    var nodeSubDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        nodeDirectoryLabel,
-                        nodeSubDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        nodeSubDirectory,
-                        "Project initialization: could not find " + nodeSubDirectoryLabel);
-
-                    projectNode.Select();
-                    using (var newItem = NewItemDialog.FromDte(app)) {
-                        newItem.FileName = "newItem.js";
-                        newItem.OK();
-                    }
-
-                    Assert.AreEqual(
-                        "Compile",
-                        nodejsProject.GetItemType("newItem.js"),
-                        "Top level files should be set to item type 'Compile'");
-
-                    Keyboard.Type("process.");
-                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
-
-                    using (var session = app.GetDocument(Path.Combine(nodejsProject.ProjectHome, @"newItem.js")).WaitForSession<ICompletionSession>()) {
-                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                        Assert.IsTrue(
-                            completions.Contains("env"),
-                            "New documents of the node type should open with default VS editor"
-                            );
-                    }
-
-                    browserSubDirectory.Select();
-                    using (var newBrowserItem = NewItemDialog.FromDte(app)) {
-                        newBrowserItem.FileName = "newBrowserItem.js";
-                        newBrowserItem.OK();
-                    }
-
-                    Keyboard.Type("document.");
-                    System.Threading.Thread.Sleep(2000);
-                    Keyboard.Type(Keyboard.CtrlSpace.ToString());
-
-                    using (var session = app.GetDocument(Path.Combine(nodejsProject.ProjectHome, @"BrowserDirectory\browserSubDirectory\newBrowserItem.js")).WaitForSession<ICompletionSession>()) {
-                        var completions = session.Session.CompletionSets.First().Completions.Select(x => x.InsertionText);
-                        Assert.IsTrue(
-                            completions.Contains("body"),
-                            "New documents of the browser type should open with default VS editor"
-                            );
-                    }
-
-                    browserSubDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel,
-                        browserSubDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        browserSubDirectory,
-                        "Folder label was not updated to " + browserSubDirectoryLabel);
-
-                    var newBrowserItemFile = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel,
-                        browserSubDirectoryLabel,
-                        "newBrowserItem.js"
-                    );
-                    Assert.AreEqual(
-                        "Content",
-                        nodejsProject.GetItemType(@"BrowserDirectory\BrowserSubDirectory\newBrowserItem.js"),
-                        "Adding a javascript file to a 'browser' directory should set the item type as Content.");
-
-                    var mixedDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        mixedDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        mixedDirectory,
-                        "Folder with mixed browser/node content should be specified as such. Could not find: " + mixedDirectoryLabel);
-
-                    nodeDirectory.Select();
-                    using (var newTypeScriptItem = NewItemDialog.FromDte(app)) {
-                        newTypeScriptItem.FileName = "newTypeScriptItem.ts";
-                        newTypeScriptItem.OK();
-                    }
-
-                    Assert.AreEqual(
-                        "TypeScriptCompile",
-                        nodejsProject.GetItemType(@"NodeDirectory\newTypeScriptItem.ts"),
-                        "Non-javascript files should retain their content type.");
-
-                    var newBrowserItemNode = nodejsProject.FindNodeByFullPath(
-                        Path.Combine(nodejsProject.ProjectHome, @"BrowserDirectory\BrowserSubDirectory\newBrowserItem.js")
-                    );
-
-                    newBrowserItemNode.ExcludeFromProject();
-                    var excludedBrowserItem = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel,
-                        emptyBrowserSubDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        emptyBrowserSubDirectoryLabel,
-                        "Label should be removed when there are no included javascript files the directory. Could not find " + emptyBrowserSubDirectoryLabel);
-
-                    (newBrowserItemNode as NodejsFileNode).IncludeInProject(false);
-                    var includedBrowserItem = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        browserDirectoryLabel,
-                        browserSubDirectoryLabel
-                    );
-                    Assert.IsNotNull(
-                        includedBrowserItem,
-                        "Label should be added when a javascript file is included in the directory. Could not find " + browserSubDirectoryLabel);
-
-                    var mixedDirectoryNode = app.GetProject("ClientServerCode").GetNodejsProject().FindNodeByFullPath(
-                        Path.Combine(nodejsProject.ProjectHome, @"MixedDirectory\"));
-
-                    System.Threading.Thread.Sleep(2000);
-                    mixedDirectory.Select();
-                    Keyboard.PressAndRelease(Key.F2);
-                    Keyboard.Type("MixedDirectoryRenamed");
-                    Keyboard.PressAndRelease(Key.Enter);
-
-                    mixedDirectoryNode.ExpandItem(EXPANDFLAGS.EXPF_ExpandFolderRecursively);
-                    var renamedMixedDirectory = solutionExplorer.WaitForItem(
-                       solutionLabel,
-                       projectLabel,
-                       mixedDirectoryRenamedLabel,
-                       mixedDirectoryBrowserDirectoryLabel,
-                       browserCodeLabel
-                   );
-
-                    Assert.IsNotNull(
-                        renamedMixedDirectory,
-                        "Renaming mixed directory failed: could not find " + browserCodeLabel);
-
-                    newBrowserItemNode.ItemNode.ItemTypeName = "Compile";
-
-                    var nodeBrowserSubDirectory = solutionExplorer.WaitForItem(
-                          solutionLabel,
-                          projectLabel,
-                          NodejsFolderNode.AppendLabel("BrowserDirectory", FolderContentType.Mixed),
-                          NodejsFolderNode.AppendLabel("BrowserSubDirectory", FolderContentType.Node)
-                    );
-                    Assert.IsNotNull(
-                        nodeBrowserSubDirectory,
-                        "Changing the item type should change the directory label. Could not find " +
-                        NodejsFolderNode.AppendLabel("BrowserSubDirectory", FolderContentType.Node)
-                        );
-
-                    var nodeDirectoryNode = app.GetProject("ClientServerCode").GetNodejsProject().FindNodeByFullPath(
-                        Path.Combine(app.GetProject("ClientServerCode").GetNodejsProject().ProjectHome,
-                        @"NodeDirectory\"));
-                    (nodeDirectoryNode as NodejsFolderNode).SetItemTypeRecursively(VSLangProj.prjBuildAction.prjBuildActionContent);
-
-                    Assert.AreEqual(
-                        "Content",
-                        nodejsProject.GetItemType(@"NodeDirectory\NodeSubDirectory\nodeCode.js"),
-                        "nodeCode.js file should be marked as content after recursively setting directory contents as Content."
-                    );
-                    Assert.AreEqual(
-                        "TypeScriptCompile",
-                        nodejsProject.GetItemType(@"NodeDirectory\newTypeScriptItem.ts"),
-                        "Only javascript file item types should change when marking item types recursively."
-                    );
-
-                    var fromPoint = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        mixedDirectoryRenamedLabel,
-                        mixedDirectoryNodeDirectoryLabel
-                    ).GetClickablePoint();
-
-                    var toPoint = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        mixedDirectoryRenamedLabel,
-                        mixedDirectoryBrowserDirectoryLabel
-                    ).GetClickablePoint();
-
-                    Mouse.MoveTo(fromPoint);
-                    Mouse.Down(MouseButton.Left);
-
-                    Mouse.MoveTo(toPoint);
-                    Mouse.Up(MouseButton.Left);
-
-                    var draggedDirectory = solutionExplorer.WaitForItem(
-                        solutionLabel,
-                        projectLabel,
-                        mixedDirectoryRenamedLabel,
-                        NodejsFolderNode.AppendLabel("BrowserDirectory", FolderContentType.Mixed),
-                        NodejsFolderNode.AppendLabel("NodeDirectory", FolderContentType.Node)
-                    );
-                    Assert.IsNotNull(
-                        draggedDirectory,
-                        "Labels not properly updated after dragging and dropping directory."
-                    );
-                }
             }
         }
     }

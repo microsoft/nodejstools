@@ -49,7 +49,12 @@
   </PropertyGroup>
 
   <!-- Import the normal VS SDK headers -->
-  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" />
+  <ImportGroup Condition="Exists('$(DevEnvDir)..\..\VSSDK')">
+    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\VSSDK\Microsoft.VsSDK.targets" />
+  </ImportGroup>
+  <ImportGroup Condition="!Exists('$(DevEnvDir)..\..\VSSDK')">
+    <Import Project="$(VSSDKInstall)\Microsoft.VsSDK.targets" />
+  </ImportGroup>
 
   <!-- For non-debug builds, don't copy debug symbols -->
   <Target Name="_ClearVSIXSourceItemLocalOnly"
@@ -165,7 +170,6 @@
     </ItemGroup>
   </Target>
 
-
   <!--
   Zip folders containing VSIX files. These folders must have been created
   by previously having built the project.
@@ -181,6 +185,12 @@
         <SourcePath>$(SignedBinariesPath)\%(VSIXBinaries.Filename)%(VSIXBinaries.Extension)</SourcePath>
       </VSIXBinaries>
       <VSIXSignedBinaries Include="@(VSIXBinaries)" Condition="Exists(%(VSIXBinaries.SourcePath))" />
+      
+      <VSIXBinariesLoc Include="$(CopyVsixExtensionRoot)**\*.resources.dll" />
+      <VSIXBinariesLoc>
+        <SourcePath>$(SignedBinariesPath)\$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName(%(VSIXBinariesLoc.FullPath)))))\%(VSIXBinariesLoc.Filename)%(VSIXBinariesLoc.Extension)</SourcePath>
+      </VSIXBinariesLoc>
+      <VSIXSignedBinaries Include="@(VSIXBinariesLoc)" Condition="Exists(%(VSIXBinariesLoc.SourcePath))" />
     </ItemGroup>
 
     <Copy SourceFiles="@(VSIXSignedBinaries->'%(SourcePath)')"
@@ -214,9 +224,11 @@
       <_Container>%(VSIX.Container)</_Container>
     </PropertyGroup>
 
-    <CreateZipPackage Files="@(_VSIXSourceItems)"
+    <CreateZipPackage SourceManifest="%(VSIX.SourceDir)extension.vsixmanifest"
+                      Files="@(_VSIXSourceItems)"
                       ZipPackage="$(_Container)"
-                      CompressionLevel="$(ZipPackageCompressionLevel)">
+                      CompressionLevel="$(ZipPackageCompressionLevel)"
+                      ItemsToConsider="@(None)">
         <Output TaskParameter="ZipPackage" ItemName="FileWrites" />
     </CreateZipPackage>
 
@@ -279,6 +291,4 @@
              Query="/vsx11:PackageManifest/vsx11:Installation/@InstalledByMsi"
              Value="false" />
   </Target>
-
-
 </Project>

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.IO;
 using System.Security;
 using System.Text;
@@ -24,8 +25,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.NodejsTools.Npm;
-
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools {
     internal class TypingsAcquisition {
@@ -118,7 +117,7 @@ namespace Microsoft.NodejsTools {
         private async Task<bool> ExecuteTypingsTool(IEnumerable<string> arguments, Redirector redirector) {
             string typingsTool = await EnsureTypingsToolInstalled(redirector);
             if (string.IsNullOrEmpty(typingsTool)) {
-                redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolNotInstalledError));
+                redirector?.WriteErrorLine(Resources.TypingsToolNotInstalledError);
                 return false;
             }
 
@@ -135,16 +134,16 @@ namespace Microsoft.NodejsTools {
                 if (!process.IsStarted) {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolCouldNotStart));
+                    redirector?.WriteErrorLine(Resources.TypingsToolCouldNotStart);
                     return false;
                 }
                 var i = await process;
                 if (i == 0) {
-                    redirector?.WriteLine(SR.GetString(SR.TypingsToolTypingsInstallCompleted));
+                    redirector?.WriteLine(Resources.TypingsToolTypingsInstallCompleted);
                     return true;
                 } else {
                     process.Kill();
-                    redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolTypingsInstallErrorOccurred));
+                    redirector?.WriteErrorLine(Resources.TypingsToolTypingsInstallErrorOccurred);
                     return false;
                 }
             }
@@ -159,7 +158,7 @@ namespace Microsoft.NodejsTools {
                 return null;
             } 
             if (!await InstallTypingsTool()) {
-                redirector?.WriteErrorLine(SR.GetString(SR.TypingsToolInstallFailed));
+                redirector?.WriteErrorLine(Resources.TypingsToolInstallFailed);
                 return null;
             }
             return await EnsureTypingsToolInstalled(redirector);
@@ -174,7 +173,7 @@ namespace Microsoft.NodejsTools {
             using (var commander = _npmController.CreateNpmCommander()) {
                 return await commander.InstallPackageToFolderByVersionAsync(
                     NodejsConstants.ExternalToolsPath,
-                    string.Format(@"""{0}""", LocalTypingsToolPath),
+                    string.Format(CultureInfo.InvariantCulture, @"""{0}""", LocalTypingsToolPath),
                     string.Empty,
                     false);
             }
@@ -197,7 +196,7 @@ namespace Microsoft.NodejsTools {
             try {
                 foreach (var file in Directory.EnumerateFiles(typingsDirectoryPath, "*.d.ts", SearchOption.AllDirectories)) {
                     var directory = Directory.GetParent(file);
-                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath)) {
+                    if (directory.FullName != typingsDirectoryPath && Path.GetFullPath(directory.FullName).StartsWith(typingsDirectoryPath, StringComparison.OrdinalIgnoreCase)) {
                         packages.Add(directory.Name);
                     }
                 }

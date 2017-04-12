@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,6 @@ using Microsoft.NodejsTools.Debugger.Commands;
 using Microsoft.NodejsTools.Debugger.Events;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json.Linq;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Debugger.Communication {
     sealed class DebuggerClient : IDebuggerClient {
@@ -109,7 +109,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
         private void OnConnectionClosed(object sender, EventArgs e) {
             ConcurrentDictionary<int, TaskCompletionSource<JObject>> messages = Interlocked.Exchange(ref _messages, new ConcurrentDictionary<int, TaskCompletionSource<JObject>>());
             foreach (var kv in messages) {
-                var exception = new IOException(SR.GetString(SR.DebuggerConnectionClosed));
+                var exception = new IOException(Resources.DebuggerConnectionClosed);
                 kv.Value.SetException(exception);
             }
 
@@ -135,7 +135,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    Debug.Fail(string.Format("Unrecognized type '{0}' in message: {1}", messageType, message));
+                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Unrecognized type '{0}' in message: {1}", messageType, message));
                     break;
             }
         }
@@ -179,7 +179,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
                     break;
 
                 default:
-                    Debug.Fail(string.Format("Unrecognized type '{0}' in event message: {1}", eventType, message));
+                    Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Unrecognized type '{0}' in event message: {1}", eventType, message));
                     break;
             }
         }
@@ -195,7 +195,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication {
             if (_messages.TryGetValue(messageId, out promise)) {
                 promise.SetResult(message);
             } else {
-                Debug.Fail(string.Format("Invalid response identifier '{0}'", messageId));
+                Debug.Fail(string.Format(CultureInfo.CurrentCulture, "Invalid response identifier '{0}'", messageId));
             }
         }
     }

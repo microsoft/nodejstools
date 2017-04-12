@@ -14,10 +14,11 @@
 //
 //*********************************************************//
 
-using Microsoft.NodejsTools.Options;
-using Microsoft.VisualStudioTools.Project;
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using Microsoft.NodejsTools.Options;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Logging {
 
@@ -64,12 +65,12 @@ namespace Microsoft.NodejsTools.Logging {
         }
 
         public static void WriteLine(string message) {
-            var str = String.Format("[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
+            var str = string.Format(CultureInfo.InvariantCulture, "[{0}] {1}", DateTime.UtcNow.TimeOfDay, message);
             Instance.LogMessage(str);
         }
 
         public static void WriteLine(string format, params object[] args) {
-            var str = String.Format(format, args);
+            var str = string.Format(CultureInfo.InvariantCulture, format, args);
             WriteLine(str);
         }
 

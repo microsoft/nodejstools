@@ -9,9 +9,6 @@
 
         <?foreach key in VS;VWD?>
         <DirectoryRef Id="Dir_$(var.key)InstallLocation">
-            <Directory Id="Dir_$(var.key)InstallLocationFileTemplates" Name="FileTemplates">
-                <Directory Id="Dir_$(var.key)FileTemplatesNewItem" Name="NewItem" />
-            </Directory>
             <Directory Id="Dir_$(var.key)TypingsAcquisitionTool" Name="TypingsAcquisitionTool">
                 <Directory Id="Dir_$(var.key)TypingsAcquisitionToolBin" Name="bin" />
             </Directory>

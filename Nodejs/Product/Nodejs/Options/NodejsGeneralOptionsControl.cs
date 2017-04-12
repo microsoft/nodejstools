@@ -66,10 +66,11 @@ namespace Microsoft.NodejsTools.Options {
             _waitOnNormalExit.Checked = page.WaitOnNormalExit;
             _editAndContinue.Checked = page.EditAndContinue;
             _checkForLongPaths.Checked = page.CheckForLongPaths;
-            _showBrowserAndNodeLabels.Checked = page.ShowBrowserAndNodeLabels;
+            _webkitDebugger.Checked = page.UseWebKitDebugger;
 
-            // Disable the show "browser" and "node" labels option when the user is in ES6 IntelliSense Preview mode
-            _showBrowserAndNodeLabels.Enabled = false;
+#if !DEV15
+            _webkitDebugger.Enabled = false;
+#endif
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page) {
@@ -78,7 +79,7 @@ namespace Microsoft.NodejsTools.Options {
             page.WaitOnNormalExit = _waitOnNormalExit.Checked;
             page.EditAndContinue = _editAndContinue.Checked;
             page.CheckForLongPaths = _checkForLongPaths.Checked;
-            page.ShowBrowserAndNodeLabels = _showBrowserAndNodeLabels.Checked;
+            page.UseWebKitDebugger = _webkitDebugger.Checked;
         }
     }
 }

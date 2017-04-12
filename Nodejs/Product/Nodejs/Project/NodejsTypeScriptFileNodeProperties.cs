@@ -27,9 +27,9 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
+        [SRCategory(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [ResourcesDescription(nameof(Resources.TestFrameworkDescription))]
         public string TestFramework {
             get {
                 var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);
@@ -50,9 +50,9 @@ namespace Microsoft.NodejsTools.Project {
             : base(node) {
         }
 
-        [SRCategoryAttribute(SR.Advanced)]
+        [SRCategory(SR.Advanced)]
         [LocDisplayName(SR.TestFramework)]
-        [SRDescriptionAttribute(SR.TestFrameworkDescription)]
+        [ResourcesDescription(nameof(Resources.TestFrameworkDescription))]
         public string TestFramework {
             get {
                 var framework = this.HierarchyNode.ItemNode.GetMetadata(SR.TestFramework);

@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Npm {
@@ -27,7 +28,7 @@ namespace Microsoft.NodejsTools.Npm {
                 return 1;
             }
             //  TODO: should take into account versions!
-            return x.Name.CompareTo(y.Name);
+            return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
         }
     }
 

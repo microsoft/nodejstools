@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -57,7 +58,7 @@ namespace Microsoft.NodejsTools.Repl {
             _window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
             _window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
 
-            _window.WriteLine(SR.GetString(SR.ReplInitializationMessage));
+            _window.WriteLine(Resources.ReplInitializationMessage);
 
             return ExecutionResult.Succeeded;
         }
@@ -136,11 +137,11 @@ namespace Microsoft.NodejsTools.Repl {
 
             string nodeExePath = GetNodeExePath();
             if (String.IsNullOrWhiteSpace(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodejsNotInstalled));
+                _window.WriteError(Resources.NodejsNotInstalled);
                 _window.WriteError(Environment.NewLine);
                 return;
             } else if (!File.Exists(nodeExePath)) {
-                _window.WriteError(SR.GetString(SR.NodeExeDoesntExist, nodeExePath));
+                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
                 _window.WriteError(Environment.NewLine);
                 return;
             }
@@ -174,7 +175,7 @@ namespace Microsoft.NodejsTools.Repl {
             try {
                 process.Start();
             } catch (Exception e) {
-                _window.WriteError(String.Format("Failed to start interactive process: {0}{1}{2}", Environment.NewLine, e.ToString(), Environment.NewLine));
+                _window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
@@ -187,7 +188,7 @@ namespace Microsoft.NodejsTools.Repl {
             if (startupProject != null) {
                 nodeExePath = Nodejs.GetAbsoluteNodeExePath(
                     startupProject.ProjectHome,
-                    startupProject.GetProjectProperty(NodejsConstants.NodeExePath)
+                    startupProject.GetProjectProperty(NodeProjectProperty.NodeExePath)
                 );
             } else {
                 nodeExePath = Nodejs.NodeExePath;
@@ -216,7 +217,7 @@ namespace Microsoft.NodejsTools.Repl {
 #if DEBUG
             private Thread _socketLockedThread;
 #endif
-            static string _noReplProcess = "Current interactive window is disconnected - please reset the process." + Environment.NewLine;
+            private static string _noReplProcess = Resources.InteractiveWindowNoProcessErrorMessage + Environment.NewLine;
 
             public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket) {
                 _eval = eval;
@@ -251,7 +252,7 @@ namespace Microsoft.NodejsTools.Repl {
             }
 
             private void ProcessExitedWorker() {
-                _eval._window.WriteError("The process has exited" + Environment.NewLine);
+                _eval._window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
                 using (new SocketLock(this)) {
                     if (_completion != null) {
                         _completion.SetResult(ExecutionResult.Failure);
@@ -364,7 +365,7 @@ namespace Microsoft.NodejsTools.Repl {
                             break;
 #if DEBUG
                         default:
-                            Debug.WriteLine(String.Format("Unknown command: {0}", response.Body));
+                            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Unknown command: {0}", response.Body));
                             break;
 #endif
                     }

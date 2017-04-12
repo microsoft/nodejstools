@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims {
 
         static ContractShim() {
             string shimName = typeof(T).FullName;
-            Debug.Assert(shimName.StartsWith("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims."));
+            Debug.Assert(shimName.StartsWith("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims.", StringComparison.Ordinal));
             string realName = shimName.Replace(".Shims.", ".");
             _interface = contractAssembly.GetType(realName, throwOnError: true);
         }

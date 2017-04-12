@@ -21,6 +21,7 @@ using System.Windows.Forms;
 namespace Microsoft.NodejsTools.Options {
     [ComVisible(true)]
     public class NodejsGeneralOptionsPage : NodejsDialogPage {
+
         private const string DefaultSurveyNewsFeedUrl = "https://go.microsoft.com/fwlink/?LinkId=328027";
         private const string DefaultSurveyNewsIndexUrl = "https://go.microsoft.com/fwlink/?LinkId=328029";
         private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
@@ -31,12 +32,8 @@ namespace Microsoft.NodejsTools.Options {
         private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
         private const string EditAndContinueSetting = "EditAndContinue";
         private const string CheckForLongPathsSetting = "CheckForLongPaths";
-        private const string ShowBrowserAndNodeLabelsSetting = "ShowBrowserAndNodeLabels";
-        private bool _showBrowserAndNodeLabels;
-        private SurveyNewsPolicy _surveyNewsCheck;
-        private string _surveyNewsFeedUrl;
-        private string _surveyNewsIndexUrl;
-        private DateTime _surveyNewsLastCheck;
+        private const string UseWebKitDebuggerSetting = "UseWebKitDebugger";
+
         private NodejsGeneralOptionsControl _window;
 
         public NodejsGeneralOptionsPage()
@@ -53,12 +50,6 @@ namespace Microsoft.NodejsTools.Options {
                 return _window;
             }
         }
-
-        /// <summary>
-        /// Indicates whether or not the Output window should be shown when
-        /// npm commands are being executed.
-        /// </summary>
-        public bool ShowOutputWindowWhenExecutingNpm { get; set; }
 
         /// <summary>
         /// True if Node processes should pause for input before exiting
@@ -83,56 +74,30 @@ namespace Microsoft.NodejsTools.Options {
         public bool CheckForLongPaths { get; set; }
 
         /// <summary>
-        /// Indicates whether labels should be appended to folders in Solution Explorer denoting browser and Node.js code.
+        /// Indicates whether we should use the WebKit debugger or the default NodeJs debugger.
         /// </summary>
-        public bool ShowBrowserAndNodeLabels {
-            get { return _showBrowserAndNodeLabels; }
-            set {
-                var oldSetting = _showBrowserAndNodeLabels;
-                _showBrowserAndNodeLabels = value;
-                if (oldSetting != _showBrowserAndNodeLabels) {
-                    var changed = ShowBrowserAndNodeLabelsChanged;
-                    if (changed != null) {
-                        changed(this, EventArgs.Empty);
-                    }
-                }
-            }
-        }
-
-        public event EventHandler<EventArgs> ShowBrowserAndNodeLabelsChanged;
+        public bool UseWebKitDebugger { get; set; }
 
         /// <summary>
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
-        public SurveyNewsPolicy SurveyNewsCheck {
-            get { return _surveyNewsCheck; }
-            set { _surveyNewsCheck = value; }
-        }
+        public SurveyNewsPolicy SurveyNewsCheck { get; set; }
 
         /// <summary>
         /// The date/time when the last check for news occurred.
         /// </summary>
-        public DateTime SurveyNewsLastCheck {
-            get { return _surveyNewsLastCheck; }
-            set { _surveyNewsLastCheck = value; }
-        }
+        public DateTime SurveyNewsLastCheck { get; set; }
 
         /// <summary>
         /// The url of the news feed.
         /// </summary>
-        public string SurveyNewsFeedUrl {
-            get { return _surveyNewsFeedUrl; }
-            set { _surveyNewsFeedUrl = value; }
-        }
+        public string SurveyNewsFeedUrl { get; set; }
 
         /// <summary>
         /// The url of the news index page.
         /// </summary>
-        public string SurveyNewsIndexUrl {
-            get { return _surveyNewsIndexUrl; }
-            set { _surveyNewsIndexUrl = value; }
-        }
+        public string SurveyNewsIndexUrl { get; set; }
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -140,28 +105,28 @@ namespace Microsoft.NodejsTools.Options {
         /// values.
         /// </summary>
         public override void ResetSettings() {
-            _surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
-            _surveyNewsLastCheck = DateTime.MinValue;
-            _surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
-            _surveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
+            SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
+            SurveyNewsLastCheck = DateTime.MinValue;
+            SurveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
+            SurveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
             WaitOnAbnormalExit = true;
             WaitOnNormalExit = false;
             EditAndContinue = true;
             CheckForLongPaths = true;
-            _showBrowserAndNodeLabels = true;
+            UseWebKitDebugger = false;
         }
 
         public override void LoadSettingsFromStorage() {
             // Load settings from storage.
-            _surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
-            _surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
-            _surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
-            _surveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
+            SurveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
+            SurveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
+            SurveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
+            SurveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
             WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
             WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
             CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
-            _showBrowserAndNodeLabels = LoadBool(ShowBrowserAndNodeLabelsSetting) ?? true;
+            UseWebKitDebugger = LoadBool(UseWebKitDebuggerSetting) ?? false;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -176,13 +141,13 @@ namespace Microsoft.NodejsTools.Options {
             }
 
             // Save settings.
-            SaveEnum(SurveyNewsCheckSetting, _surveyNewsCheck);
-            SaveDateTime(SurveyNewsLastCheckSetting, _surveyNewsLastCheck);
+            SaveEnum(SurveyNewsCheckSetting, SurveyNewsCheck);
+            SaveDateTime(SurveyNewsLastCheckSetting, SurveyNewsLastCheck);
             SaveBool(WaitOnNormalExitSetting, WaitOnNormalExit);
             SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, EditAndContinue);
             SaveBool(CheckForLongPathsSetting, CheckForLongPaths);
-            SaveBool(ShowBrowserAndNodeLabelsSetting, ShowBrowserAndNodeLabels);
+            SaveBool(UseWebKitDebuggerSetting, UseWebKitDebugger);
         }
     }
 }

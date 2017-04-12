@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -64,15 +65,15 @@ namespace Microsoft.NodejsTools.Npm {
                             standardOutputLines = process.StandardOutputLines.ToList();
                         }
                         if (redirector != null) {
-                            redirector.WriteLine(string.Format(
+                            redirector.WriteLine(string.Format(CultureInfo.InvariantCulture,
                                 "\r\n===={0}====\r\n\r\n",
-                                string.Format(Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
+                                string.Format(CultureInfo.InvariantCulture, Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
                                 ));
                         }
                     } else {
                         process.Kill();
                         if (redirector != null) {
-                            redirector.WriteErrorLine(string.Format(
+                            redirector.WriteErrorLine(string.Format(CultureInfo.InvariantCulture,
                             "\r\n===={0}====\r\n\r\n",
                             Resources.NpmCommandCancelled));
                         }
@@ -98,7 +99,7 @@ namespace Microsoft.NodejsTools.Npm {
 
             if (string.IsNullOrEmpty(path)) {
                 throw new NpmNotFoundException(
-                    string.Format(
+                    string.Format(CultureInfo.CurrentCulture,
                         "Cannot find {0} in the registry, your path, or under " +
                         "program files in the nodejs folder.  Ensure Node.js is installed.",
                         executable

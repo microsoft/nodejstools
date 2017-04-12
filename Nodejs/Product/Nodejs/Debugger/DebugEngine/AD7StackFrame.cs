@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -83,20 +84,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
                 if (funcName == "<module>") {
                     if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                         funcName = Path.GetFileName(_stackFrame.FileName) + " module";
-                    } else if (_stackFrame.FileName.EndsWith("<string>")) {
+                    } else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal)) {
                         funcName = "<exec or eval>";
                     } else {
                         funcName = _stackFrame.FileName + " unknown code";
                     }
                 } else {
                     if (_stackFrame.FileName != "<unknown>") {
-                        funcName = string.Format("{0} [{1}]", funcName, Path.GetFileName(_stackFrame.FileName));
+                        funcName = string.Format(CultureInfo.InvariantCulture, "{0} [{1}]", funcName, Path.GetFileName(_stackFrame.FileName));
                     } else {
                         funcName = funcName + " in <unknown>";
                     }
                 }
 
-                frameInfo.m_bstrFuncName = string.Format("{0} Line {1}", funcName, _stackFrame.Line + 1);
+                frameInfo.m_bstrFuncName = string.Format(CultureInfo.InvariantCulture, "{0} Line {1}", funcName, _stackFrame.Line + 1);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
 
@@ -110,7 +111,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_MODULE) != 0) {
                 if (_stackFrame.FileName.IndexOfAny(Path.GetInvalidPathChars()) == -1) {
                     frameInfo.m_bstrModule = Path.GetFileName(_stackFrame.FileName);
-                } else if (_stackFrame.FileName.EndsWith("<string>")) {
+                } else if (_stackFrame.FileName.EndsWith("<string>", StringComparison.Ordinal)) {
                     frameInfo.m_bstrModule = "<exec/eval>";
                 } else {
                     frameInfo.m_bstrModule = "<unknown>";
@@ -296,7 +297,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
         // "{ function-name, source-file-name, module-file-name }"
         int IDebugExpressionContext2.GetName(out string pbstrName) {
-            pbstrName = String.Format("{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
+            pbstrName = string.Format(CultureInfo.InvariantCulture, "{{ {0} {1} }}", _stackFrame.FunctionName, _stackFrame.FileName);
             return VSConstants.S_OK;
         }
 

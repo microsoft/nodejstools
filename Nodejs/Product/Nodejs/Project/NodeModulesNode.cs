@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Npm;
@@ -198,46 +199,13 @@ namespace Microsoft.NodejsTools.Project {
                 NpmOutputPane?.ShowAndActivate();
             }
         }
-
-#if INTEGRATE_WITH_ERROR_LIST
-        private ErrorListProvider _errorListProvider;
-
-        private ErrorListProvider GetErrorListProvider() {
-            if (null == _errorListProvider) {
-                _errorListProvider = new ErrorListProvider(_projectNode.ProjectMgr.Site);
-            }
-            return _errorListProvider;
-        }
-
-        private void WriteNpmErrorsToErrorList(NpmLogEventArgs args) {
-            var provider = GetErrorListProvider();
-            foreach (var line in args.LogText.Split(new[] {'\n' })) {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("npm ERR!")) {
-                    provider.Tasks.Add(new ErrorTask() {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Error,
-                        Text = trimmed
-                    });
-                } else if (trimmed.StartsWith("npm WARN")) {
-                    provider.Tasks.Add(new ErrorTask() {
-                        Category = TaskCategory.User,
-                        ErrorCategory = TaskErrorCategory.Warning,
-                        Text = trimmed
-                    });
-                }
-            }
-        }
-
-#endif
-
         private void ForceUpdateStatusBarWithNpmActivity(string activity) {
             if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim())) {
                 return;
             }
 
             if (!activity.Contains("npm")) {
-                activity = string.Format("npm: {0}", activity);
+                activity = string.Format(CultureInfo.CurrentCulture, "npm: {0}", activity);
             }
 
             var statusBar = (IVsStatusbar)_projectNode.GetService(typeof(SVsStatusbar));
@@ -267,10 +235,10 @@ namespace Microsoft.NodejsTools.Project {
                 return string.Empty;
             }
 
-            if (text.EndsWith("\r\n")) {
+            if (text.EndsWith("\r\n", StringComparison.Ordinal)) {
                 return text.Remove(text.Length - 2);
             }
-            if (text.EndsWith("\r") || text.EndsWith("\n")) {
+            if (text.EndsWith("\r", StringComparison.Ordinal) || text.EndsWith("\n", StringComparison.Ordinal)) {
                 return text.Remove(text.Length - 1);
             }
 
@@ -279,10 +247,6 @@ namespace Microsoft.NodejsTools.Project {
 
         private void WriteNpmLogToOutputWindow(string logText) {
             NpmOutputPane?.WriteLine(logText);
-
-#if INTEGRATE_WITH_ERROR_LIST
-            WriteNpmErrorsToErrorList(args);
-#endif
         }
 
         private void WriteNpmLogToOutputWindow(NpmLogEventArgs args) {
@@ -327,13 +291,13 @@ namespace Microsoft.NodejsTools.Project {
 
         private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e) {
             if (e.WithErrors) {
-                return SR.GetString(
-                    e.Cancelled ? SR.NpmCancelledWithErrors : SR.NpmCompletedWithErrors,
+                return string.Format(CultureInfo.CurrentCulture,
+                    e.Cancelled ? Resources.NpmCancelledWithErrors : Resources.NpmCompletedWithErrors,
                     e.CommandText);
             } else if (e.Cancelled) {
-                return SR.GetString(SR.NpmCancelled, e.CommandText);
+                return string.Format(CultureInfo.CurrentCulture, Resources.NpmCancelled, e.CommandText);
             }
-            return SR.GetString(SR.NpmSuccessfullyCompleted, e.CommandText);
+            return string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, e.CommandText);
         }
 
         private void StopNpmIdleTimer() {
@@ -486,7 +450,7 @@ namespace Microsoft.NodejsTools.Project {
             if (NpmController.RootPackage == null) {
                 NpmController.Refresh();
                 if (NpmController.RootPackage == null) {
-                    MessageBox.Show(String.Format("Unable to parse {0} from your project.  Please fix any errors and try again.", NodejsConstants.PackageJsonFile));
+                    MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.NodeModulesCouldNotParsePackageJsonErrorMessageText, NodejsConstants.PackageJsonFile));
                     return;
                 }
             }

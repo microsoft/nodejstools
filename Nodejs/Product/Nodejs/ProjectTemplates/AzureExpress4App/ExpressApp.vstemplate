@@ -1,8 +1,8 @@
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name>Basic Azure Node.js Express 4 Application</Name>
-    <Description>A basic Node.js Express 4 application for Microsoft Azure.</Description>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404" />
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3059"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3060"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="404"/>
     <ProjectType>JavaScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.AzureExpressApp</TemplateID>
     <SortOrder>150</SortOrder>

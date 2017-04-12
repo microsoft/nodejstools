@@ -46,7 +46,6 @@ namespace Microsoft.VisualStudioTools {
                 }
 
                 return new Uri(path, kind);
-
             } catch (UriFormatException ex) {
                 throw new ArgumentException("Path was invalid", throwParameterName, ex);
             } catch (ArgumentException ex) {
@@ -60,6 +59,13 @@ namespace Microsoft.VisualStudioTools {
         public static string NormalizePath(string path) {
             if (string.IsNullOrEmpty(path)) {
                 return null;
+            }
+
+            const string MdhaPrefix = "mdha:";
+
+            // webkit debugger prepends with 'mdha'
+            if (path.StartsWith(MdhaPrefix, StringComparison.OrdinalIgnoreCase)) {
+                path = path.Substring(MdhaPrefix.Length);
             }
 
             var uri = MakeUri(path, false, UriKind.RelativeOrAbsolute);

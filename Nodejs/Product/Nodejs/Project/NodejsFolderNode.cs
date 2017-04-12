@@ -14,28 +14,17 @@
 //
 //*********************************************************//
 
-using System;
 using System.IO;
-using Microsoft.NodejsTools.Options;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
-using VSLangProj;
 
 namespace Microsoft.NodejsTools.Project {
     class NodejsFolderNode : CommonFolderNode {
         private readonly CommonProjectNode _project;
-        private FolderContentType _contentType = FolderContentType.NotAssigned;
-        private bool _containsNodeOrBrowserFiles = false;
 
         public NodejsFolderNode(CommonProjectNode root, ProjectElement element) : base(root, element) {
             _project = root;
-        }
-
-        public FolderContentType ContentType {
-            get {
-                return _contentType;
-            }
         }
 
         public override string Caption {
@@ -46,49 +35,6 @@ namespace Microsoft.NodejsTools.Project {
 
         public override void RemoveChild(HierarchyNode node) {
             base.RemoveChild(node);
-        }
-
-        public override void AddChild(HierarchyNode node) {
-            base.AddChild(node);
-
-            // If we are adding an immediate child to a directory, then set the content type
-            // acording to the content type of the folder it is being moved to.
-            var nodejsFileNode = node as NodejsFileNode;
-            if (nodejsFileNode != null && nodejsFileNode.Url.EndsWith(".js", StringComparison.OrdinalIgnoreCase) && nodejsFileNode.Parent == this) {
-                var properties = nodejsFileNode.NodeProperties as IncludedFileNodeProperties;
-                if (properties != null) {
-                    switch (ContentType) {
-                        case FolderContentType.Browser:
-                            properties.ItemType = ProjectFileConstants.Content;
-                            break;
-                        case FolderContentType.Node:
-                            properties.ItemType = ProjectFileConstants.Compile;
-                            break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Append a label denoting browser-side code, node, or both depending on the content type
-        /// 
-        /// </summary>
-        /// <param name="folderName"></param>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
-        public static string AppendLabel(string folderName, FolderContentType contentType) {
-            switch (contentType) {
-                case FolderContentType.Browser:
-                    folderName += " (browser)";
-                    break;
-                case FolderContentType.Node:
-                    folderName += " (node)";
-                    break;
-                case FolderContentType.Mixed:
-                    folderName += " (node, browser)";
-                    break;
-            }
-            return folderName;
         }
 
         internal override int IncludeInProject(bool includeChildren) {
@@ -103,63 +49,22 @@ namespace Microsoft.NodejsTools.Project {
             return base.IncludeInProject(includeChildren);
         }
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
-                switch (cmd) {
-                    case PkgCmdId.cmdidSetAsContent:
-                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Node)) {
-                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        }
-                        return VSConstants.S_OK;
-                    case PkgCmdId.cmdidSetAsCompile:
-                        if (_containsNodeOrBrowserFiles && ContentType.HasFlag(FolderContentType.Browser)) {
-                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                        }
-                        return VSConstants.S_OK;
-                }
-            }
-            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
-        }
-
-        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsCmdSet) {
-                switch (cmd) {
-                    case PkgCmdId.cmdidSetAsContent:
-                        SetItemTypeRecursively(prjBuildAction.prjBuildActionContent);
-                        return VSConstants.S_OK;
-                    case PkgCmdId.cmdidSetAsCompile:
-                        SetItemTypeRecursively(prjBuildAction.prjBuildActionCompile);
-                        return VSConstants.S_OK;
-                }
-            }
-            return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
-        }
-
-        internal void SetItemTypeRecursively(prjBuildAction buildAction) {
-            var fileNodesEnumerator = this.EnumNodesOfType<NodejsFileNode>().GetEnumerator();
-            while (fileNodesEnumerator.MoveNext()) {
-                var includedFileNodeProperties = fileNodesEnumerator.Current.NodeProperties as IncludedFileNodeProperties;
-                if (includedFileNodeProperties != null && includedFileNodeProperties.URL.EndsWith(".js", StringComparison.OrdinalIgnoreCase)) {
-                    includedFileNodeProperties.BuildAction = buildAction;
-                }
-            }
-        }
 
         private bool ShouldIncludeNodeModulesFolderInProject() {
-            var includeNodeModulesButton = new TaskDialogButton(SR.GetString(SR.IncludeNodeModulesIncludeTitle), SR.GetString(SR.IncludeNodeModulesIncludeDescription));
-            var cancelOperationButton = new TaskDialogButton(SR.GetString(SR.IncludeNodeModulesCancelTitle));
+            var includeNodeModulesButton = new TaskDialogButton(Resources.IncludeNodeModulesIncludeTitle, Resources.IncludeNodeModulesIncludeDescription);
+            var cancelOperationButton = new TaskDialogButton(Resources.IncludeNodeModulesCancelTitle);
             var taskDialog = new TaskDialog(_project.ProjectMgr.Site) {
                 AllowCancellation = true,
                 EnableHyperlinks = true,
                 Title = SR.ProductName,
                 MainIcon = TaskDialogIcon.Warning,
-                Content = SR.GetString(SR.IncludeNodeModulesContent),
+                Content = Resources.IncludeNodeModulesContent,
                 Buttons = {
                     cancelOperationButton,
                     includeNodeModulesButton
                 },
                 FooterIcon = TaskDialogIcon.Information,
-                Footer = SR.GetString(SR.IncludeNodeModulesInformation),
+                Footer = Resources.IncludeNodeModulesInformation,
                 SelectedButton = cancelOperationButton
             };
 
@@ -167,13 +72,5 @@ namespace Microsoft.NodejsTools.Project {
 
             return button == includeNodeModulesButton;
         }
-    }
-
-    internal enum FolderContentType {
-        None = 0,
-        Browser = 1,
-        Node = 2,
-        Mixed = 3,
-        NotAssigned
     }
 }

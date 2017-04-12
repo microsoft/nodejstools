@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
@@ -42,7 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe) {
             return new PackageJsonException(
-                string.Format(@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
+                string.Format(CultureInfo.CurrentCulture,@"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
 
 The following error occurred:
 

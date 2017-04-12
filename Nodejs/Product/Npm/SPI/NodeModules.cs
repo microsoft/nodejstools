@@ -47,7 +47,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                         // All dependencies in npm v3 will have at least one element present in _requiredBy.
                         // _requiredBy dependencies that begin with hash characters represent top-level dependencies
                         foreach (var requiredBy in packageJson.RequiredBy) {
-                            if (requiredBy.StartsWith("#") || requiredBy == "/") {
+                            if (requiredBy.StartsWith("#", StringComparison.Ordinal) || requiredBy == "/") {
                                 AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
                                 break;
                             }
@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
                             break;
                         }
 
-                        var parentNodeModulesIndex = moduleDir.LastIndexOf(NodejsConstants.NodeModulesFolder, Math.Max(0, moduleDir.Length - NodejsConstants.NodeModulesFolder.Length - dependency.Name.Length - 1));
+                        var parentNodeModulesIndex = moduleDir.LastIndexOf(NodejsConstants.NodeModulesFolder, Math.Max(0, moduleDir.Length - NodejsConstants.NodeModulesFolder.Length - dependency.Name.Length - 1), StringComparison.Ordinal);
                         moduleDir = moduleDir.Substring(0, parentNodeModulesIndex + NodejsConstants.NodeModulesFolder.Length);
                     } while (moduleDir.Contains(NodejsConstants.NodeModulesFolder));
                 }
@@ -140,8 +140,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public override int GetDepth(string filepath) {
-            var lastNodeModules = filepath.LastIndexOf(NodejsConstants.NodeModulesFolder + "\\");
-            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1);
+            var lastNodeModules = filepath.LastIndexOf(NodejsConstants.NodeModulesFolder + "\\", StringComparison.Ordinal);
+            var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1, StringComparison.Ordinal);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
             ModuleInfo value = null;
@@ -166,7 +166,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             // Go through every directory in node_modules, and see if it's required as a top-level dependency
             foreach (var moduleDir in topLevelDirectories) {
-                if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore))) {
+                if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore, StringComparison.Ordinal))) {
                     IPackageJson json = null;
                     try {
                         json = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));

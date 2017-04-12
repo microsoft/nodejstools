@@ -17,6 +17,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudioTools.Project;
@@ -28,13 +29,17 @@ namespace Microsoft.NodejsTools.Debugger {
     sealed class NodeProcess : IDisposable {
         private readonly ProcessStartInfo _psi;
         private readonly bool _waitOnAbnormal, _waitOnNormal, _enableRaisingEvents;
-        private Process _process, _pressAnyKeyProcess;
+        private Process _process;
+        private Process _pressAnyKeyProcess;
 
-        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents) {
+        public ushort DebuggerPort { get; }
+
+        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents, ushort debuggerPort = 0) {
             _psi = psi;
             _waitOnAbnormal = waitOnAbnormal;
             _waitOnNormal = waitOnNormal;
             _enableRaisingEvents = enableRaisingEvents;
+            DebuggerPort = debuggerPort;
         }
 
         public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal) {
@@ -61,7 +66,7 @@ namespace Microsoft.NodejsTools.Debugger {
 
             if (waitMode != null) {
                 var pidFile = Path.GetTempFileName();
-                _psi.Arguments = String.Format("{0} {1} {2} {3}",
+                _psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
                     waitMode,
                     ProcessOutput.QuoteSingleArgument(pidFile),
                     ProcessOutput.QuoteSingleArgument(_psi.FileName),

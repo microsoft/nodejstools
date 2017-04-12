@@ -23,6 +23,13 @@
     
     Valid values: "14.0", "15.0"
 
+.Parameter vsroot
+    [Optional] For VS15 only. Specifies the installation root directory of visual studio
+    
+    Example: "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise"
+    
+    Must be specified when building for VS15.
+
 .Parameter name
     [Optional] A suffix to append to the name of the build.
     
@@ -109,7 +116,8 @@
 [CmdletBinding()]
 param(
     [string] $outdir,
-    [string[]] $vsTarget,
+    [string] $vsTarget,
+    [string] $vsroot,
     [string] $name,
     [switch] $release,
     [switch] $internal,
@@ -149,16 +157,16 @@ $project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "huvalo", "jinglou", "sitani", "crwilcox"
 
 # These people are the contacts for the symbols uploaded to the symbol server
-$symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
+$symbol_contacts = "$env:username;dinov;smortaz;jinglou"
 
 # This single person or DL is the contact for virus scan notifications
 $vcs_contact = "ntvscore"
 
 # These options are passed to all MSBuild processes
-$global_msbuild_options = @("/v:m", "/m", "/nologo")
+$global_msbuild_options = @("/v:m", "/m", "/nologo", "/flp:verbosity=detailed")
 
 if ($skiptests) {
     $global_msbuild_options += "/p:IncludeTests=false"
@@ -172,16 +180,20 @@ if ($release -or $mockrelease) {
 
 # Get the path to msbuild for a configuration
 function msbuild-exe($target) {
-    $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
-    if (-not $msbuild_reg) {
-        Throw "Visual Studio build tools $($target.VSTarget) not found."
+    if ($target.VSTarget -eq "15.0") {
+        return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
+    } else {
+        $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
+        if (-not $msbuild_reg) {
+            Throw "Visual Studio build tools $($target.VSTarget) not found."
+        }
+        
+        $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
+        if (-not (Test-Path -Path $target_exe)) {
+            Throw "Visual Studio build tools $($target.VSTarget) not found."
+        }
+        return $target_exe
     }
-    
-    $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
-    if (-not (Test-Path -Path $target_exe)) {
-        Throw "Visual Studio build tools $($target.VSTarget) not found."
-    }
-    $target_exe
 }
 
 # This function is used to get options for each configuration
@@ -212,17 +224,18 @@ function msbuild-options($target) {
         "/p:CopyOutputsToPath=$($target.destdir)",
         "/p:Configuration=$($target.config)",
         "/p:MsiVersion=$($target.msi_version)",
-        "/p:ReleaseVersion=$($target.release_version)"
+        "/p:ReleaseVersion=$($target.release_version)",
+        "/p:DevEnvDir=$($target.vsroot)\Common7\IDE\\"
     )
 }
 
 # This function is invoked after each target is built.
 function after-build($buildroot, $target) {
     Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $($target.destdir)
-    
-    $setup15 = mkdir "$($target.destdir)\Setup15" -Force
-    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.json" $setup15
-    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15
+
+    $setup15 = mkdir "$($target.destdir)\Setup15" -Force 
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Binaries\**\*.json" $setup15 
+    Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Setup\*.vsman" $setup15 
 
     if ($copytests) {
         Copy-Item -Recurse -Force "$buildroot\BuildOutput\$($target.config)$($target.VSTarget)\Tests" "$($target.destdir)\Tests"
@@ -230,11 +243,47 @@ function after-build($buildroot, $target) {
     }
 }
 
+# Fixes hashing information in the .vsman file
+function fix-vs-manifest($vsmanFile, $bindir) {
+    Write-Output "Patching Manifest $vsmanFile"
+    $json = Get-Content $vsmanFile -raw | ConvertFrom-Json
+    foreach ($pkg in $json.packages) {
+        Write-Output "Patching package $($pkg.id)"
+
+        # Assume only one payload
+        $payload = $pkg.payloads[0]
+
+        # Remove the _buildInfo block
+        $payload = $payload | Select-Object * -ExcludeProperty _buildInfo
+        $pkg.payloads[0] = $payload
+
+        # Check that the file exists
+        $vsixFilename = "$bindir\$($pkg.payloads[0].fileName)"
+        if (!(Test-Path $vsixFilename)) {
+            Write-Output "File $vsixFilename does not exist; continuing"
+            continue
+        }
+
+        # Get its length and hash
+        $length = (Get-Item $vsixFilename).Length
+        $sha256 = (Get-Filehash $vsixFilename -Algorithm SHA256).Hash.ToLower()
+        Write-Output "Hashed $vsixFilename (size $length) to $($sha256.Substring(0, 34))..."
+
+        # Set properties
+        $payload.sha256 = $sha256
+        $payload.size = $length
+    }
+    $json | ConvertTo-Json -depth 100 | Out-File $vsmanFile
+}
+
 # This function is invoked after the entire build process but before scorching
 function after-build-all($buildroot, $outdir) {
     if (-not $release) {
         Copy-Item -Force "$buildroot\Nodejs\Prerequisites\*.reg" $outdir
     }
+ 
+    $logDrop = mkdir "$($outdir)\Logs" -Force 
+    Copy-Item -Recurse -Force "$buildroot\Logs\*.*" $logDrop   
     
     $vsdrop = mkdir "$env:BUILD_STAGINGDIRECTORY\vsdrop" -Force
     Copy-Item -Force "$outdir\**.vsman" $vsdrop
@@ -273,6 +322,15 @@ $installer_names = @{
     'Microsoft.VisualStudio.NodejsTools.Targets.json' = 'Microsoft.VisualStudio.NodejsTools.Targets.json';
 }
 
+$locales = ("cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
+$localized_files = (
+    "Microsoft.NodejsTools.InteractiveWindow.resources.dll",
+    "Microsoft.NodejsTools.Npm.resources.dll",
+    "Microsoft.NodejsTools.ProjectWizard.resources.dll",
+    "Microsoft.NodejsTools.resources.dll"
+)
+
 # Add list of files requiring signing here
 $managed_files = (
     "Microsoft.NodejsTools.NodeLogConverter.exe", 
@@ -291,7 +349,7 @@ $managed_files = (
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="15.0"; name="VS 15"; build_by_default=$true},    
+    @{number="15.0"; name="VS 2017"; build_by_default=$true},    
     @{number="14.0"; name="VS 2015"; build_by_default=$true}
 )
 
@@ -348,7 +406,6 @@ if ($signedbuild) {
     Pop-Location
 }
 
-
 $spacename = ""
 if ($name) {
     $spacename = " $name"
@@ -356,7 +413,6 @@ if ($name) {
 } elseif ($internal) {
     Throw "'-name [build name]' must be specified when using '-internal'"
 }
-
 
 $version_file_backed_up = 0
 # Force use of a backup if there are pending changes to $version_file
@@ -408,7 +464,7 @@ if ($internal -or $release -or $mockrelease) {
 }
 
 Import-Module -Force $buildroot\Build\VisualStudioHelpers.psm1
-$target_versions = get_target_vs_versions $vstarget
+$target_versions = get_target_vs_versions $vstarget $vsroot
 
 if ($skipdebug) {
     $target_configs = ("Release")
@@ -446,7 +502,7 @@ if (-not $skipclean) {
     }
 }
 
-$logdir = mkdir "$outdir\Logs" -Force
+$logdir = mkdir "$buildroot\Logs" -Force
 
 if ($scorch -and $has_tf_workspace) {
     tfpt scorch $buildroot /noprompt
@@ -479,6 +535,7 @@ try {
                 config=$config;
                 msi_version=$msi_version;
                 release_version=$release_version;
+                vsroot=$($_.vsroot)
             }
             $i.unsigned_bindir = mkdir "$($i.destdir)\UnsignedBinaries" -Force
             $i.unsigned_msidir = mkdir "$($i.destdir)\UnsignedMsi" -Force
@@ -494,7 +551,7 @@ try {
             }
             $i
         })
-        
+
         foreach ($i in $target_info) {
             if (-not $skipbuild) {
                 $target_msbuild_exe = msbuild-exe $i
@@ -528,7 +585,7 @@ try {
                 Write-Output "Submitting signing jobs for $($i.VSName)"
 
                 $jobs += begin_sign_files `
-                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$project_name}} | ?{Test-Path $_.path}) `
+                    @($managed_files | %{@{path="$($i.unsigned_bindir)\$_"; name=$_}} | ?{Test-Path $_.path}) `
                     $i.signed_bindir $approvers `
                     $project_name $project_url "$project_name $($i.VSName) - managed code" $project_keywords `
                     "authenticode;strongname" `
@@ -539,11 +596,24 @@ try {
                     $i.signed_bindir $approvers `
                     $project_name $project_url "$project_name $($i.VSName) - native code" $project_keywords `
                     "authenticode" 
+
+                # we only loc Dev 15
+                if ($i.VSTarget -eq "15.0") {
+                    foreach ($loc in $locales) {
+                        $jobs += begin_sign_files `
+                            @($localized_files | %{@{path="$($i.unsigned_bindir)\$loc\$_"; name=$_}} | ?{Test-Path $_.path}) `
+                            "$($i.signed_bindir)\$loc" $approvers `
+                            $project_name $project_url "$project_name $($i.VSName) - managed code - $loc" $project_keywords `
+                            "authenticode;strongname" `
+                            -delaysigned
+                    }
+                }
             }
             
             end_sign_files $jobs
             
             foreach ($i in $target_info) {
+                Write-Output "Begin symbol submission for $($i.VSName)"
                 if ($i.logfile -in $failed_logs) {
                     Write-Output "Skipping symbol submission for $($i.VSName) because the build failed"
                     continue
@@ -551,6 +621,9 @@ try {
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "binaries" $i.signed_bindir $symbol_contacts
                 submit_symbols "$project_name$spacename" "$buildnumber $($i.VSName) $config" "symbols" $i.symboldir $symbol_contacts
 
+                Write-Output "End symbol submission for $($i.VSName)"                
+
+                Write-Output "Begin Setup build for $($i.VSName)"
                 $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
@@ -564,6 +637,8 @@ try {
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project
+
+                Write-Output "End Setup build for $($i.VSName)"
             }
 
             $jobs = @()
@@ -585,7 +660,6 @@ try {
                         $project_name $project_url "$project_name $($i.VSName) - installer" $project_keywords `
                         "msi"
                 }
-
 
                 $vsix_files = @((Get-ChildItem "$($i.signed_unsigned_msidir)\*.vsix") | %{ @{
                     path="$_";
@@ -632,9 +706,17 @@ try {
                 } } | `
                 %{ Copy-Item $_.src $_.dest -Force -EA 0; $_ } | `
                 %{ "Copied $($_.src) -> $($_.dest)" }
+
+            $vsmanFile = "$($outdir)\NodejsTools.vsman"
+            if (Test-Path $vsmanFile) {
+                Write-Output "Patching VS Manifest $vsmanFile"
+                fix-vs-manifest $vsmanFile $i.final_msidir
+            } else {
+                Write-Output "Skipping VS Manifest patching because $vsmanFile does not exist"
+            }
         }
     }
-    
+
     after-build-all $buildroot $outdir
     
     if ($scorch) {

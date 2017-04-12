@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                     return ((OAProject)parentNode.GetAutomationObject()).ProjectItems;
                 } else {
                     // Not supported. Override this method in derived classes to return appropriate collection object
-                    throw new InvalidOperationException();
+                    return null;
                 }
             }
         }

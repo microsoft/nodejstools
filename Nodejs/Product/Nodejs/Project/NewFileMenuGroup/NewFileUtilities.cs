@@ -15,57 +15,19 @@
 //*********************************************************//
 
 using System;
-using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
     internal static class NewFileUtilities {
-        public static string GetTemplateFile(string fileType) {
-            string templateFileName = null;
-
-            switch (fileType) {
-                case NodejsConstants.JavaScript:
-                    templateFileName = "EmptyJs.js";
-                    break;
-                case NodejsConstants.TypeScript:
-                    templateFileName = "EmptyTs.ts";
-                    break;
-                case NodejsConstants.HTML:
-                    templateFileName = "EmptyHTML.html";
-                    break;
-                case NodejsConstants.CSS:
-                    templateFileName = "EmptyCSS.css";
-                    break;
-            }
-
-            if (templateFileName == null) {
-                Debug.Fail(String.Format("Invalid file type: {0}", fileType));
-            }
-
-            return NodejsToolsInstallPath.GetFile("FileTemplates\\NewItem\\" + templateFileName);
-        }
-
-        private static string GetInitialName(string fileType) {
-
-            switch (fileType) {
-                case NodejsConstants.JavaScript:
-                    return "JavaScript.js";
-                case NodejsConstants.TypeScript:
-                    return "TypeScript.ts";
-                case NodejsConstants.HTML:
-                    return "HTML.html";
-                case NodejsConstants.CSS:
-                    return "CSS.css";
-                default:
-                    Debug.Fail(String.Format("Invalid file type: {0}", fileType));
-                    return null;
-            }
-        }
-
-        private static void CreateNewFile(NodejsProjectNode projectNode, uint containerId, string fileType) {
-            using (var dialog = new NewFileNameForm(GetInitialName(fileType))) {
+        internal static void CreateNewFile(NodejsProjectNode projectNode, uint containerId) {
+            using (var dialog = new NewFileNameForm("")) {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
                     string itemName = dialog.TextBox.Text;
+                    if (string.IsNullOrWhiteSpace(itemName)) {
+                        return;
+                    }
+                    itemName = itemName.Trim();
 
                     VSADDRESULT[] pResult = new VSADDRESULT[1];
                     projectNode.AddItem(
@@ -73,30 +35,11 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup {
                         VSADDITEMOPERATION.VSADDITEMOP_CLONEFILE,    // Indicate that we want to create this new file by cloning a template file.
                         itemName,
                         1,                                           // Number of templates in the next parameter. Must be 1 if using VSADDITEMOP_CLONEFILE.
-                        new string[] { GetTemplateFile(fileType) },  // Array contains the template file path.
+                        new string[] { Path.GetTempFileName() },     // Array contains the template file path.
                         IntPtr.Zero,                                 // Handle to the Add Item dialog box. Must be Zero if using VSADDITEMOP_CLONEFILE.
-                        pResult
-                    );
-
-                    // TODO: Do we need to check if result[0] = VSADDRESULT.ADDRESULT_Success here?
+                        pResult);
                 }
             }
-        }
-
-        internal static void CreateNewJavaScriptFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.JavaScript);
-        }
-
-        internal static void CreateNewTypeScriptFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.TypeScript);
-        }
-
-        internal static void CreateNewHTMLFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.HTML);
-        }
-
-        internal static void CreateNewCSSFile(NodejsProjectNode projectNode, uint containerId) {
-            CreateNewFile(projectNode, containerId, NodejsConstants.CSS);
         }
     }
 }

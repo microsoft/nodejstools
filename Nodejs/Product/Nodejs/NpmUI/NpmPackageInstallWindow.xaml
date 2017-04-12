@@ -7,7 +7,8 @@
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    Title="Install New npm Packages"
+    xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
+    Title="{x:Static resx:NpmInstallWindowResources.WindowTitle}"
     Height="500"
     MinHeight="500"
     Width="700"
@@ -15,6 +16,7 @@
     WindowStartupLocation="CenterOwner"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
     ResizeMode="CanResizeWithGrip">
+    
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary>
@@ -49,14 +51,14 @@
                                         Opacity="0.5" />
 
                             <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}">
-                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Author: </TextBlock>
+                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.AuthorLabel}" />
                                 <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
                             </StackPanel>
 
                             <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
                                 Visibility="{Binding HomepagesVisibility}"
                                 Orientation="Horizontal">
-                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve">Homepage: </TextBlock>
+                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.HomepageLabel}" />
                                 <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -73,7 +75,7 @@
                             </StackPanel>
 
                             <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">
-                                <Run FontWeight="Bold" xml:space="preserve">Description: </Run>
+                                <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.DescriptionLabel}" />
                                 <Run Text="{Binding Path=Description, Mode=OneWay}"/>
                             </TextBlock>
                         </StackPanel>
@@ -141,17 +143,17 @@
                                 <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallMessage"
                                            Visibility="Collapsed"
-                                           FontWeight="Bold">
-                                    Installed locally
-                                </TextBlock>
+                                           FontWeight="Bold"
+                                           Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
+
                                 <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
                                            FontWeight="Bold"
                                            Foreground="Red">
-                                    <Run>Old version</Run>
+                                    <Run Text="{x:Static resx:NpmInstallWindowResources.OldVersionMessage}" />
                                     <Run Text="{Binding LocalVersion,Mode=OneWay}" />
-                                    <Run>installed locally</Run>
+                                    <Run Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
                                 </TextBlock>
                                 <TextBlock Grid.Column="2"
                                            x:Name="InstallMessageSeparator"
@@ -188,9 +190,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0"
                                        Margin="0 0 3 0"
-                                       VerticalAlignment="Center">
-                                Catalog Updated
-                            </TextBlock>
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
+                            
                             <TextBlock Grid.Column="1"
                                        x:Name="Message"
                                        Text="{Binding Description}"
@@ -279,9 +281,8 @@
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
                         IsCancel="True"
-                        KeyboardNavigation.TabIndex="10">
-                _Close
-            </Button>
+                        KeyboardNavigation.TabIndex="10"
+                        Content="{x:Static resx:NpmInstallWindowResources.CloseButtonContent}" />
         </Grid>
 
         <Grid Visibility="{Binding FilterControlsVisibility}">
@@ -297,7 +298,6 @@
                 <ColumnDefinition Width="7*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Grid.Column="0">
-
                 <TextBox x:Name="FilterTextBox"
                              IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                              Height="24"
@@ -308,8 +308,8 @@
                            Focusable="False"
                            IsHitTestVisible="False"
                            IsManipulationEnabled="False"
-                                    x:Name="SearchBlock" FontStyle="Italic" Padding="6 4 0 0" Opacity="0.5">
-                            Search for packages
+                           x:Name="SearchBlock" FontStyle="Italic" Padding="6 4 0 0" Opacity="0.5"
+                           Text="{x:Static resx:NpmInstallWindowResources.SearchForPackagesLabel}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
@@ -343,19 +343,17 @@
                         BorderThickness="{Binding ElementName=_packageList,Path=BorderThickness}">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center"
-                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}">
-                            Type to search for packages.
-                        </TextBlock>
+                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}"
+                                   Text="{x:Static resx:NpmInstallWindowResources.SearchPromptMessage}" />
                         <ProgressBar 
                     HorizontalAlignment="Stretch"
                     IsEnabled="True" 
                     IsIndeterminate="True"
                     Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.Filtering == b ? Visibility.Visible : Visibility.Hidden'}}"/>
-                        <TextBlock 
-                    HorizontalAlignment="Center"
-                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}">
-                    No results found.
-                        </TextBlock>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}"
+                            Text="{x:Static resx:NpmInstallWindowResources.NoResultsFoundMessage}" />
                     </Grid>
                 </Border>
             </Grid>
@@ -382,7 +380,8 @@
                         Name="RefreshButton"
                         Command="{x:Static npmUi:NpmPackageInstallViewModel.RefreshCatalogCommand}"
                         KeyboardNavigation.TabIndex="8"
-                        xml:space="preserve">Refresh</Button>
+                        xml:space="preserve"
+                        Content="{x:Static resx:NpmInstallWindowResources.RefreshButtonContent}" />
             </Grid>
 
             <Grid Grid.Column="2" Grid.RowSpan="2" Margin="8 0 0 0" >
@@ -424,12 +423,12 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4">Options</TextBlock>
-                        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Other npm arguments</Label>
+                        <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4" Text="{x:Static resx:NpmInstallWindowResources.OptionsLabel}" />
+                        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.OtherNpmArgumentsLabel}" />
                         <TextBox x:Name="ArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="6"/>
-                        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Add to package.json</Label>
-                        <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4">(recommended)</CheckBox>
-                        <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Dependency type</Label>
+                        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonLabel}" />
+                        <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonCheckboxLabel}" />
+                        <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.DependencyTypeLabel}" />
 
                         <ComboBox Name="DependencyComboBox"
                                   Grid.Row="2"
@@ -439,12 +438,12 @@
                                   Margin="4"
                                   KeyboardNavigation.TabIndex="3" SelectedIndex="{Binding SelectedDependencyTypeIndex}"
                               HorizontalAlignment="Left">
-                            <ComboBoxItem Tag="St" IsSelected="True">Standard</ComboBoxItem>
-                            <ComboBoxItem Tag="Dev">Development</ComboBoxItem>
-                            <ComboBoxItem Tag="Opt">Optional</ComboBoxItem>
+                            <ComboBoxItem Tag="St" IsSelected="True" Content="{x:Static resx:NpmInstallWindowResources.DevTypeStandardChoice}" />
+                            <ComboBoxItem Tag="Dev" Content="{x:Static resx:NpmInstallWindowResources.DevTypeDevelopmentChoice}" />
+                            <ComboBoxItem Tag="Opt" Content="{x:Static resx:NpmInstallWindowResources.DevTypeOptionalChoice}" />
                         </ComboBox>
 
-                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Selected version</Label>
+                        <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.SelectedVersionLabel}" />
                         <ComboBox Name="SelectedVersionComboBox"
                                   Grid.Row="4"
                                   Grid.Column="1"
@@ -471,13 +470,12 @@
                                 Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
                                 CommandParameter="{Binding SelectedPackage}"
                                 KeyboardNavigation.TabIndex="6"
-                                IsDefault="True">
-                            _Install Package
-                        </Button>
+                                IsDefault="True"
+                                Content="{x:Static resx:NpmInstallWindowResources.InstallPackageButtonLabel}" />
+
                         <Button Style="{StaticResource NavigationButton}" VerticalAlignment="Center" Margin="5 0 0 0" 
-                                Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="7">
-                            Reset Options
-                        </Button>
+                                Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="7"
+                                Content="{x:Static resx:NpmInstallWindowResources.ResetOptionsButtonLabel}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>

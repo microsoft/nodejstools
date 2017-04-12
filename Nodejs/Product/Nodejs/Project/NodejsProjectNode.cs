@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -142,7 +143,7 @@ namespace Microsoft.NodejsTools.Project {
 
         private static bool TrySetTypingsLoadingStatusBar(IVsStatusbar statusBar, object icon) {
             if (statusBar != null && !IsStatusBarFrozen(statusBar)) {
-                statusBar.SetText(SR.GetString(SR.StatusTypingsLoading));
+                statusBar.SetText(Resources.StatusTypingsLoading);
                 statusBar.Animation(1, ref icon);
                 if (ErrorHandler.Succeeded(statusBar.FreezeOutput(1))) {
                     return true;
@@ -160,7 +161,7 @@ namespace Microsoft.NodejsTools.Project {
                 }
 
                 statusBar.Animation(0, ref icon);
-                statusBar.SetText(SR.GetString(SR.StatusTypingsLoaded));
+                statusBar.SetText(Resources.StatusTypingsLoaded);
             }
         }
 
@@ -241,7 +242,7 @@ namespace Microsoft.NodejsTools.Project {
 
         public bool IsTypeScriptProject {
             get {
-                return string.Equals(GetProjectProperty(NodejsConstants.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
+                return string.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true", StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -313,14 +314,14 @@ namespace Microsoft.NodejsTools.Project {
 
             if (IsProjectTypeScriptSourceFile(fileName) && !IsTypeScriptProject) {
                 // enable TypeScript on the project automatically...
-                SetProjectProperty(NodejsConstants.EnableTypeScript, "true");
-                SetProjectProperty(NodejsConstants.TypeScriptSourceMap, "true");
+                SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
+                SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
 #if DEV14
                 // Reset cached value, so it will be recalculated later.
                 this.shouldAcquireTypingsAutomatically = false;
 #endif
-                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodejsConstants.TypeScriptModuleKind))) {
-                    SetProjectProperty(NodejsConstants.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                if (String.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind))) {
+                    SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
                 }
             }
         }
@@ -424,10 +425,10 @@ namespace Microsoft.NodejsTools.Project {
         protected override Guid[] GetConfigurationDependentPropertyPages() {
             var res = base.GetConfigurationDependentPropertyPages();
 
-            var enableTs = GetProjectProperty(NodejsConstants.EnableTypeScript, resetCache: false);
+            var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
             bool fEnableTs;
             if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs) {
-                var typeScriptPages = GetProjectProperty(NodejsConstants.TypeScriptCfgProperty);
+                var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null) {
                     foreach (var strGuid in typeScriptPages.Split(';')) {
                         Guid guid;
@@ -469,11 +470,6 @@ namespace Microsoft.NodejsTools.Project {
                    ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override int InitializeForOuter(string filename, string location, string name, uint flags, ref Guid iid, out IntPtr projectPointer, out int canceled) {
-            NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged += ShowBrowserAndNodeLabelsChanged;
-
-            return base.InitializeForOuter(filename, location, name, flags, ref iid, out projectPointer, out canceled);
-        }
 
         protected override void Reload() {
             using (new DebugTimer("Project Load")) {
@@ -499,44 +495,37 @@ namespace Microsoft.NodejsTools.Project {
             _intermediateOutputPath = Path.Combine(ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
         }
 
-        private void ShowBrowserAndNodeLabelsChanged(object sender, EventArgs e) {
-            var nodejsFolderNodes = this.AllDescendants.Where(item => (item as NodejsFolderNode) != null).Select(item => (NodejsFolderNode)item);
-            foreach (var node in nodejsFolderNodes) {
-                ProjectMgr.ReDrawNode(node, UIHierarchyElement.Caption);
-            }
-        }
-
         protected override void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue) {
             base.RaiseProjectPropertyChanged(propertyName, oldValue, newValue);
 
             var propPage = GeneralPropertyPageControl;
             if (propPage != null) {
                 switch (propertyName) {
-                    case NodejsConstants.Environment:
+                    case NodeProjectProperty.Environment:
                         propPage.Environment = newValue;
                         break;
-                    case NodejsConstants.DebuggerPort:
+                    case NodeProjectProperty.DebuggerPort:
                         propPage.DebuggerPort = newValue;
                         break;
-                    case NodejsConstants.NodejsPort:
+                    case NodeProjectProperty.NodejsPort:
                         propPage.NodejsPort = newValue;
                         break;
-                    case NodejsConstants.NodeExePath:
+                    case NodeProjectProperty.NodeExePath:
                         propPage.NodeExePath = newValue;
                         break;
-                    case NodejsConstants.NodeExeArguments:
+                    case NodeProjectProperty.NodeExeArguments:
                         propPage.NodeExeArguments = newValue;
                         break;
                     case CommonConstants.StartupFile:
                         propPage.ScriptFile = newValue;
                         break;
-                    case NodejsConstants.ScriptArguments:
+                    case NodeProjectProperty.ScriptArguments:
                         propPage.ScriptArguments = newValue;
                         break;
-                    case NodejsConstants.LaunchUrl:
+                    case NodeProjectProperty.LaunchUrl:
                         propPage.LaunchUrl = newValue;
                         break;
-                    case NodejsConstants.StartWebBrowser:
+                    case NodeProjectProperty.StartWebBrowser:
                         bool value;
                         if (Boolean.TryParse(newValue, out value)) {
                             propPage.StartWebBrowser = value;
@@ -613,7 +602,19 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         protected override ReferenceContainerNode CreateReferenceContainerNode() {
-            return null;
+            // Only create a reference node if the project is targeting UWP
+            if(GetProjectTypeGuids().Contains(Guids.NodejsUwpProjectFlavor)) {
+                return base.CreateReferenceContainerNode();
+            } else {
+                return null;
+            }
+        }
+
+        private string GetProjectTypeGuids()
+        {
+            string projectTypeGuids = "";
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            return projectTypeGuids;
         }
 
         public NodeModulesNode ModulesNode { get; private set; }
@@ -728,18 +729,18 @@ namespace Microsoft.NodejsTools.Project {
                 var taskDialog = new TaskDialog(NodejsPackage.Instance) {
                     AllowCancellation = true,
                     EnableHyperlinks = true,
-                    Title = SR.GetString(SR.LongPathWarningTitle),
+                    Title = Resources.LongPathWarningTitle,
                     MainIcon = TaskDialogIcon.Warning,
-                    Content = SR.GetString(SR.LongPathWarningText),
-                    CollapsedControlText = SR.GetString(SR.LongPathShowPathsExceedingTheLimit),
-                    ExpandedControlText = SR.GetString(SR.LongPathHidePathsExceedingTheLimit),
+                    Content = Resources.LongPathWarningText,
+                    CollapsedControlText = Resources.LongPathShowPathsExceedingTheLimit,
+                    ExpandedControlText = Resources.LongPathHidePathsExceedingTheLimit,
                     Buttons = {
-                        (dedupeButton = new TaskDialogButton(SR.GetString(SR.LongPathNpmDedupe), SR.GetString(SR.LongPathNpmDedupeDetail))),
-                        (ignoreButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingButWarnNextTime))),
-                        (disableButton = new TaskDialogButton(SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgain), SR.GetString(SR.LongPathDoNothingAndDoNotWarnAgainDetail)))
+                        (dedupeButton = new TaskDialogButton(Resources.LongPathNpmDedupe, Resources.LongPathNpmDedupeDetail)),
+                        (ignoreButton = new TaskDialogButton(Resources.LongPathDoNothingButWarnNextTime)),
+                        (disableButton = new TaskDialogButton(Resources.LongPathDoNothingAndDoNotWarnAgain, Resources.LongPathDoNothingAndDoNotWarnAgainDetail))
                     },
                     FooterIcon = TaskDialogIcon.Information,
-                    Footer = SR.GetString(SR.LongPathFooter)
+                    Footer = Resources.LongPathFooter
                 };
 
                 taskDialog.HyperlinkClicked += (sender, e) => {
@@ -764,7 +765,7 @@ namespace Microsoft.NodejsTools.Project {
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(ProjectHome)
                     .Concat(GetLongSubPaths(_intermediateOutputPath))
-                    .Select(lpi => string.Format("• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, SR.GetString(SR.LongPathClickToCopy)))
+                    .Select(lpi => string.Format(CultureInfo.InvariantCulture, "• {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, Resources.LongPathClickToCopy))
                     .ToArray());
                 if (longPaths.Length == 0) {
                     return;
@@ -776,7 +777,7 @@ namespace Microsoft.NodejsTools.Project {
                     var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
                     await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(SR.ProductName);
 
-                    taskDialog.Content += "\r\n\r\n" + SR.GetString(SR.LongPathNpmDedupeDidNotHelp);
+                    taskDialog.Content += "\r\n\r\n" + Resources.LongPathNpmDedupeDidNotHelp;
                     taskDialog.Buttons.Remove(dedupeButton);
                     goto recheck;
                 } else if (button == disableButton) {
@@ -849,8 +850,6 @@ namespace Microsoft.NodejsTools.Project {
                     _idleNodeModulesTimer = null;
                 }
 
-                NodejsPackage.Instance.GeneralOptionsPage.ShowBrowserAndNodeLabelsChanged -= ShowBrowserAndNodeLabelsChanged;
-
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
                 RemoveChild(ModulesNode);
@@ -914,11 +913,9 @@ namespace Microsoft.NodejsTools.Project {
                             }
                         }
                         break;
-						case PkgCmdId.cmdidAddNewJavaScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewTypeScriptFileCommand: 
-					case PkgCmdId.cmdidAddNewHTMLFileCommand: 
-					case PkgCmdId.cmdidAddNewCSSFileCommand: 
-						return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
+
+                    case PkgCmdId.cmdidAddFileCommand:
+                        return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED; 
                 }
             }
 
@@ -937,7 +934,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
@@ -953,7 +950,7 @@ namespace Microsoft.NodejsTools.Project {
                     NpmHelpers.GetPathToNpm(
                         Nodejs.GetAbsoluteNodeExePath(
                             ProjectHome,
-                            Project.GetNodejsProject().GetProjectProperty(NodejsConstants.NodeExePath)
+                            Project.GetNodejsProject().GetProjectProperty(NodeProjectProperty.NodeExePath)
                     ));
                 } catch (NpmNotFoundException) {
                     Nodejs.ShowNodejsNotInstalled();
@@ -989,26 +986,10 @@ namespace Microsoft.NodejsTools.Project {
                         handled = true;
                         return VSConstants.S_OK;
 
-                    case PkgCmdId.cmdidAddNewJavaScriptFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewJavaScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
+                    case PkgCmdId.cmdidAddFileCommand:
+                        NewFileMenuGroup.NewFileUtilities.CreateNewFile(projectNode: this, containerId: selectedNodes[0].ID);
                         handled = true;
                         return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewTypeScriptFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewTypeScriptFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewHTMLFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewHTMLFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
-                    case PkgCmdId.cmdidAddNewCSSFileCommand:
-                        NewFileMenuGroup.NewFileUtilities.CreateNewCSSFile(projectNode: this, containerId: selectedNodes[0].ID);
-                        handled = true;
-                        return VSConstants.S_OK;
-
                 }
             }
 
@@ -1060,7 +1041,7 @@ namespace Microsoft.NodejsTools.Project {
         internal OutputWindowRedirector NpmOutputPane {
             get {
                 try {
-                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, "Bower/npm");
+                    return OutputWindowRedirector.Get(Site, VSPackageManagerPaneGuid, Resources.NpmOutputPaneTitle);
                 } catch (InvalidOperationException) {
                     return null;
                 }

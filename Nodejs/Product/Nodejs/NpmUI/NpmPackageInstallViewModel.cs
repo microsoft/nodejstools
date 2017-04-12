@@ -118,7 +118,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             private set {
                 _isLoadingCatalog = value;
                 OnPropertyChanged();
-                OnPropertyChanged("CanRefreshCatalog");
+                OnPropertyChanged(nameof(CanRefreshCatalog));
             }
         }
 
@@ -155,7 +155,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _loadingCatalogControlVisibility = value;
                 OnPropertyChanged();
-                OnPropertyChanged("FilterControlsVisibility");
+                OnPropertyChanged(nameof(FilterControlsVisibility));
             }
         }
         
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.NpmUI {
 
             CatalogControlVisibility = Visibility.Collapsed;
             LoadingCatalogControlVisibility = Visibility.Visible;
-            LoadingCatalogMessage = SR.GetString(SR.CatalogLoadingDefault);
+            LoadingCatalogMessage = Resources.CatalogLoadingDefault;
 
             LastRefreshedMessage = LastRefreshedMessageProvider.RefreshInProgress;
 
@@ -258,7 +258,7 @@ namespace Microsoft.NodejsTools.NpmUI {
             set {
                 _isFiltering = value;
                 OnPropertyChanged();
-                OnPropertyChanged("PackageFilterState");
+                OnPropertyChanged(nameof(PackageFilterState));
             }
         }
 
@@ -276,7 +276,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 // PackageFilterState should be triggered before FilteredPackages
                 // to allow the UI to update the status before the package list,
                 // making for a smoother experience.
-                OnPropertyChanged("PackageFilterState");
+                OnPropertyChanged(nameof(PackageFilterState));
                 OnPropertyChanged();
             }
         }
@@ -290,7 +290,7 @@ namespace Microsoft.NodejsTools.NpmUI {
                 IsFiltering = !string.IsNullOrWhiteSpace(_filterText);
 
                 OnPropertyChanged();
-                OnPropertyChanged("PackageFilterState");
+                OnPropertyChanged(nameof(PackageFilterState));
             }
         }
 

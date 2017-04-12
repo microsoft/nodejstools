@@ -14,6 +14,7 @@
 //
 //*********************************************************//
 
+using System.Globalization;
 using System.Text;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,7 +39,7 @@ namespace NpmTests {
             Assert.AreEqual(null != expectedBuildMetadata, actual.HasBuildMetadata, "Build metadata presence mismatch.");
             Assert.AreEqual(expectedBuildMetadata, actual.BuildMetadata, "Build metadata mismatch.");
 
-            var expected = new StringBuilder(string.Format("{0}.{1}.{2}", expectedMajor, expectedMinor, expectedPatch));
+            var expected = new StringBuilder(string.Format(CultureInfo.InvariantCulture, "{0}.{1}.{2}", expectedMajor, expectedMinor, expectedPatch));
             if (null != expectedPreRelease) {
                 expected.Append('-');
                 expected.Append(expectedPreRelease);

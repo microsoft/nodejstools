@@ -1,0 +1,214 @@
+<?xml version="1.0" ?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" original="D:\dd\nodejstools\Nodejs\Product\Nodejs\NodejsTools.vsct" source-language="en" target-language="cs">
+    <body>
+      <trans-unit id="ToolsMenu|ButtonText">
+        <source xml:lang="en">Node.&amp;js Tools</source>
+        <target>Ná&amp;stroje Node.js</target>
+      </trans-unit>
+      <trans-unit id="ToolsMenu|CommandName">
+        <source xml:lang="en">Node.&amp;js Tools</source>
+        <target>Ná&amp;stroje Node.js</target>
+      </trans-unit>
+      <trans-unit id="RemoteDebugProxyMenu|ButtonText">
+        <source xml:lang="en">&amp;Remote Debugging Proxy</source>
+        <target>&amp;Server proxy vzdáleného ladění</target>
+      </trans-unit>
+      <trans-unit id="RemoteDebugProxyMenu|CommandName">
+        <source xml:lang="en">&amp;Remote Debugging Proxy</source>
+        <target>&amp;Server proxy vzdáleného ladění</target>
+      </trans-unit>
+      <trans-unit id="NpmMenu|ButtonText">
+        <source xml:lang="en">&amp;Npm</source>
+        <target>&amp;Npm</target>
+      </trans-unit>
+      <trans-unit id="NpmMenu|CommandName">
+        <source xml:lang="en">&amp;Npm</source>
+        <target>&amp;Npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidAddNewFileCommand|ButtonText">
+        <source xml:lang="en">New File...</source>
+        <target>Nový soubor...</target>
+      </trans-unit>
+      <trans-unit id="cmdidSetAsNodejsStartupFile|ButtonText">
+        <source xml:lang="en">S&amp;et as Node.js Startup File</source>
+        <target>N&amp;astavit jako spouštěcí soubor Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidSetAsNodejsStartupFile|CommandName">
+        <source xml:lang="en">Set as Node.js Startup File</source>
+        <target>Nastavit jako spouštěcí soubor Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidAddExistingFolder|ButtonText">
+        <source xml:lang="en">Existing &amp;Folder...</source>
+        <target>&amp;Existující složka...</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenCommandPromptHere|ButtonText">
+        <source xml:lang="en">Open Command &amp;Prompt Here...</source>
+        <target>Otevřít zde příkazový řádek...</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenCommandPromptHere|CommandName">
+        <source xml:lang="en">OpenCommandPromptHere</source>
+      </trans-unit>
+      <trans-unit id="cmdidCopyFullPath|ButtonText">
+        <source xml:lang="en">Copy F&amp;ull Path</source>
+        <target>&amp;Kopírovat úplnou cestu</target>
+      </trans-unit>
+      <trans-unit id="cmdidCopyFullPath|ToolTipText">
+        <source xml:lang="en">Copy Full Path</source>
+        <target>Kopírovat úplnou cestu</target>
+      </trans-unit>
+      <trans-unit id="cmdidReplWindow|ButtonText">
+        <source xml:lang="en">Node.js Interactive Window</source>
+        <target>Interaktivní okno Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidReplWindow|CommandName">
+        <source xml:lang="en">Node.js Interactive Window</source>
+        <target>Interaktivní okno Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenReplWindow|ButtonText">
+        <source xml:lang="en">Open Node.js Interactive Window</source>
+        <target>Otevřít interaktivní okno Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenReplWindow|CommandName">
+        <source xml:lang="en">Open Node.js Interactive Window</source>
+        <target>Otevřít interaktivní okno Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenRemoteDebugProxyFolder|ButtonText">
+        <source xml:lang="en">&amp;Open Containing Folder</source>
+        <target>&amp;Otevřít nadřazenou složku</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenRemoteDebugProxyFolder|CommandName">
+        <source xml:lang="en">Open Containing Folder</source>
+        <target>Otevřít nadřazenou složku</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenRemoteDebugDocumentation|ButtonText">
+        <source xml:lang="en">Open &amp;Documentation</source>
+        <target>Otevřít &amp;dokumentaci</target>
+      </trans-unit>
+      <trans-unit id="cmdidOpenRemoteDebugDocumentation|CommandName">
+        <source xml:lang="en">Open Documentation</source>
+        <target>Otevřít dokumentaci</target>
+      </trans-unit>
+      <trans-unit id="cmdidDocumentation|ButtonText">
+        <source xml:lang="en">&amp;Documentation...</source>
+        <target>&amp;Dokumentace...</target>
+      </trans-unit>
+      <trans-unit id="cmdidDocumentation|CommandName">
+        <source xml:lang="en">Documentation...</source>
+        <target>Dokumentace...</target>
+      </trans-unit>
+      <trans-unit id="cmdidSurveyNews|ButtonText">
+        <source xml:lang="en">Survey/&amp;News...</source>
+        <target>Průzkum/&amp;novinky...</target>
+      </trans-unit>
+      <trans-unit id="cmdidSurveyNews|CommandName">
+        <source xml:lang="en">Survey/News...</source>
+        <target>Průzkum/novinky...</target>
+      </trans-unit>
+      <trans-unit id="cmdidSendFeedback|ButtonText">
+        <source xml:lang="en">&amp;Report Issue or Send Feedback...</source>
+        <target>&amp;Nahlásit problém nebo poslat názor...</target>
+      </trans-unit>
+      <trans-unit id="cmdidSendFeedback|CommandName">
+        <source xml:lang="en">Report Issue or Send Feedback...</source>
+        <target>Nahlásit problém nebo poslat názor...</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmManageModules|ButtonText">
+        <source xml:lang="en">Install &amp;New npm Packages...</source>
+        <target>&amp;Nainstalovat nové balíčky npm...</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmManageModules|CommandName">
+        <source xml:lang="en">cmdidNpmManageModules</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmInstallModules|ButtonText">
+        <source xml:lang="en">&amp;Install Missing npm Packages</source>
+        <target>&amp;Nainstalovat chybějící balíčky npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmInstallModules|CommandName">
+        <source xml:lang="en">cmdidNpmInstallModules</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUpdateModules|ButtonText">
+        <source xml:lang="en">Up&amp;date npm Packages</source>
+        <target>&amp;Aktualizovat balíčky npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUpdateModules|CommandName">
+        <source xml:lang="en">cmdidNpmUpdateModules</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUninstallModule|ButtonText">
+        <source xml:lang="en">Unins&amp;tall npm Package(s)</source>
+        <target>&amp;Odinstalovat balíčky npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUninstallModule|CommandName">
+        <source xml:lang="en">cmdidNpmUninstallModules</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmInstallSingleMissingModule|ButtonText">
+        <source xml:lang="en">&amp;Install Missing npm Package(s)</source>
+        <target>&amp;Nainstalovat chybějící balíčky npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmInstallSingleMissingModule|CommandName">
+        <source xml:lang="en">cmdidNpmInstallSingleMissingModule</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUpdateSingleModule|ButtonText">
+        <source xml:lang="en">&amp;Update npm Package(s)</source>
+        <target>&amp;Atualizovat balíčky npm</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmUpdateSingleModule|CommandName">
+        <source xml:lang="en">cmdidNpmUpdateSingleModule</source>
+      </trans-unit>
+      <trans-unit id="cmdidNpmOpenModuleHomepage|ButtonText">
+        <source xml:lang="en">Open &amp;Documentation</source>
+        <target>Otevřít &amp;dokumentaci</target>
+      </trans-unit>
+      <trans-unit id="cmdidNpmOpenModuleHomepage|CommandName">
+        <source xml:lang="en">cmdidNpmOpenModuleHomepage</source>
+      </trans-unit>
+      <trans-unit id="cmdidImportWizard|ButtonText">
+        <source xml:lang="en">Import Existing &amp;Project...</source>
+        <target>I&amp;mportovat existující projekt...</target>
+      </trans-unit>
+      <trans-unit id="cmdidImportWizard|ToolTipText">
+        <source xml:lang="en">Import Existing Project...</source>
+        <target>Importovat existující projekt...</target>
+      </trans-unit>
+      <trans-unit id="cmdidImportWizard|MenuText">
+        <source xml:lang="en">Import Existing &amp;Project...</source>
+        <target>I&amp;mportovat existující projekt...</target>
+      </trans-unit>
+      <trans-unit id="cmdidImportWizard|CommandName">
+        <source xml:lang="en">Import Existing Project...</source>
+        <target>Importovat existující projekt...</target>
+      </trans-unit>
+      <trans-unit id="cmdidAzureExplorerAttachNodejsDebugger|ButtonText">
+        <source xml:lang="en">Attach Debugger (&amp;Node.js)</source>
+        <target>Připojit ladicí program (&amp;Node.js)</target>
+      </trans-unit>
+      <trans-unit id="cmdidAzureExplorerAttachNodejsDebugger|ToolTipText">
+        <source xml:lang="en">Attach the Node.js debugger to the remote Microsoft Azure site</source>
+        <target>Připojit ladicí program Node.js ke vzdálenému webu Microsoft Azure</target>
+      </trans-unit>
+      <trans-unit id="cmdidAzureExplorerAttachNodejsDebugger|MenuText">
+        <source xml:lang="en">Attach Debugger (&amp;Node.js)</source>
+        <target>Připojit ladicí program (&amp;Node.js)</target>
+      </trans-unit>
+      <trans-unit id="cmdidAzureExplorerAttachNodejsDebugger|CommandName">
+        <source xml:lang="en">Attach Node.js Debugger</source>
+        <target>Připojit ladicí program Node.js</target>
+      </trans-unit>
+      <trans-unit id="cmdidDiagnostics|ButtonText">
+        <source xml:lang="en">&amp;Diagnostic Info...</source>
+        <target>&amp;Diagnostické informace...</target>
+      </trans-unit>
+      <trans-unit id="cmdidDiagnostics|ToolTipText">
+        <source xml:lang="en">Diagnostic Info...</source>
+        <target>Diagnostické informace...</target>
+      </trans-unit>
+      <trans-unit id="cmdidDiagnostics|MenuText">
+        <source xml:lang="en">&amp;Diagnostic Info...</source>
+        <target>&amp;Diagnostické informace...</target>
+      </trans-unit>
+      <trans-unit id="cmdidDiagnostics|CommandName">
+        <source xml:lang="en">Diagnostic Info...</source>
+        <target>Diagnostické informace...</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

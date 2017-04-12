@@ -196,7 +196,7 @@ namespace Microsoft.NodejsTools.Jade {
 
         [ExcludeFromCodeCoverage]
         public override string ToString() {
-            return String.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", Start, End);
+            return string.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", Start, End);
         }
 
         /// <summary>

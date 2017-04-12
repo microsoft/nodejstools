@@ -30,21 +30,21 @@ namespace Microsoft.NodejsTools.Project {
         }
 
         public override string GetClassName() {
-            return SR.GetString(SR.PropertiesClassNpm);
+            return Resources.PropertiesClassNpm;
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmNodePackageInstallation)]
-        [SRDescriptionAttribute(SR.NpmNodePackageInstallationDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmNodePackageInstallation))]
+        [ResourcesDescription(nameof(Resources.NpmNodePackageInstallationDescription))]
         public string PackageInstallation {
             get {
-                return SR.GetString(SR.PackageInstallationLocal);
+                return Resources.PackageInstallationLocal;
             }
         }
 
-        [SRCategoryAttribute(SR.General)]
-        [SRDisplayName(SR.NpmNodePath)]
-        [SRDescriptionAttribute(SR.NpmNodePathDescription)]
+        [SRCategory(SR.General)]
+        [ResourcesDisplayName(nameof(Resources.NpmNodePath))]
+        [ResourcesDescription(nameof(Resources.NpmNodePathDescription))]
         public string Path {
             get {
                 var node = NpmNode;

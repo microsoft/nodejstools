@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -38,9 +39,9 @@ namespace Microsoft.NodejsTools.Profiling {
 
         public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser, bool justMyCode) {
             if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64) {
-                throw new InvalidOperationException(String.Format("Unsupported architecture: {0}", arch));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Unsupported architecture: {0}", arch));
             }
-            if (dir.EndsWith("\\")) {
+            if (dir.EndsWith("\\", StringComparison.Ordinal)) {
                 dir = dir.Substring(0, dir.Length - 1);
             }
             if (String.IsNullOrEmpty(dir)) {
@@ -80,7 +81,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 }
             }
 
-            processInfo.Arguments = String.Format("{1} --prof \"{0}\" {2}", script, interpreterArgs, scriptArgs);
+            processInfo.Arguments = string.Format(CultureInfo.InvariantCulture, "{1} --prof \"{0}\" {2}", script, interpreterArgs, scriptArgs);
             _process = new Process();
             _process.StartInfo = processInfo;
         }
@@ -141,7 +142,7 @@ namespace Microsoft.NodejsTools.Profiling {
                             .Reverse()
                             .FirstOrDefault();
                         if (v8log == null) {
-                            MessageBox.Show(String.Format("v8 log file was not successfully saved to:\r\n{0}\r\n\r\nNo profiling data is available.", v8log));
+                            MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToSaveV8LogMessageText, v8log));
                             return;
                         }
                     }
@@ -151,11 +152,11 @@ namespace Microsoft.NodejsTools.Profiling {
                                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                                 "Microsoft.NodejsTools.NodeLogConverter.exe"
                             ),
-                            (_justMyCode ? "/jmc " : String.Empty) + 
-                            (is012 ? "/v:0.12 " : String.Empty) + 
+                            (_justMyCode ? "/jmc " : string.Empty) + 
+                            (is012 ? "/v:0.12 " : string.Empty) + 
                             "\"" + v8log + "\" " +
                             "\"" + filename + "\" " +
-                            "\"" + _process.StartTime.ToString() + "\" " +
+                            "\"" + _process.StartTime.ToString(CultureInfo.InvariantCulture) + "\" " +
                             "\"" + executionTime.ToString() + "\""
                         );
 
@@ -176,11 +177,7 @@ namespace Microsoft.NodejsTools.Profiling {
                 } catch {
                     // file in use, multiple node.exe's running, user trying
                     // to profile multiple times, etc...
-                    MessageBox.Show(string.Format(
-                        "Unable to delete '{0}'.\r\n\r\n" +
-                        "There is probably a second copy of node.exe running and the\r\n" +
-                        "results may be unavailable or incorrect.\r\n",
-                        v8log));
+                    MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.UnableToDeleteV8Log, v8log));
                 }
             };
 

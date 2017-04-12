@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Profiling {
     /// <summary>
     /// Factory for creating our editor object. Extends from the IVsEditoryFactory interface
     /// </summary>
-    [Guid(Guids.ProfilingEditorFactoryString)]
+    [Guid(ProfilingGuids.ProfilingEditorFactoryString)]
     sealed class ProfilingSessionEditorFactory : IVsEditorFactory, IDisposable {
         private readonly NodejsProfilingPackage _editorPackage;
         private ServiceProvider _vsServiceProvider;
@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.Profiling {
             // Initialize to null
             ppunkDocView = IntPtr.Zero;
             ppunkDocData = IntPtr.Zero;
-            pguidCmdUI = Guids.ProfilingEditorFactory;
+            pguidCmdUI = ProfilingGuids.ProfilingEditorFactory;
             pgrfCDW = 0;
             pbstrEditorCaption = null;
 
@@ -182,10 +182,10 @@ namespace Microsoft.NodejsTools.Profiling {
                     fs.Close();
                 }
             } catch (IOException e) {
-                MessageBox.Show("Failed to open file {0}\r\n\r\n" + e.Message, Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToOpenFileErrorMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
             } catch (InvalidOperationException e) {
-                MessageBox.Show("Failed to read performance session {0}\r\n\r\n" + e.Message, Resources.NodejsToolsForVS);
+                MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToReadPerformanceSessionMessageText, e.Message), Resources.NodejsToolsForVS);
                 return VSConstants.E_FAIL;
             }
 

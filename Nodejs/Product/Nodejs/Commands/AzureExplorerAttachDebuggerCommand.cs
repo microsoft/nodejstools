@@ -15,6 +15,7 @@
 //*********************************************************//
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -79,10 +80,7 @@ namespace Microsoft.NodejsTools.Commands {
             Action<Task<bool>> onAttach = null;
             onAttach = (attachTask) => {
                 if (!attachTask.Result) {
-                    string msg = string.Format(
-                        "Could not attach to node.exe process on Azure Website at {0}.\r\n\r\n" +
-                        "Error retrieving websocket debug proxy information from web.config.",
-                        webSite.Uri);
+                    string msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
                     if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
                         AttachWorker(webSite).ContinueWith(onAttach);
                     }
@@ -187,7 +185,11 @@ namespace Microsoft.NodejsTools.Commands {
         }
 
         private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
-            using (new WaitDialog("Azure remote debugging", "Attaching to Azure Website at " + webSite.Uri, NodejsPackage.Instance, showProgress: true)) {
+            using (new WaitDialog(
+                Resources.AzureRemoteDebugWaitCaption,
+                string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoteDebugWaitMessage, webSite.Uri),
+                NodejsPackage.Instance,
+                showProgress: true)) {
                 // Get path (relative to site URL) for the debugger endpoint.
                 XDocument webConfig;
                 try {
@@ -222,7 +224,7 @@ namespace Microsoft.NodejsTools.Commands {
                     // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
                     // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
                     var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
-                    output.WriteErrorLine("Failed to attach to Azure Website: " + ex.Message);
+                    output.WriteErrorLine(string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage, ex.Message));
                     output.ShowAndActivate();
                 }
                 return true;
@@ -255,7 +257,7 @@ namespace Microsoft.NodejsTools.Commands {
 
             // Get web.config for the site via FTP.
 
-            if (!publishUrl.EndsWith("/")) {
+            if (!publishUrl.EndsWith("/", StringComparison.Ordinal)) {
                 publishUrl += "/";
             }
             publishUrl += "web.config";
@@ -319,7 +321,7 @@ namespace Microsoft.NodejsTools.Commands {
 
             // Prepare a web request to get the publish settings.
             // See http://msdn.microsoft.com/en-us/library/windowsazure/dn166996.aspx
-            string requestPath = string.Format(
+            string requestPath = string.Format(CultureInfo.InvariantCulture,
                 "{0}/services/WebSpaces/{1}/sites/{2}/publishxml",
                 subscription.SubscriptionId,
                 webSite.WebSpace,

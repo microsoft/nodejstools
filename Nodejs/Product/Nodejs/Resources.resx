@@ -246,35 +246,11 @@
   <data name="PackageTypeLocalSubpackage" xml:space="preserve">
     <value>Local sub-package</value>
   </data>
-  <data name="LinkStatusLocallyInstalled" xml:space="preserve">
-    <value>Installed locally</value>
-  </data>
-  <data name="LinkStatusNotLinkedToProject" xml:space="preserve">
-    <value>Not linked to project</value>
-  </data>
-  <data name="LinkStatusLinkedToProject" xml:space="preserve">
-    <value>Linked or installed into project</value>
-  </data>
   <data name="LinkStatusNotApplicableSubPackages" xml:space="preserve">
     <value>Not applicable for sub-packages.</value>
   </data>
   <data name="LinkStatusUnknown" xml:space="preserve">
     <value>Unknown</value>
-  </data>
-  <data name="NewVersionNotApplicableSubpackage" xml:space="preserve">
-    <value>Not applicable for sub-packages</value>
-  </data>
-  <data name="NewVersionUnknown" xml:space="preserve">
-    <value>Unknown</value>
-  </data>
-  <data name="NewVersionPackageCatalogNotRetrieved" xml:space="preserve">
-    <value>Package catalog not yet retrieved</value>
-  </data>
-  <data name="NewVersionYes" xml:space="preserve">
-    <value>Yes: {0}</value>
-  </data>
-  <data name="NewVersionNo" xml:space="preserve">
-    <value>No</value>
   </data>
   <data name="RequestedVersionRangeNone" xml:space="preserve">
     <value>None</value>
@@ -337,9 +313,6 @@
   <data name="CatalogLoadingDefault" xml:space="preserve">
     <value>Loading published package list...</value>
   </data>
-  <data name="CatalogLoadingNoNpm" xml:space="preserve">
-    <value>Catalog retrieval aborted - npm.cmd not found</value>
-  </data>
   <data name="NoKeywordsInPackage" xml:space="preserve">
     <value>(This package has no keywords.)</value>
   </data>
@@ -369,21 +342,6 @@
   </data>
   <data name="PackageCatalogRefresh3Months" xml:space="preserve">
     <value>More than 3 months ago</value>
-  </data>
-  <data name="PackageCatalogRefresh6Months" xml:space="preserve">
-    <value>Far too long ago</value>
-  </data>
-  <data name="PackageCount" xml:space="preserve">
-    <value> - info for {0} packages retrieved</value>
-  </data>
-  <data name="PackageMatchCount" xml:space="preserve">
-    <value> - {0} matching packages</value>
-  </data>
-  <data name="PackageInstalledLocally" xml:space="preserve">
-    <value>Installed locally</value>
-  </data>
-  <data name="PackageInstalledLocallyOldVersion" xml:space="preserve">
-    <value>Old version {0} installed locally</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
     <value>{0} cancelled with errors - see Output window for details</value>
@@ -500,63 +458,14 @@ NAME2=value2
   <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
     <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
   </data>
-  <data name="StatusAnalysisSaved" xml:space="preserve">
-    <value>Node.js analysis saved to disk</value>
-  </data>
-  <data name="StatusAnalysisSaving" xml:space="preserve">
-    <value>Saving Node.js analysis to disk...</value>
-  </data>
-  <data name="StatusAnalysisLoaded" xml:space="preserve">
-    <value>Cached Node.js analysis loaded.</value>
-  </data>
-  <data name="StatusAnalysisLoadFailed" xml:space="preserve">
-    <value>Loading cached Node.js analysis failed.</value>
-  </data>
-  <data name="StatusAnalysisLoading" xml:space="preserve">
-    <value>Loading cached Node.js analysis for project...</value>
-  </data>
-  <data name="AzureToolsInstallInstructions" xml:space="preserve">
-    <value>These tools are a free download for your version of Visual Studio that allow you to write, deploy and debug applications for Microsoft Azure in a range of programming languages.</value>
-  </data>
-  <data name="AzureToolsRequired" xml:space="preserve">
-    <value>This project requires Microsoft Azure Tools for Visual Studio.</value>
-  </data>
-  <data name="AzureToolsUpgradeInstructions" xml:space="preserve">
-    <value>Your project can still be created, but some manual configuration of your project will be required and features may be missing or limited.
-
-We recommend installing the latest version of Microsoft Azure Tools for Visual Studio.</value>
-  </data>
-  <data name="AzureToolsUpgradeRecommended" xml:space="preserve">
-    <value>Your version of Microsoft Azure Tools is not supported by Node.js Tools for Visual Studio.</value>
-  </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
     <value>Could Not Clear Node.js Cache Directory</value>
   </data>
   <data name="CacheDirectoryClearFailedCaption" xml:space="preserve">
     <value>Could not clear Node.js cache directory. Try manually deleting the directory: {0}</value>
   </data>
-  <data name="ContinueWithoutAzureToolsUpgrade" xml:space="preserve">
-    <value>&amp;Continue
-Some manual steps will be required to configure your project.</value>
-  </data>
-  <data name="DontShowAgain" xml:space="preserve">
-    <value>Do not show this warning again.</value>
-  </data>
-  <data name="DownloadAndInstall" xml:space="preserve">
-    <value>&amp;Download and install now
-You will need to restart Visual Studio after installation.</value>
-  </data>
-  <data name="ErrorNoDte" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
-  </data>
   <data name="UpgradedEnvironmentVariables" xml:space="preserve">
     <value>Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below.</value>
-  </data>
-  <data name="Milliseconds" xml:space="preserve">
-    <value>milliseconds</value>
-  </data>
-  <data name="Seconds" xml:space="preserve">
-    <value>seconds</value>
   </data>
   <data name="StatusAnalysisUpToDate" xml:space="preserve">
     <value>Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}</value>
@@ -575,12 +484,6 @@ You will need to restart Visual Studio after installation.</value>
   </data>
   <data name="IncludeNodeModulesInformation" xml:space="preserve">
     <value>&lt;a href="http://go.microsoft.com/fwlink/?LinkID=518083"&gt;More Information&lt;/a&gt;</value>
-  </data>
-  <data name="InsertSnippet" xml:space="preserve">
-    <value>Insert Snippet</value>
-  </data>
-  <data name="SurroundWith" xml:space="preserve">
-    <value>Surround With</value>
   </data>
   <data name="RemoteDebugProxyFileDoesNotExist" xml:space="preserve">
     <value>Remote Debug Proxy "{0}" does not exist.</value>
@@ -609,12 +512,6 @@ You will need to restart Visual Studio after installation.</value>
   <data name="TypingsOpenOptionsText" xml:space="preserve">
     <value>Customize...</value>
   </data>
-  <data name="EcmaScript5" xml:space="preserve">
-    <value>ECMAScript 5</value>
-  </data>
-  <data name="EcmaScript6" xml:space="preserve">
-    <value>ECMAScript 6</value>
-  </data>
   <data name="StatusTypingsLoaded" xml:space="preserve">
     <value>Node.js IntelliSense typings folder is up to date</value>
   </data>
@@ -627,10 +524,100 @@ You will need to restart Visual Studio after installation.</value>
   <data name="TypingsToolCouldNotStart" xml:space="preserve">
     <value>Could not start Typings tool used for IntelliSense</value>
   </data>
-  <data name="CouldNotGetTypeScriptLanguagePreferences" xml:space="preserve">
-    <value>Could not retrieve Typescript language preferences. NTVS is not able to load. Please ensure Typescript is properly installed.</value>
-  </data>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
     <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>
+  </data>
+  <data name="ImportingProjectStatusText" xml:space="preserve">
+    <value>Importing project...</value>
+  </data>
+  <data name="ImportingProjectErrorStatusText" xml:space="preserve">
+    <value>An error occurred and your project was not created.</value>
+  </data>
+  <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
+    <value>Failed to start interactive process: {0}{1}{2}</value>
+  </data>
+  <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
+    <value>Current interactive window is disconnected - please reset the process.</value>
+  </data>
+  <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
+    <value>The process has exited</value>
+  </data>
+  <data name="InteractiveWindowTitle" xml:space="preserve">
+    <value>Node.js Interactive Window</value>
+  </data>
+  <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
+    <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
+  </data>
+  <data name="ImportingProjectUnexpectedErrorMessage" xml:space="preserve">
+    <value>An unexpected error {0} occurred while creating your project.</value>
+  </data>
+  <data name="NodeModulesCouldNotParsePackageJsonErrorMessageText" xml:space="preserve">
+    <value>Unable to parse {0} from your project.  Please fix any errors and try again.</value>
+  </data>
+  <data name="NpmNotInstalledMessageCaption" xml:space="preserve">
+    <value>npm Not Installed</value>
+  </data>
+  <data name="NpmNotInstalledMessageText" xml:space="preserve">
+    <value>Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.
+
+The following error occurred trying to execute npm.cmd:
+
+{0}</value>
+  </data>
+  <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
+    <value>Azure remote debugging</value>
+  </data>
+  <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
+    <value>Attaching to Azure Website at {0}</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
+    <value>Could not attach to node.exe process on Azure Website at {0}.
+
+Error retrieving websocket debug proxy information from web.config.</value>
+  </data>
+  <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
+    <value>Failed to attach to Azure Website: {0}</value>
+  </data>
+  <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
+    <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
+  </data>
+  <data name="RemoteDebugCouldNotAttachErrorMessage" xml:space="preserve">
+    <value>Could not attach to Node.js process at {0}{1}
+
+</value>
+  </data>
+  <data name="RemoteDebugEnableWebSocketsErrorMessage" xml:space="preserve">
+    <value>Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal.</value>
+  </data>
+  <data name="RemoteDebugUnsupportedPlatformErrorMessage" xml:space="preserve">
+    <value>Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.</value>
+  </data>
+  <data name="DebugCouldNotResolveStartupFileErrorMessage" xml:space="preserve">
+    <value>Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties</value>
+  </data>
+  <data name="DebugInterpreterDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Interpreter "{0}" does not exist.</value>
+  </data>
+  <data name="DebugTypeScriptCombineNotSupportedWarningMessage" xml:space="preserve">
+    <value>This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?</value>
+  </data>
+  <data name="DebugWorkingDirectoryDoesNotExistErrorMessage" xml:space="preserve">
+    <value>Working directory "{0}" does not exist.</value>
+  </data>
+  <data name="DependencyNodeLabelBundled" xml:space="preserve">
+    <value>bundled</value>
+  </data>
+  <data name="DependencyNodeLabelMissing" xml:space="preserve">
+    <value>missing</value>
+  </data>
+  <data name="DependencyNodeLabelNotListed" xml:space="preserve">
+    <value>not listed in {0}</value>
+  </data>
+  <data name="DependencyNodeModuleDoesNotExist" xml:space="preserve">
+    <value>Path to module does not exist:
+{0}</value>
+  </data>
+  <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
+    <value>Launch url '{0}' is not valid </value>
   </data>
 </root>

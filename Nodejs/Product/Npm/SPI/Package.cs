@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -97,7 +98,7 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public override string ToString() {
-            return string.Format("{0} {1}", Name, Version);
+            return string.Format(CultureInfo.InvariantCulture, "{0} {1}", Name, Version);
         }
     }
 }
