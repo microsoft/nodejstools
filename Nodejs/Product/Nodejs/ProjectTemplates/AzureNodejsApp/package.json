@@ -2,7 +2,12 @@
   "name": "$npmsafeprojectname$",
   "version": "0.0.0",
   "description": "$projectname$",
-  "main": "server.js",
+  "scripts": {
+    "start": "node server"
+  },
+  "engines": {
+    "node": "~6.10.x"
+  },
   "author": {
     "name": "$username$"
   }
