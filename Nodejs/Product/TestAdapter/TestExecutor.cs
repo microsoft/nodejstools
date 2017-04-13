@@ -165,7 +165,9 @@ namespace Microsoft.NodejsTools.TestAdapter
             // debugger, and as the tests don't execute in the devenv.exe process, those assemblies
             // fail to load - so load them manually from PublicAssemblies.
 
-            var currentProc = Process.GetCurrentProcess().MainModule.FileName;
+            // Use the executable name, as this is only needed for the out of proc test execution
+            // that may interact with the debugger (vstest.executionengine.x86.exe).
+            string currentProc = Process.GetCurrentProcess().MainModule.FileName;
             if(Path.GetFileName(currentProc).ToLowerInvariant().Equals("vstest.executionengine.x86.exe"))
             {
                 string baseDir = Path.GetDirectoryName(currentProc);
