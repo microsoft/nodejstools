@@ -23,12 +23,8 @@ namespace Microsoft.NodejsTools
         {
             if (!string.IsNullOrEmpty(path))
             {
-                var versionString = FileVersionInfo.GetVersionInfo(path).ProductVersion;
-                Version version;
-                if (Version.TryParse(versionString, out version))
-                {
-                    return version;
-                }
+                var version = FileVersionInfo.GetVersionInfo(path);
+                return new Version(version.ProductMajorPart, version.ProductMinorPart);
             }
 
             return default(Version);
