@@ -140,7 +140,7 @@ Write-Output "Build Root: $buildroot"
 
 
 # This value is used to determine the most significant digit of the build number.
-$base_year = 2012
+$base_year = 2016
 # This value is used to automatically generate outdir for -release and -internal builds
 $base_outdir = "\\pytools\Release\Nodejs"
 
@@ -180,20 +180,7 @@ if ($release -or $mockrelease) {
 
 # Get the path to msbuild for a configuration
 function msbuild-exe($target) {
-    if ($target.VSTarget -eq "15.0") {
-        return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
-    } else {
-        $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
-        if (-not $msbuild_reg) {
-            Throw "Visual Studio build tools $($target.VSTarget) not found."
-        }
-        
-        $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
-        if (-not (Test-Path -Path $target_exe)) {
-            Throw "Visual Studio build tools $($target.VSTarget) not found."
-        }
-        return $target_exe
-    }
+    return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
 }
 
 # This function is used to get options for each configuration
@@ -343,15 +330,13 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.Telemetry.14.0.dll",
     "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
 
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="15.0"; name="VS 2017"; build_by_default=$true},    
-    @{number="14.0"; name="VS 2015"; build_by_default=$true}
+    @{number="15.0"; name="VS 2017"; build_by_default=$true}
 )
 
 # #############################################################################
@@ -611,16 +596,14 @@ try {
                     $project_name $project_url "$project_name $($i.VSName) - native code" $project_keywords `
                     "authenticode" 
 
-                # we only loc Dev 15
-                if ($i.VSTarget -eq "15.0") {
-                    foreach ($loc in $locales) {
-                        $jobs += begin_sign_files `
+
+                foreach ($loc in $locales) {
+                    $jobs += begin_sign_files `
                             @($localized_files | %{@{path="$($i.unsigned_bindir)\$loc\$_"; name=$_}} | ?{Test-Path $_.path}) `
                             "$($i.signed_bindir)\$loc" $approvers `
                             $project_name $project_url "$project_name $($i.VSName) - managed code - $loc" $project_keywords `
                             "authenticode;strongname" `
                             -delaysigned
-                    }
                 }
             }
             
