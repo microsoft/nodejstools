@@ -15,9 +15,6 @@
   </TemplateData>
   <TemplateContent>
     <Project File="ExpressApp.njsproj" ReplaceParameters="true">
-      <Folder Name="bin">
-        <ProjectItem ReplaceParameters="true">www</ProjectItem>
-      </Folder>
       <Folder Name="public">
         <Folder Name="images"/>
         <Folder Name="javascripts"/>
@@ -32,6 +29,7 @@
       <Folder Name="views">
         <ProjectItem>index.pug</ProjectItem>
         <ProjectItem>layout.pug</ProjectItem>
+        <ProjectItem>error.pug</ProjectItem>
       </Folder>
       <Folder Name="typings">
         <Folder Name="globals">

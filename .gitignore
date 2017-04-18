@@ -38,6 +38,8 @@ x64/
 *.vspscc
 *.vssscc
 .builds
+#Include the telemetry pdb
+!Nodejs/Common/Telemetry/*.*
 
 # Visual C++ cache files
 ipch/

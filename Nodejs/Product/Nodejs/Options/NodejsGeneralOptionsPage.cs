@@ -19,10 +19,7 @@ namespace Microsoft.NodejsTools.Options
         private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
         private const string EditAndContinueSetting = "EditAndContinue";
         private const string CheckForLongPathsSetting = "CheckForLongPaths";
-        private SurveyNewsPolicy _surveyNewsCheck;
-        private string _surveyNewsFeedUrl;
-        private string _surveyNewsIndexUrl;
-        private DateTime _surveyNewsLastCheck;
+
         private NodejsGeneralOptionsControl _window;
 
         public NodejsGeneralOptionsPage()
@@ -70,38 +67,22 @@ namespace Microsoft.NodejsTools.Options
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
-        public SurveyNewsPolicy SurveyNewsCheck
-        {
-            get { return this._surveyNewsCheck; }
-            set { this._surveyNewsCheck = value; }
-        }
+        public SurveyNewsPolicy SurveyNewsCheck { get; set; }
 
         /// <summary>
         /// The date/time when the last check for news occurred.
         /// </summary>
-        public DateTime SurveyNewsLastCheck
-        {
-            get { return this._surveyNewsLastCheck; }
-            set { this._surveyNewsLastCheck = value; }
-        }
+        public DateTime SurveyNewsLastCheck { get; set; }
 
         /// <summary>
         /// The url of the news feed.
         /// </summary>
-        public string SurveyNewsFeedUrl
-        {
-            get { return this._surveyNewsFeedUrl; }
-            set { this._surveyNewsFeedUrl = value; }
-        }
+        public string SurveyNewsFeedUrl { get; set; }
 
         /// <summary>
         /// The url of the news index page.
         /// </summary>
-        public string SurveyNewsIndexUrl
-        {
-            get { return this._surveyNewsIndexUrl; }
-            set { this._surveyNewsIndexUrl = value; }
-        }
+        public string SurveyNewsIndexUrl { get; set; }
 
         /// <summary>
         /// Resets settings back to their defaults. This should be followed by
@@ -110,10 +91,10 @@ namespace Microsoft.NodejsTools.Options
         /// </summary>
         public override void ResetSettings()
         {
-            this._surveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
-            this._surveyNewsLastCheck = DateTime.MinValue;
-            this._surveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
-            this._surveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
+            this.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
+            this.SurveyNewsLastCheck = DateTime.MinValue;
+            this.SurveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
+            this.SurveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
             this.WaitOnAbnormalExit = true;
             this.WaitOnNormalExit = false;
             this.EditAndContinue = true;
@@ -123,10 +104,10 @@ namespace Microsoft.NodejsTools.Options
         public override void LoadSettingsFromStorage()
         {
             // Load settings from storage.
-            this._surveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
-            this._surveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
-            this._surveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
-            this._surveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
+            this.SurveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
+            this.SurveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
+            this.SurveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
+            this.SurveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
             this.WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
             this.WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             this.EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
@@ -148,8 +129,8 @@ namespace Microsoft.NodejsTools.Options
             }
 
             // Save settings.
-            SaveEnum(SurveyNewsCheckSetting, this._surveyNewsCheck);
-            SaveDateTime(SurveyNewsLastCheckSetting, this._surveyNewsLastCheck);
+            SaveEnum(SurveyNewsCheckSetting, this.SurveyNewsCheck);
+            SaveDateTime(SurveyNewsLastCheckSetting, this.SurveyNewsLastCheck);
             SaveBool(WaitOnNormalExitSetting, this.WaitOnNormalExit);
             SaveBool(WaitOnAbnormalExitSetting, this.WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, this.EditAndContinue);

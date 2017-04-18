@@ -140,7 +140,7 @@ Write-Output "Build Root: $buildroot"
 
 
 # This value is used to determine the most significant digit of the build number.
-$base_year = 2012
+$base_year = 2016
 # This value is used to automatically generate outdir for -release and -internal builds
 $base_outdir = "\\pytools\Release\Nodejs"
 
@@ -157,16 +157,16 @@ $project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "smortaz", "dinov", "stevdo", "pminaev", "gilbertw", "huvalo", "jinglou", "sitani", "crwilcox"
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "huvalo", "jinglou", "sitani", "crwilcox"
 
 # These people are the contacts for the symbols uploaded to the symbol server
-$symbol_contacts = "$env:username;dinov;smortaz;gilbertw;jinglou"
+$symbol_contacts = "$env:username;dinov;smortaz;jinglou"
 
 # This single person or DL is the contact for virus scan notifications
 $vcs_contact = "ntvscore"
 
 # These options are passed to all MSBuild processes
-$global_msbuild_options = @("/v:m", "/m", "/nologo", "/flp:verbosity=detailed")
+$global_msbuild_options = @("/v:q", "/m", "/nologo", "/flp:verbosity=detailed")
 
 if ($skiptests) {
     $global_msbuild_options += "/p:IncludeTests=false"
@@ -180,20 +180,7 @@ if ($release -or $mockrelease) {
 
 # Get the path to msbuild for a configuration
 function msbuild-exe($target) {
-    if ($target.VSTarget -eq "15.0") {
-        return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
-    } else {
-        $msbuild_reg = Get-ItemProperty -Path "HKLM:\Software\Wow6432Node\Microsoft\MSBuild\ToolsVersions\$($target.VSTarget)" -EA 0
-        if (-not $msbuild_reg) {
-            Throw "Visual Studio build tools $($target.VSTarget) not found."
-        }
-        
-        $target_exe = $msbuild_reg.MSBuildToolsPath + "msbuild.exe"
-        if (-not (Test-Path -Path $target_exe)) {
-            Throw "Visual Studio build tools $($target.VSTarget) not found."
-        }
-        return $target_exe
-    }
+    return "$($target.vsroot)\MSBuild\$($target.VSTarget)\Bin\msbuild.exe"
 }
 
 # This function is used to get options for each configuration
@@ -217,6 +204,7 @@ function msbuild-exe($target) {
 #   signed_bindir       Output directory for signed binaries
 #   signed_msidir       Output directory for signed installers
 #   signed_unsigned_msidir  Output directory for unsigned installers containing signed binaries
+#   signed_swix_logfile Log file for vsman project
 function msbuild-options($target) {
     @(
         "/p:VSTarget=$($target.VSTarget)",
@@ -342,15 +330,13 @@ $managed_files = (
     "Microsoft.NodejsTools.Npm.dll",
     "Microsoft.NodejsTools.TestAdapter.dll",
     "Microsoft.NodejsTools.PressAnyKey.exe",
-    "Microsoft.NodejsTools.Telemetry.14.0.dll",
     "Microsoft.NodejsTools.Telemetry.15.0.dll"
 )
 
 $native_files = @()
 
 $supported_vs_versions = (
-    @{number="15.0"; name="VS 2017"; build_by_default=$true},    
-    @{number="14.0"; name="VS 2015"; build_by_default=$true}
+    @{number="15.0"; name="VS 2017"; build_by_default=$true}
 )
 
 # #############################################################################
@@ -439,9 +425,17 @@ if (-not $outdir) {
     $outdir = $base_outdir
 }
 
-$buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), 0)
+$serverBuildNumber = ${ENV:Build_BuildNumber}
+if (-not $serverBuildNumber) {
+    $buildindex = 0
+} else {
+    $buildindex = "$serverBuildNumber".Split(".")[1]
+}
+
+$buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
+
 if ($release -or $mockrelease -or $internal) {
-    for ($buildindex = 0; $buildindex -lt 10000; $buildindex += 1) {
+    for (; $buildindex -lt 10000; $buildindex += 1) {
         $buildnumber = '{0}{1:MMdd}.{2:D2}' -f (((Get-Date).Year - $base_year), (Get-Date), $buildindex)
         if (-not (Test-Path $outdir\$buildnumber)) {
             break
@@ -460,7 +454,12 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 $msi_version = "$release_version.$buildnumber"
 
 if ($internal -or $release -or $mockrelease) {
-    $outdir = "$outdir\$buildnumber"
+
+    if (-not $serverBuildNumber) {
+       $outdir = "$outdir\$buildnumber"
+    } else {
+       $outdir = "$outdir\$serverBuildNumber"
+    }
 }
 
 Import-Module -Force $buildroot\Build\VisualStudioHelpers.psm1
@@ -480,13 +479,12 @@ if ($name) {
 }
 Write-Output "Output Dir: $outdir"
 if ($mockrelease) {
-    Write-Output "Auto-generated release outdir: $base_outdir\$release_version\$buildnumber"
+    Write-Output "Auto-generated release outdir: $outdir"
 }
 Write-Output ""
 Write-Output "Product version: $assembly_version.`$(VS version)"
 Write-Output "MSI version: $msi_version"
 Write-Output "Building for $([String]::Join(", ", ($target_versions | % { $_.name })))"
-Write-Output ""
 Write-Output "============================================================"
 Write-Output ""
 
@@ -546,6 +544,7 @@ try {
                 $i.signed_msidir = mkdir "$($i.destdir)\SignedMsi" -Force
                 $i.final_msidir = $i.signed_msidir
                 $i.signed_logfile = "$logdir\BuildRelease_Signed.$config.$($_.number).log"
+                $i.signed_swix_logfile = "$logdir\BuildRelease_Swix_Signed.$config.$($_.number).log"
             } else {
                 $i.final_msidir = $i.unsigned_msidir
             }
@@ -597,16 +596,14 @@ try {
                     $project_name $project_url "$project_name $($i.VSName) - native code" $project_keywords `
                     "authenticode" 
 
-                # we only loc Dev 15
-                if ($i.VSTarget -eq "15.0") {
-                    foreach ($loc in $locales) {
-                        $jobs += begin_sign_files `
+
+                foreach ($loc in $locales) {
+                    $jobs += begin_sign_files `
                             @($localized_files | %{@{path="$($i.unsigned_bindir)\$loc\$_"; name=$_}} | ?{Test-Path $_.path}) `
                             "$($i.signed_bindir)\$loc" $approvers `
                             $project_name $project_url "$project_name $($i.VSName) - managed code - $loc" $project_keywords `
                             "authenticode;strongname" `
                             -delaysigned
-                    }
                 }
             }
             
@@ -633,7 +630,7 @@ try {
                     $setup_project
 
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
-                    /fl /flp:logfile=$($i.signed_logfile) `
+                    /fl /flp:logfile=$($i.signed_swix_logfile) `
                     /p:SignedBinariesPath=$($i.signed_bindir) `
                     /p:RezipVSIXFiles=true `
                     $setup_swix_project

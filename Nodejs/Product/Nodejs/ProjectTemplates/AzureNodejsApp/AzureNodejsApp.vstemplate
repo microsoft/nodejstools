@@ -20,12 +20,6 @@
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
-      <Folder Name="bin">
-        <ProjectItem>ChangeConfig.ps1</ProjectItem>
-        <ProjectItem>download.ps1</ProjectItem>
-        <ProjectItem>setup_web.cmd</ProjectItem>
-        <ProjectItem>node.cmd</ProjectItem>
-      </Folder>
     </Project>
   </TemplateContent>
   <WizardExtension>

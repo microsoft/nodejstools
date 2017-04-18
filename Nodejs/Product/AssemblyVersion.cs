@@ -21,20 +21,14 @@ internal class AssemblyVersionInfo
     // This version string (and the comment for Version) should be updated
     // manually between minor releases (e.g. from 1.0 to 1.1).
     // Servicing branches and prereleases should retain the value.
-    public const string FileVersion = "1.3";
+    public const string FileVersion = "1.4";
 
     // This version should never change from "4100.00"; BuildRelease.ps1
     // will replace it with a generated value.
     public const string BuildNumber = "4100.00";
-#if DEV14
-    public const string VSMajorVersion = "14";
-    const string VSVersionSuffix = "2015";
-#elif DEV15
+
     public const string VSMajorVersion = "15";
-    private const string VSVersionSuffix = "15";
-#else
-#error Unrecognized VS Version.
-#endif
+    private const string VSVersionSuffix = "2017";
 
     public const string VSVersion = VSMajorVersion + ".0";
 
