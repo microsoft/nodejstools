@@ -363,7 +363,6 @@ namespace Microsoft.NodejsTools.Project
 
                 SyncFileSystem();
 
-                NodejsPackage.Instance.CheckSurveyNews(false);
                 this.ModulesNode.ReloadHierarchySafe();
             }
         }

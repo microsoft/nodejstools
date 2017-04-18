@@ -208,7 +208,6 @@
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\ShowDocumentationCommand.cs" />
-    <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
     <Compile Include="ImportWizardResources.Designer.cs">
@@ -412,7 +411,6 @@
     <Compile Include="Options\NodejsGeneralOptionsControl.Designer.cs">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\AbstractNpmNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
       <DependentUpon>StartupPage.xaml</DependentUpon>
@@ -1228,10 +1226,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
-    </Content>
-    <Content Include="NoSurveyNewsFeed.html">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

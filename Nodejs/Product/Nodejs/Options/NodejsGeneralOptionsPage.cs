@@ -9,12 +9,6 @@ namespace Microsoft.NodejsTools.Options
     [ComVisible(true)]
     public class NodejsGeneralOptionsPage : NodejsDialogPage
     {
-        private const string DefaultSurveyNewsFeedUrl = "https://go.microsoft.com/fwlink/?LinkId=328027";
-        private const string DefaultSurveyNewsIndexUrl = "https://go.microsoft.com/fwlink/?LinkId=328029";
-        private const string SurveyNewsCheckSetting = "SurveyNewsCheck";
-        private const string SurveyNewsLastCheckSetting = "SurveyNewsLastCheck";
-        private const string SurveyNewsFeedUrlSetting = "SurveyNewsFeedUrl";
-        private const string SurveyNewsIndexUrlSetting = "SurveyNewsIndexUrl";
         private const string WaitOnAbnormalExitSetting = "WaitOnAbnormalExit";
         private const string WaitOnNormalExitSetting = "WaitOnNormalExit";
         private const string EditAndContinueSetting = "EditAndContinue";
@@ -64,37 +58,12 @@ namespace Microsoft.NodejsTools.Options
         public bool CheckForLongPaths { get; set; }
 
         /// <summary>
-        /// The frequency at which to check for updated news. Default is once
-        /// per week.
-        /// </summary>
-        public SurveyNewsPolicy SurveyNewsCheck { get; set; }
-
-        /// <summary>
-        /// The date/time when the last check for news occurred.
-        /// </summary>
-        public DateTime SurveyNewsLastCheck { get; set; }
-
-        /// <summary>
-        /// The url of the news feed.
-        /// </summary>
-        public string SurveyNewsFeedUrl { get; set; }
-
-        /// <summary>
-        /// The url of the news index page.
-        /// </summary>
-        public string SurveyNewsIndexUrl { get; set; }
-
-        /// <summary>
         /// Resets settings back to their defaults. This should be followed by
         /// a call to <see cref="SaveSettingsToStorage" /> to commit the new
         /// values.
         /// </summary>
         public override void ResetSettings()
         {
-            this.SurveyNewsCheck = SurveyNewsPolicy.CheckOnceWeek;
-            this.SurveyNewsLastCheck = DateTime.MinValue;
-            this.SurveyNewsFeedUrl = DefaultSurveyNewsFeedUrl;
-            this.SurveyNewsIndexUrl = DefaultSurveyNewsIndexUrl;
             this.WaitOnAbnormalExit = true;
             this.WaitOnNormalExit = false;
             this.EditAndContinue = true;
@@ -104,10 +73,6 @@ namespace Microsoft.NodejsTools.Options
         public override void LoadSettingsFromStorage()
         {
             // Load settings from storage.
-            this.SurveyNewsCheck = LoadEnum<SurveyNewsPolicy>(SurveyNewsCheckSetting) ?? SurveyNewsPolicy.CheckOnceWeek;
-            this.SurveyNewsLastCheck = LoadDateTime(SurveyNewsLastCheckSetting) ?? DateTime.MinValue;
-            this.SurveyNewsFeedUrl = LoadString(SurveyNewsFeedUrlSetting) ?? DefaultSurveyNewsFeedUrl;
-            this.SurveyNewsIndexUrl = LoadString(SurveyNewsIndexUrlSetting) ?? DefaultSurveyNewsIndexUrl;
             this.WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
             this.WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             this.EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
@@ -129,8 +94,6 @@ namespace Microsoft.NodejsTools.Options
             }
 
             // Save settings.
-            SaveEnum(SurveyNewsCheckSetting, this.SurveyNewsCheck);
-            SaveDateTime(SurveyNewsLastCheckSetting, this.SurveyNewsLastCheck);
             SaveBool(WaitOnNormalExitSetting, this.WaitOnNormalExit);
             SaveBool(WaitOnAbnormalExitSetting, this.WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, this.EditAndContinue);
@@ -138,4 +101,3 @@ namespace Microsoft.NodejsTools.Options
         }
     }
 }
-
