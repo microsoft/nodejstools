@@ -83,8 +83,8 @@ var run_tests = function (testCases, callback) {
         });
         try {
             var testCase = require(test.testFile);
-            testCase[test.testName]();
             result.title = test.testName;
+            testCase[test.testName]();
             result.passed = true;
         } catch (err) {
             result.passed = false;

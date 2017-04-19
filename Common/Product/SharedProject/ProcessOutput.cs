@@ -58,6 +58,15 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public virtual void ShowAndActivate() {
         }
+
+        /// <summary>
+        /// Called to determine if stdin should be closed for a redirected process.
+        /// The default is true.
+        /// </summary>
+        public virtual bool CloseStandardInput()
+        {
+            return true;
+        }
     }
 
     sealed class TeeRedirector : Redirector, IDisposable {
@@ -423,10 +432,16 @@ namespace Microsoft.VisualStudioTools.Project {
                 
                 if (_process.StartInfo.RedirectStandardInput) {
                     // Close standard input so that we don't get stuck trying to read input from the user.
-                    try {
-                        _process.StandardInput.Close();
-                    } catch (InvalidOperationException) {
-                        // StandardInput not available
+                    if (_redirector == null || (_redirector != null && _redirector.CloseStandardInput()))
+                    {
+                        try
+                        {
+                            _process.StandardInput.Close();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // StandardInput not available
+                        }
                     }
                 }
             }
@@ -555,6 +570,20 @@ namespace Microsoft.VisualStudioTools.Project {
         /// </summary>
         public Redirector Redirector {
             get { return _redirector; }
+        }
+
+        /// <summary>
+        /// Writes a line to stdin. A redirector must have been provided that indicates not
+        /// to close the StandardInput stream.
+        /// </summary>
+        /// <param name="line"></param>
+        public void WriteInputLine(string line)
+        {
+            if (IsStarted && _redirector != null && !_redirector.CloseStandardInput())
+            {
+                _process.StandardInput.WriteLine(line);
+                _process.StandardInput.Flush();
+            }
         }
 
         private void FlushAndCloseOutput() {

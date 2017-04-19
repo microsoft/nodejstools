@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -31,9 +32,31 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using MSBuild = Microsoft.Build.Evaluation;
 using Newtonsoft.Json;
-using System.Globalization;
 
 namespace Microsoft.NodejsTools.TestAdapter {
+    class TestExecutionRedirector : Redirector
+    {
+        Action<string> writer;
+        public TestExecutionRedirector(Action<string> onWriteLine)
+        {
+            writer = onWriteLine;
+        }
+        public override void WriteErrorLine(string line)
+        {
+            writer(line);
+        }
+
+        public override void WriteLine(string line)
+        {
+            writer(line);
+        }
+
+        public override bool CloseStandardInput()
+        {
+            return false;
+        }
+    }
+
     [ExtensionUri(TestExecutor.ExecutorUriString)]
     class TestExecutor : ITestExecutor {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
@@ -44,8 +67,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
 
         private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
-        private ProcessStartInfo _psi;
-        private Process _nodeProcess;
+        private ProcessOutput _nodeProcess;
         private object _syncObject = new object();
         private List<TestCase> _currentTests;
         private IFrameworkHandle _frameworkHandle;
@@ -59,25 +81,34 @@ namespace Microsoft.NodejsTools.TestAdapter {
             _cancelRequested.Set();
         }
 
-        private void ProcessTestEvent(object sender, DataReceivedEventArgs e) {
-            try {
-                if (e.Data != null) {
-                    TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(e.Data);
-                    // Extract test from list of tests
-                    var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
-                    if (test.Count() > 0) {
-                        if (testEvent.type == "test start") {
-                            _currentResult = new TestResult(test.First());
-                            _currentResult.StartTime = DateTimeOffset.Now;
-                            _frameworkHandle.RecordStart(test.First());
-                        } else if (testEvent.type == "result") {
-                            RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
-                        }
-                    } else if (testEvent.type == "suite end") {
-                        _currentResultObject = testEvent.result;
+        private void ProcessTestRunnerEmit(string line)
+        {
+            try
+            {
+                TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
+                // Extract test from list of tests
+                var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
+                if (test.Count() > 0)
+                {
+                    if (testEvent.type == "test start")
+                    {
+                        _currentResult = new TestResult(test.First());
+                        _currentResult.StartTime = DateTimeOffset.Now;
+                        _frameworkHandle.RecordStart(test.First());
+                    }
+                    else if (testEvent.type == "result")
+                    {
+                        RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
                     }
                 }
-            } catch (Exception) { }
+                else if (testEvent.type == "suite end")
+                {
+                    _currentResultObject = testEvent.result;
+                }
+            }
+            catch (JsonReaderException) {
+                // Often lines emitted while running tests are not test results, and thus will fail to parse above
+            }
         }
 
         /// <summary>
@@ -100,49 +131,8 @@ namespace Microsoft.NodejsTools.TestAdapter {
             if (_cancelRequested.WaitOne(0)) {
                 return;
             }
-            // May be null, but this is handled by RunTestCase if it matters.
-            // No VS instance just means no debugging, but everything else is
-            // okay.
-            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
-                // .ts file path -> project settings
-                var fileToTests = new Dictionary<string, List<TestCase>>();
-                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-                NodejsProjectSettings settings = null;
 
-                // put tests into dictionary where key is their source file
-                foreach (var test in receiver.Tests) {
-                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
-                        fileToTests[test.CodeFilePath] = new List<TestCase>();
-                    }
-                    fileToTests[test.CodeFilePath].Add(test);
-                }
-
-                // where key is the file and value is a list of tests
-                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
-                    List<string> args = new List<string>();
-                    TestCase firstTest = entry.Value.ElementAt(0);
-                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
-                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
-                    }
-                    int port = 0;
-                    if (runContext.IsBeingDebugged && app != null) {
-                        app.GetDTE().Debugger.DetachAll();
-                        args.AddRange(GetDebugArgs(settings, out port));
-                    }
-
-                    _currentTests = entry.Value;
-                    _frameworkHandle = frameworkHandle;
-
-                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
-
-                    // launch node process
-                    LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-                    // Run all test cases in a given file
-                    RunTestCases(entry.Value, runContext, frameworkHandle, settings);
-                    // dispose node process
-                    _nodeProcess.Dispose();
-                }
-            }
+            RunTests(receiver.Tests, runContext, frameworkHandle);
         }
 
         /// <summary>
@@ -151,51 +141,42 @@ namespace Microsoft.NodejsTools.TestAdapter {
         /// <param name="tests">The list of TestCases selected to run</param>
         /// <param name="runContext">Defines the settings related to the current run</param>
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle) {
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
             ValidateArg.NotNull(tests, "tests");
             ValidateArg.NotNull(runContext, "runContext");
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
             _cancelRequested.Reset();
 
-            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
-                // .ts file path -> project settings
-                var fileToTests = new Dictionary<string, List<TestCase>>();
-                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-                NodejsProjectSettings settings = null;
+            // .ts file path -> project settings
+            var fileToTests = new Dictionary<string, List<TestCase>>();
+            var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+            NodejsProjectSettings settings = null;
 
-                // put tests into dictionary where key is their source file
-                foreach (var test in tests) {
-                    if (!fileToTests.ContainsKey(test.CodeFilePath)) {
-                        fileToTests[test.CodeFilePath] = new List<TestCase>();
-                    }
-                    fileToTests[test.CodeFilePath].Add(test);
+            // put tests into dictionary where key is their source file
+            foreach (var test in tests)
+            {
+                if (!fileToTests.ContainsKey(test.CodeFilePath))
+                {
+                    fileToTests[test.CodeFilePath] = new List<TestCase>();
+                }
+                fileToTests[test.CodeFilePath].Add(test);
+            }
+
+            // where key is the file and value is a list of tests
+            foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests)
+            {
+                TestCase firstTest = entry.Value.ElementAt(0);
+                if (!sourceToSettings.TryGetValue(firstTest.Source, out settings))
+                {
+                    sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
                 }
 
-                // where key is the file and value is a list of tests
-                foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests) {
-                    List<string> args = new List<string>();
-                    TestCase firstTest = entry.Value.ElementAt(0);
-                    if (!sourceToSettings.TryGetValue(firstTest.Source, out settings)) {
-                        sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
-                    }
-                    int port = 0;
-                    if (runContext.IsBeingDebugged && app != null) {
-                        app.GetDTE().Debugger.DetachAll();
-                        args.AddRange(GetDebugArgs(settings, out port));
-                    }
+                _currentTests = entry.Value;
+                _frameworkHandle = frameworkHandle;
 
-                    _currentTests = entry.Value;
-                    _frameworkHandle = frameworkHandle;
-
-                    args.AddRange(GetInterpreterArgs(firstTest, settings.WorkingDir, settings.ProjectRootDir));
-
-                    // launch node process
-                    LaunchNodeProcess(settings.WorkingDir, settings.NodeExePath, args);
-                    // Run all test cases in a given file
-                    RunTestCases(entry.Value, runContext, frameworkHandle, settings);
-                    // dispose node process
-                    _nodeProcess.Dispose();
-                }
+                // Run all test cases in a given file
+                RunTestCases(entry.Value, runContext, frameworkHandle, settings);
             }
         }
 
@@ -203,12 +184,27 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // May be null, but this is handled by RunTestCase if it matters.
             // No VS instance just means no debugging, but everything else is
             // okay.
+            if (tests.Count() == 0)
+            {
+                return;
+            }
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable)) {
                 int port = 0;
+                List<string> nodeArgs = new List<string>();
                 // .njsproj file path -> project settings
                 var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-                TestCaseObject testObject;
                 List<TestCaseObject> testObjects = new List<TestCaseObject>();
+
+                if (!File.Exists(settings.NodeExePath))
+                {
+                    frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
+                    return;
+                }
+
+                // All tests being run are for the same test file, so just use the first test listed to get the working dir
+                NodejsTestInfo testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
+                var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+
                 foreach (var test in tests) {
                     if (_cancelRequested.WaitOne(0)) {
                         break;
@@ -221,54 +217,44 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         frameworkHandle.RecordEnd(test, TestOutcome.Failed);
                     }
 
-                    NodejsTestInfo testInfo = new NodejsTestInfo(test.FullyQualifiedName);
                     List<string> args = new List<string>();
-                    if (runContext.IsBeingDebugged && app != null) {
-                        app.GetDTE().Debugger.DetachAll();
-                        args.AddRange(GetDebugArgs(settings, out port));
-                    }
-
-                    var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
                     args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
 
-                    //Debug.Fail("attach debugger");
-                    if (!File.Exists(settings.NodeExePath)) {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
-                        return;
+                    // Fetch the run_tests argument for starting node.exe if not specified yet
+                    if(nodeArgs.Count == 0 && args.Count > 0)
+                    {
+                        nodeArgs.Add(args[0]);
                     }
-                    testObject = new TestCaseObject(args[1], args[2], args[3], args[4], args[5]);
-                    testObjects.Add(testObject);
+
+                    testObjects.Add(new TestCaseObject(args[1], args[2], args[3], args[4], args[5]));
                 }
 
-                if (!_nodeProcess.HasExited) {
-                    // send testcases to run_tests.js
-                    _nodeProcess.StandardInput.WriteLine(JsonConvert.SerializeObject(testObjects));
-                    _nodeProcess.StandardInput.Close();
-                    _nodeProcess.WaitForExit();
+                if (runContext.IsBeingDebugged && app != null)
+                {
+                    app.GetDTE().Debugger.DetachAll();
+                    // Ensure that --debug-brk is the first argument
+                    nodeArgs.InsertRange(0, GetDebugArgs(out port));
                 }
 
-                // Automatically fail tests that haven't been run by this point (failures in before() hooks)
-                foreach(TestCase notRunTest in _currentTests) {
-                    TestResult result = new TestResult(notRunTest);
-                    result.Outcome = TestOutcome.Failed;
-                    if(_currentResultObject != null) {
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
-                    }
-                    frameworkHandle.RecordResult(result);
-                    frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
-                }
+                _nodeProcess = ProcessOutput.Run(
+                    settings.NodeExePath,
+                    nodeArgs,
+                    settings.WorkingDir,
+                    /* env */        null,
+                    /* visible */    false,
+                    /* redirector */ new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                    /* quote args */ false);
 
                 if (runContext.IsBeingDebugged && app != null) {
                     try {
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
                         //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
                         string qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        //while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
-                        //    if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
-                        //        break;
-                        //    }
-                        //}
+                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri)) {
+                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500))) {
+                                break;
+                            }
+                        }
 #if DEBUG
                     } catch (COMException ex) {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
@@ -281,6 +267,21 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         KillNodeProcess();
                     }
 #endif
+                }
+                // Send the process the list of tests to run and wait for it to complete
+                _nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
+                _nodeProcess.Wait();
+
+                // Automatically fail tests that haven't been run by this point (failures in before() hooks)
+                foreach(TestCase notRunTest in _currentTests) {
+                    TestResult result = new TestResult(notRunTest);
+                    result.Outcome = TestOutcome.Failed;
+                    if(_currentResultObject != null) {
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
+                    }
+                    frameworkHandle.RecordResult(result);
+                    frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
                 }
             }
         }
@@ -306,28 +307,13 @@ namespace Microsoft.NodejsTools.TestAdapter {
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
-        private static IEnumerable<string> GetDebugArgs(NodejsProjectSettings settings, out int port) {
+        private static IEnumerable<string> GetDebugArgs(out int port) {
             port = GetFreePort();
 
+            // TODO: Need to use --inspect-brk on Node.js 8 or later
             return new[] {
                 "--debug-brk=" + port.ToString()
             };
-        }
-
-        private void LaunchNodeProcess(string workingDir, string nodeExePath, List<string> args) {
-            _psi = new ProcessStartInfo("cmd.exe") {
-                Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
-                ProcessOutput.QuoteSingleArgument(workingDir),
-                ProcessOutput.QuoteSingleArgument(nodeExePath),
-                ProcessOutput.GetArguments(args, true)),
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            _psi.RedirectStandardInput = true;
-            _psi.RedirectStandardOutput = true;
-            _nodeProcess = Process.Start(_psi);
-            _nodeProcess.BeginOutputReadLine();
-            _nodeProcess.OutputDataReceived += ProcessTestEvent;
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile) {

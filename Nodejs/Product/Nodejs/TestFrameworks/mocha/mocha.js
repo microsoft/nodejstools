@@ -104,6 +104,7 @@ var run_tests = function (testCases, callback) {
         process.exit(code);
     });
 
+    // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
     runner.on('suite', function (suite) {
         post({
             type: 'suite start',

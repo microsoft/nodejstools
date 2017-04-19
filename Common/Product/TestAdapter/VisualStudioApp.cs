@@ -15,7 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -75,7 +77,34 @@ namespace Microsoft.VisualStudioTools {
             return dte;
         }
 
+#if DEV15
+        private static bool DTELoaded = false;
+#endif
+
         private static DTE GetDTE(int processId) {
+#if DEV15
+            // VS 2017 doesn't install some assemblies to the GAC that are needed to work with the
+            // debugger, and as the tests don't execute in the devenv.exe process, those assemblies
+            // fail to load - so load them manually from PublicAssemblies.
+
+            // Use the executable name, as this is only needed for the out of proc test execution
+            // that may interact with the debugger (vstest.executionengine.x86.exe).
+            if (!DTELoaded)
+            {
+                string currentProc = Process.GetCurrentProcess().MainModule.FileName;
+                if (Path.GetFileName(currentProc).ToLowerInvariant().Equals("vstest.executionengine.x86.exe"))
+                {
+                    string baseDir = Path.GetDirectoryName(currentProc);
+                    string publicAssemblies = Path.Combine(baseDir, "..\\..\\..\\PublicAssemblies");
+
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "Microsoft.VisualStudio.OLE.Interop.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte90.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte80.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte.dll"));
+                }
+                DTELoaded = true;
+            }
+#endif
             MessageFilter.Register();
 
             var prefix = Process.GetProcessById(processId).ProcessName;
