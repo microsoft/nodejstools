@@ -13,12 +13,6 @@ namespace Microsoft.NodejsTools.Logging
         /// </summary>
         Launch,
         /// <summary>
-        /// Logs the frequency at which users check for new Survey\News
-        /// 
-        /// Data is an int enum mapping to SurveyNews* setting
-        /// </summary>
-        SurveyNewsFrequency,
-        /// <summary>
         /// Logs the analysis detail level
         /// 
         /// Data is an int enum mapping to AnalysisLevel* setting

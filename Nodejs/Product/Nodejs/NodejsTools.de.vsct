@@ -167,13 +167,6 @@
           <CommandName>Dokumentation...</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
-        <Strings>
-          <ButtonText>Umfrage/&amp;Neuigkeiten...</ButtonText>
-          <CommandName>Umfrage/Neuigkeiten...</CommandName>
-        </Strings>
-      </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
@@ -314,7 +307,6 @@
       <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
-      <IDSymbol name="cmdidSurveyNews" value="0x0204" />
       <IDSymbol name="cmdidImportWizard" value="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />

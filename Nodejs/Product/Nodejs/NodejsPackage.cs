@@ -73,8 +73,6 @@ namespace Microsoft.NodejsTools
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
         private IContentType _contentType;
         internal static NodejsPackage Instance;
-        private string _surveyNewsUrl;
-        private object _surveyNewsUrlLock = new object();
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private NodejsToolsLogger _logger;
         private ITelemetryLogger _telemetryLogger;
@@ -131,7 +129,6 @@ namespace Microsoft.NodejsTools
                 new OpenReplWindowCommand(),
                 new OpenRemoteDebugProxyFolderCommand(),
                 new OpenRemoteDebugDocumentationCommand(),
-                new SurveyNewsCommand(),
                 new ImportWizardCommand(),
                 new SendFeedbackCommand(),
                 new ShowDocumentationCommand()
@@ -191,9 +188,6 @@ namespace Microsoft.NodejsTools
         private void InitializeLogging()
         {
             this._logger = new NodejsToolsLogger(this.ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
-
-            // log interesting stats on startup
-            this._logger.LogEvent(NodejsToolsLogEvent.SurveyNewsFrequency, this.GeneralOptionsPage.SurveyNewsCheck);
         }
 
         private void InitializeTelemetry()
@@ -370,161 +364,6 @@ namespace Microsoft.NodejsTools
                 {
                     Marshal.FreeCoTaskMem(pDirName);
                 }
-            }
-        }
-
-        private void BrowseSurveyNewsOnIdle(object sender, ComponentManagerEventArgs e)
-        {
-            this.OnIdle -= this.BrowseSurveyNewsOnIdle;
-
-            lock (this._surveyNewsUrlLock)
-            {
-                if (!string.IsNullOrEmpty(this._surveyNewsUrl))
-                {
-                    OpenVsWebBrowser(this, this._surveyNewsUrl);
-                    this._surveyNewsUrl = null;
-                }
-            }
-        }
-
-        internal void BrowseSurveyNews(string url)
-        {
-            lock (this._surveyNewsUrlLock)
-            {
-                this._surveyNewsUrl = url;
-            }
-
-            this.OnIdle += this.BrowseSurveyNewsOnIdle;
-        }
-
-        private void CheckSurveyNewsThread(Uri url, bool warnIfNoneAvailable)
-        {
-            // We can't use a simple WebRequest, because that doesn't have access
-            // to the browser's session cookies.  Cookies are used to remember
-            // which survey/news item the user has submitted/accepted.  The server 
-            // checks the cookies and returns the survey/news urls that are 
-            // currently available (availability is determined via the survey/news 
-            // item start and end date).
-            var th = new Thread(() =>
-            {
-                var br = new WebBrowser();
-                br.Tag = warnIfNoneAvailable;
-                br.DocumentCompleted += this.OnSurveyNewsDocumentCompleted;
-                br.Navigate(url);
-                Application.Run();
-            });
-            th.SetApartmentState(ApartmentState.STA);
-            th.Start();
-        }
-
-        private void OnSurveyNewsDocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            var br = (WebBrowser)sender;
-            var warnIfNoneAvailable = (bool)br.Tag;
-            if (br.Url == e.Url)
-            {
-                List<string> available = null;
-
-                var json = br.DocumentText;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var startIndex = json.IndexOf("<PRE>");
-                    if (startIndex > 0)
-                    {
-                        var endIndex = json.IndexOf("</PRE>", startIndex);
-                        if (endIndex > 0)
-                        {
-                            json = json.Substring(startIndex + 5, endIndex - startIndex - 5);
-
-                            try
-                            {
-                                // Example JSON data returned by the server:
-                                //{
-                                // "cannotvoteagain": [], 
-                                // "notvoted": [
-                                //  "http://ptvs.azurewebsites.net/news/141", 
-                                //  "http://ptvs.azurewebsites.net/news/41", 
-                                // ], 
-                                // "canvoteagain": [
-                                //  "http://ptvs.azurewebsites.net/news/51"
-                                // ]
-                                //}
-
-                                // Description of each list:
-                                // voted: cookie found
-                                // notvoted: cookie not found
-                                // canvoteagain: cookie found, but multiple votes are allowed
-                                var serializer = new JavaScriptSerializer();
-                                var results = serializer.Deserialize<Dictionary<string, List<string>>>(json);
-                                available = results["notvoted"];
-                            }
-                            catch (ArgumentException)
-                            {
-                            }
-                            catch (InvalidOperationException)
-                            {
-                            }
-                        }
-                    }
-                }
-
-                if (available != null && available.Count > 0)
-                {
-                    BrowseSurveyNews(available[0]);
-                }
-                else if (warnIfNoneAvailable)
-                {
-                    if (available != null)
-                    {
-                        BrowseSurveyNews(this.GeneralOptionsPage.SurveyNewsIndexUrl);
-                    }
-                    else
-                    {
-                        BrowseSurveyNews(NodejsToolsInstallPath.GetFile("NoSurveyNewsFeed.html"));
-                    }
-                }
-
-                Application.ExitThread();
-            }
-        }
-
-        internal void CheckSurveyNews(bool forceCheckAndWarnIfNoneAvailable)
-        {
-            if (forceCheckAndWarnIfNoneAvailable || ShouldQuerySurveryNewsServer())
-            {
-                var options = this.GeneralOptionsPage;
-                options.SurveyNewsLastCheck = DateTime.Now;
-                options.SaveSettingsToStorage();
-                CheckSurveyNewsThread(new Uri(options.SurveyNewsFeedUrl), forceCheckAndWarnIfNoneAvailable);
-            }
-        }
-
-        private bool ShouldQuerySurveryNewsServer()
-        {
-            var options = this.GeneralOptionsPage;
-            // Ensure that we don't prompt the user on their very first project creation.
-            // Delay by 3 days by pretending we checked 4 days ago (the default of check
-            // once a week ensures we'll check again in 3 days).
-            if (options.SurveyNewsLastCheck == DateTime.MinValue)
-            {
-                options.SurveyNewsLastCheck = DateTime.Now - TimeSpan.FromDays(4);
-                options.SaveSettingsToStorage();
-            }
-
-            var elapsedTime = DateTime.Now - options.SurveyNewsLastCheck;
-            switch (options.SurveyNewsCheck)
-            {
-                case SurveyNewsPolicy.Disabled:
-                    return false;
-                case SurveyNewsPolicy.CheckOnceDay:
-                    return elapsedTime.TotalDays >= 1;
-                case SurveyNewsPolicy.CheckOnceWeek:
-                    return elapsedTime.TotalDays >= 7;
-                case SurveyNewsPolicy.CheckOnceMonth:
-                    return elapsedTime.TotalDays >= 30;
-                default:
-                    Debug.Assert(false, string.Format(CultureInfo.CurrentCulture, "Unexpected SurveyNewsPolicy: {0}.", options.SurveyNewsCheck));
-                    return false;
             }
         }
 
