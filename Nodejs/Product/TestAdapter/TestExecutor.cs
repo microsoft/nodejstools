@@ -152,7 +152,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
             var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-            NodejsProjectSettings settings = null;
+            NodejsProjectSettings projectSettings = null;
 
             // put tests into dictionary where key is their source file
             foreach (var test in tests)
@@ -168,16 +168,16 @@ namespace Microsoft.NodejsTools.TestAdapter {
             foreach (KeyValuePair<string, List<TestCase>> entry in fileToTests)
             {
                 TestCase firstTest = entry.Value.ElementAt(0);
-                if (!sourceToSettings.TryGetValue(firstTest.Source, out settings))
+                if (!sourceToSettings.TryGetValue(firstTest.Source, out projectSettings))
                 {
-                    sourceToSettings[firstTest.Source] = settings = LoadProjectSettings(firstTest.Source);
+                    sourceToSettings[firstTest.Source] = projectSettings = LoadProjectSettings(firstTest.Source);
                 }
 
                 _currentTests = entry.Value;
                 _frameworkHandle = frameworkHandle;
 
                 // Run all test cases in a given file
-                RunTestCases(entry.Value, runContext, frameworkHandle, settings);
+                RunTestCases(entry.Value, runContext, frameworkHandle, projectSettings);
             }
         }
 

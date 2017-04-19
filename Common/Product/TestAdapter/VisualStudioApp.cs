@@ -92,7 +92,8 @@ namespace Microsoft.VisualStudioTools {
             if (!DTELoaded)
             {
                 string currentProc = Process.GetCurrentProcess().MainModule.FileName;
-                if (Path.GetFileName(currentProc).ToLowerInvariant().Equals("vstest.executionengine.x86.exe"))
+                if (StringComparer.OrdinalIgnoreCase.Equals(
+                        Path.GetFileName(currentProc), "vstest.executionengine.x86.exe"))
                 {
                     string baseDir = Path.GetDirectoryName(currentProc);
                     string publicAssemblies = Path.Combine(baseDir, "..\\..\\..\\PublicAssemblies");
