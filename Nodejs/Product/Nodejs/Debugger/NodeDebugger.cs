@@ -113,7 +113,7 @@ namespace Microsoft.NodejsTools.Debugger {
             return debuggerPortOrDefault;
         }
 
-        public static NodeProcess StartNodeProcessWithDebug(
+        private static NodeProcess StartNodeProcessWithDebug(
             string exe, 
             string script, 
             string dir, 
@@ -126,7 +126,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            var allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} \"{CommonUtils.UnquotePath(script)}\""; /* unquote the path so we can safely add quotes */
+            var allArgs = $"--debug-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} {script}";  // script includes the arguments for the script, so we can't quote it here
 
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }
@@ -144,7 +144,7 @@ namespace Microsoft.NodejsTools.Debugger {
             var debuggerPortOrDefault = debuggerPort ?? GetDebuggerPort();
 
             // Node usage: node [options] [ -e script | script.js ] [arguments]
-            var allArgs = $"--inspect={debuggerPortOrDefault} --debug-brk --nolazy {interpreterOptions} \"{CommonUtils.UnquotePath(script)}\""; /* unquote the path so we can safely add quotes */
+            var allArgs = $"--inspect-brk={debuggerPortOrDefault} --nolazy {interpreterOptions} {script}"; // script includes the arguments for the script, so we can't quote it here
 
             return StartNodeProcess(exe, dir, env, debugOptions, debuggerPortOrDefault, allArgs, createNodeWindow);
         }

@@ -1,4 +1,5 @@
-﻿import express = require('express');
+﻿import debug = require('debug');
+import express = require('express');
 import path = require('path');
 
 import routes from './routes/index';
@@ -46,5 +47,8 @@ app.use((err: any, req, res, next) => {
     });
 });
 
+app.set('port', process.env.PORT || 3000);
 
-module.exports = app;
+var server = app.listen(app.get('port'), function () {
+    debug('Express server listening on port ' + server.address().port);
+});

@@ -10,6 +10,6 @@ using System.Reflection;
 // (See also AssemblyVersion.cs in this same directory.)
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Node.js Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
+[assembly: AssemblyCopyright("Copyright © Microsoft")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

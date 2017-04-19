@@ -31,13 +31,6 @@
         <ProjectItem>layout.pug</ProjectItem>
         <ProjectItem>error.pug</ProjectItem>
       </Folder>
-      <Folder Name="bin">
-        <ProjectItem ReplaceParameters="true">www</ProjectItem>
-        <ProjectItem>ChangeConfig.ps1</ProjectItem>
-        <ProjectItem>download.ps1</ProjectItem>
-        <ProjectItem>setup_web.cmd</ProjectItem>
-        <ProjectItem>node.cmd</ProjectItem>
-      </Folder>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
       <ProjectItem OpenInEditor="true">app.js</ProjectItem>

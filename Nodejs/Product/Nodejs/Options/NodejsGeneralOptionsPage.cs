@@ -74,11 +74,6 @@ namespace Microsoft.NodejsTools.Options {
         public bool CheckForLongPaths { get; set; }
 
         /// <summary>
-        /// Indicates whether we should use the WebKit debugger or the default NodeJs debugger.
-        /// </summary>
-        public bool UseWebKitDebugger { get; set; }
-
-        /// <summary>
         /// The frequency at which to check for updated news. Default is once
         /// per week.
         /// </summary>
@@ -113,7 +108,6 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnNormalExit = false;
             EditAndContinue = true;
             CheckForLongPaths = true;
-            UseWebKitDebugger = false;
         }
 
         public override void LoadSettingsFromStorage() {
@@ -126,7 +120,6 @@ namespace Microsoft.NodejsTools.Options {
             WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
             CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
-            UseWebKitDebugger = LoadBool(UseWebKitDebuggerSetting) ?? false;
 
             // Synchronize UI with backing properties.
             if (_window != null) {
@@ -147,7 +140,6 @@ namespace Microsoft.NodejsTools.Options {
             SaveBool(WaitOnAbnormalExitSetting, WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, EditAndContinue);
             SaveBool(CheckForLongPathsSetting, CheckForLongPaths);
-            SaveBool(UseWebKitDebuggerSetting, UseWebKitDebugger);
         }
     }
 }

@@ -68,21 +68,26 @@ namespace Microsoft.NodejsTools.Project {
 
         private int Start(string file, bool debug) {
             var nodePath = GetNodePath();
+
             if (nodePath == null) {
                 Nodejs.ShowNodejsNotInstalled();
                 return VSConstants.S_OK;
             }
 
-            bool startBrowser = ShouldStartBrowser();
+            var chromeProtocolRequired = Nodejs.GetNodeVersion(nodePath) >= new Version(8, 0);
+
 #if !DEV15
-            bool useWebKitDebugger = false;
-#else
-            bool useWebKitDebugger = NodejsPackage.Instance.GeneralOptionsPage.UseWebKitDebugger;
+            if (chromeProtocolRequired) {
+                Nodejs.ShowNodeVersionNotSupported();
+                return VSConstants.S_OK;
+            }
 #endif
 
-            if (debug && !useWebKitDebugger) {
+            bool startBrowser = ShouldStartBrowser();
+
+            if (debug && !chromeProtocolRequired) {
                 StartWithDebugger(file);
-            } else if (debug && useWebKitDebugger) {
+            } else if (debug && chromeProtocolRequired) {
                 StartAndAttachDebugger(file, nodePath);
             } else {
                 StartNodeProcess(file, nodePath, startBrowser);
@@ -99,8 +104,9 @@ namespace Microsoft.NodejsTools.Project {
             var env = GetEnvironmentVariablesString(url);
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             var debugOptions = this.GetDebugOptions();
+            var script = GetFullArguments(file, includeNodeArgs: false);
 
-            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: file, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
+            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: script, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
             process.Start();
 
             // setup debug info and attach
@@ -179,7 +185,7 @@ namespace Microsoft.NodejsTools.Project {
                 UseShellExecute = false,
 
                 FileName = nodePath,
-                Arguments = GetFullArguments(file),
+                Arguments = GetFullArguments(file, includeNodeArgs: true),
                 WorkingDirectory = _project.GetWorkingDirectory()
             };
 
@@ -211,7 +217,7 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-        private string GetFullArguments(string file, bool includeNodeArgs = true) {
+        private string GetFullArguments(string file, bool includeNodeArgs) {
             string res = String.Empty;
             if (includeNodeArgs) {
                 var nodeArgs = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);

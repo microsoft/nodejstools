@@ -2,8 +2,13 @@
   "name": "$npmsafeprojectname$",
   "version": "0.0.0",
   "description": "$projectname$",
-  "main": "worker.js",
+  "scripts": {
+    "start": "node worker"
+  },
   "author": {
     "name": "$username$"
+  },
+  "engines": {
+    "node": "~6.10.2"
   }
 }

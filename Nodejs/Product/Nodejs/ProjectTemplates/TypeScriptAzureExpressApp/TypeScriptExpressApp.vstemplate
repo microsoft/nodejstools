@@ -29,6 +29,7 @@
       <Folder Name="views">
         <ProjectItem>index.pug</ProjectItem>
         <ProjectItem>layout.pug</ProjectItem>
+        <ProjectItem>error.pug</ProjectItem>
       </Folder>
       <Folder Name="typings">
         <Folder Name="globals">
@@ -55,11 +56,6 @@
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.config</ProjectItem>
       <ProjectItem ReplaceParameters="true">Web.Debug.config</ProjectItem>
-      <ProjectItem TargetFileName="bin\ChangeConfig.ps1">ChangeConfig.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\download.ps1">download.ps1</ProjectItem>
-      <ProjectItem TargetFileName="bin\setup_web.cmd">setup_web.cmd</ProjectItem>
-      <ProjectItem TargetFileName="bin\node.cmd">node.cmd</ProjectItem>
-      <ProjectItem TargetFileName="bin\www">www</ProjectItem>
       <ProjectItem>typings.json</ProjectItem>
     </Project>
   </TemplateContent>
