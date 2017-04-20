@@ -34,10 +34,20 @@
             // 
             // _topOptionsPanel
             // 
-            this._topOptionsPanel.Controls.Add(this._checkForLongPaths);
-            this._topOptionsPanel.Controls.Add(this._editAndContinue);
-            this._topOptionsPanel.Controls.Add(this._waitOnNormalExit);
+
+            // due to a bug in winforms the order you add controls to the parent collection
+            // actually affects the Tab-Order... 
+            // so make sure you keep the order:
+            // * this._waitOnAbnormalExit
+            // * this._waitOnNormalExit
+            // * this._editAndContinue
+            // * this._checkForLongPaths
+
             this._topOptionsPanel.Controls.Add(this._waitOnAbnormalExit);
+            this._topOptionsPanel.Controls.Add(this._waitOnNormalExit);
+            this._topOptionsPanel.Controls.Add(this._editAndContinue);
+            this._topOptionsPanel.Controls.Add(this._checkForLongPaths);
+
             resources.ApplyResources(this._topOptionsPanel, "_topOptionsPanel");
             this._topOptionsPanel.Name = "_topOptionsPanel";
             // 
