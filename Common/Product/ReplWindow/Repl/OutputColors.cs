@@ -3,12 +3,8 @@
 using System;
 using Microsoft.VisualStudio.Text;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     internal sealed class ColoredSpan
     {
         public readonly Span Span;
@@ -21,4 +17,3 @@ namespace Microsoft.VisualStudio.Repl {
         }
     }
 }
-

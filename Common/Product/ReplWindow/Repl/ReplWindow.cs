@@ -15,9 +15,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -30,14 +30,8 @@ using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-using Microsoft.VisualStudio;
-
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Provides implementation of a Repl Window built on top of the VS editor using projection buffers.
     /// 
@@ -48,11 +42,7 @@ namespace Microsoft.VisualStudio.Repl {
     [Guid(ReplWindow.TypeGuid)]
     internal class ReplWindow : ToolWindowPane, IOleCommandTarget, IReplWindow3, IVsFindTarget
     {
-#if NTVS_FEATURE_INTERACTIVEWINDOW
         public const string TypeGuid = "2153A414-267E-4731-B891-E875ADBA1993";
-#else
-        public const string TypeGuid = "5adb6033-611f-4d39-a193-57a717115c0f";
-#endif
 
         private bool _adornmentToMinimize = false;
         private bool _showOutput, _useSmartUpDown;
@@ -3822,4 +3812,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

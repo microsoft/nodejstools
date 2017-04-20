@@ -3,12 +3,8 @@
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     [Export(typeof(IReplCommand))]
     internal class EchoReplCommand : IReplCommand
     {
@@ -61,4 +57,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

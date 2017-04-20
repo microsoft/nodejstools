@@ -4,12 +4,8 @@ using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.Text;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     internal sealed class ReplSpan
     {
         private readonly object _span; // ITrackingSpan or string
@@ -102,4 +98,3 @@ namespace Microsoft.VisualStudio.Repl {
         }
     }
 }
-
