@@ -57,58 +57,73 @@ function run_tests(testInfo, callback) {
         return;
     }
 
-    var harness = tape.getHarness();
-
-    testInfo.forEach(function (info) {
-        runTest(info, harness, function (result) {
-            callback(result);
-        });
-    });
-
-    tape.onFinish(function () {
-        // executes when all tests are done running
-    });
-
-    function runTest(testInfo, harness, done) {
-        var stream = harness.createStream({ objectMode: true });
-        var title = testInfo.testName;
-
-        stream.on(('data'), function (result) {
-            if (result.type === 'test') {
-                done({
-                    type: 'test start',
-                    title: title
-                });
-            }
-        });
-
-        try {
-            var htest = tape.test(title, {}, function (result) {
-                done({
-                    type: 'result',
-                    title: title,
-                    result: {
-                        'title': title,
-                        'passed': result._ok,
-                        'stdOut': '',
-                        'stdErr': ''
-                    }
-                });
-            });
-        } catch (e) {
-            console.error('NTVS_ERROR:', e);
-            done({
-                type: 'result',
-                title: title,
-                result: {
-                    'title': title,
-                    'passed': false,
+    var harness = tape.getHarness({objectMode: true});
+    var capture = false; // Only capture between 'test' and 'end' events to avoid skipped test events.
+    harness.createStream({ objectMode: true }).on('data', function (evt){
+        switch (evt.type) {
+            case 'test':
+                capture = true;
+                // Test is starting. Reset the result object. Send a "test start" event.
+                result = {
+                    'title': evt.name,
+                    'passed': true,
                     'stdOut': '',
-                    'stdErr': e.message
+                    'stdErr': ''
+                };
+                callback({
+                    'type': 'test start',
+                    'title': result.title,
+                    'result': result
+                });
+                break;
+            case 'assert':
+                if (!capture) break;
+                // Correlate the success/failure asserts for this test. There may be multiple per test
+                var msg = "Operator: " + evt.operator + ". Expected: " + evt.expected + ". Actual: " + evt.actual + "\n";
+                if (evt.ok) {
+                    result.stdOut += msg;
+                } else {
+                    result.stdErr += msg + (evt.error.stack || evt.error.message) + "\n";
+                    result.passed = false;
                 }
+                break;
+            case 'end':
+                if (!capture) break;
+                // Test is done. Send a "result" event.
+                callback({
+                    'type': 'result',
+                    'title': result.title,
+                    'result': result
+                });
+                capture = false;
+                break;
+            default:
+                break;
+        }
+    });
+
+    loadTestCases(testInfo[0].testFile);
+
+    // Skip those not selected to run. The rest will start running on the next tick.
+    harness['_tests'].forEach(function(test){
+        if( !testInfo.some( function(ti){ return ti.testName == test.name; }) ) {
+            test._skip = true;
+        }
+    });
+
+    harness.onFinish(function () {
+        // TODO: This still doesn't seem to handle async tests with plan issues.
+        if (capture) {
+            // Something didn't finish. Finish it now.
+            result.passed = false;
+            callback({
+                'type': 'result',
+                'title': result.title,
+                'result': result
             });
         }
-    }
+        process.exit(0);
+    });
 }
 module.exports.run_tests = run_tests;
 
