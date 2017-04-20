@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkGreenFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x00, 0x7f, 0);
+            ForegroundColor = Color.FromRgb(0x00, 0x40, 0);
         }
     }
 
@@ -183,7 +183,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkGrayFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x7f, 0x7f, 0x7f);
+            ForegroundColor = Color.FromRgb(0x76, 0x76, 0x76);
         }
     }
 
@@ -203,7 +203,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveRedFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0xff, 0, 0);
+            ForegroundColor = Color.FromRgb(0xEE, 0, 0);
         }
     }
 
@@ -223,7 +223,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveGreenFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x00, 0xff, 0);
+            ForegroundColor = Color.FromRgb(0x00, 0x80, 0);
         }
     }
 
