@@ -41,8 +41,7 @@
 
                     <DataTemplate x:Key="PackageInfoTemplate">
                         <StackPanel x:Name="PackageInfo">
-
-                            <TextBlock Margin="0" x:Name="NpmPackageLabel">
+                            <TextBlock Margin="0" x:Name="NpmPackageLabel" KeyboardNavigation.TabIndex="5">
                                 <Run Text="{Binding Path=Name, Mode=OneWay}" FontSize="15pt" FontWeight="Bold" />
                                 <Run Text="{Binding Path=Version, Mode=OneWay}" />
                             </TextBlock>
@@ -52,7 +51,12 @@
                                         TextWrapping="Wrap"
                                         Opacity="0.5" />
 
-                            <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}">
+                            <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}" KeyboardNavigation.TabIndex="6">
+                                <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.DescriptionLabel}" />
+                                <Run Text="{Binding Path=Description, Mode=OneWay}"/>
+                            </TextBlock>
+
+                            <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}" KeyboardNavigation.TabIndex="7">
                                 <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.AuthorLabel}" />
                                 <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
                             </StackPanel>
@@ -68,18 +72,13 @@
                                                     Content="{Binding Mode=OneWay}"
                                                     Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
                                                     CommandParameter="{Binding}"
-                                                    KeyboardNavigation.IsTabStop="False"
+                                                    KeyboardNavigation.TabIndex="8"
                                                     Margin="0"
                                                     Padding="0"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </StackPanel>
-
-                            <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}">
-                                <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.DescriptionLabel}" />
-                                <Run Text="{Binding Path=Description, Mode=OneWay}"/>
-                            </TextBlock>
                         </StackPanel>
                     </DataTemplate>
 
@@ -225,7 +224,7 @@
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
                         IsCancel="True"
-                        KeyboardNavigation.TabIndex="10"
+                        TabIndex="15"
                         Content="{x:Static resx:NpmInstallWindowResources.CloseButtonContent}" />
         </Grid>
 
@@ -247,7 +246,7 @@
                          Height="24"
                          Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
                          PreviewKeyDown="FilterTextBox_PreviewKeyDown"
-                         KeyboardNavigation.TabIndex="0"
+                         TabIndex="0"
                          AutomationProperties.Name="{x:Static resx:NpmInstallWindowResources.SearchForPackagesLabel}" />
                 <TextBlock IsEnabled="False" Background="{x:Null}"
                            Focusable="False"
@@ -282,7 +281,7 @@
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
-                          KeyboardNavigation.TabIndex="1" 
+                          TabIndex="2" 
                           Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.ResultsAvailable == b ? Visibility.Visible : Visibility.Hidden'}}" />
                 <Border BorderBrush="{Binding ElementName=packageList, Path=BorderBrush}"
                         BorderThickness="{Binding ElementName=packageList,Path=BorderThickness}">
@@ -302,7 +301,7 @@
                     </Grid>
                 </Border>
             </Grid>
-            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Width="6" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True" />
+            <GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Width="6" Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Center" ShowsPreview="True" IsTabStop="False" />
 
             <Grid Grid.Column="2" Grid.RowSpan="2" Margin="8 0 0 0" >
                 <Grid.RowDefinitions>
@@ -320,7 +319,9 @@
                 </Grid.Style>
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Content="{Binding Path=SelectedPackage}"
-                              ContentTemplate="{StaticResource PackageInfoTemplate}" />
+                              ContentTemplate="{StaticResource PackageInfoTemplate}"
+                              IsTabStop="True" AutomationProperties.Name="{Binding Path=SelectedPackage.Name}"
+                              TabIndex="3" />
 
                 <StackPanel Grid.Row="1"
                             Orientation="Vertical"
@@ -345,14 +346,14 @@
 
                         <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4" Text="{x:Static resx:NpmInstallWindowResources.OptionsLabel}" />
                         <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.OtherNpmArgumentsLabel}" Name="OtherNpmArgumentsLabel" />
-                        <TextBox x:Name="OtherNpmArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="6">
+                        <TextBox x:Name="OtherNpmArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="12">
                             <AutomationProperties.LabeledBy>
                                 <Binding ElementName="OtherNpmArgumentsLabel" />
                             </AutomationProperties.LabeledBy>
                         </TextBox>
                         <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonLabel}" x:Name="AddToPackageJsonLabel"/>
                         <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                                  IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="4" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonCheckboxLabel}">
+                                  IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="10" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonCheckboxLabel}">
                             <AutomationProperties.LabeledBy>
                                 <Binding ElementName="AddToPackageJsonLabel" />
                             </AutomationProperties.LabeledBy>
@@ -365,7 +366,7 @@
                                   Width="100"
                                   MaxHeight="24"
                                   Margin="4"
-                                  KeyboardNavigation.TabIndex="3" SelectedIndex="{Binding SelectedDependencyTypeIndex}"
+                                  KeyboardNavigation.TabIndex="9" SelectedIndex="{Binding SelectedDependencyTypeIndex}"
                               HorizontalAlignment="Left">
                             <AutomationProperties.LabeledBy>
                                 <Binding ElementName="DependencyTypeLabel" />
@@ -381,7 +382,7 @@
                                   Grid.Column="1"
                                   SelectedItem="{Binding Path=SelectedVersion}"
                                   SelectedIndex="0"
-                                  KeyboardNavigation.TabIndex="5"
+                                  KeyboardNavigation.TabIndex="11"
                                   SelectionChanged="SelectedVersionComboBox_OnSelectionChanged"
                                   Margin="4">
                             <AutomationProperties.LabeledBy>
@@ -404,12 +405,12 @@
                                 HorizontalAlignment="Left"
                                 Command="{x:Static npmUi:NpmPackageInstallViewModel.InstallCommand}"
                                 CommandParameter="{Binding SelectedPackage}"
-                                KeyboardNavigation.TabIndex="6"
+                                KeyboardNavigation.TabIndex="13"
                                 IsDefault="True"
                                 Content="{x:Static resx:NpmInstallWindowResources.InstallPackageButtonLabel}" />
 
                         <Button Style="{StaticResource NavigationButton}" VerticalAlignment="Center" Margin="5 0 0 0" 
-                                Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="7"
+                                Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="14"
                                 Content="{x:Static resx:NpmInstallWindowResources.ResetOptionsButtonLabel}" />
                     </StackPanel>
                 </StackPanel>

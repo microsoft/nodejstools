@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI
@@ -26,10 +25,10 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             this.Name = name;
             this.version = version;
-            this.AvailableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
+            this.AvailableVersions = availableVersions ?? Enumerable.Empty<SemverVersion>();
             this.Author = author;
             this.Description = description;
-            this.Homepages = homepages != null ? homepages.ToList() : new List<string>();
+            this.Homepages = homepages ?? Enumerable.Empty<string>();
             this.Keywords = keywords;
             this.localVersion = localVersion;
         }
@@ -40,6 +39,11 @@ namespace Microsoft.NodejsTools.NpmUI
         public string Description { get; }
         public IEnumerable<string> Homepages { get; }
         public string Keywords { get; }
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 
     internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel
@@ -49,7 +53,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 package.Name ?? string.Empty,
                 package.Version,
                 package.AvailableVersions,
-                package.Author == null ? string.Empty : package.Author.ToString(),
+                package.Author?.ToString() ?? string.Empty,
                 package.Description ?? string.Empty,
                 package.Homepages,
                 (package.Keywords != null && package.Keywords.Any())
