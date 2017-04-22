@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.NpmUI
@@ -12,7 +13,7 @@ namespace Microsoft.NodejsTools.NpmUI
     /// <summary>
     /// Interaction logic for NpmPackageInstallWindow.xaml
     /// </summary>
-    internal sealed partial class NpmPackageInstallWindow : DialogWindowVersioningWorkaround, IDisposable
+    public sealed partial class NpmPackageInstallWindow : DialogWindow, IDisposable
     {
         private readonly NpmPackageInstallViewModel viewModel;
 
@@ -120,8 +121,8 @@ namespace Microsoft.NodejsTools.NpmUI
             this.DependencyComboBox.SelectedIndex = (int)DependencyType.Standard;
             this.SaveToPackageJsonCheckbox.IsChecked = true;
 
-            this.ArgumentsTextBox.Text = string.Empty;
-            this.ArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            this.OtherNpmArgumentsTextBox.Text = string.Empty;
+            this.OtherNpmArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
         }
 
         private void SelectedVersionComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
