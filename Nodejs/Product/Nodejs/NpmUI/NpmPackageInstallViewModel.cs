@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
