@@ -227,6 +227,7 @@
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
+    <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="NpmUI\NpmInstallOutputWindowResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -247,9 +248,6 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
-    <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Options\NodejsNpmOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -398,7 +396,6 @@
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
-    <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
