@@ -68,7 +68,7 @@ if ($microbuild -or ($vstarget -eq "15.0" -and -not $skipRestore)) {
     Write-Output ""
     Write-Output "Installing Nuget MicroBuild packages"
 
-    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\packages.config" -PackagesDirectory "$packagedir"
+    & "$rootdir\Nodejs\.nuget\nuget.exe" restore "$rootdir\Nodejs\Setup\swix\project.json" -PackagesDirectory "$packagedir" -ConfigFile "$rootdir\Nodejs\.nuget\nuget.config"
 
     # If using the -microbuild switch, ONLY do the microbuild restore (this behavior is expected by the build servers).
     if($microbuild) {
