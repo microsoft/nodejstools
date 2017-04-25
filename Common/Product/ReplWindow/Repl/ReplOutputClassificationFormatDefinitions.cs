@@ -12,6 +12,26 @@ namespace Microsoft.NodejsTools.Repl
     [ClassificationType(ClassificationTypeNames = Name)]
     [Name(Name)]
     [UserVisible(true)]
+    internal class InteractiveErrorFormatDefinition : ClassificationFormatDefinition
+    {
+        public const string Name = "Node.js Interactive - Error";
+
+        [Export]
+        [Name(Name)]
+        [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]
+        internal static ClassificationTypeDefinition Definition = null; // Set via MEF
+
+        public InteractiveErrorFormatDefinition()
+        {
+            DisplayName = Name;
+            ForegroundColor = Color.FromRgb(0xee, 00, 00);
+        }
+    }
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = Name)]
+    [Name(Name)]
+    [UserVisible(true)]
     internal class InteractiveBlackFormatDefinition : ClassificationFormatDefinition
     {
         public const string Name = "Node.js Interactive - Black";
@@ -44,7 +64,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkRedFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x7f, 0, 0);
+            ForegroundColor = Color.FromRgb(0xd4, 0, 0);
         }
     }
 
@@ -64,7 +84,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkGreenFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x00, 0x40, 0);
+            ForegroundColor = Color.FromRgb(0x00, 0x8a, 0);
         }
     }
 
@@ -84,7 +104,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkYellowFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x7f, 0x7f, 0);
+            ForegroundColor = Color.FromRgb(0x98, 0x70, 0);
         }
     }
 
@@ -104,7 +124,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkBlueFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x00, 0x00, 0x7f);
+            ForegroundColor = Color.FromRgb(0x00, 0x57, 0xff);
         }
     }
 
@@ -124,7 +144,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkMagentaFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x7f, 0x00, 0x7f);
+            ForegroundColor = Color.FromRgb(0xbb, 0x00, 0xbb);
         }
     }
 
@@ -163,7 +183,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveGrayFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0xC0, 0xC0, 0xC0);
+            ForegroundColor = Color.FromRgb(0x76, 0x76, 0x76);
         }
     }
 
@@ -183,7 +203,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveDarkGrayFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0x76, 0x76, 0x76);
+            ForegroundColor = Color.FromRgb(0x69, 0x69, 0x69);
         }
     }
 
@@ -284,7 +304,7 @@ namespace Microsoft.NodejsTools.Repl
         public InteractiveMagentaFormatDefinition()
         {
             DisplayName = Name;
-            ForegroundColor = Color.FromRgb(0xff, 0x00, 0xff);
+            ForegroundColor = Color.FromRgb(0xd1, 0x00, 0xd1);
         }
     }
 

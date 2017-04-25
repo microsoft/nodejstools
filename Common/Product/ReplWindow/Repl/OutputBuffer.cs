@@ -19,8 +19,9 @@ namespace Microsoft.NodejsTools.Repl
         private static readonly Stopwatch _stopwatch;
         private readonly ReplWindow _window;
         private const int _initialMaxSize = 1024;
-        private bool _processAnsiEscapes;
-        private ConsoleColor _outColor = ConsoleColor.Black, _errColor = ConsoleColor.Red;
+
+        private InteractiveWindowColor _outColor = InteractiveWindowColor.Foreground;
+        private InteractiveWindowColor _errColor = InteractiveWindowColor.Error;
 
         static OutputBuffer()
         {
@@ -42,8 +43,8 @@ namespace Microsoft.NodejsTools.Repl
 
         public void ResetColors()
         {
-            _outColor = ConsoleColor.Black;
-            _errColor = ConsoleColor.Red;
+            _outColor = InteractiveWindowColor.Foreground;
+            _errColor = InteractiveWindowColor.Error;
         }
 
         public void Write(string text, bool isError = false)
@@ -52,7 +53,7 @@ namespace Microsoft.NodejsTools.Repl
             lock (_lock)
             {
                 int escape;
-                if (_processAnsiEscapes && (escape = text.IndexOf('\x1b')) != -1)
+                if (ProcessAnsiEscapes && (escape = text.IndexOf('\x1b')) != -1)
                 {
                     AppendEscapedText(text, isError, escape);
                 }
@@ -77,7 +78,7 @@ namespace Microsoft.NodejsTools.Repl
         private void AppendEscapedText(string text, bool isError, int escape)
         {
             OutputEntryKind kind = isError ? OutputEntryKind.StdErr : OutputEntryKind.StdOut;
-            ConsoleColor color = isError ? _errColor : _outColor;
+            InteractiveWindowColor color = isError ? _errColor : _outColor;
 
             // http://en.wikipedia.org/wiki/ANSI_escape_code
             // process any ansi color sequences...
@@ -136,7 +137,7 @@ namespace Microsoft.NodejsTools.Repl
                             if (codes.Count == 0)
                             {
                                 // reset
-                                color = isError ? ConsoleColor.Red : ConsoleColor.White;
+                                color = isError ? InteractiveWindowColor.Red : InteractiveWindowColor.White;
                             }
                             else
                             {
@@ -144,9 +145,9 @@ namespace Microsoft.NodejsTools.Repl
                                 {
                                     switch (codes[j])
                                     {
-                                        case 0: color = ConsoleColor.White; break;
+                                        case 0: color = InteractiveWindowColor.White; break;
                                         case 1: // bright/bold
-                                            color |= ConsoleColor.DarkGray;
+                                            color |= InteractiveWindowColor.DarkGray;
                                             break;
                                         case 2: // faint
 
@@ -163,9 +164,9 @@ namespace Microsoft.NodejsTools.Repl
                                         case 11: // 11-19, n-th alternate font
                                             break;
                                         case 21: // bright/bold off 
-                                            color &= ~ConsoleColor.DarkGray;
-                                            break;
                                         case 22: // normal intensity
+                                            color &= ~InteractiveWindowColor.DarkGray;
+                                            break;
                                         case 24: // underline off
                                             break;
                                         case 25: // blink off
@@ -173,14 +174,14 @@ namespace Microsoft.NodejsTools.Repl
                                         case 27: // image - postive
                                         case 28: // reveal
                                         case 29: // not crossed out
-                                        case 30: color = ConsoleColor.Black | (color & ConsoleColor.DarkGray); break;
-                                        case 31: color = ConsoleColor.DarkRed | (color & ConsoleColor.DarkGray); break;
-                                        case 32: color = ConsoleColor.DarkGreen | (color & ConsoleColor.DarkGray); break;
-                                        case 33: color = ConsoleColor.DarkYellow | (color & ConsoleColor.DarkGray); break;
-                                        case 34: color = ConsoleColor.DarkBlue | (color & ConsoleColor.DarkGray); break;
-                                        case 35: color = ConsoleColor.DarkMagenta | (color & ConsoleColor.DarkGray); break;
-                                        case 36: color = ConsoleColor.DarkCyan | (color & ConsoleColor.DarkGray); break;
-                                        case 37: color = ConsoleColor.Gray | (color & ConsoleColor.DarkGray); break;
+                                        case 30: color = InteractiveWindowColor.Black | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 31: color = InteractiveWindowColor.DarkRed | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 32: color = InteractiveWindowColor.DarkGreen | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 33: color = InteractiveWindowColor.DarkYellow | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 34: color = InteractiveWindowColor.DarkBlue | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 35: color = InteractiveWindowColor.DarkMagenta | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 36: color = InteractiveWindowColor.DarkCyan | (color & InteractiveWindowColor.DarkGray); break;
+                                        case 37: color = InteractiveWindowColor.Gray | (color & InteractiveWindowColor.DarkGray); break;
                                         case 38: // xterm 286 background color
                                         case 39: // default text color
                                             color = _outColor;
@@ -193,14 +194,14 @@ namespace Microsoft.NodejsTools.Repl
                                         case 45:
                                         case 46:
                                         case 47: break;
-                                        case 90: color = ConsoleColor.DarkGray; break;
-                                        case 91: color = ConsoleColor.Red; break;
-                                        case 92: color = ConsoleColor.Green; break;
-                                        case 93: color = ConsoleColor.Yellow; break;
-                                        case 94: color = ConsoleColor.Blue; break;
-                                        case 95: color = ConsoleColor.Magenta; break;
-                                        case 96: color = ConsoleColor.Cyan; break;
-                                        case 97: color = ConsoleColor.White; break;
+                                        case 90: color = InteractiveWindowColor.DarkGray; break;
+                                        case 91: color = InteractiveWindowColor.Red; break;
+                                        case 92: color = InteractiveWindowColor.Green; break;
+                                        case 93: color = InteractiveWindowColor.Yellow; break;
+                                        case 94: color = InteractiveWindowColor.Blue; break;
+                                        case 95: color = InteractiveWindowColor.Magenta; break;
+                                        case 96: color = InteractiveWindowColor.Cyan; break;
+                                        case 97: color = InteractiveWindowColor.White; break;
                                     }
                                 }
                             }
@@ -216,13 +217,14 @@ namespace Microsoft.NodejsTools.Repl
                     escape = text.IndexOf('\x1b', escape + 1);
                 }// else not an escape sequence, process as text
             } while (escape != -1);
+
             if (start != text.Length)
             {
                 AppendText(text.Substring(start), kind, color);
             }
         }
 
-        private void AppendText(string text, OutputEntryKind kind, ConsoleColor color)
+        private void AppendText(string text, OutputEntryKind kind, InteractiveWindowColor color)
         {
             var newProps = new OutputEntryProperties(kind, color);
             if (_outputEntries.Count == 0 || _outputEntries[_outputEntries.Count - 1].Properties != newProps)
@@ -233,11 +235,7 @@ namespace Microsoft.NodejsTools.Repl
             buffer.Append(text);
         }
 
-        public bool ProcessAnsiEscapes
-        {
-            get { return _processAnsiEscapes; }
-            set { _processAnsiEscapes = value; }
-        }
+        public bool ProcessAnsiEscapes { get; set; }
 
         /// <summary>
         /// Flushes the buffer, should always be called from the UI thread.
@@ -295,9 +293,9 @@ namespace Microsoft.NodejsTools.Repl
         internal struct OutputEntryProperties
         {
             public readonly OutputEntryKind Kind;
-            public readonly ConsoleColor Color;
+            public readonly InteractiveWindowColor Color;
 
-            public OutputEntryProperties(OutputEntryKind kind, ConsoleColor color)
+            public OutputEntryProperties(OutputEntryKind kind, InteractiveWindowColor color)
             {
                 Kind = kind;
                 Color = color;

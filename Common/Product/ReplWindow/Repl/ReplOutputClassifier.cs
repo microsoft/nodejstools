@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Repl
 
             List<ClassificationSpan> classifications = new List<ClassificationSpan>();
 
-            int startIndex = coloredSpans.BinarySearch(new ColoredSpan(span, ConsoleColor.White), SpanStartComparer.Instance);
+            int startIndex = coloredSpans.BinarySearch(new ColoredSpan(span, InteractiveWindowColor.White), SpanStartComparer.Instance);
             if (startIndex < 0)
             {
                 startIndex = ~startIndex - 1;
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Repl
             for (int i = startIndex; i < coloredSpans.Count && coloredSpans[i].Span.Start < spanEnd; i++)
             {
                 IClassificationType type;
-                if (_provider._classTypes.TryGetValue(coloredSpans[i].Color, out type))
+                if (_provider.TryGetValue(coloredSpans[i].Color, out type))
                 {
                     var overlap = span.Overlap(coloredSpans[i].Span);
                     if (overlap != null)
