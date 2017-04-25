@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+      <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+  </PropertyGroup>
+
   <Import Project="..\SetupProjectBefore.settings" />
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" />
 
