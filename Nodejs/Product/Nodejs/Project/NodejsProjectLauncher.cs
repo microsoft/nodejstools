@@ -16,6 +16,7 @@ using System.Web;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -68,7 +69,7 @@ namespace Microsoft.NodejsTools.Project
                 return VSConstants.S_OK;
             }
 
-            var chromeProtocolRequired = Nodejs.GetNodeVersion(nodePath) >= new Version(8, 0);
+            var chromeProtocolRequired = Nodejs.GetNodeVersion(nodePath) >= new Version(8, 0) || CheckDebugProtocolOption();
             var startBrowser = ShouldStartBrowser();
 
             if (debug && !chromeProtocolRequired)
@@ -85,6 +86,13 @@ namespace Microsoft.NodejsTools.Project
             }
 
             return VSConstants.S_OK;
+        }
+
+        private static bool CheckDebugProtocolOption()
+        {
+            var optionString = NodejsDialogPage.LoadString(name: "DebugProtocol", cat: "Debugging");
+
+            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "chrome");
         }
 
         private void StartAndAttachDebugger(string file, string nodePath)
