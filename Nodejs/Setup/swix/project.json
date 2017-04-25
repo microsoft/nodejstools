@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "MicroBuild.Core": "0.2.0",
+    "MicroBuild.Plugins.SwixBuild": "1.0.*"
+  },
+  "frameworks": {
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}
