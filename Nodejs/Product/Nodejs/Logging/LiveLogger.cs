@@ -3,36 +3,19 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using Microsoft.NodejsTools.Options;
-using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Logging
 {
     /// <summary>
     /// An efficient logger that logs diagnostic messages using Debug.WriteLine.
-    /// Additionally logs messages to the NTVS Diagnostics task pane if option is enabled.
     /// </summary>
     internal sealed class LiveLogger
     {
         private static readonly LiveLogger Instance = new LiveLogger();
         private static readonly object _loggerLock = new object();
 
-        private NodejsDiagnosticsOptionsPage _diagnosticsOptions;
-
         private LiveLogger()
         {
-        }
-
-        private NodejsDiagnosticsOptionsPage DiagnosticsOptions
-        {
-            get
-            {
-                if (this._diagnosticsOptions == null && NodejsPackage.Instance != null)
-                {
-                    this._diagnosticsOptions = NodejsPackage.Instance.DiagnosticsOptionsPage;
-                }
-                return this._diagnosticsOptions;
-            }
         }
 
         public static void WriteLine(string message, Type category)
@@ -53,4 +36,3 @@ namespace Microsoft.NodejsTools.Logging
         }
     }
 }
-

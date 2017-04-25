@@ -8,9 +8,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
@@ -94,9 +91,7 @@ namespace Microsoft.NodejsTools
             Instance = this;
         }
 
-        public NodejsGeneralOptionsPage GeneralOptionsPage => (NodejsGeneralOptionsPage)GetDialogPage(typeof(NodejsGeneralOptionsPage));
-
-        public NodejsDiagnosticsOptionsPage DiagnosticsOptionsPage => (NodejsDiagnosticsOptionsPage)GetDialogPage(typeof(NodejsDiagnosticsOptionsPage));
+        public NodejsGeneralOptionsPage GeneralOptionsPage => GetDialogPage<NodejsGeneralOptionsPage>();
 
         public EnvDTE.DTE DTE => (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
@@ -305,6 +300,11 @@ namespace Microsoft.NodejsTools
         internal new object GetService(Type serviceType)
         {
             return base.GetService(serviceType);
+        }
+
+        private T GetDialogPage<T>() where T : NodejsDialogPage
+        {
+            return (T)GetDialogPage(typeof(T));
         }
 
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null)
