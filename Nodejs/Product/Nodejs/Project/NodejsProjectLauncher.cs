@@ -348,7 +348,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var serviceProvider = _project.Site;
 
-            var setupConfiguration = serviceProvider.GetService(typeof(SetupConfiguration)) as ISetupConfiguration2;
+            var setupConfiguration = new SetupConfiguration();
 
             var visualStudioInstallationInstanceID = setupConfiguration.GetInstanceForCurrentProcess().GetInstanceId();
 
