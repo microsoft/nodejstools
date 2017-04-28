@@ -35,12 +35,16 @@ namespace Microsoft.NodejsTools.Project
         private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
         private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
         private static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
-        private static readonly string PathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" + 
-            $@"Microsoft\VisualStudio\NodeAdapter\{GetVisualStudioInstallationInstanceID()}\out\src\nodeDebug.js""");
+
+        private static string GetPathToNode2DebugAdapterRuntime()
+        {
+            return Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
+                $@"Microsoft\VisualStudio\NodeAdapter\{GetVisualStudioInstallationInstanceID()}\out\src\nodeDebug.js""");
+        }
 
         private static string GetVisualStudioInstallationInstanceID()
         {
-            SetupConfiguration configuration = new SetupConfiguration();
+            var configuration = new SetupConfiguration();
             return configuration.GetInstanceForCurrentProcess().GetInstanceId();
         }
 
@@ -90,7 +94,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 if (CheckUseNewChromeDebugProtocolOption())
                 {
-                    StartWithChromeV2Debugger(file);
+                    StartWithChromeV2Debugger(file, nodePath);
                 }
                 else
                 {
@@ -107,7 +111,7 @@ namespace Microsoft.NodejsTools.Project
 
         private static bool CheckUseNewChromeDebugProtocolOption()
         {
-            var optionString = NodejsDialogPage.LoadString(name: "DebugProtocol", cat: "ChromeDebuggingVersion");
+            var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");
 
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "V2");
         }
@@ -117,6 +121,13 @@ namespace Microsoft.NodejsTools.Project
             var optionString = NodejsDialogPage.LoadString(name: "DebugProtocol", cat: "Debugging");
 
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "chrome");
+        }
+
+        private static bool CheckEnableDiagnosticLoggingOption()
+        {
+            var optionString = NodejsDialogPage.LoadString(name: "DiagnosticLogging", cat: "Debugging");
+
+            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
         }
 
         private void StartAndAttachDebugger(string file, string nodePath)
@@ -345,24 +356,25 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private void StartWithChromeV2Debugger(string program)
+        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable)
         {
-            string cwd = Path.GetDirectoryName(program);
-            JObject configuration = new JObject(
+            var cwd = _project.GetWorkingDirectory(); // Current working directory
+            var configuration = new JObject(
                 new JProperty("name", "Debug Node.js program from Visual Studio"),
                 new JProperty("type", "node2"),
                 new JProperty("request", "launch"),
                 new JProperty("program", program),
+                new JProperty("runtimeExecutable", nodeRuntimeExecutable),
                 new JProperty("cwd", cwd),
-                new JProperty("diagnosticLogging", true),
+                new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
-                new JProperty("$adapter", PathToNode2DebugAdapterRuntime),
+                new JProperty("$adapter", GetPathToNode2DebugAdapterRuntime()),
                 new JProperty("$adapterRuntime", "node"));
 
-            string jsonContent = configuration.ToString();
+            var jsonContent = configuration.ToString();
 
-            VsDebugTargetInfo4[] debugTargets = new VsDebugTargetInfo4[] {
+            var debugTargets = new [] {
                 new VsDebugTargetInfo4() {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
                     guidLaunchDebugEngine = WebKitDebuggerV2Guid,
@@ -371,7 +383,7 @@ namespace Microsoft.NodejsTools.Project
                 }
             };
 
-            VsDebugTargetProcessInfo[] processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
+            var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
 
             var serviceProvider = _project.Site;
             var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
