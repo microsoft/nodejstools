@@ -107,5 +107,6 @@ var run_tests = function (testCases, callback) {
         type: 'suite end',
         result: result
     });
+	process.exit();
 };
 module.exports.run_tests = run_tests;

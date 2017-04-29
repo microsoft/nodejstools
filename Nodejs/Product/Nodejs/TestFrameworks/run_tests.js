@@ -8,6 +8,7 @@ var rl = readline.createInterface({
 });
 
 rl.on('line', (line) => {
+    rl.close();
     var testCases = JSON.parse(line);
     // get rid of leftover quotations from C# (necessary?)
     for (var test in testCases) {
@@ -33,7 +34,4 @@ rl.on('line', (line) => {
     }
     // run the test
     framework.run_tests(testCases, postResult);
-    
-    // close readline interface
-    rl.close();
 });
