@@ -92,9 +92,9 @@ var run_tests = function (testCases, callback) {
     var mocha = initializeMocha(Mocha, testCases[0].projectFolder);
 
     var testGrepString = '^(' + testCases.map(function (testCase) {
-        return testCase.testName
+        return escapeRegExp(testCase.testName);
     }).join('|') + ')$';
-    
+
     if (testGrepString) {
         mocha.grep(new RegExp(testGrepString));
     }

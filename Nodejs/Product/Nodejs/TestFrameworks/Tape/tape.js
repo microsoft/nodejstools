@@ -112,7 +112,6 @@ function run_tests(testInfo, callback) {
     });
 
     harness.onFinish(function () {
-        // TODO: This still doesn't seem to handle async tests with plan issues.
         if (capture) {
             // Something didn't finish. Finish it now.
             result.passed = false;
