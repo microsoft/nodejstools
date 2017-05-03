@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.ComponentModel.Composition;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -15,7 +13,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         Added,
         Removed,
         Changed,
-        Renamed
+        Renamed,
     }
 
     internal class TestFileChangedEventArgs : EventArgs
@@ -56,7 +54,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             if (_projectDocTracker != null)
             {
-                int hr = _projectDocTracker.AdviseTrackProjectDocumentsEvents(this, out _cookie);
+                var hr = _projectDocTracker.AdviseTrackProjectDocumentsEvents(this, out _cookie);
                 ErrorHandler.ThrowOnFailure(hr); // do nothing if this fails
             }
         }
@@ -65,7 +63,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             if (_cookie != VSConstants.VSCOOKIE_NIL && _projectDocTracker != null)
             {
-                int hr = _projectDocTracker.UnadviseTrackProjectDocumentsEvents(_cookie);
+                var hr = _projectDocTracker.UnadviseTrackProjectDocumentsEvents(_cookie);
                 ErrorHandler.Succeeded(hr); // do nothing if this fails
 
                 _cookie = VSConstants.VSCOOKIE_NIL;
@@ -74,7 +72,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         private int NotifyTestFileAddRemove(int changedProjectCount, IVsProject[] changedProjects, string[] changedProjectItems, int[] rgFirstIndices, TestFileChangedReason reason)
         {
-            for (int index = 0; index < changedProjectCount; index++)
+            for (var index = 0; index < changedProjectCount; index++)
             {
                 var projectItem = changedProjectItems[index];
                 var projectIndex = rgFirstIndices[index];
@@ -176,4 +174,3 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         }
     }
 }
-

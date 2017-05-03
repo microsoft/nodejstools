@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
     {
         public NodejsTestInfo(string fullyQualifiedName)
         {
-            string[] parts = fullyQualifiedName.Split(new string[] { "::" }, StringSplitOptions.None);
+            var parts = fullyQualifiedName.Split(new[] { "::" }, StringSplitOptions.None);
             if (parts.Length != 3)
             {
                 throw new ArgumentException("Invalid fully qualified test name");
@@ -34,15 +34,14 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 return ModulePath + "::" + TestName + "::" + TestFramework;
             }
         }
-        public string ModulePath { get; private set; }
+        public string ModulePath { get; }
 
-        public string TestName { get; private set; }
+        public string TestName { get; }
 
-        public string TestFramework { get; private set; }
+        public string TestFramework { get; }
 
-        public int SourceLine { get; private set; }
+        public int SourceLine { get; }
 
-        public int SourceColumn { get; private set; }
+        public int SourceColumn { get; }
     }
 }
-

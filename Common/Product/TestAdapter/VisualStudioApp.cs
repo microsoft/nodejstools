@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -32,7 +34,7 @@ namespace Microsoft.VisualStudioTools
 
         public static VisualStudioApp FromEnvironmentVariable(string variable)
         {
-            string pid = Environment.GetEnvironmentVariable(variable);
+            var pid = Environment.GetEnvironmentVariable(variable);
             if (pid == null)
             {
                 return null;
@@ -76,8 +78,36 @@ namespace Microsoft.VisualStudioTools
             return dte;
         }
 
+#if DEV15
+        private static bool DTELoaded = false;
+#endif
+
         private static DTE GetDTE(int processId)
         {
+#if DEV15
+            // VS 2017 doesn't install some assemblies to the GAC that are needed to work with the
+            // debugger, and as the tests don't execute in the devenv.exe process, those assemblies
+            // fail to load - so load them manually from PublicAssemblies.
+
+            // Use the executable name, as this is only needed for the out of proc test execution
+            // that may interact with the debugger (vstest.executionengine.x86.exe).
+            if (!DTELoaded)
+            {
+                var currentProc = Process.GetCurrentProcess().MainModule.FileName;
+                if (StringComparer.OrdinalIgnoreCase.Equals(
+                        Path.GetFileName(currentProc), "vstest.executionengine.x86.exe"))
+                {
+                    var baseDir = Path.GetDirectoryName(currentProc);
+                    var publicAssemblies = Path.Combine(baseDir, "..\\..\\..\\PublicAssemblies");
+
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "Microsoft.VisualStudio.OLE.Interop.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte90.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte80.dll"));
+                    Assembly.LoadFrom(Path.Combine(publicAssemblies, "envdte.dll"));
+                }
+                DTELoaded = true;
+            }
+#endif
             MessageFilter.Register();
 
             var prefix = Process.GetProcessById(processId).ProcessName;
@@ -86,7 +116,7 @@ namespace Microsoft.VisualStudioTools
                 prefix = "VisualStudio";
             }
 
-            var progId = string.Format("!{0}.DTE.{1}:{2}", prefix, AssemblyVersionInfo.VSVersion, processId);
+            var progId = $"!{prefix}.DTE.{AssemblyVersionInfo.VSVersion}:{processId}";
             object runningObject = null;
 
             IBindCtx bindCtx = null;
@@ -313,4 +343,3 @@ namespace Microsoft.VisualStudioTools
                            int dwPendingType);
     }
 }
-

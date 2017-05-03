@@ -3,13 +3,12 @@
 using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.VisualStudioTools
 {
     internal class ProjectEventArgs : EventArgs
     {
-        public IVsProject Project { get; private set; }
+        public IVsProject Project { get; }
 
         public ProjectEventArgs(IVsProject project)
         {
@@ -301,4 +300,3 @@ namespace Microsoft.VisualStudioTools
         }
     }
 }
-

@@ -162,4 +162,3 @@ namespace Microsoft.NodejsTools
 #endif
    }
 }
-

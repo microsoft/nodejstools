@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(project, "project");
 
-            string projectTypeGuids = project.GetAggregateProjectTypeGuids();
+            var projectTypeGuids = project.GetAggregateProjectTypeGuids();
 
             // Currently we assume that all matching projects are test projects.
             return (projectTypeGuids.IndexOf(projectGuid.ToString(), StringComparison.OrdinalIgnoreCase) >= 0);
@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             }
 
             // Each item in VS OM is IVSHierarchy. 
-            IVsHierarchy hierarchy = (IVsHierarchy)project;
+            var hierarchy = (IVsHierarchy)project;
 
             return GetProjectItems(hierarchy, VSConstants.VSITEMID_ROOT);
         }
@@ -179,12 +179,12 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                     continue;
                 }
 
-                foreach (string item in GetProjectItems(project, childId))
+                foreach (var item in GetProjectItems(project, childId))
                 {
                     yield return item;
                 }
 
-                string childPath = GetCanonicalName(childId, project);
+                var childPath = GetCanonicalName(childId, project);
                 yield return childPath;
             }
         }
@@ -194,12 +194,36 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         /// </summary>
         private static uint GetItemId(object pvar)
         {
-            if (pvar == null) return VSConstants.VSITEMID_NIL;
-            if (pvar is int) return (uint)(int)pvar;
-            if (pvar is uint) return (uint)pvar;
-            if (pvar is short) return (uint)(short)pvar;
-            if (pvar is ushort) return (uint)(ushort)pvar;
-            if (pvar is long) return (uint)(long)pvar;
+            if (pvar == null)
+            {
+                return VSConstants.VSITEMID_NIL;
+            }
+
+            if (pvar is int)
+            {
+                return (uint)(int)pvar;
+            }
+
+            if (pvar is uint)
+            {
+                return (uint)pvar;
+            }
+
+            if (pvar is short)
+            {
+                return (uint)(short)pvar;
+            }
+
+            if (pvar is ushort)
+            {
+                return (uint)(ushort)pvar;
+            }
+
+            if (pvar is long)
+            {
+                return (uint)(long)pvar;
+            }
+
             return VSConstants.VSITEMID_NIL;
         }
 
@@ -228,7 +252,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             Debug.Assert(itemId != VSConstants.VSITEMID_NIL, "ItemId cannot be nill");
 
-            string strRet = string.Empty;
+            var strRet = string.Empty;
             if (ErrorHandler.Failed(hierarchy.GetCanonicalName(itemId, out strRet)))
             {
                 return string.Empty;
@@ -237,4 +261,3 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         }
     }
 }
-

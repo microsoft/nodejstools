@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     internal class FrameworkDiscover
     {
-        private readonly Dictionary<String, TestFramework> _frameworks;
+        private readonly Dictionary<String, TestFramework> _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
         public FrameworkDiscover() : this(null)
         {
         }
@@ -17,13 +17,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         {
             if (testFrameworkDirectories == null)
             {
-                TestFrameworkDirectories directoryLoader = new TestFrameworkDirectories();
+                var directoryLoader = new TestFrameworkDirectories();
                 testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
             }
-            _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
-            foreach (string directory in testFrameworkDirectories)
+
+            foreach (var directory in testFrameworkDirectories)
             {
-                TestFramework fx = new TestFramework(directory);
+                var fx = new TestFramework(directory);
                 _frameworks.Add(fx.Name, fx);
             }
         }
@@ -36,4 +36,3 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         }
     }
 }
-
