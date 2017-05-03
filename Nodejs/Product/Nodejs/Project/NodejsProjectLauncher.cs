@@ -353,7 +353,7 @@ namespace Microsoft.NodejsTools.Project
             var visualStudioInstallationInstanceID = setupConfiguration.GetInstanceForCurrentProcess().GetInstanceId();
 
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
-                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\out\src\nodeDebug.js""");
+                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
