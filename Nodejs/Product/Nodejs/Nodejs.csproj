@@ -1530,4 +1530,5 @@
   <Target Name="_DeleteAfterCreatePkgDef" AfterTargets="GeneratePkgDef">
     <Delete Files="@(_CopiedForCreatePkgdef)" />
   </Target>
+  <Target Name="GetVSIXVersion" Outputs="42.42.42.42" />
 </Project>
