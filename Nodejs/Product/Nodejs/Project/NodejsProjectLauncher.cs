@@ -350,7 +350,12 @@ namespace Microsoft.NodejsTools.Project
 
             var setupConfiguration = new SetupConfiguration();
 
-            var visualStudioInstallationInstanceID = setupConfiguration.GetInstanceForCurrentProcess().GetInstanceId();
+            var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
+
+            var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
+
+            // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
+            var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "\\JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
 
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
@@ -366,8 +371,8 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
-                new JProperty("$adapter", pathToNode2DebugAdapterRuntime),
-                new JProperty("$adapterRuntime", "node"));
+                new JProperty("$adapter", pathToNodeExe),
+                new JProperty("$adapterArgs", pathToNode2DebugAdapterRuntime));
 
             var jsonContent = configuration.ToString();
 
