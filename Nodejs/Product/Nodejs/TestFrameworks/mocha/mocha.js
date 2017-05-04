@@ -2,12 +2,6 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
-var result = {
-    'title': '',
-    'passed': false,
-    'stdOut': '',
-    'stdErr': ''
-};
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
 // and 'xunit' does not print the stack trace from the test.
@@ -22,6 +16,17 @@ function hook_outputs() {
     process.stdout.write = append_stdout;
     process.stderr.write = append_stderr;
 }
+function reset_result() {
+    return {
+        'title': '',
+        'passed': false,
+        'pending': false,
+        'stdOut': '',
+        'stdErr': ''
+    };
+}
+
+var result = reset_result();
 
 hook_outputs();
 
@@ -142,6 +147,17 @@ var run_tests = function (testCases, callback) {
         });
     });
 
+    runner.on('pending', function (test) {
+        result.pending = true;
+        result.title = test.fullTitle();
+        post({
+            type: 'pending',
+            title: result.title,
+            result: result
+        });
+        result = reset_result();
+    });
+
     runner.on('test', function (test) {
         result.title = test.fullTitle();
         post({
@@ -162,14 +178,10 @@ var run_tests = function (testCases, callback) {
         post({
             type: 'result',
             title: result.title,
-            result: result
+            result: result,
+            pending: false
         });
-        result = {
-            'title': '',
-            'passed': false,
-            'stdOut': '',
-            'stdErr': ''
-        }
+        result = reset_result();
     });
 
     runner.on('fail', function (test, err) {
@@ -177,14 +189,10 @@ var run_tests = function (testCases, callback) {
         post({
             type: 'result',
             title: result.title,
-            result: result
+            result: result,
+            pending: false
         });
-        result = {
-            'title': '',
-            'passed': false,
-            'stdOut': '',
-            'stdErr': ''
-        }
+        result = reset_result();
     });
 };
 
