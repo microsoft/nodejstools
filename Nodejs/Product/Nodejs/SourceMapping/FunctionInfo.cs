@@ -10,7 +10,8 @@ namespace Microsoft.NodejsTools.SourceMapping
         internal readonly int? LineNumber;
         internal readonly bool IsRecompilation;
 
-        internal FunctionInformation(string ns, string methodName, int? lineNo, string filename) : this(ns, methodName, lineNo, filename, false) { }
+        internal FunctionInformation(string ns, string methodName, int? lineNo, string filename) 
+            : this(ns, methodName, lineNo, filename, false) { }
 
         internal FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation)
         {
@@ -22,4 +23,3 @@ namespace Microsoft.NodejsTools.SourceMapping
         }
     }
 }
-

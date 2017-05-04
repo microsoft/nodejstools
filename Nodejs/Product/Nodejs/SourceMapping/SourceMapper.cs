@@ -364,4 +364,3 @@ namespace Microsoft.NodejsTools.SourceMapping
         }
     }
 }
-

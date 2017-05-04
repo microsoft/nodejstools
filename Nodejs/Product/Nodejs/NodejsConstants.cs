@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Microsoft.NodejsTools
 {
-    internal class NodejsConstants
+    internal static class NodejsConstants
     {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
@@ -87,4 +87,3 @@ namespace Microsoft.NodejsTools
         internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
     }
 }
-

@@ -109,4 +109,3 @@ namespace Microsoft.VisualStudioTools
         public const string Visible = "Visible";
     }
 }
-

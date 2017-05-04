@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         public TestFrameworkDirectories()
         {
-            this._frameworkDirectories = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase);
+            this._frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
             {
                 var name = Path.GetFileName(directory);
@@ -59,4 +59,3 @@ namespace Microsoft.NodejsTools.TestFrameworks
         }
     }
 }
-
