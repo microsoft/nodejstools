@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class NpmController : AbstractNpmLogSource, INpmController {
-        private IPackageCatalog _sRepoCatalog;
+        private IPackageCatalog _sRepoCatalog = EmptyPackageCatalog.Instance;
         private string _fullPathToRootPackageDirectory;
         private string _cachePath;
         private bool _showMissingDevOptionalSubPackages;
@@ -174,28 +174,8 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             OnCommandCompleted(e.Arguments, e.WithErrors, e.Cancelled);
         }
 
-        public async Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress) {
-            //  This should really be thread-safe but await can't be inside a lock so
-            //  we'll just have to hope and pray this doesn't happen concurrently. Worst
-            //  case is we'll end up with two retrievals, one of which will be binned,
-            //  which isn't the end of the world.
-            _sRepoCatalog = null;
-            if (null == _sRepoCatalog || _sRepoCatalog.ResultsCount == 0 || forceDownload) {
-                Exception ex = null;
-                using (var commander = CreateNpmCommander()) {
-                    EventHandler<NpmExceptionEventArgs> exHandler = (sender, args) => { LogException(sender, args); ex = args.Exception; };
-                    commander.ErrorLogged += LogError;
-                    commander.ExceptionLogged += exHandler;
-                    _sRepoCatalog = await commander.GetCatalogAsync(forceDownload, progress);
-                    commander.ErrorLogged -= LogError;
-                    commander.ExceptionLogged -= exHandler;
-                }
-                if (null != ex) {
-                    OnOutputLogged(ex.ToString());
-                    throw ex;
-                }
-            }
-            return _sRepoCatalog;
+        public Task<IPackageCatalog> GetRepositoryCatalogAsync(bool forceDownload, IProgress<string> progress) {
+            return Task.FromResult(_sRepoCatalog);
         }
 
         public IPackageCatalog MostRecentlyLoadedCatalog {

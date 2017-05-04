@@ -144,6 +144,13 @@ namespace Microsoft.NodejsTools.Npm {
             }
         }
 
+        public void AddVersion(SemverVersion version) {
+            if( version > this.LatestVersion) {
+                this.LatestVersion = version;
+            }
+            this._availableVersions.Add(version);
+        }
+
         public IPackage Build() {
             var proxy = new PackageProxy {
                 Author = Author,
