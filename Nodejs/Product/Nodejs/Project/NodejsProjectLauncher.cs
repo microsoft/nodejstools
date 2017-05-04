@@ -354,7 +354,8 @@ namespace Microsoft.NodejsTools.Project
 
             var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
 
-            var pathToNodeExe = setupInstance.GetInstallationPath() + "\\JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe";
+            // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
+            var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "\\JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
 
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
