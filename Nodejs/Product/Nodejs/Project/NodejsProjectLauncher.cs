@@ -359,8 +359,6 @@ namespace Microsoft.NodejsTools.Project
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
 
-            var adapterString = pathToNodeExe + " " + pathToNode2DebugAdapterRuntime;
-
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
                 new JProperty("name", "Debug Node.js program from Visual Studio"),
@@ -372,7 +370,8 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
-                new JProperty("$adapter", pathToNode2DebugAdapterRuntime));
+                new JProperty("$adapter", pathToNodeExe),
+                new JProperty("$adapterArgs", pathToNode2DebugAdapterRuntime));
 
             var jsonContent = configuration.ToString();
 
