@@ -359,7 +359,7 @@ namespace NpmTests {
             }
         }
 
-        [TestMethod, Priority(0)]
+        //[TestMethod, Priority(0)]
         public void CheckNonZeroPackageVersionsExist() {
             IDictionary<string, IPackage> byName;
             var target = GetTestPackageList(PackageCacheDirectory, out byName);
