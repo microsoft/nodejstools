@@ -137,7 +137,7 @@ namespace Microsoft.NodejsTools.Repl
                             if (codes.Count == 0)
                             {
                                 // reset
-                                color = isError ? InteractiveWindowColor.Red : InteractiveWindowColor.White;
+                                color = isError ? _errColor : _outColor;
                             }
                             else
                             {
