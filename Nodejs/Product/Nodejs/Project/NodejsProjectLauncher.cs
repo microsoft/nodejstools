@@ -383,6 +383,7 @@ namespace Microsoft.NodejsTools.Project
             var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
 
             // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
+            // This node.exe will be the one used by the node2 debug adapter, not the one used to host the user code.
             var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
 
             // We check the registry to see if any parameters for the node.exe invocation have been specified (like "--inspect"), and append them if we find them.
@@ -401,7 +402,6 @@ namespace Microsoft.NodejsTools.Project
                 pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\out\src\nodeDebug.js""");
             }
-
 
             // Here we need to massage the env variables into the format expected by node and vs code
             object envVars = GetEnvironmentVariables();
@@ -459,8 +459,6 @@ namespace Microsoft.NodejsTools.Project
                     );
                 }
             }
-
-
         }
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
