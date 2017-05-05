@@ -85,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.VisualStudio.Utilities, Version=$(VSTarget).0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" >
+    <Reference Include="Microsoft.VisualStudio.Utilities, Version=$(VSTarget).0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>$(DevEnvDir)\Microsoft.VisualStudio.Utilities.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -96,10 +96,6 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Theme\blue.vstheme" />
-    <None Include="Theme\contrast.vstheme" />
-    <None Include="Theme\dark.vstheme" />
-    <None Include="Theme\light.vstheme" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Icons\SystemRegisteredICO\NodeJS.ico">
@@ -114,9 +110,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
     </Content>
-    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v14.0.pkgdef" />
-    <None Include="Theme\Microsoft.NodejsTools.InteractiveWindow.theme.v15.0.pkgdef" />
-    <None Include="Theme\make_theme_pkgdef.py" />
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="InteractiveWindow.cs.vsct">
@@ -161,6 +154,7 @@
     <VSCTCompile Include="InteractiveWindow.en.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
+    <Compile Include="Repl\InteractiveWindowColor.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

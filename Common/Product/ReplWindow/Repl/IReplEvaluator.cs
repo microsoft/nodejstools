@@ -4,12 +4,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Implements an evaluator for a specific REPL implementation.  The evaluator is provided to the
     /// REPL implementation by the IReplEvaluatorProvider interface.

@@ -2,12 +2,8 @@
 
 using System.Collections.Generic;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Represents a command which can be run from a REPL window.
     /// 

@@ -6,13 +6,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.Utilities;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
-
     [Export(typeof(IClassifierProvider)), ContentType(ReplConstants.ReplContentTypeName)]
     internal class ReplAggregateClassifierProvider : IClassifierProvider
     {
@@ -35,4 +30,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

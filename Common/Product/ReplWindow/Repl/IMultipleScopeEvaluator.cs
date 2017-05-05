@@ -5,12 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Supports a REPL evaluator which enables the user to switch between
     /// multiple scopes of execution.
