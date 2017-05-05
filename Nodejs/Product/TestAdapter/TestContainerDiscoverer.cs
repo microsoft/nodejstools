@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 (uint)(__VSENUMPROJFLAGS.EPF_MATCHTYPE | __VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION),
                 ref guid,
                 out hierarchies)));
-            IVsHierarchy[] hierarchy = new IVsHierarchy[1];
+            var hierarchy = new IVsHierarchy[1];
             uint fetched;
             while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out fetched)) && fetched == 1)
             {
@@ -102,15 +102,17 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId)
         {
-            object pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
+            var pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
 
-            uint childId = GetItemId(pVar);
+            var childId = GetItemId(pVar);
             while (childId != VSConstants.VSITEMID_NIL)
             {
                 yield return childId;
 
                 foreach (var childNodePathId in GetProjectItemIds(project, childId))
+                {
                     yield return childNodePathId;
+                }
 
                 pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_NextSibling, childId, project);
                 childId = GetItemId(pVar);
@@ -120,17 +122,35 @@ namespace Microsoft.NodejsTools.TestAdapter
         public static uint GetItemId(object pvar)
         {
             if (pvar == null)
+            {
                 return VSConstants.VSITEMID_NIL;
+            }
+
             if (pvar is int)
+            {
                 return (uint)(int)pvar;
+            }
+
             if (pvar is uint)
+            {
                 return (uint)pvar;
+            }
+
             if (pvar is short)
+            {
                 return (uint)(short)pvar;
+            }
+
             if (pvar is ushort)
+            {
                 return (uint)(ushort)pvar;
+            }
+
             if (pvar is long)
+            {
                 return (uint)(long)pvar;
+            }
+
             return VSConstants.VSITEMID_NIL;
         }
 
@@ -156,8 +176,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         internal bool IsTestFile(string pathToFile)
         {
-            string testCaseFile = pathToFile;
-            IVsProject project = GetTestProjectFromFile(pathToFile);
+            var testCaseFile = pathToFile;
+            var project = GetTestProjectFromFile(pathToFile);
             if (null == project)
             {
                 //The file is not included in the project.  
@@ -171,7 +191,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             //
             if (TypeScriptHelpers.IsTypeScriptFile(pathToFile))
             {
-                string jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
+                var jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
                 if (!File.Exists(jsFile))
                 {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
@@ -192,7 +212,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private static bool IsTestFile(uint itemId, IVsProject project)
         {
-            IVsHierarchy hierarchy = project as IVsHierarchy;
+            var hierarchy = project as IVsHierarchy;
 
             if (hierarchy == null)
             {
@@ -280,13 +300,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         #region ITestContainerDiscoverer
         public event EventHandler TestContainersUpdated;
 
-        public Uri ExecutorUri
-        {
-            get
-            {
-                return TestExecutor.ExecutorUri;
-            }
-        }
+        public Uri ExecutorUri => TestExecutor.ExecutorUri;
 
         public IEnumerable<ITestContainer> TestContainers
         {
@@ -594,7 +608,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             foreach (var project in EnumerateLoadedProjects(solution))
             {
-                IVsHierarchy hierarchy = project as IVsHierarchy;
+                var hierarchy = project as IVsHierarchy;
                 uint itemid;
                 string projectPath;
                 if (project.TryGetProjectPath(out projectPath) &&
@@ -674,4 +688,3 @@ namespace Microsoft.NodejsTools.TestAdapter
         }
     }
 }
-

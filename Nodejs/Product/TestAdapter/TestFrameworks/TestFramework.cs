@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Newtonsoft.Json;
-using System.Linq;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
@@ -26,25 +26,26 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             _runTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "run_tests.js");
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
+
         public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger,
             string workingDirectory)
         {
-            string testInfo = string.Empty;
-            string discoverResultFile = Path.GetTempFileName();
+            var testInfo = string.Empty;
+            var discoverResultFile = Path.GetTempFileName();
             try
             {
-                string stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
+                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
                 if (!string.IsNullOrWhiteSpace(stdout))
                 {
-                    IEnumerable<String> stdoutLines = stdout.Split(new string[] { Environment.NewLine },
+                    var stdoutLines = stdout.Split(new[] { Environment.NewLine },
                         StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("NTVS_ERROR:")).Select(s => s.Trim().Remove(0, 11));
 
                     if (stdoutLines != null && stdoutLines.Count() > 0)
                     {
-                        foreach (string s in stdoutLines)
+                        foreach (var s in stdoutLines)
                         {
                             logger.SendMessage(TestMessageLevel.Error, s);
                         }
@@ -53,7 +54,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                     }
                 }
 
-                for (int i = 0; i < 4; i++)
+                for (var i = 0; i < 4; i++)
                 {
                     try
                     {
@@ -80,15 +81,15 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 }
             }
 
-            List<NodejsTestInfo> testCases = new List<NodejsTestInfo>();
-            List<DiscoveredTest> discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
+            var testCases = new List<NodejsTestInfo>();
+            var discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
             if (discoveredTests != null)
             {
-                foreach (DiscoveredTest discoveredTest in discoveredTests)
+                foreach (var discoveredTest in discoveredTests)
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    NodejsTestInfo test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, line, column);
+                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, line, column);
                     testCases.Add(test);
                 }
             }
@@ -99,7 +100,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
             projectRootDir = projectRootDir.TrimEnd(new char['\\']);
-            return new string[] {
+            return new[] {
                 WrapWithQuotes(_runTestsScriptFile),
                 Name,
                 WrapTestNameWithQuotes(testName),
@@ -131,7 +132,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory)
         {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            string arguments = WrapWithQuotes(_findTestsScriptFile)
+            var arguments = WrapWithQuotes(_findTestsScriptFile)
                 + " " + Name +
                 " " + WrapWithQuotes(testFile) +
                 " " + WrapWithQuotes(discoverResultFile) +
@@ -143,7 +144,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             processStartInfo.RedirectStandardError = true;
             processStartInfo.RedirectStandardOutput = true;
 
-            string stdout = string.Empty;
+            var stdout = string.Empty;
             try
             {
                 using (var process = Process.Start(processStartInfo))
@@ -187,4 +188,3 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         }
     }
 }
-

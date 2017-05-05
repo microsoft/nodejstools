@@ -4,20 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.Win32;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-using Microsoft.VisualStudio;
-
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     [Export(typeof(IReplWindowProvider))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     internal sealed class ReplWindowProvider : IReplWindowProvider
@@ -265,4 +260,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

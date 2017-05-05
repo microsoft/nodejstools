@@ -5,12 +5,8 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Classifies regions for REPL error output spans.  These are always classified as errors.
     /// </summary>
@@ -44,7 +40,7 @@ namespace Microsoft.VisualStudio.Repl {
 
             List<ClassificationSpan> classifications = new List<ClassificationSpan>();
 
-            int startIndex = coloredSpans.BinarySearch(new ColoredSpan(span, ConsoleColor.White), SpanStartComparer.Instance);
+            int startIndex = coloredSpans.BinarySearch(new ColoredSpan(span, InteractiveWindowColor.White), SpanStartComparer.Instance);
             if (startIndex < 0)
             {
                 startIndex = ~startIndex - 1;
@@ -54,7 +50,7 @@ namespace Microsoft.VisualStudio.Repl {
             for (int i = startIndex; i < coloredSpans.Count && coloredSpans[i].Span.Start < spanEnd; i++)
             {
                 IClassificationType type;
-                if (_provider._classTypes.TryGetValue(coloredSpans[i].Color, out type))
+                if (_provider.TryGetValue(coloredSpans[i].Color, out type))
                 {
                     var overlap = span.Overlap(coloredSpans[i].Span);
                     if (overlap != null)
@@ -80,4 +76,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

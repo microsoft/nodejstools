@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    StartAndAttachDebugger(file, nodePath);
+                    StartAndAttachDebugger(file, nodePath, startBrowser);
                 }
             }
             else
@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.Project
             return paramString;
         }
 
-        private void StartAndAttachDebugger(string file, string nodePath)
+        private void StartAndAttachDebugger(string file, string nodePath, bool startBrowser)
         {
             // start the node process
             var workingDir = _project.GetWorkingDirectory();
@@ -134,6 +134,12 @@ namespace Microsoft.NodejsTools.Project
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             var debugOptions = this.GetDebugOptions();
             var script = GetFullArguments(file, includeNodeArgs: false);
+
+            Uri uri = null;
+            if (!String.IsNullOrWhiteSpace(url))
+            {
+                uri = new Uri(url);
+            }
 
             var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: script, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
             process.Start();
@@ -159,6 +165,18 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.bstrExe = $"\01";
 
             AttachDebugger(dbgInfo);
+
+            if (startBrowser && uri != null)
+            {
+                OnPortOpenedHandler.CreateHandler(
+                    uri.Port,
+                    shortCircuitPredicate: () => process.HasExited,
+                    action: () =>
+                    {
+                        VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                    }
+                );
+            }
         }
 
         private NodeDebugOptions GetDebugOptions()
@@ -512,7 +530,6 @@ namespace Microsoft.NodejsTools.Project
 
             dbgInfo.fSendStdoutToOutputWindow = 0;
             dbgInfo.bstrEnv = GetEnvironmentVariablesString(url);
-
 
             // Set the Node  debugger
             dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
