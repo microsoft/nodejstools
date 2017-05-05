@@ -47,6 +47,10 @@ namespace Microsoft.NodejsTools.Npm {
         public long? ResultsCount => 0;
 
         public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
+
+            // All exceptions thrown here and in the called methods are handled by the
+            // NPM search dialog, so we don't have to do any exception handling here.
+
             var relativeUri = string.Format("/-/v1/search?text={0}", filterText);
             var searchUri = new Uri(defaultRegistryUri, relativeUri);
 
