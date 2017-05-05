@@ -622,7 +622,7 @@ etc.
 
         public IPackageCatalog Catalog { get { return this; } }
 
-        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null) {
+        public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
             IEnumerable<IPackage> packages = null;
             using (var semaphore = GetDatabaseSemaphore()) {
                 // Wait until file is downloaded/parsed if another download is already in session.
@@ -635,7 +635,7 @@ etc.
                 }
 
                 try {
-                    registryUrl = registryUrl ?? await GetRegistryUrl();
+                    var registryUrl = await GetRegistryUrl();
                     RegistryFileMapping registryFileMapping = null;
                     using (var db = new SQLiteConnection(DatabaseCacheFilePath)) {
                         registryFileMapping = db.Table<RegistryFileMapping>().FirstOrDefault(info => info.RegistryUrl == registryUrl.ToString());

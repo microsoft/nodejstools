@@ -36,7 +36,7 @@ namespace NpmTests {
 
         public DateTime LastRefreshed { get; private set; }
 
-        public Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText, Uri registryUrl = null) {
+        public Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText) {
             return Task.FromResult(_results.AsEnumerable());
         }
 
