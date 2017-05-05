@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 if (CheckUseNewChromeDebugProtocolOption())
                 {
-                    StartWithChromeV2Debugger(file, nodePath);
+                    StartWithChromeV2Debugger(file, nodePath, StartBrowser);
                 }
                 else
                 {
@@ -116,6 +116,13 @@ namespace Microsoft.NodejsTools.Project
             var optionString = NodejsDialogPage.LoadString(name: "DiagnosticLogging", cat: "Debugging");
 
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
+        }
+
+        private static string CheckForRegistrySpecifiedNodeParams()
+        {
+            var paramString = NodejsDialogPage.LoadString(name: "NodeCmdParams", cat: "Debugging");
+
+            return paramString;
         }
 
         private void StartAndAttachDebugger(string file, string nodePath)
@@ -344,7 +351,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable)
+        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable, bool startBrowser)
         {
             var serviceProvider = _project.Site;
 
@@ -354,11 +361,30 @@ namespace Microsoft.NodejsTools.Project
 
             var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
 
+            
+
             // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
             var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "\\JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
 
+            // We check the registry to see if any parameters for the node.exe invocation have been specified (like "--inspect"), and append them if we find them.
+            string nodeParams = CheckForRegistrySpecifiedNodeParams();
+            if (!string.IsNullOrEmpty(nodeParams))
+            {
+                pathToNodeExe = pathToNodeExe + " " + nodeParams;
+            }
+
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
+
+            if (!File.Exists(pathToNode2DebugAdapterRuntime))
+            {
+                pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
+                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\out\src\nodeDebug.js""");
+            }
+
+
+            // Here we need to massage the env variables into the format expected by node and vs code
+            string envVarsString = GetEnvironmentVariables().ToString();
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
@@ -368,6 +394,7 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("program", program),
                 new JProperty("runtimeExecutable", nodeRuntimeExecutable),
                 new JProperty("cwd", cwd),
+                new JProperty("env", envVarsString),
                 new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
@@ -389,6 +416,17 @@ namespace Microsoft.NodejsTools.Project
 
             var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
             debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+
+            // Launch browser 
+            var webBrowserUrl = GetFullUrl();
+            Uri uri = null;
+            if (!String.IsNullOrWhiteSpace(webBrowserUrl))
+            {
+                uri = new Uri(webBrowserUrl);
+                psi.EnvironmentVariables["PORT"] = uri.Port.ToString();
+            }
+
+
         }
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
