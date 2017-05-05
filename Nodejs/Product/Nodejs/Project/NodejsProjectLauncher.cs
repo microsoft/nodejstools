@@ -82,7 +82,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 if (CheckUseNewChromeDebugProtocolOption())
                 {
-                    StartWithChromeV2Debugger(file, nodePath);
+                    StartWithChromeV2Debugger(file, nodePath, startBrowser);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");
 
-            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "V2");
+            return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "V1");
         }
 
         private static bool CheckDebugProtocolOption()
@@ -118,6 +118,13 @@ namespace Microsoft.NodejsTools.Project
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
         }
 
+        private static string CheckForRegistrySpecifiedNodeParams()
+        {
+            var paramString = NodejsDialogPage.LoadString(name: "NodeCmdParams", cat: "Debugging");
+
+            return paramString;
+        }
+
         private void StartAndAttachDebugger(string file, string nodePath, bool startBrowser)
         {
             // start the node process
@@ -127,12 +134,6 @@ namespace Microsoft.NodejsTools.Project
             var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
             var debugOptions = this.GetDebugOptions();
             var script = GetFullArguments(file, includeNodeArgs: false);
-
-            Uri uri = null;
-            if (!String.IsNullOrWhiteSpace(url))
-            {
-                uri = new Uri(url);
-            }
 
             var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: script, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
             process.Start();
@@ -159,16 +160,25 @@ namespace Microsoft.NodejsTools.Project
 
             AttachDebugger(dbgInfo);
 
-            if (startBrowser && uri != null)
+            if (startBrowser)
             {
-                OnPortOpenedHandler.CreateHandler(
-                    uri.Port,
-                    shortCircuitPredicate: () => process.HasExited,
-                    action: () =>
-                    {
-                        VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                    }
-                );
+                Uri uri = null;
+                if (!String.IsNullOrWhiteSpace(url))
+                {
+                    uri = new Uri(url);
+                }
+
+                if (uri != null)
+                {
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        shortCircuitPredicate: () => process.HasExited,
+                        action: () =>
+                        {
+                            VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                        }
+                    );
+                }
             }
         }
 
@@ -362,7 +372,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable)
+        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable, bool startBrowser)
         {
             var serviceProvider = _project.Site;
 
@@ -373,10 +383,28 @@ namespace Microsoft.NodejsTools.Project
             var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
 
             // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
-            var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "\\JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
+            // This node.exe will be the one used by the node2 debug adapter, not the one used to host the user code.
+            var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
+
+            // We check the registry to see if any parameters for the node.exe invocation have been specified (like "--inspect"), and append them if we find them.
+            string nodeParams = CheckForRegistrySpecifiedNodeParams();
+            if (!string.IsNullOrEmpty(nodeParams))
+            {
+                pathToNodeExe = pathToNodeExe + " " + nodeParams;
+            }
 
             var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
                     $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
+
+            string trimmedPathToNode2DebugAdapter = pathToNode2DebugAdapterRuntime.Replace("\"", "");
+            if (!File.Exists(trimmedPathToNode2DebugAdapter))
+            {
+                pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
+                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\out\src\nodeDebug.js""");
+            }
+
+            // Here we need to massage the env variables into the format expected by node and vs code
+            object envVars = GetEnvironmentVariables();
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
@@ -386,6 +414,7 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("program", program),
                 new JProperty("runtimeExecutable", nodeRuntimeExecutable),
                 new JProperty("cwd", cwd),
+                new JProperty("env", envVars),
                 new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
@@ -407,6 +436,29 @@ namespace Microsoft.NodejsTools.Project
 
             var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
             debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+
+            // Launch browser 
+            if (startBrowser)
+            {
+                var webBrowserUrl = GetFullUrl();
+                Uri uri = null;
+                if (!String.IsNullOrWhiteSpace(webBrowserUrl))
+                {
+                    uri = new Uri(webBrowserUrl);
+                }
+
+                if (uri != null)
+                {
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        shortCircuitPredicate: () => false,
+                        action: () =>
+                        {
+                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                        }
+                    );
+                }
+            }
         }
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
