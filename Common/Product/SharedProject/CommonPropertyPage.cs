@@ -19,9 +19,9 @@ namespace Microsoft.VisualStudioTools.Project
     /// </summary>
     public abstract class CommonPropertyPage : IPropertyPage
     {
-        private IPropertyPageSite _site;
-        private bool _dirty, _loading;
+        private IPropertyPageSite site;
         private CommonProjectNode _project;
+        private bool dirty;
 
         public abstract Control Control
         {
@@ -236,32 +236,22 @@ namespace Microsoft.VisualStudioTools.Project
             newGroup.AddProperty(propertyName, propertyValue);
         }
 
-        public bool Loading
-        {
-            get
-            {
-                return this._loading;
-            }
-            set
-            {
-                this._loading = value;
-            }
-        }
+        public bool Loading { get; set; }
 
         public bool IsDirty
         {
             get
             {
-                return this._dirty;
+                return this.dirty;
             }
             set
             {
-                if (this._dirty != value && !this.Loading)
+                if (this.dirty != value && !this.Loading)
                 {
-                    this._dirty = value;
-                    if (this._site != null)
+                    this.dirty = value;
+                    if (this.site != null)
                     {
-                        this._site.OnStatusChange((uint)(this._dirty ? PropPageStatus.Dirty : PropPageStatus.Clean));
+                        this.site.OnStatusChange((uint)(this.dirty ? PropPageStatus.Dirty : PropPageStatus.Clean));
                     }
                 }
             }
@@ -269,7 +259,25 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal)
         {
-            NativeMethods.SetParent(this.Control.Handle, hWndParent);
+            this.Control.Visible = false;
+
+            // suspend to reduce flashing
+            this.Control.SuspendLayout();
+
+            try
+            {
+                var parent = Control.FromHandle(hWndParent);
+                this.Control.Parent = parent;
+
+                // move to final location
+                ((IPropertyPage)this).Move(pRect);
+            }
+            finally
+            {
+                this.Control.ResumeLayout();
+                this.Control.Visible = true;
+                this.Control.Focus();
+            }
         }
 
         int IPropertyPage.Apply()
@@ -309,6 +317,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IPropertyPage.Help(string pszHelpDir)
         {
+            // not implemented
         }
 
         int IPropertyPage.IsPageDirty()
@@ -374,13 +383,23 @@ namespace Microsoft.VisualStudioTools.Project
 
         void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite)
         {
-            this._site = pPageSite;
+            this.site = pPageSite;
         }
 
         void IPropertyPage.Show(uint nCmdShow)
         {
-            this.Control.Visible = true; // TODO: pass SW_SHOW* flags through      
-            this.Control.Show();
+            const int SW_HIDE = 0;
+
+            if (nCmdShow != SW_HIDE)
+            {
+                this.Control.Visible = true;
+                this.Control.Show();
+            }
+            else
+            {
+                this.Control.Visible = false;
+                this.Control.Hide();
+            }
         }
 
         int IPropertyPage.TranslateAccelerator(MSG[] pMsg)
@@ -389,12 +408,20 @@ namespace Microsoft.VisualStudioTools.Project
 
             var msg = pMsg[0];
 
-            if ((msg.message < NativeMethods.WM_KEYFIRST || msg.message > NativeMethods.WM_KEYLAST) && (msg.message < NativeMethods.WM_MOUSEFIRST || msg.message > NativeMethods.WM_MOUSELAST))
+            var message = Message.Create(msg.hwnd, (int)msg.message, msg.wParam, msg.lParam);
+
+            var target = Control.FromChildHandle(message.HWnd);
+            if (target != null && target.PreProcessMessage(ref message))
             {
-                return VSConstants.S_FALSE;
+                // handled the message
+                pMsg[0].message = (uint)message.Msg;
+                pMsg[0].wParam = message.WParam;
+                pMsg[0].lParam = message.LParam;
+
+                return VSConstants.S_OK;
             }
 
-            return (NativeMethods.IsDialogMessageA(this.Control.Handle, ref msg)) ? VSConstants.S_OK : VSConstants.S_FALSE;
+            return VSConstants.S_FALSE;
         }
     }
 }
