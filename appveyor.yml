@@ -9,10 +9,10 @@
   image: Visual Studio 2015
   environment:
     matrix:
-    - nodejs_version: 4
+    - nodejs_version: Stable
       vs_version: 14.0
       architecture: x64
-    - nodejs_version: 5
+    - nodejs_version: LTS
       vs_version: 14.0
       architecture: x86
   install: &default_install_script
