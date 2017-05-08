@@ -49,6 +49,10 @@
             <ProjectItem TargetFileName="index.d.ts">serve-static.d.ts</ProjectItem>
             <ProjectItem TargetFileName="typings.json">serve-static.typings.json</ProjectItem>
           </Folder>
+          <Folder Name="debug">
+            <ProjectItem TargetFileName="index.d.ts">debug.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">debug.typings.json</ProjectItem>
+          </Folder>
         </Folder>
       </Folder>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
