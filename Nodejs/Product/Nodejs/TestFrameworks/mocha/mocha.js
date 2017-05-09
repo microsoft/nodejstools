@@ -2,11 +2,28 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
-
+var result = {
+    'title': '',
+    'passed': false,
+    'stdOut': '',
+    'stdErr': ''
+};
 // Choose 'tap' rather than 'min' or 'xunit'. The reason is that
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
+function append_stdout(string, encoding, fd) {
+    result.stdOut += string;
+}
+function append_stderr(string, encoding, fd) {
+    result.stdErr += string;
+}
+function hook_outputs() {
+    process.stdout.write = append_stdout;
+    process.stderr.write = append_stderr;
+}
+
+hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -56,24 +73,118 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testName, testFile, workingFolder, projectFolder) {
-    var Mocha = detectMocha(projectFolder);
+var run_tests = function (testCases, callback) {
+    function post(event) {
+        callback(event);
+        hook_outputs();
+    }
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
+    var testResults = [];
+    var Mocha = detectMocha(testCases[0].projectFolder);
     if (!Mocha) {
         return;
     }
 
-    var mocha = initializeMocha(Mocha, projectFolder);
+    var mocha = initializeMocha(Mocha, testCases[0].projectFolder);
 
-    if (testName) {
-        if (typeof mocha.fgrep === 'function')
-            mocha.fgrep(testName); // since Mocha 3.0.0
-        else
-            mocha.grep(testName); // prior Mocha 3.0.0
+    var testGrepString = '^(' + testCases.map(function (testCase) {
+        return escapeRegExp(testCase.testName);
+    }).join('|') + ')$';
+
+    if (testGrepString) {
+        mocha.grep(new RegExp(testGrepString));
     }
-    mocha.addFile(testFile);
+    mocha.addFile(testCases[0].testFile);
 
-    mocha.run(function (code) {
+    var runner = mocha.run(function (code) {
         process.exit(code);
+    });
+
+    // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
+    runner.on('suite', function (suite) {
+        post({
+            type: 'suite start',
+            result: result
+        });
+    });
+
+    runner.on('suite end', function (suite) {
+        post({
+            type: 'suite end',
+            result: result
+        });
+    });
+
+    runner.on('hook', function (hook) {
+        post({
+            type: 'hook start',
+            title: hook.title,
+            result: result
+        });
+    });
+
+    runner.on('hook end', function (hook) {
+        post({
+            type: 'hook end',
+            title: hook.title,
+            result: result
+        });
+    });
+
+    runner.on('start', function () {
+        post({
+            type: 'start',
+            result: result
+        });
+    });
+
+    runner.on('test', function (test) {
+        result.title = test.fullTitle();
+        post({
+            type: 'test start',
+            title: result.title
+        });
+    });
+
+    runner.on('end', function () {
+        post({
+            type: 'end',
+            result: result
+        });
+    });
+
+    runner.on('pass', function (test) {
+        result.passed = true;
+        post({
+            type: 'result',
+            title: result.title,
+            result: result
+        });
+        result = {
+            'title': '',
+            'passed': false,
+            'stdOut': '',
+            'stdErr': ''
+        }
+    });
+
+    runner.on('fail', function (test, err) {
+        result.passed = false;
+        post({
+            type: 'result',
+            title: result.title,
+            result: result
+        });
+        result = {
+            'title': '',
+            'passed': false,
+            'stdOut': '',
+            'stdErr': ''
+        }
     });
 };
 

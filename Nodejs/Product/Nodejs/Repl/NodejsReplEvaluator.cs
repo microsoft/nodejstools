@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Project;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl
@@ -172,7 +172,6 @@ namespace Microsoft.NodejsTools.Repl
             psi.RedirectStandardError = true;
             psi.RedirectStandardOutput = true;
 
-
             string fileName, directory = null;
 
             if (this._site.TryGetStartupFileAndDirectory(out fileName, out directory))
@@ -220,6 +219,11 @@ namespace Microsoft.NodejsTools.Repl
             conn.Bind(new IPEndPoint(IPAddress.Loopback, 0));
             conn.Listen(0);
             portNum = ((IPEndPoint)conn.LocalEndPoint).Port;
+        }
+
+        internal void Clear()
+        {
+            this._listener.SendRequest(new Dictionary<string, object>() { { "type", "clear" } });
         }
 
         internal class ListenerThread : JsonListener, IDisposable
@@ -303,7 +307,9 @@ namespace Microsoft.NodejsTools.Repl
                 {
                     if (this._executionText != null)
                     {
+#if DEBUG
                         Debug.WriteLine("Executing delayed text: " + this._executionText);
+#endif
                         SendExecuteText(this._executionText);
                         this._executionText = null;
                     }
@@ -315,13 +321,17 @@ namespace Microsoft.NodejsTools.Repl
             public Task<ExecutionResult> ExecuteText(string text)
             {
                 TaskCompletionSource<ExecutionResult> completion;
+#if DEBUG
                 Debug.WriteLine("Executing text: " + text);
+#endif
                 using (new SocketLock(this))
                 {
                     if (!this._connected)
                     {
                         // delay executing the text until we're connected
+#if DEBUG
                         Debug.WriteLine("Delayed executing text");
+#endif
                         this._completion = completion = new TaskCompletionSource<ExecutionResult>();
                         this._executionText = text;
                         return completion.Task;
@@ -536,11 +546,6 @@ namespace Microsoft.NodejsTools.Repl
                 }
             }
             #endregion
-        }
-
-        internal void Clear()
-        {
-            this._listener.SendRequest(new Dictionary<string, object>() { { "type", "clear" } });
         }
     }
 }

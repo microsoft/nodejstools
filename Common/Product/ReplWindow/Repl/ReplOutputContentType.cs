@@ -3,12 +3,8 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     /// <summary>
     /// Provides the content type for our REPL error buffer.
     /// </summary>
@@ -18,4 +14,3 @@ namespace Microsoft.VisualStudio.Repl {
         internal static ContentTypeDefinition ContentTypeDefinition = null;
     }
 }
-

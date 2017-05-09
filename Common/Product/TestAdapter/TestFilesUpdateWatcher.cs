@@ -2,10 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.IO;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
@@ -126,4 +124,3 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         }
     }
 }
-

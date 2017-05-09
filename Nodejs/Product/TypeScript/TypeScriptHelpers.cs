@@ -87,4 +87,3 @@ namespace Microsoft.NodejsTools.TypeScript
         }
     }
 }
-

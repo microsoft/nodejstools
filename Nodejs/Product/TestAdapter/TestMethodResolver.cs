@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var rdt = (IVsRunningDocumentTable)_serviceProvider.GetService(typeof(SVsRunningDocumentTable));
             IVsHierarchy hierarchy;
             uint itemId;
-            IntPtr docData = IntPtr.Zero;
+            var docData = IntPtr.Zero;
             uint cookie;
             try
             {
@@ -86,4 +86,3 @@ namespace Microsoft.NodejsTools.TestAdapter
         #endregion
     }
 }
-

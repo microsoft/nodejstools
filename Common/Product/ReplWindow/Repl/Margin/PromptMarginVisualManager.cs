@@ -2,24 +2,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
-using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
     internal sealed class PromptMarginVisualManager
     {
         private readonly PromptMargin _margin;
@@ -254,4 +246,3 @@ namespace Microsoft.VisualStudio.Repl {
         }
     }
 }
-

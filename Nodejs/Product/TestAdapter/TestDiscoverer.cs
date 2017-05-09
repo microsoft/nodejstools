@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-
-using MSBuild = Microsoft.Build.Evaluation;
+using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
-
-using Microsoft.NodejsTools.SourceMapping;
+using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -50,7 +48,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 try
                 {
                     // Load all the test containers passed in (.njsproj msbuild files)
-                    foreach (string source in sources)
+                    foreach (var source in sources)
                     {
                         buildEngine.LoadProject(source);
                     }
@@ -59,18 +57,18 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        Dictionary<string, List<TestFileEntry>> testItems = new Dictionary<string, List<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
+                        var testItems = new Dictionary<string, List<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
                         // Provide all files to the test analyzer
                         foreach (var item in proj.Items.Where(item => item.ItemType == "Compile" || item.ItemType == "TypeScriptCompile"))
                         {
                             //Check to see if this is a TestCase
-                            string value = item.GetMetadataValue("TestFramework");
+                            var value = item.GetMetadataValue("TestFramework");
                             if (!TestContainerDiscoverer.IsValidTestFramework(value))
                             {
                                 continue;
                             }
-                            string fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                            bool typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
+                            var fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            var typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if (typeScriptTest)
                             {
                                 fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj, fileAbsolutePath);
@@ -108,7 +106,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DiscoverTests(Dictionary<string, List<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger)
         {
-            List<TestFrameworks.NodejsTestInfo> result = new List<TestFrameworks.NodejsTestInfo>();
+            var result = new List<TestFrameworks.NodejsTestInfo>();
             var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
             var projSource = ((MSBuild.Project)proj).FullPath;
 
@@ -123,29 +121,29 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
-            int testCount = 0;
-            foreach (string testFx in testItems.Keys)
+            var testCount = 0;
+            foreach (var testFx in testItems.Keys)
             {
-                TestFrameworks.TestFramework testFramework = GetTestFrameworkObject(testFx);
+                var testFramework = GetTestFrameworkObject(testFx);
                 if (testFramework == null)
                 {
                     logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Ignoring unsupported test framework {0}", testFx));
                     continue;
                 }
 
-                List<TestFileEntry> fileList = testItems[testFx];
-                string files = string.Join(";", fileList.Select(p => p.File));
+                var fileList = testItems[testFx];
+                var files = string.Join(";", fileList.Select(p => p.File));
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
-                List<TestFrameworks.NodejsTestInfo> discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
+                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
                 testCount += discoveredTestCases.Count;
-                foreach (TestFrameworks.NodejsTestInfo discoveredTest in discoveredTestCases)
+                foreach (var discoveredTest in discoveredTestCases)
                 {
-                    string qualifiedName = discoveredTest.FullyQualifiedName;
+                    var qualifiedName = discoveredTest.FullyQualifiedName;
                     logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
                     //figure out the test source info such as line number
-                    string filePath = discoveredTest.ModulePath;
-                    TestFileEntry entry = fileList.Find(p => p.File.Equals(filePath, StringComparison.OrdinalIgnoreCase));
+                    var filePath = discoveredTest.ModulePath;
+                    var entry = fileList.Find(p => p.File.Equals(filePath, StringComparison.OrdinalIgnoreCase));
                     FunctionInformation fi = null;
                     if (entry.IsTypeScriptTest)
                     {
@@ -172,7 +170,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework)
         {
-            TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
+            var discover = new TestFrameworks.FrameworkDiscover();
             return discover.Get(testFramework);
         }
 
@@ -200,4 +198,3 @@ namespace Microsoft.NodejsTools.TestAdapter
         }
     }
 }
-

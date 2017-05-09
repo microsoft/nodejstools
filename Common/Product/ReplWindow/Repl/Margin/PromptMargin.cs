@@ -15,13 +15,8 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Classification;
 using System.Diagnostics;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
 namespace Microsoft.NodejsTools.Repl
 {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
-
     [Export(typeof(IWpfTextViewMarginProvider))]
     [Name(PromptMargin.MarginName)]
     [Order(Before = PredefinedMarginNames.LeftSelection)]
@@ -44,11 +39,8 @@ namespace Microsoft.VisualStudio.Repl {
     /// </summary>
     internal sealed class PromptMargin : IWpfTextViewMargin
     {
-#if NTVS_FEATURE_INTERACTIVEWINDOW
+
         public const string MarginName = "NodejsInteractivePromptMargin";
-#else
-        public const string MarginName = "InteractivePromptMargin";
-#endif
 
         private readonly IWpfTextView _textView;
         private readonly IEditorFormatMap _editorFormatMap;
@@ -214,4 +206,3 @@ namespace Microsoft.VisualStudio.Repl {
         #endregion
     }
 }
-

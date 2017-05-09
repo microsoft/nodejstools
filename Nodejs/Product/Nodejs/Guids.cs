@@ -57,4 +57,3 @@ namespace Microsoft.NodejsTools
         public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
     };
 }
-

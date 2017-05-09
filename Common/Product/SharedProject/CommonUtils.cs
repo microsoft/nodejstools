@@ -708,4 +708,3 @@ namespace Microsoft.VisualStudioTools
         }
     }
 }
-

@@ -30,4 +30,3 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         }
     }
 }
-

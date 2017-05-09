@@ -148,7 +148,6 @@ $base_outdir = "\\pytools\Release\Nodejs"
 $version_file = gi "$buildroot\Nodejs\Product\AssemblyVersion.cs"
 
 $build_project = gi "$buildroot\Nodejs\dirs.proj"
-$setup_project = gi "$buildroot\Nodejs\Setup\setup.proj"
 $setup_swix_project = gi "$buildroot\Nodejs\Setup\setup-swix.proj"
 
 # Project metadata
@@ -623,11 +622,6 @@ try {
                 Write-Output "Begin Setup build for $($i.VSName)"
                 $target_msbuild_exe = msbuild-exe $i
                 $target_msbuild_options = msbuild-options $i
-                & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
-                    /fl /flp:logfile=$($i.signed_logfile) `
-                    /p:SignedBinariesPath=$($i.signed_bindir) `
-                    /p:RezipVSIXFiles=false `
-                    $setup_project
 
                 & $target_msbuild_exe $global_msbuild_options $target_msbuild_options `
                     /fl /flp:logfile=$($i.signed_swix_logfile) `
