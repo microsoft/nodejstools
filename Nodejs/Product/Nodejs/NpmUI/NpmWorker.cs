@@ -18,13 +18,13 @@ namespace Microsoft.NodejsTools.NpmUI
 {
     internal sealed class NpmWorker : IDisposable
     {
+        // todo: get this from a user specified location?
         private static readonly Uri defaultRegistryUri = new Uri("https://registry.npmjs.org/");
 
         private readonly INpmController npmController;
         private readonly BlockingCollection<QueuedNpmCommandInfo> commandQueue = new BlockingCollection<QueuedNpmCommandInfo>();
         private readonly Thread worker;
 
-        private bool isDisposed;
         private QueuedNpmCommandInfo currentCommand;
 
         public NpmWorker(INpmController controller)
@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools.NpmUI
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
-            while (!this.isDisposed && !this.commandQueue.IsCompleted)
+            while (!this.commandQueue.IsCompleted)
             {
                 // The Take method will block the worker thread when there are no items left in the queue
                 // and the thread will be signalled when new items are items to the queue, or the queue is
@@ -109,6 +109,54 @@ namespace Microsoft.NodejsTools.NpmUI
             var request = WebRequest.Create(searchUri);
             using (var response = await request.GetResponseAsync())
             {
+                /* We expect the following response:
+                 {
+                      "objects": [
+                        {
+                          "package": {
+                            "name": "express",
+                            "scope": "unscoped",
+                            "version": "4.15.2",
+                            "description": "Fast, unopinionated, minimalist web framework",
+                            "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
+                            "date": "2017-03-06T13:42:44.853Z",
+                            "links": {
+                              "npm": "https://www.npmjs.com/package/express",
+                              "homepage": "http://expressjs.com/",
+                              "repository": "https://github.com/expressjs/express",
+                              "bugs": "https://github.com/expressjs/express/issues"
+                            },
+                            "author": {
+                              "name": "TJ Holowaychuk",
+                              "email": "tj@vision-media.ca"
+                            },
+                            "publisher": {
+                              "username": "dougwilson",
+                              "email": "doug@somethingdoug.com"
+                            },
+                            "maintainers": [
+                              {
+                                "username": "dougwilson",
+                                "email": "doug@somethingdoug.com"
+                              }
+                            ]
+                          },
+                          "score": {
+                            "final": 0.9549640105248649,
+                            "detail": {
+                              "quality": 0.9427473299991661,
+                              "popularity": 0.9496544159654299,
+                              "maintenance": 0.9707450455348992
+                            }
+                          },
+                          "searchScore": 100000.95
+                        }
+                      ],
+                      "total": 10991,
+                      "time": "Tue May 09 2017 22:41:07 GMT+0000 (UTC)"
+                    }
+                */
+
                 var reader = new StreamReader(response.GetResponseStream());
                 using (var jsonReader = new JsonTextReader(reader))
                 {
@@ -143,7 +191,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 switch (jsonReader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        if (StringComparer.OrdinalIgnoreCase.Equals(jsonReader.Value, "package"))
+                        if (StringComparer.Ordinal.Equals(jsonReader.Value, "package"))
                         {
                             var token = (JProperty)JToken.ReadFrom(jsonReader);
                             var package = ReadPackage(token.Value, builder);
@@ -242,7 +290,6 @@ namespace Microsoft.NodejsTools.NpmUI
         public void Dispose()
         {
             this.commandQueue.CompleteAdding();
-            this.isDisposed = true;
         }
 
         private sealed class QueuedNpmCommandInfo
