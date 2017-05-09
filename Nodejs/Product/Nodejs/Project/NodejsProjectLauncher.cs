@@ -404,7 +404,8 @@ namespace Microsoft.NodejsTools.Project
             }
 
             // Here we need to massage the env variables into the format expected by node and vs code
-            object envVars = GetEnvironmentVariables();
+            var webBrowserUrl = GetFullUrl();
+            var envVars = GetEnvironmentVariables(webBrowserUrl);
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
@@ -414,7 +415,8 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("program", program),
                 new JProperty("runtimeExecutable", nodeRuntimeExecutable),
                 new JProperty("cwd", cwd),
-                new JProperty("env", envVars),
+                new JProperty("console", "externalTerminal"),
+                new JProperty("env", JObject.FromObject(envVars)),
                 new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
@@ -440,7 +442,6 @@ namespace Microsoft.NodejsTools.Project
             // Launch browser 
             if (startBrowser)
             {
-                var webBrowserUrl = GetFullUrl();
                 Uri uri = null;
                 if (!String.IsNullOrWhiteSpace(webBrowserUrl))
                 {
@@ -553,6 +554,26 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetEnvironmentVariablesString(string url)
         {
+            var env = GetEnvironmentVariables(url);
+            if (env.Count > 0)
+            {
+                //Environment variables should be passed as a
+                //null-terminated block of null-terminated strings. 
+                //Each string is in the following form:name=value\0
+                var buf = new StringBuilder();
+                foreach (var entry in env)
+                {
+                    buf.AppendFormat("{0}={1}\0", entry.Key, entry.Value);
+                }
+                buf.Append("\0");
+                return buf.ToString();
+            }
+
+            return null;
+        }
+
+        private Dictionary<string, string> GetEnvironmentVariables(string url)
+        {
             var env = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (!string.IsNullOrWhiteSpace(url))
             {
@@ -577,20 +598,9 @@ namespace Microsoft.NodejsTools.Project
                         env.Add(strKey, (string)variables[key]);
                     }
                 }
-
-                //Environment variables should be passed as a
-                //null-terminated block of null-terminated strings. 
-                //Each string is in the following form:name=value\0
-                var buf = new StringBuilder();
-                foreach (var entry in env)
-                {
-                    buf.AppendFormat("{0}={1}\0", entry.Key, entry.Value);
-                }
-                buf.Append("\0");
-                return buf.ToString();
             }
 
-            return null;
+            return env;
         }
 
         private bool ShouldStartBrowser()
