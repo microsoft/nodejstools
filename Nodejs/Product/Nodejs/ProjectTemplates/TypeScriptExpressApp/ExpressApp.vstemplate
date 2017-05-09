@@ -43,7 +43,7 @@
           </Folder>
           <Folder Name="mime">
             <ProjectItem TargetFileName="index.d.ts">mime.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">mine.typings.json</ProjectItem>
+            <ProjectItem TargetFileName="typings.json">mime.typings.json</ProjectItem>
           </Folder>
           <Folder Name="serve-static">
             <ProjectItem TargetFileName="index.d.ts">serve-static.d.ts</ProjectItem>

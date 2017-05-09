@@ -1060,12 +1060,12 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mine.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\debug.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mine.typings.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\debug.typings.json" />
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
