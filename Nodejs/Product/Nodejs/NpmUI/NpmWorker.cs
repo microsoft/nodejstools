@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,14 +21,11 @@ namespace Microsoft.NodejsTools.NpmUI
         private static readonly Uri defaultRegistryUri = new Uri("https://registry.npmjs.org/");
 
         private readonly INpmController npmController;
-        private readonly Queue<QueuedNpmCommandInfo> commandQueue = new Queue<QueuedNpmCommandInfo>();
-        private readonly object queuelock = new object();
+        private readonly BlockingCollection<QueuedNpmCommandInfo> commandQueue = new BlockingCollection<QueuedNpmCommandInfo>();
+        private readonly Thread worker;
 
         private bool isDisposed;
-        private bool isExecutingCommand;
-        private readonly Thread worker;
         private QueuedNpmCommandInfo currentCommand;
-        private INpmCommander commander;
 
         public NpmWorker(INpmController controller)
         {
@@ -34,112 +33,63 @@ namespace Microsoft.NodejsTools.NpmUI
 
             this.worker = new Thread(this.Run)
             {
-                Name = "npm worker Execution",
+                Name = "NPM worker Execution",
                 IsBackground = true
             };
             this.worker.Start();
         }
 
-        private void Pulse()
-        {
-            lock (this.queuelock)
-            {
-                Monitor.PulseAll(this.queuelock);
-            }
-        }
-
-        public bool IsExecutingCommand
-        {
-            get
-            {
-                lock (this.queuelock)
-                {
-                    return this.isExecutingCommand;
-                }
-            }
-            set
-            {
-                lock (this.queuelock)
-                {
-                    this.isExecutingCommand = value;
-                    Pulse();
-                }
-            }
-        }
-
         private void QueueCommand(QueuedNpmCommandInfo info)
         {
-            lock (this.queuelock)
+            if (!this.commandQueue.IsAddingCompleted
+                || this.commandQueue.Contains(info)
+                || info.Equals(this.currentCommand))
             {
-                if (this.commandQueue.Contains(info)
-                    || info.Equals(this.currentCommand))
-                {
-                    return;
-                }
-                this.commandQueue.Enqueue(info);
-                Monitor.PulseAll(this.queuelock);
+                return;
             }
+
+            this.commandQueue.Add(info);
         }
 
         public void QueueCommand(string arguments)
         {
-            QueueCommand(new QueuedNpmCommandInfo(arguments));
+            // this is safe since the we use a blocking collection to
+            // store the commands
+            this.QueueCommand(new QueuedNpmCommandInfo(arguments));
         }
 
-        private async void Execute(QueuedNpmCommandInfo info)
+        private void Execute(QueuedNpmCommandInfo info)
         {
-            this.IsExecutingCommand = true;
-            INpmCommander cmdr = null;
+            // Wait on the command to complete.
+            // this way we're sure there's only one command being executed,
+            // since the only thread starting this commands is the worker thread
+            Debug.Assert(Thread.CurrentThread == this.worker, "The worked thread should be executing the NPM commands.");
+
+            var cmdr = this.npmController.CreateNpmCommander();
             try
             {
-                lock (this.queuelock)
-                {
-                    cmdr = this.npmController.CreateNpmCommander();
-
-                    this.commander = cmdr;
-                }
-
-                await cmdr.ExecuteNpmCommandAsync(info.Arguments);
+                cmdr.ExecuteNpmCommandAsync(info.Arguments).Wait();
             }
-            finally
+            catch (AggregateException e) when (e.InnerException is TaskCanceledException)
             {
-                lock (this.queuelock)
-                {
-                    this.commander = null;
-                }
-                this.IsExecutingCommand = false;
+                // TaskCanceledException is not un-expected, 
+                // and should not tear down this thread.
+                // Other exceptions are handled higher up the stack.
             }
         }
 
         private void Run()
         {
-            var count = 0;
             // We want the thread to continue running queued commands before
             // exiting so the user can close the install window without having to wait
             // for commands to complete.
-            while (!this.isDisposed || count > 0)
+            while (!this.isDisposed && !this.commandQueue.IsCompleted)
             {
-                lock (this.queuelock)
-                {
-                    while ((this.commandQueue.Count == 0 && !this.isDisposed)
-                        || this.npmController == null
-                        || this.IsExecutingCommand)
-                    {
-                        Monitor.Wait(this.queuelock);
-                    }
-
-                    if (this.commandQueue.Count > 0)
-                    {
-                        this.currentCommand = this.commandQueue.Dequeue();
-                    }
-                    else
-                    {
-                        this.currentCommand = null;
-                    }
-                    count = this.commandQueue.Count;
-                }
-
-                if (null != this.currentCommand)
+                // The Take method will block the worker thread when there are no items left in the queue
+                // and the thread will be signalled when new items are items to the queue, or the queue is
+                // marked completed.
+                this.currentCommand = this.commandQueue.Take();
+                if (this.currentCommand != null)
                 {
                     Execute(this.currentCommand);
                 }
@@ -148,7 +98,12 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public async Task<IEnumerable<IPackage>> GetCatalogPackagesAsync(string filterText)
         {
-            var relativeUri = string.Format("/-/v1/search?text={0}", filterText);
+            if (string.IsNullOrWhiteSpace(filterText))
+            {
+                return Enumerable.Empty<IPackage>();
+            }
+
+            var relativeUri = string.Format("/-/v1/search?text={0}", WebUtility.UrlEncode(filterText));
             var searchUri = new Uri(defaultRegistryUri, relativeUri);
 
             var request = WebRequest.Create(searchUri);
@@ -286,19 +241,18 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public void Dispose()
         {
+            this.commandQueue.CompleteAdding();
             this.isDisposed = true;
-            Pulse();
         }
 
         private sealed class QueuedNpmCommandInfo
         {
             public QueuedNpmCommandInfo(string arguments)
             {
-                this.Name = arguments;
+                this.Arguments = arguments;
             }
 
-            public string Arguments => this.Name;
-            public string Name { get; }
+            public string Arguments { get; }
 
             public bool Equals(QueuedNpmCommandInfo other)
             {

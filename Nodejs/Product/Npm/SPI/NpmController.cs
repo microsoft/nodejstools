@@ -240,7 +240,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             string path = e.FullPath;
 
-            // Check that the file is either a package.json file, or exists in the nodemodules directory
+            // Check that the file is either a package.json file, or exists in the node_modules directory
             // This allows us to properly detect both installed and uninstalled/linked packages (where we don't receive an event for package.json)
             if (path.EndsWith("package.json", StringComparison.OrdinalIgnoreCase) || path.IndexOf(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase) != -1)
             {
