@@ -1,16 +1,3 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Choose>
-    <When Condition="'$(Language)' == 'C#'">
-      <ItemGroup>
-        <Compile Include="$(BuildRoot)\Nodejs\Product\AssemblyInfoCommon.cs">
-          <Link>AssemblyInfoCommon.cs</Link>
-        </Compile>
-        <Compile Include="$(BuildRoot)\Nodejs\Product\AssemblyVersion.cs">
-          <Link>AssemblyVersion.cs</Link>
-        </Compile>
-      </ItemGroup>
-    </When>
-  </Choose>
-
   <Import Project="$(BuildRoot)\Build\Common.Build.targets" />
 </Project>

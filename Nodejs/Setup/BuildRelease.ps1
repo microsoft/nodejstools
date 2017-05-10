@@ -6,8 +6,8 @@
     This script is used to build a set of installers for Node.js Tools for
     Visual Studio based on the code in this branch.
     
-    The assembly and file versions are generated automatically and provided by
-    modifying .\Build\AssemblyVersion.cs.
+    The assembly and file versions are generated automatically by the 
+    fileVersion.targets import.
     
     The source is determined from the location of this script; to build another
     branch, use its Copy-Item of BuildRelease.ps1.
@@ -144,9 +144,6 @@ $base_year = 2016
 # This value is used to automatically generate outdir for -release and -internal builds
 $base_outdir = "\\pytools\Release\Nodejs"
 
-# This file is parsed to find version information
-$version_file = gi "$buildroot\Nodejs\Product\AssemblyVersion.cs"
-
 $build_project = gi "$buildroot\Nodejs\dirs.proj"
 $setup_swix_project = gi "$buildroot\Nodejs\Setup\setup-swix.proj"
 
@@ -188,7 +185,6 @@ function msbuild-exe($target) {
 #   VSTarget            e.g. 14.0
 #   VSName              e.g. VS 2013
 #   config              Name of the build configuration
-#   msi_version         X.Y.Z.W installer version
 #   release_version     X.Y install version
 #   assembly_version    X.Y.Z assembly version
 #   logfile             Build log file
@@ -210,8 +206,6 @@ function msbuild-options($target) {
         "/p:VisualStudioVersion=$($target.VSTarget)",
         "/p:CopyOutputsToPath=$($target.destdir)",
         "/p:Configuration=$($target.config)",
-        "/p:MsiVersion=$($target.msi_version)",
-        "/p:ReleaseVersion=$($target.release_version)",
         "/p:DevEnvDir=$($target.vsroot)\Common7\IDE\\"
     )
 }
@@ -399,20 +393,7 @@ if ($name) {
     Throw "'-name [build name]' must be specified when using '-internal'"
 }
 
-$version_file_backed_up = 0
-# Force use of a backup if there are pending changes to $version_file
-$version_file_force_backup = 0
-$has_tf_workspace = (Get-Command tf -errorAction SilentlyContinue) -and (-not (tf workspaces | Select-String -pattern "No workspace", "Unable to determine the workspace"))
-if ($has_tf_workspace) {
-    if (-not (tf status $version_file /format:detailed | Select-String "There are no pending changes.")) {
-        Write-Output "$version_file has pending changes. Using backup instead of tf undo."
-        $version_file_force_backup = 1
-    }
-}
-$version_file_is_readonly = $version_file.Attributes -band [io.FileAttributes]::ReadOnly
-
-$assembly_version = [regex]::Match((Get-Content $version_file), 'ReleaseVersion = "([0-9.]+)";').Groups[1].Value
-$release_version = [regex]::Match((Get-Content $version_file), 'FileVersion = "([0-9.]+)";').Groups[1].Value
+$release_version = "42.42.42.42"
 
 if ($internal) {
     $base_outdir = "$base_outdir\Internal\$name"
@@ -450,8 +431,6 @@ if ([int]::Parse([regex]::Match($buildnumber, '^[0-9]+').Value) -ge 65535) {
 (If the year is not yet $($base_year + 7) then something else has gone wrong.)"
 }
 
-$msi_version = "$release_version.$buildnumber"
-
 if ($internal -or $release -or $mockrelease) {
 
     if (-not $serverBuildNumber) {
@@ -481,8 +460,6 @@ if ($mockrelease) {
     Write-Output "Auto-generated release outdir: $outdir"
 }
 Write-Output ""
-Write-Output "Product version: $assembly_version.`$(VS version)"
-Write-Output "MSI version: $msi_version"
 Write-Output "Building for $([String]::Join(", ", ($target_versions | % { $_.name })))"
 Write-Output "============================================================"
 Write-Output ""
@@ -510,16 +487,6 @@ $failed_logs = @()
 Push-Location $buildroot
 try {
     $successful = $false
-    if ((-not $version_file_force_backup) -and $has_tf_workspace) {
-        tf edit $version_file | Out-Null
-    }
-    if ($version_file_force_backup -or -not $?) {
-        # running outside of MS
-        Copy-Item -Force $version_file "$($version_file).bak"
-        $version_file_backed_up = 1
-    }
-    Set-ItemProperty $version_file -Name IsReadOnly -Value $false
-    (Get-Content $version_file) | %{ $_ -replace ' = "4100.00"', (' = "' + $buildnumber + '"') } | Set-Content $version_file
 
     foreach ($config in $target_configs) {
         # See the description near the msbuild_config function
@@ -530,7 +497,6 @@ try {
                 destdir=mkdir "$outdir\$($_.name)\$config" -Force;
                 logfile="$logdir\BuildRelease.$config.$($_.number).log";
                 config=$config;
-                msi_version=$msi_version;
                 release_version=$release_version;
                 vsroot=$($_.vsroot)
             }
@@ -725,23 +691,7 @@ try {
     
     $successful = $true
 } finally {
-    try {
-        if ($version_file_backed_up) {
-            Move-Item "$version_file.bak" $version_file -Force
-            if ($version_file_is_readonly) {
-                Set-ItemProperty $version_file -Name IsReadOnly -Value $true
-            }
-            Write-Output "Restored $version_file"
-        } elseif ((-not $version_file_force_backup) -and $has_tf_workspace) {
-            tf undo /noprompt $version_file | Out-Null
-        }
-        
-        if (-not (Get-Content $version_file) -match ' = "4100.00"') {
-            Write-Error "Failed to undo $version_file"
-        }
-    } finally {
-        Pop-Location
-    }
+    Pop-Location
 }
 
 if ($successful) {
