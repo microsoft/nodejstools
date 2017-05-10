@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="B515653F-FB69-4B64-9D3F-F1FCF8421DD0" Version="1.4.0.1" Language="en-US" Publisher="Microsoft" />
+    <Identity Id="B515653F-FB69-4B64-9D3F-F1FCF8421DD0" Version="|%CurrentProject%;GetVSIXVersion|" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Node.js Tools - Profiling</DisplayName>
     <Description xml:space="preserve">Provides support for profiling Node.js projects</Description>
     <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
@@ -13,12 +13,9 @@
        Id specifications are minimums; any SKU equal or 'higher' will accept
        them. -->
   <Installation>
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Community" />
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Pro" />
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.Enterprise" />
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VWDExpress" />
-    <InstallationTarget Version="[14.0.0,16.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
+    <InstallationTarget Version="[15.0.0,16.0)" Id="Microsoft.VisualStudio.Community" />
+    <InstallationTarget Version="[15.0.0,16.0)" Id="Microsoft.VisualStudio.Pro" />
+    <InstallationTarget Version="[15.0.0,16.0)" Id="Microsoft.VisualStudio.Enterprise" />
   </Installation>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
