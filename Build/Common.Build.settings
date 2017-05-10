@@ -134,7 +134,6 @@
   </ItemDefinitionGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />
-  <Import Project="$(TargetsPath)\Common.Build.Wix.settings" Condition="'$(MSBuildProjectExtension)' == '.wixproj'" />
   <Import Project="$(TargetsPath)\CodeCoverage.proj" />
 
   <ItemGroup>
