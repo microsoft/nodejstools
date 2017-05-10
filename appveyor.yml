@@ -5,16 +5,15 @@
     - v1.1.x
     - v1.2.x
     - v1.3.x
-    - future
   skip_tags: true
-  image: Visual Studio 2015
+  image: Visual Studio 2017
   environment:
     matrix:
     - nodejs_version: Stable
-      vs_version: 14.0
+      vs_version: 15.0
       architecture: x64
     - nodejs_version: LTS
-      vs_version: 14.0
+      vs_version: 15.0
       architecture: x86
   install: &default_install_script
     - ps: >-
@@ -22,7 +21,7 @@
 
         node -v
 
-        "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"
+        "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
         $node = which node
 
