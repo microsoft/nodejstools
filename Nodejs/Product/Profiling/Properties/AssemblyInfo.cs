@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Shell;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 
-[assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Profiling", CodeBase = "Microsoft.NodejsTools.Profiling.dll", Version = AssemblyVersionInfo.StableVersion)]
+[assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Profiling", CodeBase = "Microsoft.NodejsTools.Profiling.dll", Version = "1.0.0.0")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
