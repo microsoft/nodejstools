@@ -36,8 +36,8 @@
 
         msiexec /package C:\projects\nodejstools\Common\Tests\Prerequisites\VSTestHost.msi /quiet
 
-        Set-ExecutionPolicy RemoteSigned -Confirm
-        
+        c:\projects\nodejstools\Nodejs\.nuget\nuget.exe restore "c:\projects\nodejstools\Nodejs\NodejsTools.sln" -PackagesDirectory c:\projects\nodejstools\Nodejs\packages
+
         C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget 15.0 -vsroot "$(${env:programfiles(x86)} + "\Microsoft Visual Studio\2017\Community")"
   test_script: &default_test_script
     - ps: >-
