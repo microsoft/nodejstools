@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm)
         {
-            Arguments = global
+            this.Arguments = global
                             ? string.Format(CultureInfo.InvariantCulture, "uninstall {0} --g", packageName)
                             : string.Format(CultureInfo.InvariantCulture,
                                 "uninstall {0} --{1}",

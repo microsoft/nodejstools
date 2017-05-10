@@ -6,7 +6,7 @@ namespace Microsoft.NodejsTools.Npm
     {
         Standard = 0,
         Development,
-        Optional
+        Optional,
     }
 }
 

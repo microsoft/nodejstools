@@ -48,7 +48,6 @@ namespace Microsoft.NodejsTools
     [InstalledProductRegistration("#110", "#112", AssemblyVersionInfo.Version, IconResourceID = 400)]
     [Guid(Guids.NodejsPackageString)]
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
-    [ProvideOptionPage(typeof(NodejsNpmOptionsPage), "Node.js Tools", "Npm", 114, 116, true)]
     [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId, setNextStatement: false, hitCountBp: true, justMyCodeStepping: false)]
     [ProvideDebugLanguage(NodejsConstants.Nodejs, Guids.NodejsDebugLanguageString, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
@@ -93,8 +92,6 @@ namespace Microsoft.NodejsTools
         }
 
         public NodejsGeneralOptionsPage GeneralOptionsPage => GetDialogPage<NodejsGeneralOptionsPage>();
-
-        public NodejsNpmOptionsPage NpmOptionsPage => GetDialogPage<NodejsNpmOptionsPage>();
 
         public EnvDTE.DTE DTE => (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 

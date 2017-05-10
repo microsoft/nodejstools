@@ -6,7 +6,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class Homepages : PkgStringArray, IHomepages
     {
-        public Homepages(JObject package) : base(package, "homepage") { }
+        public Homepages(JObject package)
+            : base(package, "homepage")
+        {
+        }
     }
 }
 

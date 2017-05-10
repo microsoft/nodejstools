@@ -14,7 +14,7 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools
 {
-    public sealed class Nodejs
+    public static class Nodejs
     {
         private const string NodejsRegPath = "Software\\Node.js";
         private const string InstallPath = "InstallPath";

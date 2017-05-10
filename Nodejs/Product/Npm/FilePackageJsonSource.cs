@@ -9,7 +9,7 @@ namespace Microsoft.NodejsTools.Npm
 {
     public class FilePackageJsonSource : IPackageJsonSource
     {
-        private readonly ReaderPackageJsonSource _source;
+        private readonly ReaderPackageJsonSource source;
 
         public FilePackageJsonSource(string fullPathToFile)
         {
@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.Npm
                         using (var fin = new FileStream(fullPathToFile, FileMode.Open, FileAccess.Read, FileShare.Read))
                         using (var reader = new StreamReader(fin))
                         {
-                            _source = new ReaderPackageJsonSource(reader);
+                            this.source = new ReaderPackageJsonSource(reader);
                             break;
                         }
                     }
@@ -58,7 +58,7 @@ namespace Microsoft.NodejsTools.Npm
                 ex);
         }
 
-        public dynamic Package { get { return null == _source ? null : _source.Package; } }
+        public dynamic Package => this.source?.Package;
     }
 }
 

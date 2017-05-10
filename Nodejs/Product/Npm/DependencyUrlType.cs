@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm
         GitSsh,
         GitHttp,
         GitHttps,
-        GitHub
+        GitHub,
     }
 }
 

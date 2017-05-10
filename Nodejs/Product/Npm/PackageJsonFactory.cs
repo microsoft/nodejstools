@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.Npm
     {
         public static IPackageJson Create(IPackageJsonSource source)
         {
-            return null == source.Package ? null : new PackageJson(source.Package);
+            return source.Package == null ? null : new PackageJson(source.Package);
         }
     }
 }

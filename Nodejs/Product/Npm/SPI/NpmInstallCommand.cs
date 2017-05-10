@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm)
         {
-            Arguments = "install";
+            this.Arguments = "install";
         }
 
         public NpmInstallCommand(
@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, pathToNpm)
         {
-            Arguments = NpmArgumentBuilder.GetNpmInstallArguments(
+            this.Arguments = NpmArgumentBuilder.GetNpmInstallArguments(
                 packageName,
                 versionRange,
                 type,

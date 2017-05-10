@@ -8,23 +8,23 @@ namespace Microsoft.NodejsTools.Npm.SPI
     {
         public DependencyUrl(string address)
         {
-            Address = address;
+            this.Address = address;
         }
 
-        public string Address { get; private set; }
+        public string Address { get; }
 
         public DependencyUrlType Type
         {
             get
             {
-                var index = Address.IndexOf("://", StringComparison.Ordinal);
+                var index = this.Address.IndexOf("://", StringComparison.Ordinal);
                 if (index < 0)
                 {
                     return DependencyUrlType.GitHub;
                 }
                 else
                 {
-                    var prefix = Address.Substring(0, index);
+                    var prefix = this.Address.Substring(0, index);
                     switch (prefix)
                     {
                         case "http":

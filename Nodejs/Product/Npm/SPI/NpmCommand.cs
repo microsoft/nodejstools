@@ -1,56 +1,54 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
-using System.Globalization;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal abstract class NpmCommand : AbstractNpmLogSource
     {
-        private readonly string _fullPathToRootPackageDirectory;
-        private string _pathToNpm;
-        private readonly ManualResetEvent _cancellation;
-        private readonly StringBuilder _output = new StringBuilder();
-        private StringBuilder _error = new StringBuilder();
-        private readonly object _bufferLock = new object();
+        private string pathToNpm;
+
+        private readonly StringBuilder output = new StringBuilder();
+
+        private StringBuilder error = new StringBuilder();
+
+        private readonly ManualResetEvent cancellation = new ManualResetEvent(false);
+        private readonly object bufferLock = new object();
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null)
         {
-            _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
-            _pathToNpm = pathToNpm;
-            _cancellation = new ManualResetEvent(false);
+            this.FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            this.pathToNpm = pathToNpm;
         }
 
         protected string Arguments { get; set; }
 
-        internal string FullPathToRootPackageDirectory
-        {
-            get { return _fullPathToRootPackageDirectory; }
-        }
+        internal string FullPathToRootPackageDirectory { get; }
 
         protected string GetPathToNpm()
         {
-            if (null == _pathToNpm || !File.Exists(_pathToNpm))
+            if (string.IsNullOrEmpty(this.pathToNpm) || !File.Exists(this.pathToNpm))
             {
-                _pathToNpm = NpmHelpers.GetPathToNpm();
+                this.pathToNpm = NpmHelpers.GetPathToNpm();
             }
-            return _pathToNpm;
+            return this.pathToNpm;
         }
 
         public string StandardOutput
         {
             get
             {
-                lock (_bufferLock)
+                lock (this.bufferLock)
                 {
-                    return _output.ToString();
+                    return this.output.ToString();
                 }
             }
         }
@@ -59,16 +57,16 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                lock (_bufferLock)
+                lock (this.bufferLock)
                 {
-                    return _error.ToString();
+                    return this.error.ToString();
                 }
             }
         }
 
         public void CancelCurrentTask()
         {
-            _cancellation.Set();
+            this.cancellation.Set();
         }
 
         public virtual async Task<bool> ExecuteAsync()
@@ -87,7 +85,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
             redirector.WriteLine(
                 string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
-                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, Arguments)));
+                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, this.Arguments)));
 
             var cancelled = false;
             try
@@ -95,15 +93,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 await NpmHelpers.ExecuteNpmCommandAsync(
                     redirector,
                     GetPathToNpm(),
-                    _fullPathToRootPackageDirectory,
-                    new[] { Arguments },
-                    _cancellation);
+                    this.FullPathToRootPackageDirectory,
+                    new[] { this.Arguments },
+                    this.cancellation);
             }
             catch (OperationCanceledException)
             {
                 cancelled = true;
             }
-            OnCommandCompleted(Arguments, redirector.HasErrors, cancelled);
+            OnCommandCompleted(this.Arguments, redirector.HasErrors, cancelled);
             return !redirector.HasErrors;
         }
 
@@ -113,7 +111,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             public NpmCommandRedirector(NpmCommand owner)
             {
-                _owner = owner;
+                this._owner = owner;
             }
 
             public bool HasErrors { get; private set; }
@@ -122,7 +120,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (data != null)
                 {
-                    lock (_owner._bufferLock)
+                    lock (this._owner.bufferLock)
                     {
                         buffer.Append(data + Environment.NewLine);
                     }
@@ -132,13 +130,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             public override void WriteLine(string line)
             {
-                _owner.OnOutputLogged(AppendToBuffer(_owner._output, line));
+                this._owner.OnOutputLogged(AppendToBuffer(this._owner.output, line));
             }
 
             public override void WriteErrorLine(string line)
             {
-                HasErrors = true;
-                _owner.OnErrorLogged(AppendToBuffer(_owner._error, line));
+                this.HasErrors = true;
+                this._owner.OnErrorLogged(AppendToBuffer(this._owner.error, line));
             }
         }
     }

@@ -12,21 +12,21 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         protected virtual void AddModule(IPackage package)
         {
-            if (package.Name != null && !_packagesByName.ContainsKey(package.Name))
+            if (package.Name != null && !this._packagesByName.ContainsKey(package.Name))
             {
-                _packagesSorted.Add(package);
-                _packagesByName[package.Name] = package;
+                this._packagesSorted.Add(package);
+                this._packagesByName[package.Name] = package;
             }
         }
 
         public int Count
         {
-            get { return _packagesSorted.Count; }
+            get { return this._packagesSorted.Count; }
         }
 
         public IPackage this[int index]
         {
-            get { return _packagesSorted[index]; }
+            get { return this._packagesSorted[index]; }
         }
 
         public IPackage this[string name]
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             get
             {
                 IPackage pkg;
-                _packagesByName.TryGetValue(name, out pkg);
+                this._packagesByName.TryGetValue(name, out pkg);
                 return pkg;
             }
         }
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IEnumerator<IPackage> GetEnumerator()
         {
-            return _packagesSorted.GetEnumerator();
+            return this._packagesSorted.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

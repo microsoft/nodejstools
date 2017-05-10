@@ -6,7 +6,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class PkgFiles : PkgStringArray, IFiles
     {
-        public PkgFiles(JObject package) : base(package, "files") { }
+        public PkgFiles(JObject package) 
+            : base(package, "files") { }
     }
 }
 

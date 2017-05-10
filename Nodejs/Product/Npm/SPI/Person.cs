@@ -26,15 +26,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private Person(string name, string email = null, string url = null)
         {
-            Name = name;
-            Email = email;
-            Url = url;
+            this.Name = name;
+            this.Email = email;
+            this.Url = url;
         }
 
         public static Person CreateFromJsonSource(string source)
         {
             if (source == null)
+            {
                 return new Person(string.Empty);
+            }
+
             return TryCreatePersonFromObject(source) ?? CreatePersonFromString(source);
         }
 
@@ -105,30 +108,30 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public override string ToString()
         {
             var buff = new StringBuilder();
-            if (!string.IsNullOrEmpty(Name))
+            if (!string.IsNullOrEmpty(this.Name))
             {
-                buff.Append(Name);
+                buff.Append(this.Name);
             }
 
-            if (!string.IsNullOrEmpty(Email))
+            if (!string.IsNullOrEmpty(this.Email))
             {
                 if (buff.Length > 0)
                 {
                     buff.Append(' ');
                 }
                 buff.Append('<');
-                buff.Append(Email);
+                buff.Append(this.Email);
                 buff.Append('>');
             }
 
-            if (!string.IsNullOrEmpty(Url))
+            if (!string.IsNullOrEmpty(this.Url))
             {
                 if (buff.Length > 0)
                 {
                     buff.Append(' ');
                 }
                 buff.Append('(');
-                buff.Append(Url);
+                buff.Append(this.Url);
                 buff.Append(')');
             }
             return buff.ToString();
