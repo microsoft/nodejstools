@@ -23,8 +23,6 @@
 
         "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
-        Write-Host "$env:programfiles"
-
         $node = which node
 
         $node = $node.Replace("/c/", "C:\").Replace("/", "\") + ".exe"
@@ -38,7 +36,7 @@
 
         msiexec /package C:\projects\nodejstools\Common\Tests\Prerequisites\VSTestHost.msi /quiet
 
-        powershell -ExecutionPolicy RemoteSigned C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget 15.0 -vsroot $($env:programfiles" + "\Microsoft Visual Studio\2017\Community")
+        powershell -ExecutionPolicy RemoteSigned C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget 15.0 -vsroot $(${env:programfiles(x86)} + "\Microsoft Visual Studio\2017\Community")
   test_script: &default_test_script
     - ps: >-
         $testsettings_version = $env:vs_version -replace '11.0', '12.0'
