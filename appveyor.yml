@@ -12,9 +12,6 @@
     - nodejs_version: Stable
       vs_version: 15.0
       architecture: x64
-    - nodejs_version: LTS
-      vs_version: 15.0
-      architecture: x86
   install: &default_install_script
     - ps: >-
         Install-Product node $env:nodejs_version $env:architecture
