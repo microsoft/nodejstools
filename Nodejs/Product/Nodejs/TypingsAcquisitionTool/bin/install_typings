@@ -18,6 +18,13 @@ var argv = minimist(process.argv.slice(2), {
 
 var emitter = new events.EventEmitter();
 
+var options = {
+    save: argv.save,
+    emitter: emitter,
+    global: true,
+    cwd: argv.cwd || process.cwd()
+};
+
 var packagesToInstall = argv._;
 
 if (!packagesToInstall.length) {
@@ -25,12 +32,7 @@ if (!packagesToInstall.length) {
     typingsTool.installTypingsForProject(options)
 } else {
     typingsTool.runAll(packagesToInstall.map(function (name) {
-        var options = {
-            save: argv.save,
-            emitter: emitter,
-            global: name === "node", // Assume everything else refers to a CommonJS module
-            cwd: argv.cwd || process.cwd()
-        };
+        options.global = name === "node"; // Assume everything else refers to a CommonJS module
         return typingsTool.installTypingsForPackage(name, options);
     }));
 }
