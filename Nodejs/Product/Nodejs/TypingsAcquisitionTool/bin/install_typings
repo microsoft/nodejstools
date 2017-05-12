@@ -17,12 +17,14 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 var emitter = new events.EventEmitter();
-
 var packagesToInstall = argv._;
 
 if (!packagesToInstall.length) {
     // top level package install
-    typingsTool.installTypingsForProject(options)
+    typingsTool.installTypingsForProject({ save: argv.save,
+                                           emitter: emitter,
+                                           global: true,
+                                           cwd: argv.cwd || process.cwd()})
 } else {
     typingsTool.runAll(packagesToInstall.map(function (name) {
         var options = {
@@ -31,6 +33,7 @@ if (!packagesToInstall.length) {
             global: name === "node", // Assume everything else refers to a CommonJS module
             cwd: argv.cwd || process.cwd()
         };
+
         return typingsTool.installTypingsForPackage(name, options);
     }));
 }
