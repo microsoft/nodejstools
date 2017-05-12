@@ -1,4 +1,4 @@
-,#!/usr/bin/env node
+#!/usr/bin/env node
 /**
     Tool to aquire typings used for NTVS IntelliSense.
 
