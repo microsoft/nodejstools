@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+,#!/usr/bin/env node
 /**
     Tool to aquire typings used for NTVS IntelliSense.
 
@@ -30,7 +30,7 @@ if (!packagesToInstall.length) {
         var options = {
             save: argv.save,
             emitter: emitter,
-            options.global = name === "node"; // Assume everything else refers to a CommonJS module
+            options.global = name === "node", // Assume everything else refers to a CommonJS module
             cwd: argv.cwd || process.cwd()
         };
 
