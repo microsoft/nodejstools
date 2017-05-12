@@ -17,22 +17,23 @@ var argv = minimist(process.argv.slice(2), {
 });
 
 var emitter = new events.EventEmitter();
-
-var options = {
-    save: argv.save,
-    emitter: emitter,
-    global: true,
-    cwd: argv.cwd || process.cwd()
-};
-
 var packagesToInstall = argv._;
 
 if (!packagesToInstall.length) {
     // top level package install
-    typingsTool.installTypingsForProject(options)
+    typingsTool.installTypingsForProject({ save: argv.save,
+                                           emitter: emitter,
+                                           global: true,
+                                           cwd: argv.cwd || process.cwd()})
 } else {
     typingsTool.runAll(packagesToInstall.map(function (name) {
-        options.global = name === "node"; // Assume everything else refers to a CommonJS module
+        var options = {
+            save: argv.save,
+            emitter: emitter,
+            options.global = name === "node"; // Assume everything else refers to a CommonJS module
+            cwd: argv.cwd || process.cwd()
+        };
+
         return typingsTool.installTypingsForPackage(name, options);
     }));
 }
