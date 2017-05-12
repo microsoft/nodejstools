@@ -127,6 +127,7 @@ param(
     [switch] $skipclean,
     [switch] $skipcopy,
     [switch] $skipdebug,
+    [switch] $skipsetup,
     [switch] $skipbuild,
     [switch] $dev,
     [switch] $copytests
@@ -169,6 +170,13 @@ if ($skiptests) {
 } else {
     $global_msbuild_options += "/p:IncludeTests=true"
 }
+
+if ($skipsetup) {
+    $global_msbuild_options += "/p:IncludeSetup=false"
+} else {
+    $global_msbuild_options += "/p:IncludeSetup=true"
+}
+
 
 if ($release -or $mockrelease) {
     $global_msbuild_options += "/p:ReleaseBuild=true"
