@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual int get_KeyOutput(out string pbstrCanonicalName) {
             pbstrCanonicalName = null;
             if (_keyOutput == null)
-                Refresh();
+                _project.Site.GetUIThread().Invoke(Refresh);
             if (_keyOutput == null) {
                 pbstrCanonicalName = String.Empty;
                 return VSConstants.S_FALSE;
@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudioTools.Project {
 
         public virtual int get_KeyOutputObject(out IVsOutput2 ppKeyOutput) {
             if (_keyOutput == null) {
-                Refresh();
+                _project.Site.GetUIThread().Invoke(Refresh);
                 if (_keyOutput == null) {
                     // horrible hack: we don't really have outputs but the Cider designer insists 
                     // that we have an output so it can figure out our output assembly name.  So we
@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudioTools.Project {
             //
             // In the end, this is probably the right thing to do, though -- as it keeps the output
             // groups always up to date.
-            Refresh();
+            _project.Site.GetUIThread().Invoke(Refresh);
 
             // See if only the caller only wants to know the count
             if (celt == 0 || rgpcfg == null) {
