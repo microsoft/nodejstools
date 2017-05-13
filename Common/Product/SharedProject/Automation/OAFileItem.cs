@@ -73,7 +73,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                 }
                 return isDirty;
             }
-
         }
 
         /// <summary>
@@ -109,7 +108,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                 return document;
             }
         }
-
 
         /// <summary>
         /// Opens the file item in the specified view.
@@ -242,7 +240,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
             }
         }
 
-
         #endregion
 
         #region helpers
@@ -308,7 +305,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
                     }
                 });
             }
-
         }
         #endregion
 

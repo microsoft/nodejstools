@@ -49,7 +49,6 @@ namespace TestUtilities.Mocks {
                     changesStack.Push(v.Changes);
                 }
 
-
                 while (changesStack.Count > 0) {
                     foreach (var change in changesStack.Pop()) {
                         if (change.Delta > 0 && change.NewPosition <= newPos && change.NewPosition - change.Delta > newPos) {
@@ -114,6 +113,5 @@ namespace TestUtilities.Mocks {
         public PointTrackingMode TrackingMode {
             get { return _mode; }
         }
-
     }
 }

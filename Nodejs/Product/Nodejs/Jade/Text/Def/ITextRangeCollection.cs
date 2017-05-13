@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Jade {

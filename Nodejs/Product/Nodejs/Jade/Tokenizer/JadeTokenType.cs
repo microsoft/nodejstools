@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Jade {
     enum JadeTokenType {
         None,

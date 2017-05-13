@@ -29,7 +29,6 @@ namespace Microsoft.NodejsTools.Profiling {
 
         #region INodeProfileSession Members
 
-
         public string Name {
             get {
                 return _node.Name;

@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         private IVsMultiItemSelect _mis;
         private ISelectionContainer _container;
 
-
         public MockVsMonitorSelection(MockVs vs) {
             _vs = vs;
             _emptyCtx = new MockVsTrackSelectionEx(this);

@@ -22,7 +22,6 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
 namespace Microsoft.VisualStudioTools.Project {
 
-
     internal abstract class ProjectDocumentsListener : IVsTrackProjectDocumentsEvents2, IDisposable {
         #region fields
         private uint eventsCookie;

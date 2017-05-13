@@ -260,7 +260,6 @@ namespace TestUtilities.UI {
                 }
                 System.Threading.Thread.Sleep(100);
             }
-
         }
     }
 }

@@ -429,7 +429,6 @@ etc.
             return filename;
         }
 
-
         private async Task<Uri> GetRegistryUrl() {
             var output = await NpmHelpers.ExecuteNpmCommandAsync(
                 null,

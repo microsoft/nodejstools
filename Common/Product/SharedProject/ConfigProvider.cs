@@ -157,7 +157,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
             }
 
-
             //add the output path
             string outputBasePath = this.ProjectMgr.OutputBaseRelativePath;
             newConfig.AddProperty("OutputPath", CommonUtils.NormalizeDirectoryPath(Path.Combine(outputBasePath, name)));
@@ -574,6 +573,5 @@ namespace Microsoft.VisualStudioTools.Project {
 
             return (configurations == null) ? new string[] { } : configurations.ToArray();
         }
-
     }
 }

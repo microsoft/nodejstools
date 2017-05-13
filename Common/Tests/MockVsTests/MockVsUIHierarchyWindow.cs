@@ -196,7 +196,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             return NativeMethods.OLECMDERR_E_NOTSUPPORTED;
         }
 
-
         private void DeleteItem(HierarchyItem item) {
             var deleteHandler = item.Hierarchy as IVsHierarchyDeleteHandler;
             int canRemoveItem = 0, canDeleteItem = 0;
@@ -217,7 +216,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                         ""
                     );
                 }
-
             } else if (canDeleteItem != 0) {
                 object name;
                 ErrorHandler.ThrowOnFailure(item.Hierarchy.GetProperty(item.ItemId, (int)__VSHPROPID.VSHPROPID_Name, out name));

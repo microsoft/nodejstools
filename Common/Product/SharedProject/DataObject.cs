@@ -229,7 +229,6 @@ namespace Microsoft.VisualStudioTools.Project {
             CF_VSPROJECTCLIPDESCRIPTOR = (ushort)UnsafeNativeMethods.RegisterClipboardFormat("CF_PROJECTCLIPBOARDDESCRIPTOR");
         }
 
-
         public static FORMATETC CreateFormatEtc(ushort iFormat) {
             FORMATETC fmt = new FORMATETC();
             fmt.cfFormat = iFormat;
@@ -386,7 +385,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // NULL terminate it
             Marshal.WriteInt16(new IntPtr((long)data + (s.Length * dwSize)), nullTerminator);
         }
-
     } // end of dragdrophelper
 
     internal class EnumSTATDATA : IEnumSTATDATA {

@@ -35,7 +35,6 @@ namespace Microsoft.VisualStudio.Repl {
 #endif
         
 
-
         [Export]
         [Name(Name)]
         [BaseDefinition(PredefinedClassificationTypeNames.NaturalLanguage)]

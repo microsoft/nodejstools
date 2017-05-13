@@ -266,8 +266,6 @@ namespace TestUtilities {
             }
 
             return false;
-
         }
     }
-
 }

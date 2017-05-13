@@ -132,7 +132,6 @@ namespace TestUtilities {
             throw new OperationCanceledException();
         }
 
-
         public void Invoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal) {
             _dispatcher.Invoke(action, priority);
         }
@@ -331,5 +330,4 @@ namespace TestUtilities {
             get { return (T)_object; }
         }
     }
-
 }

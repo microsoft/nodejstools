@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools.Profiling {
     enum TreeViewIconIndex {
         GreenNotebook,

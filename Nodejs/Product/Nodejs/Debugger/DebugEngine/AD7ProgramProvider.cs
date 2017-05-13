@@ -93,7 +93,6 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             return VSConstants.E_NOTIMPL;
         }
 
-
         // Establishes a locale for any language-specific resources needed by the DE. This engine only supports Enu.
         int IDebugProgramProvider2.SetLocale(ushort wLangID) {
             return VSConstants.S_OK;

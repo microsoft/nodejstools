@@ -258,7 +258,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // Get the list of items which require HintPath
             var references = this.ProjectMgr.CurrentConfig.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
 
-
             // Now loop through the generated References to find the corresponding one
             foreach (var reference in references) {
                 string fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
@@ -282,9 +281,7 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                     break;
                 }
-
             }
-
         }
 
         /// <summary>
@@ -380,7 +377,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return;
             }
 
-
             if (CommonUtils.IsSamePath(e.FileName, this.assemblyPath)) {
                 ProjectMgr.OnInvalidateItems(this.Parent);
             }
@@ -402,7 +398,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // Dispose the node now that is deleted.
             Dispose(true);
         }
-
 
         #endregion
     }

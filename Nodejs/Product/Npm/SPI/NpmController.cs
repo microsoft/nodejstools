@@ -37,7 +37,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
         private readonly object _fileBitsLock = new object();
 
-
         private bool _isDisposed;
         private bool _isReloadingModules = false;
 
@@ -182,7 +181,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             get { return _sRepoCatalog; }
         }
 
-
         private FileSystemWatcher CreateModuleDirectoryWatcherIfDirectoryExists(string directory) {
             if (!Directory.Exists(directory)) {
                 return null;
@@ -225,7 +223,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             return;
         }
 
-
         private void RestartFileSystemWatcherTimer() {
             lock (_fileBitsLock) {
                 if (null != _fileSystemWatcherTimer) {
@@ -247,7 +244,6 @@ namespace Microsoft.NodejsTools.Npm.SPI {
 
             ReloadModules();
         }
-
 
         private void ReloadModules() {
             var retry = false;

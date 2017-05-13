@@ -313,7 +313,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 }
             }
 
-
             // Build the relative path by looking at folder names above us as one scenarios
             // where we get called is when a folder above us gets renamed (in which case our path is invalid)
             HierarchyNode parent = this.Parent;
@@ -465,7 +464,6 @@ namespace Microsoft.VisualStudioTools.Project {
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-
         internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
             if (cmdGroup == VsMenus.guidStandardCommandSet97) {
                 switch ((VsCommands)cmd) {
@@ -491,7 +489,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
-
 
         protected override void DoDefaultAction() {
             FileDocumentManager manager = this.GetDocumentManager() as FileDocumentManager;
@@ -740,7 +737,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         /// <summary>
         /// Tries recovering from a rename failure.
         /// </summary>
@@ -927,7 +923,6 @@ namespace Microsoft.VisualStudioTools.Project {
 #endregion
 
 #region helpers
-
 
         /// <summary>
         /// Update the ChildNodes after the parent node has been renamed

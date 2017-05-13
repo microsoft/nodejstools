@@ -411,7 +411,6 @@ namespace Microsoft.NodejsTools {
             return ((IOleCommandTarget)_menuService).QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
-
         #region IVsProjectFlavorCfgProvider Members
 
         public int CreateProjectFlavorCfg(IVsCfg pBaseProjectCfg, out IVsProjectFlavorCfg ppFlavorCfg) {
@@ -432,7 +431,6 @@ namespace Microsoft.NodejsTools {
         }
 
         #endregion
-
 
         protected override int GetProperty(uint itemId, int propId, out object property) {
             switch ((__VSHPROPID)propId) {

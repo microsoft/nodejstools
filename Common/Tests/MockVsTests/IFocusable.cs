@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace Microsoft.VisualStudioTools.MockVsTests {
     /// <summary>
     /// Implemented by mock VS objects which can gain and lose focus.

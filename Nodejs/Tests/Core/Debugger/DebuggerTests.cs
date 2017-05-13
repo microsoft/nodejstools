@@ -270,7 +270,6 @@ namespace NodejsTests.Debugger {
             //    }
             //);
 
-
             // Bug 507: http://pytools.codeplex.com/workitem/507
             TestDebuggerSteps(
                 "SteppingTestBug507",

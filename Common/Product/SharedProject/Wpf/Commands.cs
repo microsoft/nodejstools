@@ -148,6 +148,5 @@ namespace Microsoft.VisualStudioTools.Wpf {
                 }
             }
         }
-
     }
 }

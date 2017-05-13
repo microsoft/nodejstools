@@ -161,7 +161,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         [SRCategory(SR.General)]
         [ResourcesDisplayName(nameof(Resources.NpmPackageLinkStatus))]
         [ResourcesDescription(nameof(Resources.NpmPackageLinkStatusDescription))]
@@ -218,6 +217,5 @@ namespace Microsoft.NodejsTools.Project {
                 return null != Package && Package.IsBundledDependency;
             }
         }
-
     }
 }

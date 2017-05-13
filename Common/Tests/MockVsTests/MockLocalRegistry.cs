@@ -43,5 +43,4 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             throw new NotImplementedException();
         }
     }
-
 }

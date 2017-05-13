@@ -14,7 +14,6 @@
 //
 //*********************************************************//
 
-
 namespace Microsoft.NodejsTools {
     class PkgCmdId {
         public const int cmdidReplWindow                    = 0x200;

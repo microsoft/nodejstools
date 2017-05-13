@@ -543,7 +543,6 @@ namespace Microsoft.VisualStudioTools.Project {
             // We rely that the caller knows what to call on us.
             Utilities.ArgumentNotNull("pages", pages);
 
-
             if (pages.Length == 0) {
                 throw new ArgumentException(SR.GetString(SR.InvalidParameter), "pages");
             }
@@ -955,5 +954,4 @@ namespace Microsoft.VisualStudioTools.Project {
         }
         #endregion
     }
-
 }

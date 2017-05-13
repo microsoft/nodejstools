@@ -141,7 +141,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-
         }
 #endif
 
@@ -764,7 +763,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
             AssertError<ArgumentOutOfRangeException>(() => item.get_FileNames(-1));
             AssertNotImplemented(() => item.Saved = false);
 
-
             AssertError<ArgumentException>(() => item.get_IsOpen("ThisIsNotTheGuidYoureLookingFor"));
             AssertError<ArgumentException>(() => item.Open("ThisIsNotTheGuidYoureLookingFor"));
         }
@@ -822,7 +820,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 var solutionExplorer = app.SolutionExplorerTreeView;
 
                 var solutionNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)");
-
 
                 var projectNode = solutionExplorer.FindItem("Solution 'AddFolderExists' (1 project)", "AddFolderExists");
 
@@ -1545,7 +1542,6 @@ namespace Microsoft.VisualStudioTools.SharedProjectTests {
                 }
             }
         }
-
 
         [Ignore]
         [TestMethod, Priority(0), TestCategory("Core")]

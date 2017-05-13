@@ -22,5 +22,4 @@ namespace TestUtilities.UI {
         Break,
         Continue
     }
-
 }

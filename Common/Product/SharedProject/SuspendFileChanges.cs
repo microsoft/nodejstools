@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudioTools.Project {
             this.documentFileName = document;
         }
 
-
         public void Suspend() {
             if (this.isSuspending)
                 return;
@@ -51,7 +50,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 uint itemId;
                 uint docCookie;
                 IVsFileChangeEx fileChange;
-
 
                 if (rdt == null)
                     return;

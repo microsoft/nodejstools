@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 using System.Windows.Input;
 namespace TestUtilities {
     public interface ITreeNode {

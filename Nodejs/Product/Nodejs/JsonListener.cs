@@ -111,7 +111,6 @@ namespace Microsoft.NodejsTools {
                             }
                         }
                     }
-
                 }
             } catch (SocketException) {
             } finally {
@@ -181,5 +180,4 @@ namespace Microsoft.NodejsTools {
             Body = body;
         }
     }
-
 }

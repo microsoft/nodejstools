@@ -24,7 +24,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 // each implement the IDebugEvent2.GetAttributes method for the type of event they represent. 
 // Most events sent the debugger are asynchronous events.
 
-
 namespace Microsoft.NodejsTools.Debugger.DebugEngine {
     #region Event base classes
 

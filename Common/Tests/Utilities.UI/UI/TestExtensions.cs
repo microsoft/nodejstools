@@ -88,6 +88,5 @@ namespace TestUtilities.UI {
             );
             return (result & (uint)state) != 0;
         }
-
     }
 }

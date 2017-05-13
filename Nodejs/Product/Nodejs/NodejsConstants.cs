@@ -72,8 +72,8 @@ namespace Microsoft.NodejsTools {
             get {
                 return Path.Combine(NtvsLocalAppData, "ExternalTools");
             }
-
         }
+
         /// <summary>
         /// Path to where NTVS caches Npm data.
         /// </summary>

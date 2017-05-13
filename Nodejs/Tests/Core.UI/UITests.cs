@@ -88,7 +88,6 @@ namespace Microsoft.Nodejs.Tests.UI {
             proj = proj.Replace("[ABSPATH]", TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath"));
             File.WriteAllText(TestData.GetPath(@"TestData\NodejsProjectData\AbsolutePath\AbsolutePath.njsproj"), proj);
 
-
             using (var app = new VisualStudioApp()) {
                 var project = app.OpenProject(@"TestData\NodejsProjectData\AbsolutePath.sln");
 
@@ -181,7 +180,6 @@ namespace Microsoft.Nodejs.Tests.UI {
                     Keyboard.PressAndRelease(Key.Enter);
 
                     Assert.AreNotEqual(null, window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameJavaScript", "renamed.js"));
-
 
                     var tsFile = window.WaitForItem("Solution 'CopyPasteRenameProject' (2 projects)", "CopyPasteRenameProjectTypeScript", "app.ts");
 

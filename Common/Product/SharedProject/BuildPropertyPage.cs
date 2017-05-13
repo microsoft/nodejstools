@@ -12,7 +12,6 @@
  *
  * ***************************************************************************/
 
-
 namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// Enumerated list of the properties shown on the build property page
@@ -20,5 +19,4 @@ namespace Microsoft.VisualStudioTools.Project {
     internal enum BuildPropertyPageTag {
         OutputPath
     }
-
 }

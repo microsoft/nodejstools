@@ -160,7 +160,6 @@ namespace Microsoft.NodejsTools.Project {
             }
         }
 
-
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie) {
             EnvDTE80.IInternalExtenderProvider outerHierarchy = Node.GetOuterInterface<EnvDTE80.IInternalExtenderProvider>();
 
@@ -172,10 +171,8 @@ namespace Microsoft.NodejsTools.Project {
                 }
                 return res;
             }
-
             return null;
         }
-
     }
 
     [ComVisible(true)]

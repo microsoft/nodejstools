@@ -70,5 +70,4 @@ namespace Microsoft.NodejsTools.Jade {
             return classifier;
         }
     }
-
 }

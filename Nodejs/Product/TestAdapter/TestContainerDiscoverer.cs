@@ -285,8 +285,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
         #endregion
 
-
-
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project) {
             if (!project.IsTestProject(Guids.NodejsBaseProjectFactory)) {
                 if (EqtTrace.IsVerboseEnabled) {
@@ -499,7 +497,6 @@ namespace Microsoft.NodejsTools.TestAdapter {
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
                 }
-
             }
         }
 

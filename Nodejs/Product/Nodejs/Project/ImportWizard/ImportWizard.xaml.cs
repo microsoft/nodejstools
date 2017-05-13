@@ -34,8 +34,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard {
         public static readonly RoutedCommand BrowseOpenFileCommand = new RoutedCommand();
         public static readonly RoutedCommand BrowseSaveFileCommand = new RoutedCommand();
 
-
-
         public ImportSettings ImportSettings {
             get { return (ImportSettings)GetValue(ImportSettingsProperty); }
             private set { SetValue(ImportSettingsPropertyKey, value); }

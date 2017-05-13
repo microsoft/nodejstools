@@ -303,7 +303,6 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                         Marshal.Release(project);
                     }
                 }
-
             }
             return VSConstants.S_OK;
         }

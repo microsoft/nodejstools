@@ -34,7 +34,6 @@ namespace Microsoft.NodejsTools.Profiling {
         private readonly NodejsProfilingPackage _editorPackage;
         private ServiceProvider _vsServiceProvider;
 
-
         public ProfilingSessionEditorFactory(NodejsProfilingPackage package) {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering {0} constructor", this.ToString()));
 

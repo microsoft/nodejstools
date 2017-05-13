@@ -21,6 +21,5 @@ namespace TestUtilities.UI {
         public NodejsPerfExplorer(AutomationElement element)
             : base(element) {
         }
-
     }
 }

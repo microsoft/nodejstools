@@ -111,7 +111,6 @@ namespace Microsoft.TestSccPackage {
                 }
             }
 
-
             // couple extra test cases to make sure we handle weird inputs...
             pscp2Project.GetSccFiles(VSConstants.VSITEMID_ROOT, null, null);
             pscp2Project.GetSccFiles(VSConstants.VSITEMID_ROOT, new CALPOLESTR[0], new CADWORD[0]);
@@ -169,7 +168,6 @@ namespace Microsoft.TestSccPackage {
             return VSConstants.S_OK;
         }
         #endregion
-
 
         #endregion
 
@@ -462,7 +460,6 @@ namespace Microsoft.TestSccPackage {
         }
     }
 
-
     public class FileInfo {
         private readonly ProjectInfo _project;
         private readonly string _name;
@@ -505,6 +502,4 @@ namespace Microsoft.TestSccPackage {
             }
         }
     }
-
-
 }

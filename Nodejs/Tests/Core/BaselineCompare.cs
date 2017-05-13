@@ -34,7 +34,6 @@ namespace NodejsTests {
                     }
                     break;
                 }
-
             }
 
             if (expected.Length != actual.Length)

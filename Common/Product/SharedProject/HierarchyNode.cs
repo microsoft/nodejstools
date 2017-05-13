@@ -140,7 +140,6 @@ namespace Microsoft.VisualStudioTools.Project {
             }
         }
 
-
         public virtual int MenuCommandId {
             get { return VsMenus.IDM_VS_CTXT_NOCOMMANDS; }
         }
@@ -148,7 +147,6 @@ namespace Microsoft.VisualStudioTools.Project {
         public virtual Guid MenuGroupId {
             get { return VsMenus.guidSHLMainMenu; }
         }
-
 
         /// <summary>
         /// Return an imageindex
@@ -252,7 +250,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 this.projectMgr = value;
             }
         }
-
 
         [System.ComponentModel.BrowsableAttribute(false)]
         public HierarchyNode NextSibling {
@@ -736,7 +733,6 @@ namespace Microsoft.VisualStudioTools.Project {
                         }
                         break;
                     }
-
             }
 
 #if DEV11_OR_LATER
@@ -1444,7 +1440,6 @@ namespace Microsoft.VisualStudioTools.Project {
                     case VsCommands.Paste:
                         return this.ProjectMgr.PasteFromClipboard(this);
                 }
-
             } else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
                 switch ((VsCommands2K)cmd) {
                     case VsCommands2K.EXCLUDEFROMPROJECT:
@@ -1476,7 +1471,6 @@ namespace Microsoft.VisualStudioTools.Project {
 #endregion
 
 #region query command handling
-
 
         /// <summary>
         /// Handles command status on a node. Should be overridden by descendant nodes. If a command cannot be handled then the base should be called.
@@ -1820,7 +1814,6 @@ namespace Microsoft.VisualStudioTools.Project {
                 return null;
             return this.projectMgr.Site.GetService(type);
         }
-
 
 #endregion
 

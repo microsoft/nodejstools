@@ -766,6 +766,5 @@ namespace NodejsTests.Debugger {
                 Assert.Fail("Unexpected set EventWaitHandle");
             }
         }
-
     }
 }

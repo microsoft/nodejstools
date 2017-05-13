@@ -46,7 +46,6 @@ namespace Microsoft.NodejsTools {
             _webProjectGuid = webProjectGuid;
         }
 
-
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="Register"]' />
         /// <devdoc>
         ///     Called to register this attribute with the given context.  The context

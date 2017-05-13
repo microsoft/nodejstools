@@ -25,5 +25,4 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             Attribute = attr;
         }
     }
-
 }

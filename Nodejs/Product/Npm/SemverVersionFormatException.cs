@@ -32,6 +32,5 @@ namespace Microsoft.NodejsTools.Npm {
         public SemverVersionFormatException(string message, Exception innerException) : base(message, innerException) { }
 
         protected SemverVersionFormatException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-
     }
 }
