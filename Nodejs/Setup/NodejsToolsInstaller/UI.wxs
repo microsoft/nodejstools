@@ -123,7 +123,7 @@
         <Control Id="Description" Type="Text" X="135" Y="70" Width="220" Height="40" Transparent="yes" NoPrefix="yes" Text="!(loc.ExitDialogDescription)" />
         <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.ExitDialogTitle)" />
         <Control Id="DownloadLinkBottom" Type="Hyperlink" X="135" Y="190" Width="220" Height="10" Transparent="yes">
-          <Text><![CDATA[<a href="http://go.microsoft.com/fwlink/?LinkID=519208">Click here to install Node.js and get started with NTVS</a>]]></Text>
+          <Text><![CDATA[<a href="https://github.com/Microsoft/nodejstools/wiki/Install-Node.js-and-get-started-with-NTVS">Click here to install Node.js and get started with NTVS</a>]]></Text>
         </Control>
       </Dialog>
     </UI>
@@ -148,7 +148,7 @@
       <DialogRef Id="UserExit" />
 
       <Publish Dialog="CustomExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-     
+
       <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="1">1</Publish>
       <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="2"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
 
