@@ -309,76 +309,10 @@ namespace Microsoft.VisualStudioTools {
         }
 
         /// <summary>
-        /// Tries to create a friendly directory path: '.' if the same as base path,
-        /// relative path if short, absolute path otherwise.
-        /// </summary>
-        public static string CreateFriendlyDirectoryPath(string basePath, string path) {
-            var relativePath = GetRelativeDirectoryPath(basePath, path);
-
-            if (relativePath.Length > 1) {
-                relativePath = TrimEndSeparator(relativePath);
-            }
-
-            if (string.IsNullOrEmpty(relativePath)) {
-                relativePath = ".";
-            }
-
-            return relativePath;
-        }
-
-        /// <summary>
         /// Tries to create a friendly file path.
         /// </summary>
         public static string CreateFriendlyFilePath(string basePath, string path) {
             return GetRelativeFilePath(basePath, path);
-        }
-
-        /// <summary>
-        /// Returns the last directory segment of a path. The last segment is
-        /// assumed to be the string between the second-last and last directory
-        /// separator characters in the path. If there is no suitable substring,
-        /// the empty string is returned.
-        /// 
-        /// The first segment of the path is only returned if it does not
-        /// contain a colon. Segments equal to "." are ignored and the preceding
-        /// segment is used.
-        /// </summary>
-        /// <remarks>
-        /// This should be used in place of:
-        /// <c>Path.GetFileName(CommonUtils.TrimEndSeparator(Path.GetDirectoryName(path)))</c>
-        /// </remarks>
-        public static string GetLastDirectoryName(string path) {
-            if (string.IsNullOrEmpty(path)) {
-                return string.Empty;
-            }
-
-            int last = path.LastIndexOfAny(DirectorySeparators);
-
-            string result = string.Empty;
-            while (last > 1) {
-                int first = path.LastIndexOfAny(DirectorySeparators, last - 1);
-                if (first < 0) {
-                    if (path.IndexOf(':') < last) {
-                        // Don't want to return scheme/drive as a directory
-                        return string.Empty;
-                    }
-                    first = -1;
-                }
-                if (first == 1 && path[0] == path[1]) {
-                    // Don't return computer name in UNC path
-                    return string.Empty;
-                }
-
-                result = path.Substring(first + 1, last - (first + 1));
-                if (!string.IsNullOrEmpty(result) && result != ".") {
-                    // Result is valid
-                    break;
-                }
-
-                last = first;
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -482,23 +416,6 @@ namespace Microsoft.VisualStudioTools {
         }
 
         /// <summary>
-        /// Removes leading @"..\" segments from a path.
-        /// </summary>
-        private static string TrimUpPaths(string path) {
-            int actualStart = 0;
-            while (actualStart + 2 < path.Length) {
-                if (path[actualStart] == '.' && path[actualStart + 1] == '.' &&
-                    (path[actualStart + 2] == Path.DirectorySeparatorChar || path[actualStart + 2] == Path.AltDirectorySeparatorChar)) {
-                    actualStart += 3;
-                } else {
-                    break;
-                }
-            }
-
-            return (actualStart > 0) ? path.Substring(actualStart) : path;
-        }
-
-        /// <summary>
         /// Remove first and last quotes from path
         /// </summary>
         /// <param name="path"></param>
@@ -517,72 +434,6 @@ namespace Microsoft.VisualStudioTools {
         public static bool IsValidPath(string path) {
             return !string.IsNullOrEmpty(path) &&
                 path.IndexOfAny(InvalidPathChars) < 0;
-        }
-
-        /// <summary>
-        /// Recursively searches for a file using breadth-first-search. This
-        /// ensures that the result closest to <paramref name="root"/> is
-        /// returned first.
-        /// </summary>
-        /// <param name="root">
-        /// Directory to start searching.
-        /// </param>
-        /// <param name="file">
-        /// Filename to find. Wildcards are not supported.
-        /// </param>
-        /// <param name="depthLimit">
-        /// The number of subdirectories to search in.
-        /// </param>
-        /// <param name="firstCheck">
-        /// A sequence of subdirectories to prioritize.
-        /// </param>
-        /// <returns>
-        /// The path to the file if found, including <paramref name="root"/>;
-        /// otherwise, null.
-        /// </returns>
-        public static string FindFile(
-            string root,
-            string file,
-            int depthLimit = 2,
-            IEnumerable<string> firstCheck = null
-        ) {
-            var candidate = Path.Combine(root, file);
-            if (File.Exists(candidate)) {
-                return candidate;
-            }
-            if (firstCheck != null) {
-                foreach (var subPath in firstCheck) {
-                    candidate = Path.Combine(root, subPath, file);
-                    if (File.Exists(candidate)) {
-                        return candidate;
-                    }
-                }
-            }
-
-            // Do a BFS of the filesystem to ensure we find the match closest to
-            // the root directory.
-            var dirQueue = new Queue<string>();
-            dirQueue.Enqueue(root);
-            dirQueue.Enqueue("<EOD>");
-            while (dirQueue.Any()) {
-                var dir = dirQueue.Dequeue();
-                if (dir == "<EOD>") {
-                    depthLimit -= 1;
-                    if (depthLimit <= 0) {
-                        return null;
-                    }
-                    continue;
-                }
-                var result = Directory.EnumerateFiles(dir, file, SearchOption.TopDirectoryOnly).FirstOrDefault();
-                if (result != null) {
-                    return result;
-                }
-                foreach (var subDir in Directory.EnumerateDirectories(dir)) {
-                    dirQueue.Enqueue(subDir);
-                }
-                dirQueue.Enqueue("<EOD>");
-            }
-            return null;
         }
 
         /// <summary>
