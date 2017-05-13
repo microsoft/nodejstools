@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Npm.SPI {
     internal class Package : RootPackage, IPackage {
@@ -56,7 +57,15 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
 
         public bool IsMissing {
-            get { return IsListedInParentPackageJson && !Directory.Exists(Path); }
+            get {
+                if (!IsListedInParentPackageJson) {
+                    return false;
+                }
+                // Limit execution time of check
+                var task = new Task<bool>(() => Directory.Exists(Path));
+                task.Start();
+                return !task.Wait(250) || !task.Result;
+            }
         }
 
         public bool IsDevDependency {
