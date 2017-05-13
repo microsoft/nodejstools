@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define InstallLocationName = "NodejsProfiling" ?>
+
+    <Module Id="TestAdapter" Language="1033" Version="1.0.0.0">
+        <Package Id="bbd6629d-9796-45e4-abe8-42c4285313f0" Manufacturer="Microsoft Corporation" InstallerVersion="500" />
+
+        <?include ..\MergeModule.wxi ?>
+
+        <Component Id="PerUserInstallRegistry" Directory="Dir_VSInstallLocation" Guid="{4343be6d-ce03-4b06-9c80-f9992278a738}">
+            <Condition>NOT ALLUSERS = 1</Condition>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\EnabledExtensions'>
+                <RegistryValue Type='string' Name='0DC97272-BC95-44AC-AC05-8D6A09D6F008,$(var.ReleaseVersion)' Value='[Dir_VSInstallLocation]'/>
+            </RegistryKey>
+            <RegistryKey Root='HKCU' Key='Software\Microsoft\VisualStudio\$(var.VSTargetVersion)\ExtensionManager\ExtensionTypes'>
+                <RegistryValue Type='string' Name='0DC97272-BC95-44AC-AC05-8D6A09D6F008,$(var.ReleaseVersion)' Value='Microsoft.VisualStudio.VsPackage'/>
+            </RegistryKey>
+        </Component>
+
+        <ComponentGroupRef Id="CGroup_TestAdapterFiles"/>
+    </Module>
+</Wix>

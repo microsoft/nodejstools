@@ -29,7 +29,6 @@
             <Custom Action="SetVWDExtensionFolder" After="SetPerMachineFolder" />
         </InstallUISequence>
 
-
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="EXTENSION_INSTALLPATH">
                 <Directory Id="Dir_VSExtensionsParent" Name="Extensions">

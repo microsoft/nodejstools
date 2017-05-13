@@ -1,0 +1,21 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
+    <TargetName>TestAdapterFiles</TargetName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Registration files -->
+    <File Include="TestAdapter\extension.vsixmanifest" />
+    <File Include="Microsoft.NodejsTools.TestAdapter.pkgdef" />
+
+    <!-- Core extension -->
+    <File Include="Microsoft.NodejsTools.TestAdapter.dll" />
+      
+    <!-- Resources -->
+    <File Include="NodeJS.ico" />
+    <File Include="NodeJS_200x.png" />
+  </ItemGroup>
+
+  <Import Project="$(BuildRoot)\Nodejs\Setup\WixGenerator.targets"/>
+</Project>

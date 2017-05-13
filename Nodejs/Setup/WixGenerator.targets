@@ -5,8 +5,6 @@
     <TargetPath Condition="'$(TargetPath)' == ''">$(IntermediateOutputPath)$(TargetName)$(TargetExt)</TargetPath>
   </PropertyGroup>
 
-  
-  
   <Target Name="Build">
     <ItemGroup>
       <_SourceFiles Include="@(GACAssembly)">
