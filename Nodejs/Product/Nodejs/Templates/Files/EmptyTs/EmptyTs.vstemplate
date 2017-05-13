@@ -2,7 +2,7 @@
   <TemplateData>
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3017"/>
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3018"/>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3"/>
+    <Icon Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="3"></Icon>
     <ProjectType>Node.js</ProjectType>
     <DefaultName>TypeScript.ts</DefaultName>
     <SortOrder>200</SortOrder>
