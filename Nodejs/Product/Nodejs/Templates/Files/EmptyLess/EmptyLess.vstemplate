@@ -2,7 +2,7 @@
   <TemplateData>
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3038"/>
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3039"/>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="0"/>
+    <Icon Package="{AAB75614-2F8F-4DA6-B0A6-763C6DBB2969}" ID="2100"/>
     <ProjectType>Node.js</ProjectType>
     <DefaultName>StyleSheet.less</DefaultName>
     <SortOrder>450</SortOrder>

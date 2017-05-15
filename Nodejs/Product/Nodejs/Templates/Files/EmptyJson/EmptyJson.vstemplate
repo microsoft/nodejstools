@@ -2,7 +2,7 @@
   <TemplateData>
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3023"/>
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3024"/>
-    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="0"/>
+    <Icon Package="{AAB75614-2F8F-4DA6-B0A6-763C6DBB2969}" ID="2200"/>
     <ProjectType>Node.js</ProjectType>
     <DefaultName>Json.json</DefaultName>
     <SortOrder>420</SortOrder>

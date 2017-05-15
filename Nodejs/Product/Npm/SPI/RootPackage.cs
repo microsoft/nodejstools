@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace Microsoft.NodejsTools.Npm.SPI
@@ -54,11 +55,11 @@ The following error was reported:
 
         public string Path { get; }
 
-        public IEnumerable<string> Homepages => this.PackageJson?.Homepages;
+        public IEnumerable<string> Homepages => this.PackageJson?.Homepages ?? Enumerable.Empty<string>();
 
         public bool HasPackageJson => this.PackageJson != null;
 
-        public string Name => this.HasPackageJson ? new DirectoryInfo(this.Path).Name : this.PackageJson.Name;
+        public string Name => this.PackageJson?.Name ?? new DirectoryInfo(this.Path).Name;
 
         public SemverVersion Version => this.PackageJson?.Version ?? new SemverVersion();
 
@@ -67,4 +68,3 @@ The following error was reported:
         public string Description => this.PackageJson?.Description;
     }
 }
-
