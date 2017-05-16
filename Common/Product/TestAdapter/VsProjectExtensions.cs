@@ -81,6 +81,9 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         /// </summary>
         public static bool IsTestProject(this IVsProject project, Guid projectGuid)
         {
+            // Overload IsTestProject method to check if we should use this test adapter
+            // at all. This is much less error prone than adding this check to all locations
+            // where this method is called.
             if (!IsTestAdapaterEnabled())
             {
                 return false;
@@ -94,19 +97,25 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             return (projectTypeGuids.IndexOf(projectGuid.ToString(), StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
+        private static bool checkedRegistryForTestAdapterEnabled = false;
+        private static bool registryValueForTestAdapterEnabled = true;
+
         public static bool IsTestAdapaterEnabled()
         {
-            using (var nodeKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).CreateSubKey(NodejsConstants.BaseRegistryKey))
+            if (!checkedRegistryForTestAdapterEnabled)
             {
+                using (var nodeKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, true).CreateSubKey(NodejsConstants.BaseRegistryKey))
                 using (var optionsKey = nodeKey.CreateSubKey("Options"))
+                using (var categoryKey = optionsKey.CreateSubKey("testing"))
                 {
-                    using (var categoryKey = optionsKey.CreateSubKey("testing"))
-                    {
-                        // If the value is set to something we disable this testadapter
-                        return string.IsNullOrEmpty(categoryKey.GetValue("testadapter") as string);
-                    }
+                    // If the value is set to something we disable this testadapter
+                    registryValueForTestAdapterEnabled = string.IsNullOrEmpty(categoryKey.GetValue("testadapter") as string);
                 }
+
+                checkedRegistryForTestAdapterEnabled = true;
             }
+
+            return registryValueForTestAdapterEnabled;
         }
 
         /// <summary>
