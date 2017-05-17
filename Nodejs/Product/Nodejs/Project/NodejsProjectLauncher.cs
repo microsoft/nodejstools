@@ -32,9 +32,9 @@ namespace Microsoft.NodejsTools.Project
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
-        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
-        private static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+        public static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
+        public static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
+        internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
 
         public NodejsProjectLauncher(NodejsProjectNode project)
         {
@@ -97,28 +97,28 @@ namespace Microsoft.NodejsTools.Project
             return VSConstants.S_OK;
         }
 
-        private static bool CheckUseNewChromeDebugProtocolOption()
+        internal static bool CheckUseNewChromeDebugProtocolOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");
 
             return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "V1");
         }
 
-        private static bool CheckDebugProtocolOption()
+        internal static bool CheckDebugProtocolOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "DebugProtocol", cat: "Debugging");
 
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "chrome");
         }
 
-        private static bool CheckEnableDiagnosticLoggingOption()
+        internal static bool CheckEnableDiagnosticLoggingOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "DiagnosticLogging", cat: "Debugging");
 
             return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
         }
 
-        private static string CheckForRegistrySpecifiedNodeParams()
+        internal static string CheckForRegistrySpecifiedNodeParams()
         {
             var paramString = NodejsDialogPage.LoadString(name: "NodeCmdParams", cat: "Debugging");
 
@@ -372,7 +372,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private void StartWithChromeV2Debugger(string program, string nodeRuntimeExecutable, bool startBrowser)
+        private void StartWithChromeV2Debugger(string file, string nodePath, bool startBrowser)
         {
             var serviceProvider = _project.Site;
 
@@ -412,8 +412,8 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("name", "Debug Node.js program from Visual Studio"),
                 new JProperty("type", "node2"),
                 new JProperty("request", "launch"),
-                new JProperty("program", program),
-                new JProperty("runtimeExecutable", nodeRuntimeExecutable),
+                new JProperty("program", file),
+                new JProperty("runtimeExecutable", nodePath),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("env", JObject.FromObject(envVars)),
@@ -429,7 +429,7 @@ namespace Microsoft.NodejsTools.Project
                 new VsDebugTargetInfo4() {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
                     guidLaunchDebugEngine = WebKitDebuggerV2Guid,
-                    bstrExe = program,
+                    bstrExe = file,
                     bstrOptions = jsonContent
                 }
             };
