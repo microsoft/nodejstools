@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,30 +6,38 @@ using System.Text.RegularExpressions;
 using EnvDTE;
 using Microsoft.VisualStudio.TemplateWizard;
 
-namespace Microsoft.NodejsTools.ProjectWizard {
-    class NodejsPackageParametersExtension : IWizard {
-        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams) {
+namespace Microsoft.NodejsTools.ProjectWizard
+{
+    internal class NodejsPackageParametersExtension : IWizard
+    {
+        public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
+        {
             var projectName = replacementsDictionary["$projectname$"];
             replacementsDictionary.Add("$npmsafeprojectname$", NormalizeNpmPackageName(projectName));
         }
 
-        public void ProjectFinishedGenerating(EnvDTE.Project project) {
+        public void ProjectFinishedGenerating(EnvDTE.Project project)
+        {
             return;
         }
 
-        public void ProjectItemFinishedGenerating(ProjectItem projectItem) {
+        public void ProjectItemFinishedGenerating(ProjectItem projectItem)
+        {
             return;
         }
 
-        public bool ShouldAddProjectItem(string filePath) {
+        public bool ShouldAddProjectItem(string filePath)
+        {
             return true;
         }
 
-        public void BeforeOpeningFile(ProjectItem projectItem) {
+        public void BeforeOpeningFile(ProjectItem projectItem)
+        {
             return;
         }
 
-        public void RunFinished() {
+        public void RunFinished()
+        {
             return;
         }
 
@@ -53,7 +47,8 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         /// Normalize a project name to be a valid Npm package name: https://docs.npmjs.com/files/package.json#name
         /// </summary>
         /// <param name="projectName">Name of a VS project.</param>
-        private static string NormalizeNpmPackageName(string projectName) {
+        private static string NormalizeNpmPackageName(string projectName)
+        {
             // Remove all leading url-invalid, underscore, and period characters
             var npmProjectNameTransform = Regex.Replace(projectName, "^[^a-zA-Z0-9-~]*", string.Empty);
 
@@ -67,3 +62,4 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         }
     }
 }
+

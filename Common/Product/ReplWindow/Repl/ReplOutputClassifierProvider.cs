@@ -1,62 +1,53 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
+namespace Microsoft.NodejsTools.Repl
+{
     /// <summary>
     /// Provides the classifier for our repl error output buffer.
     /// </summary>
     [Export(typeof(IClassifierProvider)), ContentType(ReplConstants.ReplOutputContentTypeName)]
-    class ReplOutputClassifierProvider : IClassifierProvider {
-        internal readonly Dictionary<ConsoleColor, IClassificationType> _classTypes = new Dictionary<ConsoleColor, IClassificationType>();
+    internal class ReplOutputClassifierProvider : IClassifierProvider
+    {
+        private readonly Dictionary<InteractiveWindowColor, IClassificationType> classTypes = new Dictionary<InteractiveWindowColor, IClassificationType>();
 
         [ImportingConstructor]
-        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService) {
-            _classTypes[ConsoleColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);            
-            _classTypes[ConsoleColor.DarkBlue] = classificationService.GetClassificationType(InteractiveDarkBlueFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkGreen] = classificationService.GetClassificationType(InteractiveDarkGreenFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkCyan] = classificationService.GetClassificationType(InteractiveDarkCyanFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkRed] = classificationService.GetClassificationType(InteractiveDarkRedFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkMagenta] = classificationService.GetClassificationType(InteractiveDarkMagentaFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkYellow] = classificationService.GetClassificationType(InteractiveDarkYellowFormatDefinition.Name);
-            _classTypes[ConsoleColor.Gray] = classificationService.GetClassificationType(InteractiveGrayFormatDefinition.Name);
-            _classTypes[ConsoleColor.DarkGray] = classificationService.GetClassificationType(InteractiveDarkGrayFormatDefinition.Name);
-            _classTypes[ConsoleColor.Blue] = classificationService.GetClassificationType(InteractiveBlueFormatDefinition.Name);
-            _classTypes[ConsoleColor.Green] = classificationService.GetClassificationType(InteractiveGreenFormatDefinition.Name);
-            _classTypes[ConsoleColor.Cyan] = classificationService.GetClassificationType(InteractiveCyanFormatDefinition.Name);
-            _classTypes[ConsoleColor.Red] = classificationService.GetClassificationType(InteractiveRedFormatDefinition.Name);
-            _classTypes[ConsoleColor.Magenta] = classificationService.GetClassificationType(InteractiveMagentaFormatDefinition.Name);
-            _classTypes[ConsoleColor.Yellow] = classificationService.GetClassificationType(InteractiveYellowFormatDefinition.Name);
-            _classTypes[ConsoleColor.White] = classificationService.GetClassificationType(InteractiveWhiteFormatDefinition.Name);
+        public ReplOutputClassifierProvider(IClassificationTypeRegistryService classificationService)
+        {
+            classTypes[InteractiveWindowColor.Foreground] = classificationService.GetClassificationType("Text");
+            classTypes[InteractiveWindowColor.Error] = classificationService.GetClassificationType(InteractiveErrorFormatDefinition.Name);
+
+            classTypes[InteractiveWindowColor.Black] = classificationService.GetClassificationType(InteractiveBlackFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkBlue] = classificationService.GetClassificationType(InteractiveDarkBlueFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkGreen] = classificationService.GetClassificationType(InteractiveDarkGreenFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkCyan] = classificationService.GetClassificationType(InteractiveDarkCyanFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkRed] = classificationService.GetClassificationType(InteractiveDarkRedFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkMagenta] = classificationService.GetClassificationType(InteractiveDarkMagentaFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkYellow] = classificationService.GetClassificationType(InteractiveDarkYellowFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Gray] = classificationService.GetClassificationType(InteractiveGrayFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.DarkGray] = classificationService.GetClassificationType(InteractiveDarkGrayFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Blue] = classificationService.GetClassificationType(InteractiveBlueFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Green] = classificationService.GetClassificationType(InteractiveGreenFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Cyan] = classificationService.GetClassificationType(InteractiveCyanFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Red] = classificationService.GetClassificationType(InteractiveRedFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Magenta] = classificationService.GetClassificationType(InteractiveMagentaFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.Yellow] = classificationService.GetClassificationType(InteractiveYellowFormatDefinition.Name);
+            classTypes[InteractiveWindowColor.White] = classificationService.GetClassificationType(InteractiveWhiteFormatDefinition.Name);
         }
 
-        #region IClassifierProvider Members
+        public bool TryGetValue(InteractiveWindowColor key, out IClassificationType value)
+        {
+            return classTypes.TryGetValue(key, out value);
+        }
 
-        public IClassifier GetClassifier(ITextBuffer textBuffer) {
+        public IClassifier GetClassifier(ITextBuffer textBuffer)
+        {
             return new ReplOutputClassifier(this, textBuffer);
         }
-
-        #endregion
     }
 }

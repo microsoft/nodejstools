@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -27,41 +13,53 @@ using Microsoft.NodejsTools.Logging;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodejsTools.Debugger.Remote {
-    internal class NodeRemoteEnumDebugProcesses : NodeRemoteEnumDebug<IDebugProcess2>, IEnumDebugProcesses2 {
-        private class DebuggerAlreadyAttachedException : Exception {
+namespace Microsoft.NodejsTools.Debugger.Remote
+{
+    internal class NodeRemoteEnumDebugProcesses : NodeRemoteEnumDebug<IDebugProcess2>, IEnumDebugProcesses2
+    {
+        private class DebuggerAlreadyAttachedException : Exception
+        {
             public DebuggerAlreadyAttachedException()
-                : base("A debugger is already attached to this node.js process.") {
+                : base("A debugger is already attached to this node.js process.")
+            {
             }
         }
 
         public NodeRemoteEnumDebugProcesses(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory)
-            : base(Connect(port, networkClientFactory)) {
+            : base(Connect(port, networkClientFactory))
+        {
         }
 
         public NodeRemoteEnumDebugProcesses(NodeRemoteEnumDebugProcesses processes)
-            : base(processes.Element) {
+            : base(processes.Element)
+        {
         }
 
-        public int Clone(out IEnumDebugProcesses2 ppEnum) {
+        public int Clone(out IEnumDebugProcesses2 ppEnum)
+        {
             ppEnum = new NodeRemoteEnumDebugProcesses(this);
             return VSConstants.S_OK;
         }
 
         // Connect to the remote debugging server. If any errors occur, display an error dialog, and keep
         // trying for as long as user clicks "Retry".
-        private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory) {
-            if (port.Uri.Fragment == "#ping=0") {
-                return new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
+        private static NodeRemoteDebugProcess Connect(NodeRemoteDebugPort port, INetworkClientFactory networkClientFactory)
+        {
+            if (port.Uri.Fragment == "#ping=0")
+            {
+                return new NodeRemoteDebugProcess(port, "node.exe", string.Empty, string.Empty);
             }
 
             NodeRemoteDebugProcess process = null;
-            while (true) {
+            while (true)
+            {
                 Exception exception = null;
-                try {
+                try
+                {
                     LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses pinging remote host ...");
                     using (var client = networkClientFactory.CreateNetworkClient(port.Uri))
-                    using (var stream = client.GetStream()) {
+                    using (var stream = client.GetStream())
+                    {
                         // https://nodejstools.codeplex.com/workitem/578
 
                         // Node.js (V8) debugger is fragile during attach, and it's easy to put it into a bad state where it refuses
@@ -77,17 +75,18 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
 
                         // Receive greeting.
                         var buffer = new byte[1024];
-                        int len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
-                        string response = Encoding.UTF8.GetString(buffer, 0, len);
+                        var len = stream.ReadAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
+                        var response = Encoding.UTF8.GetString(buffer, 0, len);
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger greeting: " + response);
 
                         // There's no error code, so we have to do the string comparison. Luckily, it is hardcoded into V8 and is not localized.
-                        if (response == "Remote debugging session already active\r\n") {
+                        if (response == "Remote debugging session already active\r\n")
+                        {
                             throw new DebuggerAlreadyAttachedException();
                         }
 
                         // Send "disconnect" request.
-                        string request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
+                        var request = @"{""command"":""disconnect"",""seq"":1,""type"":""request"",""arguments"":null}";
                         request = string.Format(CultureInfo.InvariantCulture, "Content-Length: {0}\r\n\r\n{1}", request.Length, request);
                         buffer = Encoding.UTF8.GetBytes(request);
                         stream.WriteAsync(buffer, 0, buffer.Length, new CancellationTokenSource(5000).Token).GetAwaiter().GetResult();
@@ -99,31 +98,47 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses debugger response: " + response);
 
                         // If we got to this point, the debuggee is behaving as expected, and we can report it as a valid Node.js process.
-                        process = new NodeRemoteDebugProcess(port, "node.exe", String.Empty, String.Empty);
+                        process = new NodeRemoteDebugProcess(port, "node.exe", string.Empty, string.Empty);
                         LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping successful.");
                         break;
                     }
-                } catch (OperationCanceledException) {
+                }
+                catch (OperationCanceledException)
+                {
                     LiveLogger.WriteLine("NodeRemoteEnumDebugProcesses ping timed out.");
-                } catch (DebuggerAlreadyAttachedException ex) {
+                }
+                catch (DebuggerAlreadyAttachedException ex)
+                {
                     LiveLogger.WriteLine("DebuggerAlreadyAttachedException connecting to remote debugger");
                     exception = ex;
-                } catch (AggregateException ex) {
+                }
+                catch (AggregateException ex)
+                {
                     LiveLogger.WriteLine("AggregateException connecting to remote debugger");
                     exception = ex;
-                } catch (IOException ex) {
+                }
+                catch (IOException ex)
+                {
                     LiveLogger.WriteLine("IOException connecting to remote debugger");
                     exception = ex;
-                } catch (InvalidOperationException ex) {
+                }
+                catch (InvalidOperationException ex)
+                {
                     LiveLogger.WriteLine("InvalidOperationException connecting to remote debugger");
                     exception = ex;
-                } catch (SocketException ex) {
+                }
+                catch (SocketException ex)
+                {
                     LiveLogger.WriteLine("SocketException connecting to remote debugger");
                     exception = ex;
-                } catch (WebSocketException ex) {
+                }
+                catch (WebSocketException ex)
+                {
                     LiveLogger.WriteLine("WebSocketException connecting to remote debugger");
                     exception = ex;
-                } catch (PlatformNotSupportedException) {
+                }
+                catch (PlatformNotSupportedException)
+                {
                     LiveLogger.WriteLine("PlatformNotSupportedException connecting to remote debugger");
                     MessageBox.Show(
                         Resources.RemoteDebugUnsupportedPlatformErrorMessage,
@@ -131,26 +146,33 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
                     return null;
                 }
 
-                if (exception != null) {
-                    while (exception.InnerException != null) {
+                if (exception != null)
+                {
+                    while (exception.InnerException != null)
+                    {
                         exception = exception.InnerException;
                     }
                 }
 
-                string errText = string.Format(CultureInfo.CurrentCulture,
+                var errText = string.Format(CultureInfo.CurrentCulture,
                     Resources.RemoteDebugCouldNotAttachErrorMessage,
                     port.Uri,
                     exception != null ? ":\r\n\r\n" + exception.Message : ".");
-                if (!(exception is DebuggerAlreadyAttachedException)) {
-                    if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss") {
+                if (!(exception is DebuggerAlreadyAttachedException))
+                {
+                    if (port.Uri.Scheme == "ws" || port.Uri.Scheme == "wss")
+                    {
                         errText += Resources.RemoteDebugEnableWebSocketsErrorMessage;
-                    } else {
+                    }
+                    else
+                    {
                         errText += string.Format(CultureInfo.CurrentCulture, Resources.RemoteDebugCheckProxyAndPortErrorMessage, NodejsConstants.DefaultDebuggerPort);
                     }
                 }
 
-                DialogResult dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-                if (dlgRes != DialogResult.Retry) {
+                var dlgRes = MessageBox.Show(errText, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                if (dlgRes != DialogResult.Retry)
+                {
                     break;
                 }
             }
@@ -159,3 +181,4 @@ namespace Microsoft.NodejsTools.Debugger.Remote {
         }
     }
 }
+

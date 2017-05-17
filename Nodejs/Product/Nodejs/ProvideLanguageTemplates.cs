@@ -1,25 +1,11 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.NodejsTools {
-
+namespace Microsoft.NodejsTools
+{
     /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute"]' />
     /// <devdoc>
     ///     This attribute associates a file extension to a given editor factory.  
@@ -30,22 +16,23 @@ namespace Microsoft.NodejsTools {
     /// a linked editor GUID can be supplied.
     /// </devdoc>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    internal sealed class ProvideLanguageTemplatesAttribute : RegistrationAttribute {
+    internal sealed class ProvideLanguageTemplatesAttribute : RegistrationAttribute
+    {
         private readonly string _projectFactory, _languageName, _package, _languageGuid, _description,
             _codeFileExtension, _templateFolder, _webProjectGuid;
 
         public ProvideLanguageTemplatesAttribute(string projectFactory, string languageName, string package,
-            string templateGroup, string description, string languageProjectGuid, string codeFileExtension, string templateFolder, string webProjectGuid) {
-            _projectFactory = projectFactory;
-            _languageName = languageName;
-            _package = package;
-            _description = description;
-            _languageGuid = languageProjectGuid;
-            _codeFileExtension = codeFileExtension;
-            _templateFolder = templateGroup;
-            _webProjectGuid = webProjectGuid;
+            string templateGroup, string description, string languageProjectGuid, string codeFileExtension, string templateFolder, string webProjectGuid)
+        {
+            this._projectFactory = projectFactory;
+            this._languageName = languageName;
+            this._package = package;
+            this._description = description;
+            this._languageGuid = languageProjectGuid;
+            this._codeFileExtension = codeFileExtension;
+            this._templateFolder = templateGroup;
+            this._webProjectGuid = webProjectGuid;
         }
-
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="Register"]' />
         /// <devdoc>
@@ -56,28 +43,34 @@ namespace Microsoft.NodejsTools {
         ///     This method is called both for registration and unregistration.  The difference is
         ///     that unregistering just uses a hive that reverses the changes applied to it.
         /// </devdoc>
-        public override void Register(RegistrationContext context) {
-            string langTemplates = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\LanguageTemplates", _projectFactory);
+        public override void Register(RegistrationContext context)
+        {
+            var langTemplates = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\LanguageTemplates", this._projectFactory);
 
-            using (Key projectKey = context.CreateKey(langTemplates)) {
-                projectKey.SetValue(_languageGuid, _webProjectGuid);
+            using (var projectKey = context.CreateKey(langTemplates))
+            {
+                projectKey.SetValue(this._languageGuid, this._webProjectGuid);
             }
 
-            var newProject = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}", _webProjectGuid);
-            using (Key projectKey = context.CreateKey(newProject)) {
-                projectKey.SetValue(null, _description);
-                projectKey.SetValue("Language(VsTemplate)", _languageName);
-                projectKey.SetValue("Package", _package);
+            var newProject = string.Format(CultureInfo.InvariantCulture, "Projects\\{0}", this._webProjectGuid);
+            using (var projectKey = context.CreateKey(newProject))
+            {
+                projectKey.SetValue(null, this._description);
+                projectKey.SetValue("Language(VsTemplate)", this._languageName);
+                projectKey.SetValue("Package", this._package);
                 projectKey.SetValue("ShowOnlySpecifiedTemplates(VsTemplate)", 0);
 
-                using (Key propKey = projectKey.CreateSubkey("WebApplicationProperties")) {
-                    propKey.SetValue("CodeFileExtension", _codeFileExtension);
-                    propKey.SetValue("TemplateFolder", _templateFolder);
+                using (var propKey = projectKey.CreateSubkey("WebApplicationProperties"))
+                {
+                    propKey.SetValue("CodeFileExtension", this._codeFileExtension);
+                    propKey.SetValue("TemplateFolder", this._templateFolder);
                 }
             }
         }
 
-        public override void Unregister(RegistrationContext context) {
+        public override void Unregister(RegistrationContext context)
+        {
         }
     }
 }
+

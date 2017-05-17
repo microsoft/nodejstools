@@ -1,28 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
-  <Choose>
-    <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
-      <PropertyGroup>
-        <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-        <FileUpgradeFlags>
-        </FileUpgradeFlags>
-        <UpgradeBackupLocation>
-        </UpgradeBackupLocation>
-        <OldToolsVersion>4.0</OldToolsVersion>
-      </PropertyGroup>
-    </When>
-    <When Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
-      <PropertyGroup>
-        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
-        <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-        <FileUpgradeFlags>
-        </FileUpgradeFlags>
-        <UpgradeBackupLocation>
-        </UpgradeBackupLocation>
-        <OldToolsVersion>4.0</OldToolsVersion>
-      </PropertyGroup>
-    </When>
-  </Choose>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+  </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -44,11 +29,7 @@
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootSuffix Exp /Log</StartArguments>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <!--
-    Setting the UICulture places the resources in satellite assemblies, so only do this for Dev15 and later
-    For details on WPF localization, see https://msdn.microsoft.com/en-us/library/ms788718(v=vs.110).aspx
-    -->
-    <UICulture Condition="'$(VSTarget)'=='15.0'">en</UICulture>
+    <UICulture>en</UICulture>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -73,8 +54,14 @@
     </VSTemplate>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Imaging, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationInsights.PersistenceChannel, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.3\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Imaging, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <!-- 
     Temporarily freeze versions of some interop assemblies 
     TODO: https://github.com/Microsoft/nodejstools/issues/759 
@@ -82,10 +69,14 @@
     <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.8.24\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Utilities, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -99,6 +90,25 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Validation, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.0.82\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -115,7 +125,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.JScript" />
     <Reference Include="Microsoft.NodejsTools.Telemetry">
-      <HintPath>..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll</HintPath>
+      <HintPath>..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.15.0.dll</HintPath>
     </Reference>
     <Reference Include="microsoft.msxml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -147,7 +157,7 @@
     <Reference Include="Microsoft.VisualStudio.Text.UI, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
-    <Reference Include="Microsoft.VisualStudio.Shell.$(VSTarget), Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.15.0, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.WindowsAzure.CommonAzureTools.Contracts">
       <SpecificVersion>False</SpecificVersion>
@@ -183,42 +193,11 @@
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <Choose>
-    <When Condition="$(VSTarget) == '15.0'">
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-        <Reference Include="Microsoft.VisualStudio.Validation, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-          <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.0.55-pre\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-        <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-          <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.100-pre\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-        <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-          <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.100-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-        <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-          <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.100-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-        <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" Condition="'$(VSTarget)' != '10.0'" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
   <ItemGroup>
-    <OutputBinariesToSign Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
+    <OutputBinariesToSign Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
@@ -227,20 +206,12 @@
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
-    <Compile Include="Commands\DiagnosticsCommand.cs" />
-    <Compile Include="Commands\DiagnosticsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Commands\DiagnosticsForm.Designer.cs">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\SendFeedbackCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
     <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
     <Compile Include="Commands\ShowDocumentationCommand.cs" />
-    <Compile Include="Commands\SurveyNewsCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
     <Compile Include="ImportWizardResources.Designer.cs">
@@ -248,7 +219,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportWizardResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Debugger\FilePosition.cs" />
     <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
     <Compile Include="Debugger\IFileNameMapper.cs" />
@@ -257,57 +227,23 @@
     <Compile Include="Debugger\ScriptTree.cs" />
     <Compile Include="Logging\InMemoryLogger.cs" />
     <Compile Include="Logging\INodejsToolsLogger.cs" />
+    <Compile Include="Logging\LiveLogger.cs" />
     <Compile Include="Logging\NodejsToolsLogEvent.cs" />
     <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
-    <Compile Include="NpmUI\NpmInstallOutputWindowResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>NpmInstallOutputWindowResources.resx</DependentUpon>
-    </Compile>
+    <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="NpmUI\NpmInstallWindowResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>NpmInstallWindowResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="NpmUI\NpmOutputWindow.xaml.cs">
-      <DependentUpon>NpmOutputWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NpmUI\NpmOutputViewModel.cs" />
+    <Compile Include="NpmUI\NpmWorker.cs" />
     <Compile Include="NpmUI\NpmPackageInstallViewModel.cs" />
     <Compile Include="NpmUI\NpmPackageInstallWindow.xaml.cs">
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
-    <Compile Include="Options\TypingsInfoBar.cs" />
-    <Compile Include="Options\NodejsDiagnosticsOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsNpmOptionsControl.Designer.cs">
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsControl.Designer.cs">
-      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsIntellisenseOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\SalsaLsIntellisenseOptionsControl.Designer.cs">
-      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Project\AzureToolsContracts.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
@@ -344,39 +280,6 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
-    <Compile Include="Options\NodejsFormattingDialogPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingBracesOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingGeneralOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Options\NodejsFormattingSpacingOptionsControl.Designer.cs">
-      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NodejsLanguageInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
@@ -480,7 +383,6 @@
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NodejsToolsInstallPath.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
-    <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="Options\NodejsDialogPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -493,7 +395,6 @@
     <Compile Include="Options\NodejsGeneralOptionsControl.Designer.cs">
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\SurveyNewsPolicy.cs" />
     <Compile Include="Project\AbstractNpmNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
       <DependentUpon>StartupPage.xaml</DependentUpon>
@@ -508,10 +409,6 @@
     <Compile Include="Project\ImportWizard\ImportWizard.xaml.cs">
       <DependentUpon>ImportWizard.xaml</DependentUpon>
     </Compile>
-    <Page Include="NpmUI\NpmOutputWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="NpmUI\NpmPackageInstallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -553,7 +450,6 @@
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
-    <Compile Include="TypingsAcquisition.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
     <Compile Include="Debugger\BreakpointBindingEventArgs.cs" />
@@ -628,36 +524,7 @@
       <Visible>true</Visible>
     </Compile>
   </ItemGroup>
-  <!-- only include the loc files for VS 15 -->
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Resources.resx">
-      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
-      <Visible>true</Visible>
-      <SubType>Designer</SubType>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ImportWizardResources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
-      <SubType>Designer</SubType>
-    </ConditionalEmbeddedResource>
-    <VSCTCompile Include="NodejsTools.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
-    </VSCTCompile>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="ImportWizardResources.cs.resx" />
     <EmbeddedResource Include="ImportWizardResources.de.resx" />
     <EmbeddedResource Include="ImportWizardResources.en.resx">
@@ -825,38 +692,7 @@
       <LogicalName>VSPackage.zh-Hant.Resources</LogicalName>
     </ConditionalEmbeddedResource>
   </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Commands\DiagnosticsForm.resx">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>NpmInstallOutputWindowResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.cs.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.de.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.es.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.fr.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.it.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ja.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ko.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pl.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.pt-BR.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.ru.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.tr.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hans.resx" />
-    <EmbeddedResource Include="NpmUI\NpmInstallOutputWindowResources.zh-Hant.resx" />
+  <ItemGroup>
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>NpmInstallWindowResources.Designer.cs</LastGenOutput>
@@ -874,35 +710,8 @@
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.tr.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hans.resx" />
     <EmbeddedResource Include="NpmUI\NpmInstallWindowResources.zh-Hant.resx" />
-    <EmbeddedResource Include="Commands\DiagnosticsForm.en.resx">
-      <DependentUpon>DiagnosticsForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Options\NodejsIntellisenseOptionsControl.resx">
-      <DependentUpon>NodejsIntellisenseOptionsControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingBracesOptionsControl.resx">
-      <DependentUpon>NodejsFormattingBracesOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingGeneralOptionsControl.resx">
-      <DependentUpon>NodejsFormattingGeneralOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsFormattingSpacingOptionsControl.resx">
-      <DependentUpon>NodejsFormattingSpacingOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\SalsaLsIntellisenseOptionsControl.resx">
-      <DependentUpon>SalsaLsIntellisenseOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.resx">
-      <DependentUpon>NewFileNameForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NewFileNameForm.cs</DependentUpon>
@@ -921,12 +730,7 @@
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NewFileMenuGroup\NewFileNameForm.zh-Hant.resx" />
   </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
-      <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
@@ -945,12 +749,7 @@
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hans.resx" />
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.zh-Hant.resx" />
   </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.resx">
-      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.en.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
@@ -969,30 +768,6 @@
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.tr.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hans.resx" />
     <EmbeddedResource Include="Options\NodejsGeneralOptionsControl.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.resx">
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <DependentUpon>NodejsNpmOptionsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.cs.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.de.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.es.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.fr.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.it.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ja.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ko.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pl.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.pt-BR.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.ru.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.tr.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hans.resx" />
-    <EmbeddedResource Include="Options\NodejsNpmOptionsControl.zh-Hant.resx" />
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
@@ -1294,7 +1069,9 @@
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.njsproj" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.vstemplate" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
@@ -1395,10 +1172,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
-    </Content>
-    <Content Include="NoSurveyNewsFeed.html">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

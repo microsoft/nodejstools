@@ -1,24 +1,12 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
 
-namespace Microsoft.NodejsTools {
-    internal class NodejsConstants {
+namespace Microsoft.NodejsTools
+{
+    internal static class NodejsConstants
+    {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
         internal const string TypeScriptDeclarationExtension = ".d.ts";
@@ -56,44 +44,33 @@ namespace Microsoft.NodejsTools {
         internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
         internal const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
 
-        public static string NtvsLocalAppData {
-            get {
-                return Path.Combine(
+        public static string NtvsLocalAppData => Path.Combine(
                     System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
                     "Microsoft",
                     "Node.js Tools");
-            }
-        }
 
         /// <summary>
         /// Path to the private package where NTVS tools are installed.
         /// </summary>
-        public static string ExternalToolsPath {
-            get {
-                return Path.Combine(NtvsLocalAppData, "ExternalTools");
-            }
-
-        }
+        public static string ExternalToolsPath => Path.Combine(NtvsLocalAppData, "ExternalTools");
         /// <summary>
         /// Path to where NTVS caches Npm data.
         /// </summary>
-        public static string NpmCachePath {
-            get {
-                return Path.Combine(NtvsLocalAppData, "NpmCache");
-            }
-        }
+        public static string NpmCachePath => Path.Combine(NtvsLocalAppData, "NpmCache");
 
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
-        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path) {
-            string tmp = "\\" + path + "\\";
+        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
+        {
+            var tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 
-    internal static class NodeProjectProperty {
+    internal static class NodeProjectProperty
+    {
         internal const string DebuggerPort = "DebuggerPort";
         internal const string EnableTypeScript = "EnableTypeScript";
         internal const string Environment = "Environment";

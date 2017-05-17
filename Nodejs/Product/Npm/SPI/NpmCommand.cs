@@ -1,132 +1,144 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudioTools.Project;
-using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class NpmCommand : AbstractNpmLogSource {
-        private readonly string _fullPathToRootPackageDirectory;
-        private string _pathToNpm;
-        private readonly ManualResetEvent _cancellation;
-        private readonly StringBuilder _output = new StringBuilder();
-        private StringBuilder _error = new StringBuilder();
-        private readonly object _bufferLock = new object();
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal abstract class NpmCommand : AbstractNpmLogSource
+    {
+        private string pathToNpm;
+
+        private readonly StringBuilder output = new StringBuilder();
+
+        private StringBuilder error = new StringBuilder();
+
+        private readonly ManualResetEvent cancellation = new ManualResetEvent(false);
+        private readonly object bufferLock = new object();
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
-            string pathToNpm = null) {
-            _fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
-            _pathToNpm = pathToNpm;
-            _cancellation = new ManualResetEvent(false);
+            string pathToNpm = null)
+        {
+            this.FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            this.pathToNpm = pathToNpm;
         }
 
         protected string Arguments { get; set; }
 
-        internal string FullPathToRootPackageDirectory {
-            get { return _fullPathToRootPackageDirectory; }
-        }
+        internal string FullPathToRootPackageDirectory { get; }
 
-        protected string GetPathToNpm() {
-            if (null == _pathToNpm || !File.Exists(_pathToNpm)) {
-                _pathToNpm = NpmHelpers.GetPathToNpm();
+        protected string GetPathToNpm()
+        {
+            if (string.IsNullOrEmpty(this.pathToNpm) || !File.Exists(this.pathToNpm))
+            {
+                this.pathToNpm = NpmHelpers.GetPathToNpm();
             }
-            return _pathToNpm;
+            return this.pathToNpm;
         }
 
-        public string StandardOutput {
-            get {
-                lock (_bufferLock) {
-                    return _output.ToString();
+        public string StandardOutput
+        {
+            get
+            {
+                lock (this.bufferLock)
+                {
+                    return this.output.ToString();
                 }
             }
         }
 
-        public string StandardError {
-            get {
-                lock (_bufferLock) {
-                    return _error.ToString();
+        public string StandardError
+        {
+            get
+            {
+                lock (this.bufferLock)
+                {
+                    return this.error.ToString();
                 }
             }
         }
 
-        public void CancelCurrentTask() {
-            _cancellation.Set();
+        public void CancelCurrentTask()
+        {
+            this.cancellation.Set();
         }
 
-        public virtual async Task<bool> ExecuteAsync() {
+        public virtual async Task<bool> ExecuteAsync()
+        {
             OnCommandStarted();
             var redirector = new NpmCommandRedirector(this);
 
-            try {
+            try
+            {
                 GetPathToNpm();
-            } catch (NpmNotFoundException) {
+            }
+            catch (NpmNotFoundException)
+            {
                 redirector.WriteErrorLine(Resources.CouldNotFindNpm);
                 return false;
             }
             redirector.WriteLine(
                 string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
-                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, Arguments)));
+                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, this.Arguments)));
 
             var cancelled = false;
-            try {
+            try
+            {
                 await NpmHelpers.ExecuteNpmCommandAsync(
                     redirector,
                     GetPathToNpm(),
-                    _fullPathToRootPackageDirectory,
-                    new[] { Arguments },
-                    _cancellation);
-            } catch (OperationCanceledException) {
+                    this.FullPathToRootPackageDirectory,
+                    new[] { this.Arguments },
+                    this.cancellation);
+            }
+            catch (OperationCanceledException)
+            {
                 cancelled = true;
             }
-            OnCommandCompleted(Arguments, redirector.HasErrors, cancelled);
+            OnCommandCompleted(this.Arguments, redirector.HasErrors, cancelled);
             return !redirector.HasErrors;
         }
 
-        internal class NpmCommandRedirector : Redirector {
-            NpmCommand _owner;
-            
-            public NpmCommandRedirector(NpmCommand owner) {
-                _owner = owner;
+        internal class NpmCommandRedirector : Redirector
+        {
+            private NpmCommand _owner;
+
+            public NpmCommandRedirector(NpmCommand owner)
+            {
+                this._owner = owner;
             }
 
             public bool HasErrors { get; private set; }
 
-            private string AppendToBuffer(StringBuilder buffer, string data) {
-                if (data != null) {
-                    lock (_owner._bufferLock) {
+            private string AppendToBuffer(StringBuilder buffer, string data)
+            {
+                if (data != null)
+                {
+                    lock (this._owner.bufferLock)
+                    {
                         buffer.Append(data + Environment.NewLine);
                     }
                 }
                 return data;
             }
 
-            public override void WriteLine(string line) {
-                _owner.OnOutputLogged(AppendToBuffer(_owner._output, line));
+            public override void WriteLine(string line)
+            {
+                this._owner.OnOutputLogged(AppendToBuffer(this._owner.output, line));
             }
 
-            public override void WriteErrorLine(string line) {
-                HasErrors = true;
-                _owner.OnErrorLogged(AppendToBuffer(_owner._error, line));
+            public override void WriteErrorLine(string line)
+            {
+                this.HasErrors = true;
+                this._owner.OnErrorLogged(AppendToBuffer(this._owner.error, line));
             }
         }
     }
 }
+

@@ -1,27 +1,15 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests {
+namespace NpmTests
+{
     [TestClass]
-    public class PackageJsonDependencyTests : AbstractPackageJsonTests {
+    public class PackageJsonDependencyTests : AbstractPackageJsonTests
+    {
         /*
          { "dependencies" :
           { "foo" : "1.0.0 - 2.9999.9999"
@@ -339,32 +327,38 @@ namespace NpmTests {
             "github"
         };
 
-        private void CheckEmptyDependenciesNotNull(IDependencies dependencies) {
+        private void CheckEmptyDependenciesNotNull(IDependencies dependencies)
+        {
             Assert.IsNotNull(dependencies, "Dependencies should not be null.");
             Assert.AreEqual(0, dependencies.Count, "Should not be any dependencies.");
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyDependenciesNotNull() {
+        public void ReadEmptyDependenciesNotNull()
+        {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).Dependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyDevDependenciesNotNull() {
+        public void ReadEmptyDevDependenciesNotNull()
+        {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).DevDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadEmptyOptionalDependenciesNotNull() {
+        public void ReadEmptyOptionalDependenciesNotNull()
+        {
             CheckEmptyDependenciesNotNull(LoadFrom(PkgSimple).OptionalDependencies);
         }
 
         private void CheckDependencies(
             IDictionary<string, IDependency> retrieved,
             IEnumerable<string[]> expected,
-            int expectedCount) {
+            int expectedCount)
+        {
             Assert.AreEqual(expectedCount, retrieved.Count, "Retrieved dependency count mismatch.");
-            foreach (var pair in expected) {
+            foreach (var pair in expected)
+            {
                 var dependency = retrieved[pair[0]];
                 Assert.IsNotNull(
                     dependency,
@@ -380,7 +374,9 @@ namespace NpmTests {
                         pair[1],
                         dependency.VersionRangeText,
                         string.Format("Version range mismatch for package '{0}'.", pair[0]));
-                } else {
+                }
+                else
+                {
                     Assert.IsNull(
                         dependency.VersionRangeText,
                         "Dependency with URL should not specify version range text.");
@@ -389,11 +385,15 @@ namespace NpmTests {
                     string address = url.Address;
                     Assert.IsNotNull(address, "Dependency URL address should not be null.");
                     var index = address.IndexOf("://");
-                    if (index < 0) {
+                    if (index < 0)
+                    {
                         Assert.AreEqual(DependencyUrlType.GitHub, url.Type, "Dependency URL type should be GitHub");
-                    } else {
+                    }
+                    else
+                    {
                         var prefix = address.Substring(0, index);
-                        switch (prefix) {
+                        switch (prefix)
+                        {
                             case "http":
                                 Assert.AreEqual(DependencyUrlType.Http, url.Type, "Dependency URL type should be Http.");
                                 break;
@@ -432,62 +432,75 @@ namespace NpmTests {
             }
         }
 
-        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected) {
+        private void CheckDependencies(IDictionary<string, IDependency> retrieved, IEnumerable<string[]> expected)
+        {
             CheckDependencies(retrieved, expected, 16);
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies, int expectedCount) {
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies, int expectedCount)
+        {
             Assert.AreEqual(expectedCount, dependencies.Count, "Dependency count mismatch.");
 
             var retrieved = new Dictionary<string, IDependency>();
-            foreach (var dependency in dependencies) {
+            foreach (var dependency in dependencies)
+            {
                 retrieved[dependency.Name] = dependency;
             }
             return retrieved;
         }
 
-        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies) {
+        private IDictionary<string, IDependency> ReadDependencies(IDependencies dependencies)
+        {
             return ReadDependencies(dependencies, 16);
         }
 
-        private IDictionary<string, IDependency> ReadDependencies() {
+        private IDictionary<string, IDependency> ReadDependencies()
+        {
             return ReadDependencies(LoadFrom(PkgDependencies).Dependencies);
         }
 
-        private IDictionary<string, IDependency> ReadDevDependencies() {
+        private IDictionary<string, IDependency> ReadDevDependencies()
+        {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).DevDependencies);
         }
 
-        private IDictionary<string, IDependency> ReadOptionalDependencies() {
+        private IDictionary<string, IDependency> ReadOptionalDependencies()
+        {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).OptionalDependencies);
         }
 
-        private IDictionary<string, IDependency> ReadAllDependencies() {
+        private IDictionary<string, IDependency> ReadAllDependencies()
+        {
             return ReadDependencies(LoadFrom(PkgAllTheDependencies).AllDependencies, 48);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadDependenciesWithVersionRange() {
+        public void ReadDependenciesWithVersionRange()
+        {
             CheckDependencies(ReadDependencies(), VersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadDependenciesWithUrls() {
+        public void ReadDependenciesWithUrls()
+        {
             CheckDependencies(ReadDependencies(), UrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadDevDependenciesWithVersionRange() {
+        public void ReadDevDependenciesWithVersionRange()
+        {
             CheckDependencies(ReadDevDependencies(), DevVersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadDevDependenciesWithUrls() {
+        public void ReadDevDependenciesWithUrls()
+        {
             CheckDependencies(ReadDevDependencies(), DevUrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadBundledDependencies() {
+        public void ReadBundledDependencies()
+        {
             CheckStringArrayContents(
                 LoadFrom(PkgAllTheDependencies).BundledDependencies,
                 16,
@@ -495,7 +508,8 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadBundleDependencies() {
+        public void ReadBundleDependencies()
+        {
             CheckStringArrayContents(
                 LoadFrom(PkgBundleDependencies).BundledDependencies,
                 16,
@@ -503,17 +517,20 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadOptionalDependenciesWithVersionRange() {
+        public void ReadOptionalDependenciesWithVersionRange()
+        {
             CheckDependencies(ReadOptionalDependencies(), OptionalVersionRangeDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadOptionalDependenciesWithUrls() {
+        public void ReadOptionalDependenciesWithUrls()
+        {
             CheckDependencies(ReadOptionalDependencies(), OptionalUrlDependencies);
         }
 
         [TestMethod, Priority(0)]
-        public void ReadAllDependenciesTest() {
+        public void ReadAllDependenciesTest()
+        {
             CheckDependencies(
                 ReadAllDependencies(),
                 UrlDependencies.Concat(VersionRangeDependencies)
@@ -525,3 +542,4 @@ namespace NpmTests {
         }
     }
 }
+

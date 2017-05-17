@@ -295,7 +295,6 @@
       <IDSymbol name="perfSingleReportCtxMenuGroup" value="0x3002"/>
       <IDSymbol name="perfToolbarGroup" value="0x3003"/>
 
-
     </GuidSymbol>
 
     <GuidSymbol name="guidCmdBarImages" value="{BC22C615-8919-4E24-8F74-A02435F1E7D3}">

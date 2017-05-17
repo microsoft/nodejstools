@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,25 +6,28 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Represents the result of an evaluation of an expression against a given stack frame.
     /// </summary>
-    internal class NodeEvaluationResult {
+    internal class NodeEvaluationResult
+    {
         private readonly Regex _stringLengthExpression = new Regex(@"\.\.\. \(length: ([0-9]+)\)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Creates an evaluation result for an expression which successfully returned a value.
         /// </summary>
-        public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame) {
-            Handle = handle;
-            Frame = frame;
-            Expression = expression;
-            StringValue = stringValue;
-            HexValue = hexValue;
-            TypeName = typeName;
-            FullName = fullName;
-            Type = type;
+        public NodeEvaluationResult(int handle, string stringValue, string hexValue, string typeName, string expression, string fullName, NodeExpressionType type, NodeStackFrame frame)
+        {
+            this.Handle = handle;
+            this.Frame = frame;
+            this.Expression = expression;
+            this.StringValue = stringValue;
+            this.HexValue = hexValue;
+            this.TypeName = typeName;
+            this.FullName = fullName;
+            this.Type = type;
         }
 
         /// <summary>
@@ -49,10 +38,7 @@ namespace Microsoft.NodejsTools.Debugger {
         /// <summary>
         /// Gets the string representation length.
         /// </summary>
-        public int StringLength {
-            get { return GetStringLength(StringValue); }
-        }
-
+        public int StringLength => GetStringLength(this.StringValue);
         /// <summary>
         /// Gets the string representation of this evaluation in hexadecimal or null if the hex value was not computable.
         /// </summary>
@@ -96,21 +82,26 @@ namespace Microsoft.NodejsTools.Debugger {
         /// "foo" or "0" so they need additional work to append onto this expression.
         /// Returns null if the object is not expandable.
         /// </summary>
-        public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken()) {
-            if (!Type.HasFlag(NodeExpressionType.Expandable)) {
+        public async Task<List<NodeEvaluationResult>> GetChildrenAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            if (!this.Type.HasFlag(NodeExpressionType.Expandable))
+            {
                 return null;
             }
 
-            return await Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
+            return await this.Frame.Process.EnumChildrenAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
-        private int GetStringLength(string stringValue) {
-            if (string.IsNullOrEmpty(stringValue)) {
+        private int GetStringLength(string stringValue)
+        {
+            if (string.IsNullOrEmpty(stringValue))
+            {
                 return 0;
             }
 
-            Match match = _stringLengthExpression.Match(stringValue);
-            if (!match.Success) {
+            var match = this._stringLengthExpression.Match(stringValue);
+            if (!match.Success)
+            {
                 return stringValue.Length;
             }
 
@@ -118,3 +109,4 @@ namespace Microsoft.NodejsTools.Debugger {
         }
     }
 }
+

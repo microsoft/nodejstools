@@ -1,30 +1,20 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests {
+namespace NpmTests
+{
     [TestClass]
-    public class InstallUninstallPackageTests : AbstractPackageJsonTests {
+    public class InstallUninstallPackageTests : AbstractPackageJsonTests
+    {
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void AddPackageToSimplePackageJsonThenUninstall() {
-            using (var manager = new TemporaryFileManager()) {
+        public void AddPackageToSimplePackageJsonThenUninstall()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.Refresh();
@@ -32,7 +22,8 @@ namespace NpmTests {
                 Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
                 Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard, true);
                     task.Wait();
                 }
@@ -59,7 +50,8 @@ namespace NpmTests {
                 Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
                 Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.UninstallPackageAsync("sax");
                     task.Wait();
                 }
@@ -76,8 +68,10 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void AddPackageNoPackageJsonThenUninstall() {
-            using (var manager = new TemporaryFileManager()) {
+        public void AddPackageNoPackageJsonThenUninstall()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 File.Delete(Path.Combine(rootDir, "package.json"));
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
@@ -86,7 +80,8 @@ namespace NpmTests {
                 Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
                 Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard, true);
                     task.Wait();
                 }
@@ -113,7 +108,8 @@ namespace NpmTests {
                 Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
                 Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.UninstallPackageAsync("sax");
                     task.Wait();
                 }
@@ -130,8 +126,10 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void AddPackageNoSavePackageJsonThenUninstall() {
-            using (var manager = new TemporaryFileManager()) {
+        public void AddPackageNoSavePackageJsonThenUninstall()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var controller = NpmControllerFactory.Create(rootDir, string.Empty);
                 controller.Refresh();
@@ -139,7 +137,8 @@ namespace NpmTests {
                 Assert.IsNotNull(rootPackage, "Root package with no dependencies should not be null.");
                 Assert.AreEqual(0, rootPackage.Modules.Count, "Should be no modules before package install.");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.InstallPackageByVersionAsync("sax", "*", DependencyType.Standard, false);
                     task.Wait();
                 }
@@ -166,7 +165,8 @@ namespace NpmTests {
                 Assert.IsFalse(module.IsBundledDependency, "Should not be marked as bundled dependency.");
                 Assert.IsTrue(module.HasPackageJson, "Module should have its own package.json");
 
-                using (var commander = controller.CreateNpmCommander()) {
+                using (var commander = controller.CreateNpmCommander())
+                {
                     Task<bool> task = commander.UninstallPackageAsync("sax");
                     task.Wait();
                 }
@@ -183,3 +183,4 @@ namespace NpmTests {
         }
     }
 }
+

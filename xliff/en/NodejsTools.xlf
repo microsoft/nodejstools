@@ -152,18 +152,6 @@
       <trans-unit id="cmdidAzureExplorerAttachNodejsDebugger|CommandName">
         <source xml:lang="en">Attach Node.js Debugger</source>
       </trans-unit>
-      <trans-unit id="cmdidDiagnostics|ButtonText">
-        <source xml:lang="en">&amp;Diagnostic Info...</source>
-      </trans-unit>
-      <trans-unit id="cmdidDiagnostics|ToolTipText">
-        <source xml:lang="en">Diagnostic Info...</source>
-      </trans-unit>
-      <trans-unit id="cmdidDiagnostics|MenuText">
-        <source xml:lang="en">&amp;Diagnostic Info...</source>
-      </trans-unit>
-      <trans-unit id="cmdidDiagnostics|CommandName">
-        <source xml:lang="en">Diagnostic Info...</source>
-      </trans-unit>
     </body>
   </file>
 </xliff>

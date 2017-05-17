@@ -1,6 +1,4 @@
-// <copyright>
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -11,13 +9,14 @@ using System.Runtime.InteropServices;
 // Properties\AssemblyInfo.cs file and remove any lines duplicating the ones below.
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("Tools for Visual Studio")]
-[assembly: AssemblyCopyright("Copyright © Microsoft")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Microsoft")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion(AssemblyVersionInfo.StableVersion)]
 [assembly: AssemblyFileVersion(AssemblyVersionInfo.Version)]
 
-class AssemblyVersionInfo {
+internal class AssemblyVersionInfo
+{
     // This version string (and the comments for StableVersion and Version)
     // should be updated manually between major releases.
     // Servicing branches should retain the value
@@ -29,24 +28,8 @@ class AssemblyVersionInfo {
 
     public const string BuildNumber = "0.00";
 
-#if DEV10
-    public const string VSMajorVersion = "10";
-    const string VSVersionSuffix = "2010";
-#elif DEV11
-    public const string VSMajorVersion = "11";
-    const string VSVersionSuffix = "2012";
-#elif DEV12
-    public const string VSMajorVersion = "12";
-    const string VSVersionSuffix = "2013";
-#elif DEV14
-    public const string VSMajorVersion = "14";
-    const string VSVersionSuffix = "2014";
-#elif DEV15
     public const string VSMajorVersion = "15";
-    const string VSVersionSuffix = "15";
-#else
-#error Unrecognized VS Version.
-#endif
+    private const string VSVersionSuffix = "2017";
 
     public const string VSVersion = VSMajorVersion + ".0";
 

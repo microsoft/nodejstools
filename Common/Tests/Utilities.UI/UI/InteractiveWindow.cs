@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -32,16 +20,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudioTools.VSTestHost;
 
-namespace TestUtilities.UI {
-    public class InteractiveWindow : EditorWindow {
-        const string CommandBase = "PythonInteractive.";
+namespace TestUtilities.UI
+{
+    public class InteractiveWindow : EditorWindow
+    {
+        private const string CommandBase = "PythonInteractive.";
 
 
-        private sealed class ReplWindowInfo {
+        private sealed class ReplWindowInfo
+        {
             public readonly ManualResetEvent Idle = new ManualResetEvent(false);
             public readonly ManualResetEvent ReadyForInput = new ManualResetEvent(false);
 
-            public void OnReadyForInput() {
+            public void OnReadyForInput()
+            {
                 Console.WriteLine("Ready for input");
                 ReadyForInput.Set();
             }
@@ -55,7 +47,8 @@ namespace TestUtilities.UI {
         private readonly ReplWindowInfo _replWindowInfo;
 
         public InteractiveWindow(string title, AutomationElement element, VisualStudioApp app)
-            : base(null, element) {
+            : base(null, element)
+        {
             _app = app;
             _title = title;
 
@@ -65,45 +58,56 @@ namespace TestUtilities.UI {
                 .OfType<ReplWindow>()
                 .FirstOrDefault(p => p.Title.Equals(title, StringComparison.CurrentCulture));
 
-            _replWindowInfo = _replWindows.GetValue(_replWindow, window => {
+            _replWindowInfo = _replWindows.GetValue(_replWindow, window =>
+            {
                 var info = new ReplWindowInfo();
                 window.ReadyForInput += new Action(info.OnReadyForInput);
                 return info;
             });
         }
 
-        public void Close() {
+        public void Close()
+        {
             var frame = _replWindow.Frame as IVsWindowFrame;
-            if (frame != null) {
+            if (frame != null)
+            {
                 frame.Hide();
             }
         }
 
-        public static void CloseAll(VisualStudioApp app = null) {
+        public static void CloseAll(VisualStudioApp app = null)
+        {
             IComponentModel compModel;
-            if (app != null) {
+            if (app != null)
+            {
                 compModel = app.GetService<IComponentModel>(typeof(SComponentModel));
-            } else {
+            }
+            else
+            {
                 compModel = (IComponentModel)VSTestContext.ServiceProvider.GetService(typeof(SComponentModel));
             }
             var replWindowProvider = compModel.GetService<IReplWindowProvider>();
             foreach (var frame in replWindowProvider.GetReplWindows()
                 .OfType<ReplWindow>()
                 .Select(r => r.Frame)
-                .OfType<IVsWindowFrame>()) {
+                .OfType<IVsWindowFrame>())
+            {
                 frame.Hide();
             }
         }
 
-        public void WaitForIdleState() {
+        public void WaitForIdleState()
+        {
             DispatchAndWait(_replWindowInfo.Idle, () => { }, DispatcherPriority.ApplicationIdle);
         }
 
-        public void DispatchAndWait(EventWaitHandle waitHandle, Action action, DispatcherPriority priority = DispatcherPriority.Normal) {
+        public void DispatchAndWait(EventWaitHandle waitHandle, Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+        {
             Dispatcher dispatcher = ((FrameworkElement)ReplWindow.TextView).Dispatcher;
             waitHandle.Reset();
 
-            dispatcher.Invoke(new Action(() => {
+            dispatcher.Invoke(new Action(() =>
+            {
                 action();
                 waitHandle.Set();
             }), priority);
@@ -111,16 +115,20 @@ namespace TestUtilities.UI {
             Assert.IsTrue(waitHandle.WaitOne(500));
         }
 
-        public void WaitForText(params string[] text) {
+        public void WaitForText(params string[] text)
+        {
             WaitForText((IList<string>)text);
         }
 
-        public void WaitForText(IList<string> text) {
+        public void WaitForText(IList<string> text)
+        {
             string expected = null;
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 WaitForIdleState();
                 expected = GetExpectedText(text);
-                if (expected.Equals(Text, StringComparison.CurrentCulture)) {
+                if (expected.Equals(Text, StringComparison.CurrentCulture))
+                {
                     return;
                 }
                 Thread.Sleep(100);
@@ -129,11 +137,14 @@ namespace TestUtilities.UI {
             FailWrongText(expected);
         }
 
-        public void WaitForTextContainsAll(params string[] substrings) {
-            for (int i = 0; i < 100; ++i) {
+        public void WaitForTextContainsAll(params string[] substrings)
+        {
+            for (int i = 0; i < 100; ++i)
+            {
                 WaitForIdleState();
                 var text = Text;
-                if (substrings.All(s => text.Contains(s))) {
+                if (substrings.All(s => text.Contains(s)))
+                {
                     return;
                 }
                 Thread.Sleep(100);
@@ -142,16 +153,20 @@ namespace TestUtilities.UI {
             FailWrongText("All of: " + string.Join(", ", substrings.Select(s => "<" + s + ">")));
         }
 
-        public void WaitForTextIPython(params string[] text) {
+        public void WaitForTextIPython(params string[] text)
+        {
             WaitForTextIPython((IList<string>)text);
         }
 
-        public void WaitForTextIPython(IList<string> text) {
+        public void WaitForTextIPython(IList<string> text)
+        {
             string expected = null;
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 WaitForIdleState();
                 expected = GetExpectedText(text);
-                if (expected.Equals(GetIPythonText(), StringComparison.CurrentCulture)) {
+                if (expected.Equals(GetIPythonText(), StringComparison.CurrentCulture))
+                {
                     return;
                 }
                 Thread.Sleep(100);
@@ -160,17 +175,23 @@ namespace TestUtilities.UI {
             FailWrongTextIPython(expected);
         }
 
-        private string GetIPythonText() {
+        private string GetIPythonText()
+        {
             var text = Text;
             var lines = Text.Split(new[] { "\r\n" }, StringSplitOptions.None);
             StringBuilder res = new StringBuilder();
-            for (int i = 0; i < lines.Length; i++) {
+            for (int i = 0; i < lines.Length; i++)
+            {
                 var line = lines[i];
 
-                if (!line.StartsWith("[IPKernelApp] ")) {
-                    if (i != lines.Length - 1 || text.EndsWith("\r\n")) {
+                if (!line.StartsWith("[IPKernelApp] "))
+                {
+                    if (i != lines.Length - 1 || text.EndsWith("\r\n"))
+                    {
                         res.AppendLine(line);
-                    } else {
+                    }
+                    else
+                    {
                         res.Append(line);
                     }
                 }
@@ -178,13 +199,16 @@ namespace TestUtilities.UI {
             return res.ToString();
         }
 
-        public void WaitForTextStartIPython(params string[] text) {
+        public void WaitForTextStartIPython(params string[] text)
+        {
             string expected = GetExpectedText(text);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 string curText = Text;
 
-                if (GetIPythonText().StartsWith(expected, StringComparison.CurrentCulture)) {
+                if (GetIPythonText().StartsWith(expected, StringComparison.CurrentCulture))
+                {
                     return;
                 }
                 Thread.Sleep(100);
@@ -193,7 +217,8 @@ namespace TestUtilities.UI {
             FailWrongText(expected);
         }
 
-        private void FailWrongText(string expected) {
+        private void FailWrongText(string expected)
+        {
             StringBuilder msg = new StringBuilder("Did not get text: ");
             AppendRepr(msg, expected);
             msg.Append(" instead got ");
@@ -201,7 +226,8 @@ namespace TestUtilities.UI {
             Assert.Fail(msg.ToString());
         }
 
-        private void FailWrongTextIPython(string expected) {
+        private void FailWrongTextIPython(string expected)
+        {
             StringBuilder msg = new StringBuilder("Did not get text: ");
             AppendRepr(msg, expected);
             msg.Append(" instead got ");
@@ -209,30 +235,38 @@ namespace TestUtilities.UI {
             Assert.Fail(msg.ToString());
         }
 
-        public void WaitForSessionDismissed() {
+        public void WaitForSessionDismissed()
+        {
             var sessionStack = IntellisenseSessionStack;
-            for (int i = 0; i < 20; i++) {
-                if (sessionStack.TopSession == null) {
+            for (int i = 0; i < 20; i++)
+            {
+                if (sessionStack.TopSession == null)
+                {
                     break;
                 }
                 System.Threading.Thread.Sleep(500);
             }
 
-            while (sessionStack.TopSession != null) {
+            while (sessionStack.TopSession != null)
+            {
                 sessionStack.TopSession.Dismiss();
             }
             Assert.AreEqual(null, sessionStack.TopSession);
         }
 
-        public ManualResetEvent ReadyForInput {
-            get {
+        public ManualResetEvent ReadyForInput
+        {
+            get
+            {
                 return _replWindowInfo.ReadyForInput;
             }
         }
 
-        public void ClearInput() {
+        public void ClearInput()
+        {
             var buffer = _replWindow.CurrentLanguageBuffer;
-            if (buffer == null) {
+            if (buffer == null)
+            {
                 return;
             }
 
@@ -241,70 +275,91 @@ namespace TestUtilities.UI {
             edit.Apply();
         }
 
-        public void ClearScreen(bool waitForReady = true) {
+        public void ClearScreen(bool waitForReady = true)
+        {
             Console.WriteLine("REPL Clearing screen");
-            if (waitForReady) {
+            if (waitForReady)
+            {
                 ReadyForInput.Reset();
             }
             _app.ExecuteCommand(CommandBase + "ClearScreen");
-            if (waitForReady) {
+            if (waitForReady)
+            {
                 Assert.IsTrue(ReadyForInput.WaitOne(1000));
             }
         }
 
-        public void CancelExecution(int attempts = 100) {
+        public void CancelExecution(int attempts = 100)
+        {
             Console.WriteLine("REPL Cancelling Execution");
             ReadyForInput.Reset();
-            for (int i = 0; i < attempts && !_replWindowInfo.ReadyForInput.WaitOne(0); i++) {
+            for (int i = 0; i < attempts && !_replWindowInfo.ReadyForInput.WaitOne(0); i++)
+            {
                 ReadyForInput.Reset();
-                try {
+                try
+                {
                     _app.ExecuteCommand(CommandBase + "CancelExecution");
-                } catch {
+                }
+                catch
+                {
                     // command may not be immediately available
                 }
-                if (ReadyForInput.WaitOne(1000)) {
+                if (ReadyForInput.WaitOne(1000))
+                {
                     break;
                 }
             }
             Assert.IsTrue(ReadyForInput.WaitOne(10000));
         }
 
-        internal IReplWindow2 ReplWindow {
-            get {
+        internal IReplWindow2 ReplWindow
+        {
+            get
+            {
                 return _replWindow;
             }
         }
 
-        public override IWpfTextView TextView {
-            get {
+        public override IWpfTextView TextView
+        {
+            get
+            {
                 return ReplWindow.TextView;
             }
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             Console.WriteLine("REPL resetting");
 
             Assert.IsTrue(ReplWindow.Reset().Wait(10000));
         }
 
-        public void WithStandardInputPrompt(string prompt, Action<string> action) {
-            if ((bool)ReplWindow.GetOptionValue(ReplOptions.DisplayPromptInMargin)) {
+        public void WithStandardInputPrompt(string prompt, Action<string> action)
+        {
+            if ((bool)ReplWindow.GetOptionValue(ReplOptions.DisplayPromptInMargin))
+            {
                 action(String.Empty);
                 return;
             }
 
             string oldPrompt = (string)ReplWindow.GetOptionValue(ReplOptions.StandardInputPrompt);
             ReplWindow.SetOptionValue(ReplOptions.StandardInputPrompt, prompt);
-            try {
+            try
+            {
                 action(prompt);
-            } finally {
+            }
+            finally
+            {
                 ReplWindow.SetOptionValue(ReplOptions.StandardInputPrompt, oldPrompt);
             }
         }
 
-        internal virtual bool IsTabGroupContainer(AutomationElement element) {
+        internal virtual bool IsTabGroupContainer(AutomationElement element)
+        {
             var clsName = element.GetCurrentPropertyValue(AutomationElement.ClassNameProperty) as string;
             return clsName == "ToolWindowTabGroupContainer" || clsName == "FloatingWindow";
         }
     }
 }
+

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <GeneratedAssemblyInfoFile>$(IntermediateOutputPath)GeneratedAssemblyInfo$(DefaultLanguageSourceExtension)</GeneratedAssemblyInfoFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CoreCompileDependsOn>GenerateAssemblyInfoFile;$(CoreCompileDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+
+ <!-- Depends on PrepareForBuild because the latter is responsible for calling MakeDir(IntermediateOutputPath). 
+  Without it, if we do a design-time build of a project (e.g. in Workspace.LoadSolution) immediately following
+  a tfpt treeclean, WriteCodeFragment may fail because the obj folder doesn't even exist at that time.  -->
+  <Target Name="GenerateAssemblyInfoFile"
+          Inputs="$(MSBuildThisFileFullPath)"
+          Outputs="$(GeneratedAssemblyInfoFile)"
+          DependsOnTargets="PrepareForBuild"
+          Condition="'$(Language)' == 'C#' or '$(Language)' == 'VB'">
+
+    <Error Condition="'$(BuildVersion)'==''" Text="'BuildVersion' is not defined. Try rebuilding clean. If the problem presists, make sure gdb.settings.targets is included in this project."/>
+    <Error Condition="'$(AssemblyVersion)'==''" Text="'AssemblyVersion' is not defined. Try rebuilding clean. If the problem presists, make sure gdb.settings.targets is included in this project."/>
+
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyCompanyAttribute">
+        <_Parameter1>Microsoft Corporation</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyCopyrightAttribute">
+        <_Parameter1>© Microsoft Corporation. All rights reserved.</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyVersionAttribute">
+        <_Parameter1>$(AssemblyVersion)</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyFileVersionAttribute">
+        <_Parameter1>$(BuildVersion)</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyInformationalVersionAttribute"> 
+        <_Parameter1>$(BuildVersionExtended)</_Parameter1> 
+      </AssemblyAttribute>
+    </ItemGroup>
+
+    <WriteCodeFragment AssemblyAttributes="@(AssemblyAttribute)"
+                       Language="$(Language)"
+                       OutputFile="$(GeneratedAssemblyInfoFile)">
+      <Output TaskParameter="OutputFile" ItemName="Compile" />
+      <Output TaskParameter="OutputFile" ItemName="FileWrites" />
+    </WriteCodeFragment>
+  </Target>
+
+  <Target Name="GetVSIXVersion" Outputs="$(VSIXBuildVersion)" />
+
+</Project>

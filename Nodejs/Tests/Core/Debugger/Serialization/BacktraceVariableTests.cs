@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.NodejsTools.Debugger;
@@ -20,11 +6,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class BacktraceVariableTests {
+    public class BacktraceVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariable() {
+        public void CreateBacktraceVariable()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             var stackFrame = new NodeStackFrame(0);
@@ -47,7 +36,8 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullName() {
+        public void CreateBacktraceVariableWithNullName()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObjectWithNullName();
             var stackFrame = new NodeStackFrame(0);
@@ -69,43 +59,52 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullStackFrame() {
+        public void CreateBacktraceVariableWithNullStackFrame()
+        {
             // Arrange
             JObject json = SerializationTestData.GetBacktraceJsonObject();
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodeBacktraceVariable(null, json);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBacktraceVariableWithNullJson() {
+        public void CreateBacktraceVariableWithNullJson()
+        {
             // Arrange
             var stackFrame = new NodeStackFrame(0);
             Exception exception = null;
             NodeBacktraceVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodeBacktraceVariable(stackFrame, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
     }
 }
+

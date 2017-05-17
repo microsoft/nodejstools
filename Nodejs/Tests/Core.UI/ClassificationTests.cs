@@ -1,15 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using TestUtilities;
 using TestUtilities.UI;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class ClassificationTests : NodejsProjectTest {
+    public class ClassificationTests : NodejsProjectTest
+    {
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ClassificationTest() {
+        public void ClassificationTest()
+        {
             var code = @"""use-strict"";
 
 var abc = /quox/;
@@ -113,7 +118,8 @@ x = $abc;";
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void IdentifierKeywords() {
+        public void IdentifierKeywords()
+        {
             var code = @"var x = app.get;
 var x = app.get();
 var x = app.get;
@@ -239,22 +245,24 @@ var";
                 new Classification("keyword", 53, 56, "var")
             );
 
-             code = @"/*some comment to make long line*/ var incomplete var
+            code = @"/*some comment to make long line*/ var incomplete var
 var";
 
-             VerifyClassifications(
-                 code,
-                 new Classification("comment", 0, 34, "/*some comment to make long line*/"),
-                 new Classification("keyword", 35, 38, "var"),
-                 new Classification("identifier", 39, 49, "incomplete"),
-                 new Classification("keyword", 50, 53, "var"),
-                 new Classification("keyword", 55, 58, "var")
-             );
+            VerifyClassifications(
+                code,
+                new Classification("comment", 0, 34, "/*some comment to make long line*/"),
+                new Classification("keyword", 35, 38, "var"),
+                new Classification("identifier", 39, 49, "incomplete"),
+                new Classification("keyword", 50, 53, "var"),
+                new Classification("keyword", 55, 58, "var")
+            );
         }
 
-        private static void VerifyClassifications(string code, params Classification[] expected) {
+        private static void VerifyClassifications(string code, params Classification[] expected)
+        {
             using (var solution = Project(
-                "Classifications", Compile("server", code)).Generate().ToVs()) {
+                "Classifications", Compile("server", code)).Generate().ToVs())
+            {
                 var item = solution.GetProject("Classifications").ProjectItems.Item("server.js");
 
                 var window = item.Open();
@@ -269,6 +277,5 @@ var";
                 Classification.Verify(spans, expected);
             }
         }
-
     }
 }

@@ -1,23 +1,11 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Globalization;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class NpmUninstallCommand : NpmCommand {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class NpmUninstallCommand : NpmCommand
+    {
         public NpmUninstallCommand(
             string fullPathToRootPackageDirectory,
             string packageName,
@@ -25,8 +13,9 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm) {
-            Arguments = global
+            : base(fullPathToRootPackageDirectory, pathToNpm)
+        {
+            this.Arguments = global
                             ? string.Format(CultureInfo.InvariantCulture, "uninstall {0} --g", packageName)
                             : string.Format(CultureInfo.InvariantCulture,
                                 "uninstall {0} --{1}",
@@ -37,3 +26,4 @@ namespace Microsoft.NodejsTools.Npm.SPI {
         }
     }
 }
+

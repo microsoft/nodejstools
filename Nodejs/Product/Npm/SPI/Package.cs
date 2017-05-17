@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,9 +6,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Package : RootPackage, IPackage {
-        private IRootPackage _parent;
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Package : RootPackage, IPackage
+    {
+        private IRootPackage parent;
 
         public Package(
             IRootPackage parent,
@@ -31,74 +19,92 @@ namespace Microsoft.NodejsTools.Npm.SPI {
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0,
             int maxDepth = 1)
-            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth) {
-            _parent = parent;
+            : base(fullPathToRootDirectory, showMissingDevOptionalSubPackages, allModules, depth, maxDepth)
+        {
+            this.parent = parent;
         }
 
-        public string PublishDateTimeString { get { return null; } }
+        public string PublishDateTimeString => null;
 
         public IEnumerable<SemverVersion> AvailableVersions { get { throw new NotImplementedException(); } }
 
         public string RequestedVersionRange { get; internal set; }
 
-        public IEnumerable<string> Keywords {
-            get {
-                var keywords = null == PackageJson ? null : PackageJson.Keywords;
-                return keywords ?? (IEnumerable<string>) new List<string>();
+        public IEnumerable<string> Keywords
+        {
+            get
+            {
+                var keywords = null == this.PackageJson ? null : this.PackageJson.Keywords;
+                return keywords ?? (IEnumerable<string>)new List<string>();
             }
         }
 
-        public bool IsListedInParentPackageJson {
-            get {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(Name));
+        public bool IsListedInParentPackageJson
+        {
+            get
+            {
+                var parentPackageJson = this.parent.PackageJson;
+                return (null != parentPackageJson && parentPackageJson.AllDependencies.Contains(this.Name));
             }
         }
 
-        public bool IsMissing {
-            get { return IsListedInParentPackageJson && !Directory.Exists(Path); }
+        public bool IsMissing
+        {
+            get { return this.IsListedInParentPackageJson && !Directory.Exists(this.Path); }
         }
 
-        public bool IsDevDependency {
-            get {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(Name);
+        public bool IsDevDependency
+        {
+            get
+            {
+                var parentPackageJson = this.parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.DevDependencies.Contains(this.Name);
             }
         }
 
-        public bool IsDependency {
-            get {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.Dependencies.Contains(Name);
+        public bool IsDependency
+        {
+            get
+            {
+                var parentPackageJson = this.parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.Dependencies.Contains(this.Name);
             }
         }
 
-        public bool IsOptionalDependency {
-            get {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(Name);
+        public bool IsOptionalDependency
+        {
+            get
+            {
+                var parentPackageJson = this.parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.OptionalDependencies.Contains(this.Name);
             }
         }
 
-        public bool IsBundledDependency {
-            get {
-                IPackageJson parentPackageJson = _parent.PackageJson;
-                return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(Name);
+        public bool IsBundledDependency
+        {
+            get
+            {
+                var parentPackageJson = this.parent.PackageJson;
+                return null != parentPackageJson && parentPackageJson.BundledDependencies.Contains(this.Name);
             }
         }
 
-        public PackageFlags Flags {
-            get {
-                return (!IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0)
-                       | (IsMissing ? PackageFlags.Missing : 0)
-                       | (IsDevDependency ? PackageFlags.Dev : 0)
-                       | (IsOptionalDependency ? PackageFlags.Optional : 0)
-                       | (IsBundledDependency ? PackageFlags.Bundled : 0);
+        public PackageFlags Flags
+        {
+            get
+            {
+                return (!this.IsListedInParentPackageJson ? PackageFlags.NotListedAsDependency : 0)
+                       | (this.IsMissing ? PackageFlags.Missing : 0)
+                       | (this.IsDevDependency ? PackageFlags.Dev : 0)
+                       | (this.IsOptionalDependency ? PackageFlags.Optional : 0)
+                       | (this.IsBundledDependency ? PackageFlags.Bundled : 0);
             }
         }
 
-        public override string ToString() {
-            return string.Format(CultureInfo.InvariantCulture, "{0} {1}", Name, Version);
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0} {1}", this.Name, this.Version);
         }
     }
 }
+

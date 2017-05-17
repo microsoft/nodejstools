@@ -167,13 +167,6 @@
           <CommandName>文件...</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidSurveyNews" priority="0x005" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
-        <Strings>
-          <ButtonText>問卷/新聞(&amp;N)...</ButtonText>
-          <CommandName>問卷/新聞...</CommandName>
-        </Strings>
-      </Button>
       <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" />
         <Strings>
@@ -265,15 +258,6 @@
           <CommandName>附加 Node.js 偵錯工具</CommandName>
         </Strings>
       </Button>
-      <Button guid="guidNodeToolsCmdSet" id="cmdidDiagnostics" priority="0x001" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" />
-        <Strings>
-          <ButtonText>診斷資訊(&amp;D)...</ButtonText>
-          <MenuText>診斷資訊(&amp;D)...</MenuText>
-          <ToolTipText>診斷資訊...</ToolTipText>
-          <CommandName>診斷資訊...</CommandName>
-        </Strings>
-      </Button>
     </Buttons>
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -323,11 +307,9 @@
       <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
       <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
-      <IDSymbol name="cmdidSurveyNews" value="0x0204" />
       <IDSymbol name="cmdidImportWizard" value="0x0205" />
       <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
-      <IDSymbol name="cmdidDiagnostics" value="0x0208" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
       <IDSymbol name="cmdidSendFeedback" value="0x0215" />
       <IDSymbol name="cmdidDocumentation" value="0x0216" />

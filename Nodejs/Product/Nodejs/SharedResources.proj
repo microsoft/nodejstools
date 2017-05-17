@@ -13,20 +13,7 @@
       <Visible>true</Visible>
     </Compile>
   </ItemGroup>
-  <!-- only include the loc files for VS 15 -->
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
-      <Link>SharedProject\ProjectResources.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_NodejsFilesLocation)\Resources.resx">
-      <Link>NodejsProject\Resources.resx</Link>
-      <ManifestResourceName>Microsoft.NodejsTools.Resources</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.en.resx">
       <Link>SharedProject\ProjectResources.en.resx</Link>
       <ManifestResourceName>Microsoft.VisualStudio.Project.en</ManifestResourceName>

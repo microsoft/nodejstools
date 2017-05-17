@@ -1,55 +1,46 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using System.IO;
-
-using MSBuild = Microsoft.Build.Evaluation;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
+using MSBuild = Microsoft.Build.Evaluation;
 
-namespace Microsoft.NodejsTools.TypeScript {
-    internal static class TypeScriptHelpers {
-        internal static bool IsTypeScriptFile(string filename) {
-            return String.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
+namespace Microsoft.NodejsTools.TypeScript
+{
+    internal static class TypeScriptHelpers
+    {
+        internal static bool IsTypeScriptFile(string filename)
+        {
+            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension);
         }
 
-        internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile) {
+        internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
+        {
             var typeScriptOutDir = project.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir);
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
         }
 
-        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile) {
-
+        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
+        {
             //Need to deal with the format being relative and explicit
-            IVsBuildPropertyStorage props = (IVsBuildPropertyStorage)project;
+            var props = (IVsBuildPropertyStorage)project;
             String outDir;
             ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out outDir));
 
-            string projHome = GetProjectHome(project);
+            var projHome = GetProjectHome(project);
 
             return GetTypeScriptBackedJavaScriptFile(projHome, outDir, pathToFile);
         }
 
-        private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile) {
-            string jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
+        private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
+        {
+            var jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
 
-            if (String.IsNullOrEmpty(typeScriptOutDir)) {
+            if (string.IsNullOrEmpty(typeScriptOutDir))
+            {
                 //No setting for OutDir
                 //  .js file is created next to .ts file
                 return jsFilePath;
@@ -57,16 +48,17 @@ namespace Microsoft.NodejsTools.TypeScript {
 
             //Get the full path to outDir
             //  If outDir is rooted then outDirPath is going to be outDir ending with backslash
-            string outDirPath = CommonUtils.GetAbsoluteDirectoryPath(projectHome, typeScriptOutDir);
+            var outDirPath = CommonUtils.GetAbsoluteDirectoryPath(projectHome, typeScriptOutDir);
 
             //Find the relative path to the file from projectRoot
             //  This folder structure will be mirrored in the TypeScriptOutDir
-            string relativeJSFilePath = CommonUtils.GetRelativeFilePath(projectHome, jsFilePath);
+            var relativeJSFilePath = CommonUtils.GetRelativeFilePath(projectHome, jsFilePath);
 
             return Path.Combine(outDirPath, relativeJSFilePath);
         }
 
-        private static string GetProjectHome(IVsProject project) {
+        private static string GetProjectHome(IVsProject project)
+        {
             Debug.Assert(project != null);
             var hier = (IVsHierarchy)project;
             object extObject;
@@ -76,15 +68,18 @@ namespace Microsoft.NodejsTools.TypeScript {
                 out extObject
             ));
             var proj = extObject as EnvDTE.Project;
-            if (proj == null) {
+            if (proj == null)
+            {
                 return null;
             }
             var props = proj.Properties;
-            if (props == null) {
+            if (props == null)
+            {
                 return null;
             }
             var projHome = props.Item("ProjectHome");
-            if (projHome == null) {
+            if (projHome == null)
+            {
                 return null;
             }
 

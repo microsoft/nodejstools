@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -26,14 +12,19 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Mocks;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class ReplWindowTests {
+    public class ReplWindowTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
-            if (!File.Exists("visualstudio_nodejs_repl.js")) {
-                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests.visualstudio_nodejs_repl.js"))) {
+            if (!File.Exists("visualstudio_nodejs_repl.js"))
+            {
+                using (StreamReader reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("NodejsTests.visualstudio_nodejs_repl.js")))
+                {
                     File.WriteAllText(
                         "visualstudio_nodejs_repl.js",
                         reader.ReadToEnd()
@@ -43,8 +34,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void Number() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void Number()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("42");
@@ -53,13 +46,16 @@ namespace NodejsTests {
             }
         }
 
-        private static NodejsReplEvaluator ProjectlessEvaluator() {
+        private static NodejsReplEvaluator ProjectlessEvaluator()
+        {
             return new NodejsReplEvaluator(TestNodejsReplSite.Instance);
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void Require() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void Require()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("require('http').constructor");
@@ -69,10 +65,13 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void FunctionDefinition() {
+        public void FunctionDefinition()
+        {
             var whitespaces = new[] { "", "\r\n", "   ", "\r\n    " };
-            using (var eval = ProjectlessEvaluator()) {
-                foreach (var whitespace in whitespaces) {
+            using (var eval = ProjectlessEvaluator())
+            {
+                foreach (var whitespace in whitespaces)
+                {
                     Console.WriteLine("Whitespace: {0}", whitespace);
                     var window = new MockReplWindow(eval);
                     window.ClearScreen();
@@ -89,8 +88,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ConsoleLog() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ConsoleLog()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("console.log('hi')");
@@ -100,8 +101,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ConsoleWarn() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ConsoleWarn()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("console.warn('hi')");
@@ -111,8 +114,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ConsoleError() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ConsoleError()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("console.error('hi')");
@@ -122,8 +127,10 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void ConsoleDir() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ConsoleDir()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("console.dir({'abc': {'foo': [1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]}})");
@@ -175,8 +182,10 @@ undefined";
             }
         }
 
-        private static void AreEqual(string expected, string received) {
-            for (int i = 0; i < expected.Length && i < received.Length; i++) {
+        private static void AreEqual(string expected, string received)
+        {
+            for (int i = 0; i < expected.Length && i < received.Length; i++)
+            {
                 Assert.AreEqual(expected[i], received[i], String.Format("Mismatch at {0}: expected {1} got {2} in <{3}>", i, expected[i], received[i], received));
             }
             Assert.AreEqual(expected.Length, received.Length, "strings differ by length");
@@ -184,13 +193,16 @@ undefined";
 
         // 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void LargeOutput() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void LargeOutput()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("var x = 'abc'; for(i = 0; i<12; i++) { x += x; }; x");
                 string expected = "abc";
-                for (int i = 0; i < 12; i++) {
+                for (int i = 0; i < 12; i++)
+                {
                     expected += expected;
                 }
 
@@ -200,8 +212,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void Exception() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void Exception()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("throw 'an error';");
@@ -213,8 +227,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ExceptionNull() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ExceptionNull()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("throw null;");
@@ -226,8 +242,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ExceptionUndefined() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ExceptionUndefined()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("throw undefined;");
@@ -239,8 +257,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ProcessExit() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ProcessExit()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("process.exit(0);");
@@ -257,8 +277,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void Reset() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void Reset()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
 
@@ -284,8 +306,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void SaveNoFile() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void SaveNoFile()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
@@ -302,8 +326,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void SaveBadFile() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void SaveBadFile()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
@@ -320,8 +346,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void Save() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void Save()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval, NodejsConstants.JavaScript);
                 window.ClearScreen();
                 var res = window.Execute("function f() { }");
@@ -346,8 +374,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void BadSave() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void BadSave()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("function f() { }");
@@ -364,7 +394,8 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ReplEvaluatorProvider() {
+        public void ReplEvaluatorProvider()
+        {
             var provider = new NodejsReplEvaluatorProvider();
             Assert.AreEqual(null, provider.GetEvaluator("Unknown"));
             Assert.AreNotEqual(null, provider.GetEvaluator("{E4AC36B7-EDC5-4AD2-B758-B5416D520705}"));
@@ -414,20 +445,26 @@ undefined";
                                                   };
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void PartialInputs() {
-            using (var eval = ProjectlessEvaluator()) {
-                foreach (var partialInput in _partialInputs) {
+        public void PartialInputs()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
+                foreach (var partialInput in _partialInputs)
+                {
                     Assert.AreEqual(false, eval.CanExecuteText(partialInput), "Partial input successfully parsed: " + partialInput);
                 }
-                foreach (var completeInput in _completeInputs) {
+                foreach (var completeInput in _completeInputs)
+                {
                     Assert.AreEqual(true, eval.CanExecuteText(completeInput), "Complete input failed to parse: " + completeInput);
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void VarI() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void VarI()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
 
@@ -445,8 +482,10 @@ undefined";
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void ObjectLiteral() {
-            using (var eval = ProjectlessEvaluator()) {
+        public void ObjectLiteral()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
                 var window = new MockReplWindow(eval);
                 window.ClearScreen();
                 var res = eval.ExecuteText("{x:42}");
@@ -459,9 +498,11 @@ undefined";
         /// https://nodejstools.codeplex.com/workitem/279
         /// </summary>
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore")]
-        public void RequireInProject() {
+        public void RequireInProject()
+        {
             string testDir;
-            do {
+            do
+            {
                 testDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             } while (Directory.Exists(testDir));
             Directory.CreateDirectory(testDir);
@@ -470,8 +511,10 @@ undefined";
             File.WriteAllText(Path.Combine(moduleDir, "foo.js"), "exports.foo = function(a, b, c) { }");
             File.WriteAllText(Path.Combine(testDir, "bar.js"), "exports.bar = function(a, b, c) { }");
 
-            try {
-                using (var eval = new NodejsReplEvaluator(new TestNodejsReplSite(null, testDir))) {
+            try
+            {
+                using (var eval = new NodejsReplEvaluator(new TestNodejsReplSite(null, testDir)))
+                {
                     var window = new MockReplWindow(eval);
                     window.ClearScreen();
                     var res = eval.ExecuteText("require('foo.js');");
@@ -483,40 +526,52 @@ undefined";
                     Assert.IsTrue(res.Wait(10000));
                     Assert.AreEqual(window.Output, "{ bar: [Function] }");
                 }
-            } finally {
-                try {
+            }
+            finally
+            {
+                try
+                {
                     Directory.Delete(testDir, true);
-                } catch (IOException) {
+                }
+                catch (IOException)
+                {
                 }
             }
         }
 
         // https://nodejstools.codeplex.com/workitem/1575
         [TestMethod, Priority(0), Timeout(180000), TestCategory("Ignore")]
-        public async Task TestNpmReplCommandProcessExitSucceeds() {
+        public async Task TestNpmReplCommandProcessExitSucceeds()
+        {
             var npmPath = Nodejs.GetPathToNodeExecutableFromEnvironment("npm.cmd");
-            using (var eval = ProjectlessEvaluator()) {
-                var mockWindow = new MockReplWindow(eval) {
+            using (var eval = ProjectlessEvaluator())
+            {
+                var mockWindow = new MockReplWindow(eval)
+                {
                     ShowAnsiCodes = true
                 };
                 mockWindow.ClearScreen();
                 var redirector = new NpmReplCommand.NpmReplRedirector(mockWindow);
 
-                for (int j = 0; j < 200; j++) {
+                for (int j = 0; j < 200; j++)
+                {
                     await NpmReplCommand.ExecuteNpmCommandAsync(
                         redirector,
                         npmPath,
                         null,
-                        new[] {"config", "get", "registry"},
+                        new[] { "config", "get", "registry" },
                         null);
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("AppVeyorIgnore"), TestCategory("Ignore")]
-        public void NpmReplRedirector() {
-            using (var eval = ProjectlessEvaluator()) {
-                var mockWindow = new MockReplWindow(eval) {
+        public void NpmReplRedirector()
+        {
+            using (var eval = ProjectlessEvaluator())
+            {
+                var mockWindow = new MockReplWindow(eval)
+                {
                     ShowAnsiCodes = true
                 };
                 mockWindow.ClearScreen();
@@ -550,7 +605,7 @@ undefined";
                 Assert.IsTrue(redirector.HasErrors);
                 mockWindow.ClearScreen();
 
-                var decodedInfoLine = "├── parseurl@1.0.1";
+                var decodedInfoLine = "\u251C\u2500\u2500 parseurl@1.0.1";
                 string encodedText = Console.OutputEncoding.GetString(Encoding.UTF8.GetBytes(decodedInfoLine));
                 redirector.WriteLine(encodedText);
                 var expectedDecodedInfoLine = NpmReplCommand.NpmReplRedirector.NormalAnsiColor + decodedInfoLine
@@ -562,3 +617,4 @@ undefined";
         }
     }
 }
+

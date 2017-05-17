@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -27,18 +13,23 @@ using TestUtilities;
 using TestUtilities.UI;
 using TestUtilities.UI.Nodejs;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class ReplWindowTests {
+    public class ReplWindowTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ErrorNewLine() {
-            Test((app, window) => {
+        public void ErrorNewLine()
+        {
+            Test((app, window) =>
+            {
                 Keyboard.Type("abc\r");
                 window.WaitForText("> abc", "ReferenceError: abc is not defined", "> ");
                 Keyboard.Type("42\r");
@@ -48,13 +39,16 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ColorOutput() {
-            Test((app, window) => {
+        public void ColorOutput()
+        {
+            Test((app, window) =>
+            {
                 Keyboard.Type("[1,2,3]\r");
                 window.WaitForText("> [1,2,3]", "[ 1, 2, 3 ]", "> ");
 
                 IList<ClassificationSpan> spans = null;
-                window.Invoke(() => {
+                window.Invoke(() =>
+                {
                     var snapshot = window.TextView.TextBuffer.CurrentSnapshot;
                     spans = window.Classifier.GetClassificationSpans(new SnapshotSpan(snapshot, 0, snapshot.Length));
                 });
@@ -80,22 +74,27 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void StdErrIsRed() {
-            Test((app, window) => {
+        public void StdErrIsRed()
+        {
+            Test((app, window) =>
+            {
                 window.ReplWindow.Evaluator.ExecuteText("setTimeout(function () { not_a_fn(); }, 0);\r").Wait();
 
                 bool receivedError = false;
-                for (int retries = 10; retries >= 0; --retries) {
+                for (int retries = 10; retries >= 0; --retries)
+                {
                     // Text from stderr takes longer to appear than the console.log()
                     // message, so we need to wait for it.
 
                     IList<ClassificationSpan> spans = null;
-                    window.Invoke(() => {
+                    window.Invoke(() =>
+                    {
                         var snapshot = window.TextView.TextBuffer.CurrentSnapshot;
                         spans = window.Classifier.GetClassificationSpans(new SnapshotSpan(snapshot, 0, snapshot.Length));
                     });
 
-                    if (spans.Count > 0 && "Node.js Interactive - Red" == spans[spans.Count - 1].ClassificationType.Classification) {
+                    if (spans.Count > 0 && "Node.js Interactive - Red" == spans[spans.Count - 1].ClassificationType.Classification)
+                    {
                         receivedError = true;
                         break;
                     }
@@ -107,10 +106,13 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void Completion() {
-            Test((app, window) => {
+        public void Completion()
+        {
+            Test((app, window) =>
+            {
                 Keyboard.Type("''.");
-                using (var session = window.WaitForSession<ICompletionSession>()) {
+                using (var session = window.WaitForSession<ICompletionSession>())
+                {
                     Assert.IsTrue(session.Session.CompletionSets.First().Completions.Any(x => x.InsertionText == "length"));
                 }
             });
@@ -118,8 +120,10 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void NoSpecialCommandCompletion() {
-            Test((app, window) => {
+        public void NoSpecialCommandCompletion()
+        {
+            Test((app, window) =>
+            {
                 Keyboard.Type(".");
                 window.AssertNoIntellisenseSession();
             });
@@ -128,14 +132,17 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// <summary>
         /// Opens the interactive window, clears the screen.
         /// </summary>
-        internal void Test(Action<NodejsVisualStudioApp, InteractiveWindow> body) {
-            using (var app = new NodejsVisualStudioApp()) {
+        internal void Test(Action<NodejsVisualStudioApp, InteractiveWindow> body)
+        {
+            using (var app = new NodejsVisualStudioApp())
+            {
                 app.SuppressCloseAllOnDispose();
 
                 const string interpreterDescription = "Node.js Interactive Window";
                 app.Dte.ExecuteCommand("View.Node.jsInteractiveWindow");
                 var interactive = app.GetInteractiveWindow(interpreterDescription);
-                if (interactive == null) {
+                if (interactive == null)
+                {
                     Assert.Inconclusive("Need " + interpreterDescription);
                 }
                 interactive.WaitForIdleState();
@@ -145,15 +152,20 @@ namespace Microsoft.Nodejs.Tests.UI {
                 interactive.ClearInput();
 
                 bool isReady = false;
-                for (int retries = 10; retries > 0; --retries) {
+                for (int retries = 10; retries > 0; --retries)
+                {
                     interactive.Reset();
-                    try {
+                    try
+                    {
                         var task = interactive.ReplWindow.Evaluator.ExecuteText("console.log('READY')");
                         Assert.IsTrue(task.Wait(10000), "ReplWindow did not initialize in time");
-                        if (!task.Result.IsSuccessful) {
+                        if (!task.Result.IsSuccessful)
+                        {
                             continue;
                         }
-                    } catch (TaskCanceledException) {
+                    }
+                    catch (TaskCanceledException)
+                    {
                         continue;
                     }
 
@@ -173,5 +185,5 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
     }
-
 }
+

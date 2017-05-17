@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Windows.Input;
@@ -19,48 +7,60 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using TestUtilities;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
-    class MockTreeNode : ITreeNode {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
+    internal class MockTreeNode : ITreeNode
+    {
         private readonly MockVs _mockVs;
         internal HierarchyItem _item;
 
         private const uint MK_CONTROL = 0x0008; //winuser.h
         private const uint MK_SHIFT = 0x0004;
 
-        public MockTreeNode(MockVs mockVs, HierarchyItem res) {
+        public MockTreeNode(MockVs mockVs, HierarchyItem res)
+        {
             _mockVs = mockVs;
             _item = res;
         }
 
-        public void Select() {
-            _mockVs.InvokeSync(() => {
+        public void Select()
+        {
+            _mockVs.InvokeSync(() =>
+            {
                 _mockVs._uiHierarchy.ClearSelectedItems();
                 _mockVs._uiHierarchy.AddSelectedItem(_item);
             });
         }
 
-        public void AddToSelection() {
-            _mockVs.InvokeSync(() => {
+        public void AddToSelection()
+        {
+            _mockVs.InvokeSync(() =>
+            {
                 _mockVs._uiHierarchy.AddSelectedItem(_item);
             });
         }
 
-        public void DragOntoThis(params ITreeNode[] source) {
+        public void DragOntoThis(params ITreeNode[] source)
+        {
             DragOntoThis(Key.None, source);
         }
 
-        public void DragOntoThis(Key modifier, params ITreeNode[] source) {
+        public void DragOntoThis(Key modifier, params ITreeNode[] source)
+        {
             _mockVs.Invoke(() => DragOntoThisUIThread(modifier, source));
         }
 
-        private void DragOntoThisUIThread(Key modifier, ITreeNode[] source) {
+        private void DragOntoThisUIThread(Key modifier, ITreeNode[] source)
+        {
             var target = _item.Hierarchy as IVsHierarchyDropDataTarget;
-            if (target != null) {
+            if (target != null)
+            {
                 uint effect = 0;
                 uint keyState = GetKeyState(modifier);
 
                 source[0].Select();
-                for (int i = 1; i < source.Length; i++) {
+                for (int i = 1; i < source.Length; i++)
+                {
                     source[i].AddToSelection();
                 }
 
@@ -78,14 +78,17 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                     ref effect
                 );
 
-                if (ErrorHandler.Succeeded(hr)) {
-                    if (effect == 0) {
+                if (ErrorHandler.Succeeded(hr))
+                {
+                    if (effect == 0)
+                    {
                         return;
                     }
 
                     hr = target.DragOver(keyState, _item.ItemId, ref effect);
 
-                    if (ErrorHandler.Succeeded(hr)) {
+                    if (ErrorHandler.Succeeded(hr))
+                    {
                         int cancel;
                         ErrorHandler.ThrowOnFailure(
                             dropDataSource.OnBeforeDropNotify(
@@ -95,7 +98,8 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                             )
                         );
 
-                        if (cancel == 0) {
+                        if (cancel == 0)
+                        {
                             hr = target.Drop(
                                 data,
                                 keyState,
@@ -105,7 +109,8 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
                         }
 
                         int dropped = 0;
-                        if (cancel == 0 && ErrorHandler.Succeeded(hr)) {
+                        if (cancel == 0 && ErrorHandler.Succeeded(hr))
+                        {
                             dropped = 1;
                         }
                         ErrorHandler.ThrowOnFailure(dropDataSource.OnDropNotify(dropped, effect));
@@ -116,8 +121,10 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             throw new NotImplementedException();
         }
 
-        private uint GetKeyState(Key modifier) {
-            switch (modifier) {
+        private uint GetKeyState(Key modifier)
+        {
+            switch (modifier)
+            {
                 case Key.LeftShift:
                     return MK_SHIFT;
                 case Key.LeftCtrl:
@@ -130,3 +137,4 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         }
     }
 }
+

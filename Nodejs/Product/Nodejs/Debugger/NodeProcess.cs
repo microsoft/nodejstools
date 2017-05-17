@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -22,11 +8,13 @@ using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Wrapper around Process which handles our wait for exit logic
     /// </summary>
-    sealed class NodeProcess : IDisposable {
+    internal sealed class NodeProcess : IDisposable
+    {
         private readonly ProcessStartInfo _psi;
         private readonly bool _waitOnAbnormal, _waitOnNormal, _enableRaisingEvents;
         private Process _process;
@@ -34,136 +22,177 @@ namespace Microsoft.NodejsTools.Debugger {
 
         public ushort DebuggerPort { get; }
 
-        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents, ushort debuggerPort = 0) {
-            _psi = psi;
-            _waitOnAbnormal = waitOnAbnormal;
-            _waitOnNormal = waitOnNormal;
-            _enableRaisingEvents = enableRaisingEvents;
+        public NodeProcess(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal, bool enableRaisingEvents, ushort debuggerPort = 0) 
+        {
+            this._psi = psi;
+            this._waitOnAbnormal = waitOnAbnormal;
+            this._waitOnNormal = waitOnNormal;
+            this._enableRaisingEvents = enableRaisingEvents;
             DebuggerPort = debuggerPort;
         }
 
-        public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal) {
+        public static NodeProcess Start(ProcessStartInfo psi, bool waitOnAbnormal, bool waitOnNormal)
+        {
             var res = new NodeProcess(psi, waitOnAbnormal, waitOnNormal, false);
             res.Start();
             return res;
         }
 
-        public void ResponseToTerminateEvent(object sender, EventArgs e) {
+        public void ResponseToTerminateEvent(object sender, EventArgs e)
+        {
             this.Kill();
         }
 
-        public void Start() {
+        public void Start()
+        {
             string waitMode;
-            if (_waitOnNormal && _waitOnAbnormal) {
+            if (this._waitOnNormal && this._waitOnAbnormal)
+            {
                 waitMode = "both";
-            } else if (_waitOnAbnormal) {
+            }
+            else if (this._waitOnAbnormal)
+            {
                 waitMode = "abnormal";
-            } else if (_waitOnNormal) {
+            }
+            else if (this._waitOnNormal)
+            {
                 waitMode = "normal";
-            } else {
+            }
+            else
+            {
                 waitMode = null;
             }
 
-            if (waitMode != null) {
+            if (waitMode != null)
+            {
                 var pidFile = Path.GetTempFileName();
-                _psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
+                this._psi.Arguments = string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}",
                     waitMode,
                     ProcessOutput.QuoteSingleArgument(pidFile),
-                    ProcessOutput.QuoteSingleArgument(_psi.FileName),
-                    _psi.Arguments
+                    ProcessOutput.QuoteSingleArgument(this._psi.FileName),
+                    this._psi.Arguments
                 );
-                _psi.FileName = Path.Combine(
+                this._psi.FileName = Path.Combine(
                     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                     "Microsoft.NodejsTools.PressAnyKey.exe"
                 );
-                var process = _pressAnyKeyProcess = Process.Start(_psi);
+                var process = this._pressAnyKeyProcess = Process.Start(this._psi);
                 int? pid = null;
-                while (!process.HasExited) {
-                    if (new FileInfo(pidFile).Length == 0) {
+                while (!process.HasExited)
+                {
+                    if (new FileInfo(pidFile).Length == 0)
+                    {
                         System.Threading.Thread.Sleep(10);
                         continue;
                     }
 
-                    try {
-                        string strPid = File.ReadAllText(pidFile);
+                    try
+                    {
+                        var strPid = File.ReadAllText(pidFile);
                         int pidValue;
-                        if (Int32.TryParse(strPid, out pidValue)) {
+                        if (Int32.TryParse(strPid, out pidValue))
+                        {
                             pid = pidValue;
                             break;
                         }
-                    } catch (IOException) {
+                    }
+                    catch (IOException)
+                    {
                         System.Threading.Thread.Sleep(10);
                     }
                 }
 
-                if (pid == null) {
+                if (pid == null)
+                {
                     throw new Win32Exception("failed to start proess");
                 }
-                _process = Process.GetProcessById(pid.Value);
-            } else {
-                _process = Process.Start(_psi);
+                this._process = Process.GetProcessById(pid.Value);
             }
-            _process.EnableRaisingEvents = _enableRaisingEvents;
+            else
+            {
+                this._process = Process.Start(this._psi);
+            }
+            this._process.EnableRaisingEvents = this._enableRaisingEvents;
         }
 
-        public void WaitForExit() {
-            if (_process == null) {
+        public void WaitForExit()
+        {
+            if (this._process == null)
+            {
                 return;
             }
-            _process.WaitForExit();
+            this._process.WaitForExit();
         }
 
-        public bool WaitForExit(int milliseconds) {
-            if (_process == null) {
+        public bool WaitForExit(int milliseconds)
+        {
+            if (this._process == null)
+            {
                 return true;
             }
-            return _process.WaitForExit(milliseconds);
+            return this._process.WaitForExit(milliseconds);
         }
 
-        public bool HasExited {
-            get {
-                if (_process == null) {
+        public bool HasExited
+        {
+            get
+            {
+                if (this._process == null)
+                {
                     return false;
                 }
-                return _process.HasExited;
+                return this._process.HasExited;
             }
         }
 
-        public int Id {
-            get {
-                if (_process == null) {
+        public int Id
+        {
+            get
+            {
+                if (this._process == null)
+                {
                     throw new InvalidOperationException();
                 }
-                return _process.Id;
+                return this._process.Id;
             }
         }
 
-        internal void Kill() {
-            if (_pressAnyKeyProcess != null) {
-                _pressAnyKeyProcess.Kill();
+        internal void Kill()
+        {
+            if (this._pressAnyKeyProcess != null)
+            {
+                this._pressAnyKeyProcess.Kill();
             }
 
-            if (_process != null) {
-                _process.Kill();
+            if (this._process != null)
+            {
+                this._process.Kill();
             }
         }
 
-        public int ExitCode {
-            get {
-                if (_process == null) {
+        public int ExitCode
+        {
+            get
+            {
+                if (this._process == null)
+                {
                     throw new InvalidOperationException();
                 }
-                return _process.ExitCode;
+                return this._process.ExitCode;
             }
         }
 
-        public void Dispose() {
-            if (_pressAnyKeyProcess != null) {
-                _pressAnyKeyProcess.Dispose();
+        public void Dispose()
+        {
+            if (this._pressAnyKeyProcess != null)
+            {
+                this._pressAnyKeyProcess.Dispose();
             }
-            if (_process != null) {
-                _process.Dispose();
+            if (this._process != null)
+            {
+                this._process.Dispose();
             }
         }
     }
 }
+

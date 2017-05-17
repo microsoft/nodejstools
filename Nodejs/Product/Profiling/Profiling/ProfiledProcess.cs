@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -29,22 +15,28 @@ using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools.Profiling {
-    class ProfiledProcess {
+namespace Microsoft.NodejsTools.Profiling
+{
+    internal class ProfiledProcess
+    {
         private readonly string _exe, _args, _dir, _launchUrl;
         private readonly ProcessorArchitecture _arch;
         private readonly Process _process;
         private readonly int? _port;
         private readonly bool _startBrowser, _justMyCode;
 
-        public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser, bool justMyCode) {
-            if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64) {
+        public ProfiledProcess(string exe, string interpreterArgs, string script, string scriptArgs, string dir, Dictionary<string, string> envVars, ProcessorArchitecture arch, string launchUrl, int? port, bool startBrowser, bool justMyCode)
+        {
+            if (arch != ProcessorArchitecture.X86 && arch != ProcessorArchitecture.Amd64)
+            {
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Unsupported architecture: {0}", arch));
             }
-            if (dir.EndsWith("\\", StringComparison.Ordinal)) {
+            if (dir.EndsWith("\\", StringComparison.Ordinal))
+            {
                 dir = dir.Substring(0, dir.Length - 1);
             }
-            if (String.IsNullOrEmpty(dir)) {
+            if (String.IsNullOrEmpty(dir))
+            {
                 // run from where the script is by default (the UI enforces this)
                 Debug.Assert(Path.IsPathRooted(script));
                 dir = Path.GetDirectoryName(script);
@@ -64,19 +56,24 @@ namespace Microsoft.NodejsTools.Profiling {
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardOutput = false;
 
-            if (_startBrowser && _port == null) {
+            if (_startBrowser && _port == null)
+            {
                 _port = GetFreePort();
             }
-            if (_port != null) {
-                if (envVars == null) {
+            if (_port != null)
+            {
+                if (envVars == null)
+                {
                     envVars = new Dictionary<string, string>();
                 }
 
                 envVars["PORT"] = port.ToString();
             }
 
-            if (envVars != null) {
-                foreach (var keyValue in envVars) {
+            if (envVars != null)
+            {
+                foreach (var keyValue in envVars)
+                {
                     processInfo.EnvironmentVariables[keyValue.Key] = keyValue.Value;
                 }
             }
@@ -86,54 +83,68 @@ namespace Microsoft.NodejsTools.Profiling {
             _process.StartInfo = processInfo;
         }
 
-        public void StartInBrowser(string url) {
+        public void StartInBrowser(string url)
+        {
             VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
         }
 
-        class BrowserStartInfo {
+        private class BrowserStartInfo
+        {
             public readonly int Port;
             public readonly string Url;
 
-            public BrowserStartInfo(int port, string url) {
+            public BrowserStartInfo(int port, string url)
+            {
                 Port = port;
                 Url = url;
             }
         }
 
-        private void StartBrowser(object browserStart) {
+        private void StartBrowser(object browserStart)
+        {
             var startInfo = (BrowserStartInfo)browserStart;
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Blocking = true;
-            for (int i = 0; i < 100 && !_process.HasExited; i++) {
-                try {
+            for (int i = 0; i < 100 && !_process.HasExited; i++)
+            {
+                try
+                {
                     socket.Connect(IPAddress.Loopback, startInfo.Port);
                     break;
-                } catch {
+                }
+                catch
+                {
                     System.Threading.Thread.Sleep(100);
                 }
             }
             socket.Close();
-            if (!_process.HasExited) {
+            if (!_process.HasExited)
+            {
                 StartInBrowser(startInfo.Url);
             }
         }
 
-        private static int GetFreePort() {
+        private static int GetFreePort()
+        {
             return Enumerable.Range(new Random().Next(1200, 2000), 60000).Except(
                 from connection in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
                 select connection.LocalEndPoint.Port
             ).First();
         }
 
-        public void StartProfiling(string filename) {
+        public void StartProfiling(string filename)
+        {
             _process.EnableRaisingEvents = true;
-            _process.Exited += (sender, args) => {
+            _process.Exited += (sender, args) =>
+            {
                 var v8log = Path.Combine(_dir, "v8.log");
 
-                try {
+                try
+                {
                     var executionTime = _process.ExitTime.Subtract(_process.StartTime);
                     bool is012 = false;
-                    if (!File.Exists(v8log)) {
+                    if (!File.Exists(v8log))
+                    {
                         // later versions of Node write out to a file like isolate-####...-v8.log
                         // Search for the latest of those.
                         is012 = true;
@@ -141,7 +152,8 @@ namespace Microsoft.NodejsTools.Profiling {
                             .OrderBy(x => new FileInfo(x).CreationTime)
                             .Reverse()
                             .FirstOrDefault();
-                        if (v8log == null) {
+                        if (v8log == null)
+                        {
                             MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.FailedToSaveV8LogMessageText, v8log));
                             return;
                         }
@@ -152,8 +164,8 @@ namespace Microsoft.NodejsTools.Profiling {
                                 Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                                 "Microsoft.NodejsTools.NodeLogConverter.exe"
                             ),
-                            (_justMyCode ? "/jmc " : string.Empty) + 
-                            (is012 ? "/v:0.12 " : string.Empty) + 
+                            (_justMyCode ? "/jmc " : string.Empty) +
+                            (is012 ? "/v:0.12 " : string.Empty) +
                             "\"" + v8log + "\" " +
                             "\"" + filename + "\" " +
                             "\"" + _process.StartTime.ToString(CultureInfo.InvariantCulture) + "\" " +
@@ -165,16 +177,22 @@ namespace Microsoft.NodejsTools.Profiling {
 
                     var convertProcess = Process.Start(psi);
                     convertProcess.WaitForExit();
-                } finally {
+                }
+                finally
+                {
                     var procExited = ProcessExited;
-                    if (procExited != null) {
+                    if (procExited != null)
+                    {
                         procExited(this, EventArgs.Empty);
                     }
                 }
 
-                try {
+                try
+                {
                     File.Delete(Path.Combine(_dir, v8log));
-                } catch {
+                }
+                catch
+                {
                     // file in use, multiple node.exe's running, user trying
                     // to profile multiple times, etc...
                     MessageBox.Show(string.Format(CultureInfo.CurrentCulture, Resources.UnableToDeleteV8Log, v8log));
@@ -183,11 +201,13 @@ namespace Microsoft.NodejsTools.Profiling {
 
             _process.Start();
 
-            if (_startBrowser) {
+            if (_startBrowser)
+            {
                 Debug.Assert(_port != null);
 
                 string webBrowserUrl = _launchUrl;
-                if (String.IsNullOrWhiteSpace(webBrowserUrl)) {
+                if (String.IsNullOrWhiteSpace(webBrowserUrl))
+                {
                     webBrowserUrl = "http://localhost:" + _port;
                 }
 
@@ -197,8 +217,10 @@ namespace Microsoft.NodejsTools.Profiling {
 
         public event EventHandler ProcessExited;
 
-        internal void StopProfiling() {
+        internal void StopProfiling()
+        {
             _process.Kill();
         }
     }
 }
+

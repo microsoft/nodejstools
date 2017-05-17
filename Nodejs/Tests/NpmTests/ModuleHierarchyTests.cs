@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Linq;
@@ -20,9 +6,11 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace NpmTests {
+namespace NpmTests
+{
     [TestClass]
-    public class ModuleHierarchyTests : AbstractPackageJsonTests {
+    public class ModuleHierarchyTests : AbstractPackageJsonTests
+    {
         protected const string PkgSingleDependency = @"{
     ""name"": ""TestPkg"",
     ""version"": ""0.1.0"",
@@ -40,8 +28,10 @@ namespace NpmTests {
 }";
 
         [TestMethod, Priority(0)]
-        public void ReadRootPackageNoDependencies() {
-            using (var manager = new TemporaryFileManager()) {
+        public void ReadRootPackageNoDependencies()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSimple);
                 var pkg = RootPackageFactory.Create(rootDir);
                 Assert.IsNotNull(pkg, "Root package should not be null.");
@@ -56,13 +46,16 @@ namespace NpmTests {
             }
         }
 
-        private static void RunNpmInstall(string rootDir) {
+        private static void RunNpmInstall(string rootDir)
+        {
             new NpmInstallCommand(rootDir).ExecuteAsync().GetAwaiter().GetResult();
         }
 
         [TestMethod, Priority(0)]
-        public void ReadRootPackageOneDependency() {
-            using (var manager = new TemporaryFileManager()) {
+        public void ReadRootPackageOneDependency()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
                 RunNpmInstall(rootDir);
 
@@ -106,8 +99,10 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadRootPackageMissingDependency() {
-            using (var manager = new TemporaryFileManager()) {
+        public void ReadRootPackageMissingDependency()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleDependency);
 
                 var pkg = RootPackageFactory.Create(rootDir);
@@ -150,9 +145,10 @@ namespace NpmTests {
         }
 
         [TestMethod, Priority(0)]
-        public void ReadRootDependencyRecursive() {
-            using (var manager = new TemporaryFileManager()) {
-
+        public void ReadRootDependencyRecursive()
+        {
+            using (var manager = new TemporaryFileManager())
+            {
                 var rootDir = FilesystemPackageJsonTestHelpers.CreateRootPackage(manager, PkgSingleRecursiveDependency);
                 RunNpmInstall(rootDir);
 
@@ -208,7 +204,8 @@ namespace NpmTests {
                 Console.WriteLine("module.Modules includes: {0}", string.Join(", ", modules.Select(m => m.Name)));
 
                 Assert.AreEqual(module.PackageJson.Dependencies.Count, modules.Count, "Sub-module count mismatch.");
-                foreach (var name in expectedModules) {
+                foreach (var name in expectedModules)
+                {
                     Console.WriteLine("Expecting {0}", name);
                     var current = modules[name];
                     Assert.IsNotNull(current, "Module should not be null when retrieved by name.");
@@ -232,3 +229,4 @@ namespace NpmTests {
         }
     }
 }
+

@@ -1,27 +1,15 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.NodejsTools.Jade {
+namespace Microsoft.NodejsTools.Jade
+{
     /// <summary>
     /// Exports the Jade content type and file extension
     /// </summary>
-    class JadeContentTypeDefinition {
+    internal class JadeContentTypeDefinition
+    {
         public const string JadeLanguageName = "Jade";
         public const string JadeContentType = "jade";
         public const string JadeFileExtension = ".jade";
@@ -52,3 +40,4 @@ namespace Microsoft.NodejsTools.Jade {
         public FileExtensionToContentTypeDefinition IPugFileExtension { get; set; }
     }
 }
+

@@ -1,172 +1,157 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.NodejsTools.Npm.SPI;
 
-namespace Microsoft.NodejsTools.Npm {
+namespace Microsoft.NodejsTools.Npm
+{
     /// <summary>
     /// Mutable class for building immutable node module descriptions
     /// </summary>
-    internal class NodeModuleBuilder {
+    public sealed class NodeModuleBuilder
+    {
         private List<IPackage> _dependencies = new List<IPackage>();
         private readonly StringBuilder _descriptionBuff = new StringBuilder();
         private readonly StringBuilder _authorBuff = new StringBuilder();
-        private readonly StringBuilder _publishDateTime = new StringBuilder();
         private List<string> _keywords = new List<string>();
         private List<string> _homepages = new List<string>();
-        private List<SemverVersion> _availableVersions = new List<SemverVersion>(); 
 
-        public NodeModuleBuilder() {
+        public NodeModuleBuilder()
+        {
             Reset();
         }
 
-        public void Reset() {
-            Name = null;
+        public void Reset()
+        {
+            this.Name = null;
+            
+            this.AvailableVersions = new List<SemverVersion>();
 
-            // We should double check, but I believe that the package no longer exists when "latest" is not set.
-            // If that's the case, we should include an option to filter out those packages.
-            // https://nodejstools.codeplex.com/workitem/1452
-            LatestVersion = SemverVersion.UnknownVersion;
-            _availableVersions = new List<SemverVersion>();
-
-            Flags = PackageFlags.None;
-            RequestedVersionRange = null;
+            this.Flags = PackageFlags.None;
+            this.RequestedVersionRange = null;
 
             //  These *have* to be reinitialised or they'll be cleared
             //  in any packages that have been created using the builder
             //  because they're passed by reference.
-            _dependencies = new List<IPackage>();
-            _keywords = new List<string>();
-            _homepages = new List<string>();
+            this._dependencies = new List<IPackage>();
+            this._keywords = new List<string>();
+            this._homepages = new List<string>();
 
-            _descriptionBuff.Length = 0;
-            _authorBuff.Length = 0;
-            _publishDateTime.Length = 0;
+            this._descriptionBuff.Length = 0;
+            this._authorBuff.Length = 0;
+            this.PublishDateTimeString = null;
         }
 
-        public void AddAuthor(string text) {
-            if (_authorBuff.Length > 0) {
-                _authorBuff.Append(' ');
+        public void AddAuthor(string text)
+        {
+            if (this._authorBuff.Length > 0)
+            {
+                this._authorBuff.Append(' ');
             }
-            _authorBuff.Append(text);
+            this._authorBuff.Append(text);
         }
 
-        public IPerson Author {
-            get {
-                var text = _authorBuff.ToString().Trim();
+        public IPerson Author
+        {
+            get
+            {
+                var text = this._authorBuff.ToString().Trim();
                 return string.IsNullOrEmpty(text) ? null : Person.CreateFromJsonSource(text);
             }
         }
 
         public string Name { get; set; }
 
-        public SemverVersion LatestVersion { get; set; }
+        public SemverVersion LatestVersion => this.AvailableVersions.FirstOrDefault();
 
-        public IEnumerable<SemverVersion> AvailableVersions {
-            get { return _availableVersions; }
-            set { _availableVersions = value != null ? value.ToList() : new List<SemverVersion>(); }
+        public IList<SemverVersion> AvailableVersions { get; private set; }
+
+        public IEnumerable<string> Homepages => this._homepages;
+
+        public void AddVersion(SemverVersion version)
+        {
+            this.AvailableVersions.Add(version);
         }
 
-        public IEnumerable<string> Homepages {
-            get {
-                return _homepages;
-            }
+        public void AddHomepage(string homepage)
+        {
+            this._homepages.Add(homepage);
         }
 
-        public void AddHomepage(string homepage) {
-            _homepages.Add(homepage);
+        public void AppendToDescription(string text)
+        {
+            this._descriptionBuff.Append(text);
         }
 
-        public void AppendToDescription(string text) {
-            _descriptionBuff.Append(text);
-        }
-
-        public string Description {
-            get {
-                var text = _descriptionBuff.ToString().Trim();
+        public string Description
+        {
+            get
+            {
+                var text = this._descriptionBuff.ToString().Trim();
                 return string.IsNullOrEmpty(text) ? null : text;
             }
         }
 
-        public void AppendToDate(string text) {
-            if (_publishDateTime.Length > 0) {
-                _publishDateTime.Append(' ');
-            }
-            _publishDateTime.Append(text);
+        public void SetDate(string text)
+        {
+            this.PublishDateTimeString = text;
         }
 
-        public string PublishDateTimeString {
-            get {
-                var text = _publishDateTime.ToString().Trim();
-                return string.IsNullOrEmpty(text) ? null : text;
-            }
+        public string PublishDateTimeString { get; private set; }
+
+        public IEnumerable<IPackage> Dependencies
+        {
+            get { return this._dependencies; }
         }
 
-        public IEnumerable<IPackage> Dependencies {
-            get { return _dependencies; }
+        public void AddDependency(IPackage module)
+        {
+            this._dependencies.Add(module);
         }
 
-        public void AddDependency(IPackage module) {
-            _dependencies.Add(module);
-        }
-
-        public void AddDependencies(IEnumerable<IPackage> packages) {
-            _dependencies.AddRange(packages);
+        public void AddDependencies(IEnumerable<IPackage> packages)
+        {
+            this._dependencies.AddRange(packages);
         }
 
         public PackageFlags Flags { get; set; }
 
         public string RequestedVersionRange { get; set; }
 
-        public void AddKeyword(string keyword) {
-            _keywords.Add(keyword);
+        public void AddKeyword(string keyword)
+        {
+            this._keywords.Add(keyword);
         }
 
-        public IEnumerable<string> Keywords {
-            get {
-                return _keywords;
+        public IEnumerable<string> Keywords
+        {
+            get
+            {
+                return this._keywords;
             }
         }
 
-        public void AddVersion(SemverVersion version) {
-            if( version > this.LatestVersion) {
-                this.LatestVersion = version;
-            }
-            this._availableVersions.Add(version);
-        }
-
-        public IPackage Build() {
-            var proxy = new PackageProxy {
-                Author = Author,
-                Name = Name,
-                Version = LatestVersion,
-                AvailableVersions = AvailableVersions,
-                Description = Description,
-                Homepages = Homepages,
-                PublishDateTimeString = PublishDateTimeString,
-                RequestedVersionRange = RequestedVersionRange,
-                Flags = Flags,
-                Keywords = _keywords
+        public IPackage Build()
+        {
+            var proxy = new PackageProxy
+            {
+                Author = this.Author,
+                Name = this.Name,
+                Version = this.LatestVersion,
+                AvailableVersions = this.AvailableVersions,
+                Description = this.Description,
+                Homepages = this.Homepages,
+                PublishDateTimeString = this.PublishDateTimeString,
+                RequestedVersionRange = this.RequestedVersionRange,
+                Flags = this.Flags,
+                Keywords = this._keywords
             };
 
             var modules = new NodeModulesProxy();
-            foreach (var dep in Dependencies) {
+            foreach (var dep in this.Dependencies)
+            {
                 modules.AddModule(dep);
             }
             proxy.Modules = modules;
@@ -174,3 +159,4 @@ namespace Microsoft.NodejsTools.Npm {
         }
     }
 }
+

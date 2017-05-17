@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -20,11 +8,13 @@ using Microsoft.VisualStudio.Shell.Interop;
 using IServiceProvider = System.IServiceProvider;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// helper to make the editor ignore external changes
     /// </summary>
-    internal class SuspendFileChanges {
+    internal class SuspendFileChanges
+    {
         private string documentFileName;
 
         private bool isSuspending;
@@ -33,25 +23,26 @@ namespace Microsoft.VisualStudioTools.Project {
 
         private IVsDocDataFileChangeControl fileChangeControl;
 
-        public SuspendFileChanges(IServiceProvider site, string document) {
+        public SuspendFileChanges(IServiceProvider site, string document)
+        {
             this.site = site;
             this.documentFileName = document;
         }
 
-
-        public void Suspend() {
+        public void Suspend()
+        {
             if (this.isSuspending)
                 return;
 
-            IntPtr docData = IntPtr.Zero;
-            try {
-                IVsRunningDocumentTable rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
+            var docData = IntPtr.Zero;
+            try
+            {
+                var rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
                 IVsHierarchy hierarchy;
                 uint itemId;
                 uint docCookie;
                 IVsFileChangeEx fileChange;
-
 
                 if (rdt == null)
                     return;
@@ -63,47 +54,61 @@ namespace Microsoft.VisualStudioTools.Project {
 
                 fileChange = this.site.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
 
-                if (fileChange != null) {
+                if (fileChange != null)
+                {
                     this.isSuspending = true;
                     ErrorHandler.ThrowOnFailure(fileChange.IgnoreFile(0, this.documentFileName, 1));
-                    if (docData != IntPtr.Zero) {
+                    if (docData != IntPtr.Zero)
+                    {
                         IVsPersistDocData persistDocData = null;
 
                         // if interface is not supported, return null
-                        object unknown = Marshal.GetObjectForIUnknown(docData);
-                        if (unknown is IVsPersistDocData) {
+                        var unknown = Marshal.GetObjectForIUnknown(docData);
+                        if (unknown is IVsPersistDocData)
+                        {
                             persistDocData = (IVsPersistDocData)unknown;
-                            if (persistDocData is IVsDocDataFileChangeControl) {
+                            if (persistDocData is IVsDocDataFileChangeControl)
+                            {
                                 this.fileChangeControl = (IVsDocDataFileChangeControl)persistDocData;
-                                if (this.fileChangeControl != null) {
+                                if (this.fileChangeControl != null)
+                                {
                                     ErrorHandler.ThrowOnFailure(this.fileChangeControl.IgnoreFileChanges(1));
                                 }
                             }
                         }
                     }
                 }
-            } catch (InvalidCastException e) {
+            }
+            catch (InvalidCastException e)
+            {
                 Trace.WriteLine("Exception" + e.Message);
-            } finally {
-                if (docData != IntPtr.Zero) {
+            }
+            finally
+            {
+                if (docData != IntPtr.Zero)
+                {
                     Marshal.Release(docData);
                 }
             }
             return;
         }
 
-        public void Resume() {
+        public void Resume()
+        {
             if (!this.isSuspending)
                 return;
             IVsFileChangeEx fileChange;
             fileChange = this.site.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
-            if (fileChange != null) {
+            if (fileChange != null)
+            {
                 this.isSuspending = false;
                 ErrorHandler.ThrowOnFailure(fileChange.IgnoreFile(0, this.documentFileName, 0));
-                if (this.fileChangeControl != null) {
+                if (this.fileChangeControl != null)
+                {
                     ErrorHandler.ThrowOnFailure(this.fileChangeControl.IgnoreFileChanges(0));
                 }
             }
         }
     }
 }
+

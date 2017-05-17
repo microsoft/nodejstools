@@ -549,6 +549,9 @@
   <data name="_browsePath.Text" xml:space="preserve">
     <value>...</value>
   </data>
+  <data name="_browsePath.AccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
   <data name="&gt;&gt;_browsePath.Name" xml:space="preserve">
     <value>_browsePath</value>
   </data>
@@ -584,6 +587,9 @@
   </data>
   <data name="_browseDirectory.Text" xml:space="preserve">
     <value>...</value>
+  </data>
+  <data name="_browseDirectory.AccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
   </data>
   <data name="&gt;&gt;_browseDirectory.Name" xml:space="preserve">
     <value>_browseDirectory</value>

@@ -1,30 +1,15 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-using Microsoft.VisualStudio;
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
+namespace Microsoft.NodejsTools.Repl
+{
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -38,19 +23,18 @@ namespace Microsoft.VisualStudio.Repl {
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
-#if NTVS_FEATURE_INTERACTIVEWINDOW
     [Description("Node.js Tools - Interactive Window")]
-#else
-    [Description("Visual Studio Interactive Window")]
-#endif
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideKeyBindingTable(ReplWindow.TypeGuid, 200)]        // Resource ID: "Interactive Console"
     [ProvideToolWindow(typeof(ReplWindow), Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow, MultiInstances = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidReplWindowPkgString)]
-    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory {
-        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id) {
-            if (toolWindowType == typeof(ReplWindow).GUID) {
+    internal sealed class ReplWindowPackage : Package, IVsToolWindowFactory
+    {
+        int IVsToolWindowFactory.CreateToolWindow(ref Guid toolWindowType, uint id)
+        {
+            if (toolWindowType == typeof(ReplWindow).GUID)
+            {
                 var model = (IComponentModel)GetService(typeof(SComponentModel));
                 var replProvider = (ReplWindowProvider)model.GetService<IReplWindowProvider>();
 

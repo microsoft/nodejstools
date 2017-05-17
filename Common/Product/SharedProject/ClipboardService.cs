@@ -1,51 +1,47 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.VisualStudioTools {
-
-    class ClipboardService : ClipboardServiceBase {
-        public override void SetClipboard(IDataObject dataObject) {
+namespace Microsoft.VisualStudioTools
+{
+    internal class ClipboardService : ClipboardServiceBase
+    {
+        public override void SetClipboard(IDataObject dataObject)
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleSetClipboard(dataObject));
         }
 
-        public override IDataObject GetClipboard() {
+        public override IDataObject GetClipboard()
+        {
             IDataObject res;
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleGetClipboard(out res));
             return res;
         }
 
-        public override void FlushClipboard() {
+        public override void FlushClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleFlushClipboard());
         }
 
-        public override bool OpenClipboard() {
-            int res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
+        public override bool OpenClipboard()
+        {
+            var res = UnsafeNativeMethods.OpenClipboard(IntPtr.Zero);
             ErrorHandler.ThrowOnFailure(res);
             return res == 1;
         }
 
-        public override void EmptyClipboard() {
+        public override void EmptyClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.EmptyClipboard());
         }
 
-        public override void CloseClipboard() {
+        public override void CloseClipboard()
+        {
             ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.CloseClipboard());
         }
     }
 }
+

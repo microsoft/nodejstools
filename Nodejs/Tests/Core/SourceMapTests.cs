@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -21,11 +7,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 using TestUtilities.Nodejs;
 
-namespace NodejsTests {
+namespace NodejsTests
+{
     [TestClass]
-    public class SourceMapTests {
+    public class SourceMapTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
@@ -57,7 +46,8 @@ namespace NodejsTests {
         private const string _sample = @"{'version':3,'file':'test.js','sourceRoot':'','sources':['test.ts'],'names':['Greeter','Greeter.constructor','Greeter.greet'],'mappings':'AAAA;IACIA,iBAAYA,QAAuBA;QAAvBC,aAAeA,GAARA,QAAQA;AAAQA,IAAIA,CAACA;IACxCD,0BAAAA;QACIE,OAAOA,MAAMA,GAAGA,IAAIA,CAACA,QAAQA,GAAGA,OAAOA;IAC3CA,CAACA;IACLF,eAACA;AAADA,CAACA,IAAA;AAAA,CAAC'}";
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void BadMappings() {
+        public void BadMappings()
+        {
             // empty segment
             AssertUtil.Throws<InvalidOperationException>(
                 () => new SourceMap(new StringReader("{version:3, mappings:','}"))
@@ -81,9 +71,10 @@ namespace NodejsTests {
 
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void MappingLine() {
+        public void MappingLine()
+        {
             var map = new SourceMap(new StringReader(_sample));
-            var testCases = new[] { 
+            var testCases = new[] {
                 new { Line = 0, Name = "Greeter", Filename = "test.ts" },
                 new { Line = 1, Name = "Greeter", Filename = "test.ts" },
                 new { Line = 1, Name = "Greeter.constructor", Filename = "test.ts" },
@@ -96,22 +87,27 @@ namespace NodejsTests {
                 new { Line = 5, Name = "Greeter", Filename = "test.ts" },
                 new { Line = -1, Name = "", Filename = "" },
             };
-            for (int i = 0; i < testCases.Length; i++) {
+            for (int i = 0; i < testCases.Length; i++)
+            {
                 SourceMapInfo mapping;
-                if (map.TryMapLine(i, out mapping)) {
+                if (map.TryMapLine(i, out mapping))
+                {
                     Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
                     Assert.AreEqual(testCases[i].Line, mapping.Line);
-                } else {
+                }
+                else
+                {
                     Assert.AreEqual(-1, testCases[i].Line);
                 }
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void MappingLineAndColumn() {
+        public void MappingLineAndColumn()
+        {
             var map = new SourceMap(new StringReader(_sample));
-            var testCases = new[] { 
+            var testCases = new[] {
                 new { InLine = 0, InColumn = 0, ExpectedLine = 0, ExpectedColumn = 0, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 1, InColumn = 0, ExpectedLine = 1, ExpectedColumn = 4, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 1, InColumn = 4, ExpectedLine = 1, ExpectedColumn = 4, Name = "Greeter", Filename = "test.ts" },
@@ -129,10 +125,12 @@ namespace NodejsTests {
                 new { InLine = 9, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 1, Name = "Greeter", Filename = "test.ts" },
                 new { InLine = 10, InColumn = 0, ExpectedLine = 5, ExpectedColumn = 0, Name = "", Filename = "" },
             };
-            for (int i = 0; i < testCases.Length; i++) {
+            for (int i = 0; i < testCases.Length; i++)
+            {
                 Console.WriteLine("{0} {1}", testCases[i].InLine, testCases[i].InColumn);
                 SourceMapInfo mapping;
-                if (map.TryMapPoint(testCases[i].InLine, testCases[i].InColumn, out mapping)) {
+                if (map.TryMapPoint(testCases[i].InLine, testCases[i].InColumn, out mapping))
+                {
                     Assert.AreEqual(testCases[i].Filename, mapping.FileName);
                     Assert.AreEqual(testCases[i].Name, mapping.Name);
                     Assert.AreEqual(testCases[i].ExpectedLine, mapping.Line);
@@ -142,36 +140,48 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void Version() {
-            try {
+        public void Version()
+        {
+            try
+            {
                 new SourceMap(new StringReader("{}"));
                 Assert.Fail("Exception not thrown on empty map");
-            } catch (NotSupportedException ex) {
+            }
+            catch (NotSupportedException ex)
+            {
                 Assert.IsTrue(ex.Message.Contains("V3"));
             }
-            try {
+            try
+            {
                 new SourceMap(new StringReader("{version:1}"));
                 Assert.Fail("Exception not thrown on V1 map");
-            } catch (NotSupportedException ex) {
+            }
+            catch (NotSupportedException ex)
+            {
                 Assert.IsTrue(ex.Message.Contains("V3"));
             }
-            try {
+            try
+            {
                 new SourceMap(new StringReader("{version:4}"));
                 Assert.Fail("Exception not thrown on V3 map");
-            } catch (NotSupportedException ex) {
+            }
+            catch (NotSupportedException ex)
+            {
                 Assert.IsTrue(ex.Message.Contains("V3"));
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void Names() {
+        public void Names()
+        {
             var map = new SourceMap(new StringReader("{version:3, names:['foo']}"));
             Assert.AreEqual(map.Names[0], "foo");
         }
 
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void Sources() {
+        public void Sources()
+        {
             var map = new SourceMap(new StringReader("{version:3, sources:['test.ts']}"));
             Assert.AreEqual(map.Sources[0], "test.ts");
 
@@ -180,29 +190,36 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void File() {
+        public void File()
+        {
             var map = new SourceMap(new StringReader("{version:3, file:'test.js'}"));
             Assert.AreEqual(map.File, "test.js");
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void InvalidJson() {
-            try {
+        public void InvalidJson()
+        {
+            try
+            {
                 var map = new SourceMap(new StringReader("{'test.js\\'}"));
                 Assert.Fail("Argument exception not raised");
-            } catch (ArgumentException) {
+            }
+            catch (ArgumentException)
+            {
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void MapToOriginal() {
+        public void MapToOriginal()
+        {
             var mapper = new SourceMapper();
             var mapInfo = mapper.MapToOriginal(TestData.GetPath(@"TestData\DebuggerProject\TypeScriptTest.js"), 1, 0);
             Assert.AreEqual("TypeScriptTest.ts", mapInfo.FileName);
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void MapToJavaScript() {
+        public void MapToJavaScript()
+        {
             var mapper = new SourceMapper();
             string fileName;
             int lineNo, columnNo;
@@ -211,12 +228,14 @@ namespace NodejsTests {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void GetOriginalFileNameWithStackFrame() {
+        public void GetOriginalFileNameWithStackFrame()
+        {
             string javaScriptFileName = TestData.GetPath(@"TestData\TypeScriptMultfile\all.js");
-            var sourceMapper = new SourceMapper();            
+            var sourceMapper = new SourceMapper();
             int? line = 24, column = 9;
             string originalFileName = sourceMapper.GetOriginalFileName(javaScriptFileName, line, column);
             Assert.IsTrue(originalFileName.Contains("file2.ts"));
         }
     }
 }
+

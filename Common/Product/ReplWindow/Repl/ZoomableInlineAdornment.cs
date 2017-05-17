@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -20,12 +8,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Text.Editor;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
-    internal class ZoomableInlineAdornment : ContentControl {
+namespace Microsoft.NodejsTools.Repl
+{
+    internal class ZoomableInlineAdornment : ContentControl
+    {
         private readonly ITextView _parent;
         private ResizingAdorner _adorner;
         private bool _isResizing;
@@ -34,7 +20,8 @@ namespace Microsoft.VisualStudio.Repl {
         private readonly double _zoomStep;
         private readonly double _widthRatio, _heightRatio;
 
-        public ZoomableInlineAdornment(UIElement content, ITextView parent) {
+        public ZoomableInlineAdornment(UIElement content, ITextView parent)
+        {
             _parent = parent;
             Debug.Assert(parent is IInputElement);
             Content = new Border { BorderThickness = new Thickness(1), Child = content, Focusable = true };
@@ -62,14 +49,16 @@ namespace Microsoft.VisualStudio.Repl {
             MyContent.Style = style;
         }
 
-        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e) {
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
             base.OnPreviewMouseLeftButtonDown(e);
 
             ((Border)Content).Focus();
             e.Handled = true;
         }
 
-        private ContextMenu MakeContextMenu() {
+        private ContextMenu MakeContextMenu()
+        {
             var result = new ContextMenu();
             AddMenuItem(result, "Zoom In", "Ctrl+OemPlus", (s, e) => OnZoomIn());
             AddMenuItem(result, "Zoom Out", "Ctrl+OemMinus", (s, e) => OnZoomOut());
@@ -82,45 +71,55 @@ namespace Microsoft.VisualStudio.Repl {
             return result;
         }
 
-        private static void AddMenuItem(ContextMenu menu, string text, string shortcut, EventHandler handler) {
+        private static void AddMenuItem(ContextMenu menu, string text, string shortcut, EventHandler handler)
+        {
             var item = new MenuItem();
             item.Header = text;
             item.Click += (s, e) => handler(s, e);
             menu.Items.Add(item);
         }
 
-        private Border MyContent {
+        private Border MyContent
+        {
             get { return Content as Border; }
         }
 
-        private void OnGotFocus(object sender, RoutedEventArgs args) {
+        private void OnGotFocus(object sender, RoutedEventArgs args)
+        {
             _adorner = new ResizingAdorner(MyContent);
             _adorner.ResizeStarted += OnResizeStarted;
             _adorner.ResizeCompleted += OnResizeCompleted;
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(MyContent);
-            if (adornerLayer != null) {
+            if (adornerLayer != null)
+            {
                 adornerLayer.Add(_adorner);
             }
         }
 
-        private void OnLostFocus(object sender, RoutedEventArgs args) {
+        private void OnLostFocus(object sender, RoutedEventArgs args)
+        {
             _adorner.ResizeStarted -= OnResizeStarted;
             _adorner.ResizeCompleted -= OnResizeCompleted;
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(MyContent);
-            if (adornerLayer != null) {
+            if (adornerLayer != null)
+            {
                 adornerLayer.Remove(_adorner);
                 _adorner = null;
             }
         }
 
-        protected override void OnPreviewKeyDown(KeyEventArgs args) {
+        protected override void OnPreviewKeyDown(KeyEventArgs args)
+        {
             var modifiers = args.KeyboardDevice.Modifiers & ModifierKeys.Control;
-            if (modifiers == ModifierKeys.Control && (args.Key == Key.OemPlus || args.Key == Key.Add)) {
+            if (modifiers == ModifierKeys.Control && (args.Key == Key.OemPlus || args.Key == Key.Add))
+            {
                 OnZoomIn();
                 args.Handled = true;
-            } else if (modifiers == ModifierKeys.Control && (args.Key == Key.OemMinus || args.Key == Key.Subtract)) {
+            }
+            else if (modifiers == ModifierKeys.Control && (args.Key == Key.OemMinus || args.Key == Key.Subtract))
+            {
                 OnZoomOut();
                 args.Handled = true;
             }
@@ -128,34 +127,42 @@ namespace Microsoft.VisualStudio.Repl {
             base.OnPreviewKeyDown(args);
         }
 
-        private void OnResizeStarted(object sender, RoutedEventArgs args) {
+        private void OnResizeStarted(object sender, RoutedEventArgs args)
+        {
             _isResizing = true;
         }
 
-        private void OnResizeCompleted(object sender, RoutedEventArgs args) {
+        private void OnResizeCompleted(object sender, RoutedEventArgs args)
+        {
             _isResizing = false;
             _zoom = MyContent.DesiredSize.Width / (_parent.ViewportWidth * _widthRatio);
         }
 
-        internal void Zoom(double zoomFactor) {
+        internal void Zoom(double zoomFactor)
+        {
             _zoom = zoomFactor;
             UpdateSize();
         }
 
-        private void OnZoomIn() {
+        private void OnZoomIn()
+        {
             _zoom += _zoomStep;
             UpdateSize();
         }
 
-        private void OnZoomOut() {
-            if (_zoom - _zoomStep > 0.1) {
+        private void OnZoomOut()
+        {
+            if (_zoom - _zoomStep > 0.1)
+            {
                 _zoom -= _zoomStep;
                 UpdateSize();
             }
         }
 
-        internal void UpdateSize() {
-            if (_isResizing) {
+        internal void UpdateSize()
+        {
+            if (_isResizing)
+            {
                 return;
             }
 
@@ -166,7 +173,8 @@ namespace Microsoft.VisualStudio.Repl {
             MyContent.Measure(new Size(width, height));
         }
 
-        internal double MinimizedZoom {
+        internal double MinimizedZoom
+        {
             get { return _minimizedZoom; }
         }
     }

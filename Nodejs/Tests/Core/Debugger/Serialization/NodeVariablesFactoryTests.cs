@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.NodejsTools.Debugger;
@@ -20,13 +6,17 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NodejsTests.Mocks;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class NodeVariablesFactoryTests {
+    public class NodeVariablesFactoryTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateNullEvaluationResult() {
+        public void CreateNullEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 5,
                 Parent = null,
                 StackFrame = null,
@@ -55,9 +45,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateNumberEvaluationResult() {
+        public void CreateNumberEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 20,
                 Parent = null,
                 StackFrame = null,
@@ -86,9 +78,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateBooleanEvaluationResult() {
+        public void CreateBooleanEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 21,
                 Parent = null,
                 StackFrame = null,
@@ -117,9 +111,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateRegexpEvaluationResult() {
+        public void CreateRegexpEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 22,
                 Parent = null,
                 StackFrame = null,
@@ -148,9 +144,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateFunctionWithoutTextEvaluationResult() {
+        public void CreateFunctionWithoutTextEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 23,
                 Parent = null,
                 StackFrame = null,
@@ -178,9 +176,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateFunctionWithTextEvaluationResult() {
+        public void CreateFunctionWithTextEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 23,
                 Parent = null,
                 StackFrame = null,
@@ -208,9 +208,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateStringEvaluationResult() {
+        public void CreateStringEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 24,
                 Parent = null,
                 StackFrame = null,
@@ -239,9 +241,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateObjectEvaluationResult() {
+        public void CreateObjectEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 25,
                 Parent = null,
                 StackFrame = null,
@@ -269,9 +273,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateDateEvaluationResult() {
+        public void CreateDateEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 27,
                 Parent = null,
                 StackFrame = null,
@@ -299,9 +305,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateArrayEvaluationResult() {
+        public void CreateArrayEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 19,
                 Parent = null,
                 StackFrame = null,
@@ -329,9 +337,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateErrorEvaluationResult() {
+        public void CreateErrorEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 26,
                 Parent = null,
                 StackFrame = null,
@@ -359,9 +369,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateUnknownEvaluationResult() {
+        public void CreateUnknownEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 26,
                 Parent = null,
                 StackFrame = null,
@@ -389,9 +401,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateUnknownEvaluationResultWithEmptyValue() {
+        public void CreateUnknownEvaluationResultWithEmptyValue()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 26,
                 Parent = null,
                 StackFrame = null,
@@ -419,27 +433,33 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateEvaluationResultFromNullVariable() {
+        public void CreateEvaluationResultFromNullVariable()
+        {
             // Arrange
             Exception exception = null;
             var factory = new EvaluationResultFactory();
 
             // Act
-            try {
+            try
+            {
                 factory.Create(null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateArrayElementEvaluationResult() {
+        public void CreateArrayElementEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 19,
                 Parent = new NodeEvaluationResult(0, null, null, "Object", "v_array", "v_array", NodeExpressionType.Expandable, null),
                 StackFrame = null,
@@ -467,9 +487,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateObjectElementEvaluationResult() {
+        public void CreateObjectElementEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 19,
                 Parent = new NodeEvaluationResult(0, null, null, "Object", "v_object", "v_object", NodeExpressionType.Expandable, null),
                 StackFrame = null,
@@ -497,9 +519,11 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateObjectElementWithInvalidIdentifierEvaluationResult() {
+        public void CreateObjectElementWithInvalidIdentifierEvaluationResult()
+        {
             // Arrange
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 19,
                 Parent = new NodeEvaluationResult(0, null, null, "Object", "v_object", "v_object", NodeExpressionType.Expandable, null),
                 StackFrame = null,
@@ -527,10 +551,12 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateEvaluationResultForPrototypeChild() {
+        public void CreateEvaluationResultForPrototypeChild()
+        {
             // Arrange
             const string parentName = "parent";
-            var variable = new MockNodeVariable {
+            var variable = new MockNodeVariable
+            {
                 Id = 19,
                 Parent = new NodeEvaluationResult(
                     0,
@@ -566,3 +592,4 @@ namespace NodejsTests.Debugger.Serialization {
         }
     }
 }
+

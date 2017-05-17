@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -21,8 +9,10 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Microsoft.VisualStudioTools.Project {
-    internal class SR {
+namespace Microsoft.VisualStudioTools.Project
+{
+    internal class SR
+    {
         internal const string AddReferenceDialogTitle = "AddReferenceDialogTitle";
         internal const string AddReferenceExtensions = "AddReferenceExtensions";
         internal const string AddToNullProjectError = "AddToNullProjectError";
@@ -185,28 +175,27 @@ namespace Microsoft.VisualStudioTools.Project {
             LazyThreadSafetyMode.ExecutionAndPublication
         );
 
-        private static ResourceManager Manager {
-            get {
-                return _manager.Value;
-            }
-        }
+        private static ResourceManager Manager => _manager.Value;
 
 #if DEBUG
         // Detect incorrect calls
         [Obsolete]
-        internal static string GetString(string value, CultureInfo c) {
+        internal static string GetString(string value, CultureInfo c)
+        {
             return null;
         }
 #endif
 
-
-        protected static string GetStringInternal(ResourceManager manager, string value, object[] args) {
-            string result = manager.GetString(value, CultureInfo.CurrentUICulture);
-            if (result == null) {
+        protected static string GetStringInternal(ResourceManager manager, string value, object[] args)
+        {
+            var result = manager.GetString(value, CultureInfo.CurrentUICulture);
+            if (result == null)
+            {
                 return null;
             }
 
-            if (args.Length == 0) {
+            if (args.Length == 0)
+            {
                 Debug.Assert(result.IndexOf("{0}") < 0, "Resource string '" + value + "' requires format arguments.");
                 return result;
             }
@@ -220,11 +209,11 @@ namespace Microsoft.VisualStudioTools.Project {
                 string.Format("Resource string '{0}' requires more than {1} argument(s)", value, args.Length)
             );
 
-
             return string.Format(CultureInfo.CurrentUICulture, result, args);
         }
 
-        public static string GetString(string value, params object[] args) {
+        public static string GetString(string value, params object[] args)
+        {
             var result = GetStringInternal(Manager, value, args);
             Debug.Assert(result != null, "String resource '" + value + "' is missing");
             return result ?? value;
@@ -243,14 +232,19 @@ namespace Microsoft.VisualStudioTools.Project {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
-            if (string.IsNullOrEmpty(callerName)) {
+        )
+        {
+            if (string.IsNullOrEmpty(callerName))
+            {
                 callerName = callerType != null ? callerType.FullName : string.Empty;
-            } else if (callerType != null) {
+            }
+            else if (callerType != null)
+            {
                 callerName = callerType.FullName + "." + callerName;
             }
 
-            return GetString(UnhandledException, ex, callerFile ?? String.Empty, callerLineNumber, callerName);
+            return GetString(UnhandledException, ex, callerFile ?? string.Empty, callerLineNumber, callerName);
         }
     }
 }
+

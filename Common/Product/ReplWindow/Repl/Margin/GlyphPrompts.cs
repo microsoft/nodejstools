@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -25,15 +13,11 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
-
-// An alternative implementation of prompt margin using GlyphMargin.
-// Unfortunately bug in GlyphMargin causes disappearance of the last REPL prompt under certain circumstances which deteriorates user experience.
-// We implement our own margin until this bug is fixed in VS.
+namespace Microsoft.NodejsTools.Repl
+{
+    // An alternative implementation of prompt margin using GlyphMargin.
+    // Unfortunately bug in GlyphMargin causes disappearance of the last REPL prompt under certain circumstances which deteriorates user experience.
+    // We implement our own margin until this bug is fixed in VS.
 #if TAGGERS
     /// <summary>
     /// Any <see cref="ITextBuffer"/> with content type <see cref="ReplConstants.ReplContentTypeName"/>, role <see cref="ReplConstants.ReplTextViewRole"/> 

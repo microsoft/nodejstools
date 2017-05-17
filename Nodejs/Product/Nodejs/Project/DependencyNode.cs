@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -28,8 +14,10 @@ using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
-namespace Microsoft.NodejsTools.Project {
-    internal class DependencyNode : HierarchyNode {
+namespace Microsoft.NodejsTools.Project
+{
+    internal class DependencyNode : HierarchyNode
+    {
         private readonly NodejsProjectNode _projectNode;
         private readonly DependencyNode _parent;
         private readonly string _displayString;
@@ -38,22 +26,27 @@ namespace Microsoft.NodejsTools.Project {
             NodejsProjectNode root,
             DependencyNode parent,
             IPackage package)
-            : base(root) {
-            _projectNode = root;
-            _parent = parent;
-            Package = package;
+            : base(root)
+        {
+            this._projectNode = root;
+            this._parent = parent;
+            this.Package = package;
 
-            _displayString = GetInitialPackageDisplayString(package);
-            ExcludeNodeFromScc = true;
+            this._displayString = GetInitialPackageDisplayString(package);
+            this.ExcludeNodeFromScc = true;
         }
 
         public IPackage Package { get; internal set; }
 
-        internal INpmController NpmController {
-            get {
-                if (null != _projectNode) {
-                    var modulesNode = _projectNode.ModulesNode;
-                    if (null != modulesNode) {
+        internal INpmController NpmController
+        {
+            get
+            {
+                if (null != this._projectNode)
+                {
+                    var modulesNode = this._projectNode.ModulesNode;
+                    if (null != modulesNode)
+                    {
                         return modulesNode.NpmController;
                     }
                 }
@@ -63,81 +56,86 @@ namespace Microsoft.NodejsTools.Project {
 
         #region HierarchyNode implementation
 
-        private string GetRelativeUrlFragment() {
+        private string GetRelativeUrlFragment()
+        {
             var buff = new StringBuilder();
-            if (null != _parent) {
-                buff.Append(_parent.GetRelativeUrlFragment());
+            if (null != this._parent)
+            {
+                buff.Append(this._parent.GetRelativeUrlFragment());
                 buff.Append('/');
             }
             buff.Append("node_modules/");
-            buff.Append(Package.Name);
+            buff.Append(this.Package.Name);
             return buff.ToString();
         }
 
-        public override string Url {
-            get { return new Url(ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl; }
-        }
-
-        public override string Caption {
-            get { return _displayString; }
-        }
-
-        public override Guid ItemTypeGuid {
-            get { return VSConstants.GUID_ItemType_VirtualFolder; }
-        }
-
-        public override Guid MenuGroupId {
-            get { return Guids.NodejsNpmCmdSet; }
-        }
-
-        public override int MenuCommandId {
-            get { return PkgCmdId.menuIdNpm; }
-        }
-
+        public override string Url => new Url(this.ProjectMgr.BaseURI, GetRelativeUrlFragment()).AbsoluteUrl;
+        public override string Caption => this._displayString;
+        public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
+        public override Guid MenuGroupId => Guids.NodejsNpmCmdSet;
+        public override int MenuCommandId => PkgCmdId.menuIdNpm;
         [Obsolete]
-        public override object GetIconHandle(bool open) {
-            int imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
-            if (Package.IsMissing) {
-                imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
-            } else {
-                if (!Package.IsListedInParentPackageJson) {
-                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyNotListed];
-                } else {
-                    imageIndex = _projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
+        public override object GetIconHandle(bool open)
+        {
+            var imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
+            if (this.Package.IsMissing)
+            {
+                imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyMissing];
+            }
+            else
+            {
+                if (!this.Package.IsListedInParentPackageJson)
+                {
+                    imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.DependencyNotListed];
+                }
+                else
+                {
+                    imageIndex = this._projectNode.ImageIndexFromNameDictionary[NodejsProjectImageName.Dependency];
                 }
             }
 
-            return _projectNode.ImageHandler.GetIconHandle(imageIndex);
+            return this._projectNode.ImageHandler.GetIconHandle(imageIndex);
         }
 
-        public override string GetEditLabel() {
+        public override string GetEditLabel()
+        {
             return null;
         }
 
-        protected override NodeProperties CreatePropertiesObject() {
+        protected override NodeProperties CreatePropertiesObject()
+        {
             return new DependencyNodeProperties(this);
         }
 
-        internal DependencyNodeProperties GetPropertiesObject() {
+        internal DependencyNodeProperties GetPropertiesObject()
+        {
             return CreatePropertiesObject() as DependencyNodeProperties;
         }
 
-#endregion
+        #endregion
 
-#region Command handling
+        #region Command handling
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result) {
+        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
+        {
             //  Latter condition is because it's only valid to carry out npm operations
             //  on top level dependencies of the user's project, not sub-dependencies.
             //  Performing operations on sub-dependencies would just break things.
-            if (cmdGroup == Guids.NodejsNpmCmdSet) {
-                switch (cmd) {
+            if (cmdGroup == Guids.NodejsNpmCmdSet)
+            {
+                switch (cmd)
+                {
                     case PkgCmdId.cmdidNpmOpenModuleHomepage:
-                        if (this.Package.Homepages != null) {
-                            using (var enumerator = this.Package.Homepages.GetEnumerator()) {
-                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
+                        if (this.Package.Homepages != null)
+                        {
+                            using (var enumerator = this.Package.Homepages.GetEnumerator())
+                            {
+                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current))
+                                {
                                     result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                                } else {
+                                }
+                                else
+                                {
                                     result = QueryStatusResult.SUPPORTED;
                                 }
                             }
@@ -145,16 +143,24 @@ namespace Microsoft.NodejsTools.Project {
                         return VSConstants.S_OK;
                 }
 
-                if (null == _parent) {
-                    switch (cmd) {
+                if (null == this._parent)
+                {
+                    switch (cmd)
+                    {
                         case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                            if (null == _projectNode.ModulesNode
-                                || _projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                            if (null == this._projectNode.ModulesNode
+                                || this._projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
+                            {
                                 result = QueryStatusResult.SUPPORTED;
-                            } else {
-                                if (null != Package && Package.IsMissing) {
+                            }
+                            else
+                            {
+                                if (null != this.Package && this.Package.IsMissing)
+                                {
                                     result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                                } else {
+                                }
+                                else
+                                {
                                     result = QueryStatusResult.SUPPORTED;
                                 }
                             }
@@ -162,10 +168,13 @@ namespace Microsoft.NodejsTools.Project {
 
                         case PkgCmdId.cmdidNpmUpdateSingleModule:
                         case PkgCmdId.cmdidNpmUninstallModule:
-                            if (null != _projectNode.ModulesNode &&
-                                !_projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode()) {
+                            if (null != this._projectNode.ModulesNode &&
+                                !this._projectNode.ModulesNode.IsCurrentStateASuppressCommandsMode())
+                            {
                                 result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                            } else {
+                            }
+                            else
+                            {
                                 result = QueryStatusResult.SUPPORTED;
                             }
                             return VSConstants.S_OK;
@@ -176,8 +185,11 @@ namespace Microsoft.NodejsTools.Project {
                             return VSConstants.S_OK;
                     }
                 }
-            } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
-                switch ((VsCommands2K)cmd) {
+            }
+            else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K)
+            {
+                switch ((VsCommands2K)cmd)
+                {
                     case CommonConstants.OpenFolderInExplorerCmdId:
                         result = QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
                         return VSConstants.S_OK;
@@ -187,48 +199,66 @@ namespace Microsoft.NodejsTools.Project {
             return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
         }
 
-        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut) {
-            if (cmdGroup == Guids.NodejsNpmCmdSet) {
-                switch (cmd) {
+        internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
+        {
+            if (cmdGroup == Guids.NodejsNpmCmdSet)
+            {
+                switch (cmd)
+                {
                     case PkgCmdId.cmdidNpmOpenModuleHomepage:
-                        if (this.Package.Homepages != null) {
-                            using (var enumerator = this.Package.Homepages.GetEnumerator()) {
-                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current)) {
+                        if (this.Package.Homepages != null)
+                        {
+                            using (var enumerator = this.Package.Homepages.GetEnumerator())
+                            {
+                                if (enumerator.MoveNext() && !string.IsNullOrEmpty(enumerator.Current))
+                                {
                                     Process.Start(enumerator.Current);
                                 }
                             }
                         }
                         return VSConstants.S_OK;
                 }
-                if (null == _parent) {
-                    switch (cmd) {
+                if (null == this._parent)
+                {
+                    switch (cmd)
+                    {
                         case PkgCmdId.cmdidNpmInstallSingleMissingModule:
-                            if (null != _projectNode.ModulesNode) {
-                                var t = _projectNode.ModulesNode.InstallMissingModule(this);
+                            if (null != this._projectNode.ModulesNode)
+                            {
+                                var t = this._projectNode.ModulesNode.InstallMissingModule(this);
                             }
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidNpmUninstallModule:
-                            if (null != _projectNode.ModulesNode) {
-                                var t = _projectNode.ModulesNode.UninstallModule(this);
+                            if (null != this._projectNode.ModulesNode)
+                            {
+                                var t = this._projectNode.ModulesNode.UninstallModule(this);
                             }
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidNpmUpdateSingleModule:
-                            if (null != _projectNode.ModulesNode) {
-                                var t = _projectNode.ModulesNode.UpdateModule(this);
+                            if (null != this._projectNode.ModulesNode)
+                            {
+                                var t = this._projectNode.ModulesNode.UpdateModule(this);
                             }
                             return VSConstants.S_OK;
                     }
                 }
-            } else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K) {
-                switch ((VsCommands2K)cmd) {
+            }
+            else if (cmdGroup == Microsoft.VisualStudioTools.Project.VsMenus.guidStandardCommandSet2K)
+            {
+                switch ((VsCommands2K)cmd)
+                {
                     case CommonConstants.OpenFolderInExplorerCmdId:
-                        string path = this.Package.Path;
-                        try {
+                        var path = this.Package.Path;
+                        try
+                        {
                             Process.Start(path);
-                        } catch (Exception ex) {
-                            if (ex is InvalidOperationException || ex is Win32Exception) {
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex is InvalidOperationException || ex is Win32Exception)
+                            {
                                 MessageBox.Show(
                                     string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeModuleDoesNotExist, path),
                                     SR.ProductName,
@@ -247,20 +277,28 @@ namespace Microsoft.NodejsTools.Project {
 
         #endregion
 
-        private static string GetInitialPackageDisplayString(IPackage package) {
+        private static string GetInitialPackageDisplayString(IPackage package)
+        {
             var buff = new StringBuilder(package.Name);
-            if (package.IsMissing) {
+            if (package.IsMissing)
+            {
                 buff.Append(string.Format(CultureInfo.CurrentCulture, " ({0})", Resources.DependencyNodeLabelMissing));
-            } else {
+            }
+            else
+            {
                 buff.Append('@');
                 buff.Append(package.Version);
 
-                if (!package.IsListedInParentPackageJson) {
+                if (!package.IsListedInParentPackageJson)
+                {
                     buff.AppendFormat(string.Format(CultureInfo.CurrentCulture, " ({0})",
                         string.Format(CultureInfo.CurrentCulture, Resources.DependencyNodeLabelNotListed, NodejsConstants.PackageJsonFile)));
-                } else {
+                }
+                else
+                {
                     var dependencyTypes = GetDependencyTypeNames(package);
-                    if (package.IsDevDependency || package.IsOptionalDependency) {
+                    if (package.IsDevDependency || package.IsOptionalDependency)
+                    {
                         buff.Append(" (");
                         buff.Append(string.Join(", ", dependencyTypes.ToArray()));
                         buff.Append(")");
@@ -268,25 +306,31 @@ namespace Microsoft.NodejsTools.Project {
                 }
             }
 
-            if (package.IsBundledDependency) {
+            if (package.IsBundledDependency)
+            {
                 buff.Append(string.Format(CultureInfo.CurrentCulture, "[{0}]",
                     Resources.DependencyNodeLabelBundled));
             }
             return buff.ToString();
         }
 
-        private static List<string> GetDependencyTypeNames(IPackage package) {
+        private static List<string> GetDependencyTypeNames(IPackage package)
+        {
             var dependencyTypes = new List<string>(3);
-            if (package.IsDependency) {
+            if (package.IsDependency)
+            {
                 dependencyTypes.Add("standard");
             }
-            if (package.IsDevDependency) {
+            if (package.IsDevDependency)
+            {
                 dependencyTypes.Add("dev");
             }
-            if (package.IsOptionalDependency) {
+            if (package.IsOptionalDependency)
+            {
                 dependencyTypes.Add("optional");
             }
             return dependencyTypes;
         }
     }
 }
+

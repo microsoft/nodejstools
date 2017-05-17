@@ -1,124 +1,69 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using Microsoft.NodejsTools.Npm;
-using Microsoft.NodejsTools.Project;
 
-namespace Microsoft.NodejsTools.NpmUI {
-    abstract class PackageCatalogEntryViewModel {
-        private readonly string _name;
-        private readonly SemverVersion? _version;
-        private readonly List<SemverVersion> _availableVersions;
-        private readonly string _author;
-        private readonly string _description;
-        private readonly List<string> _homepages;
-        private readonly string _keywords;
-
-        private readonly SemverVersion? _localVersion;
+namespace Microsoft.NodejsTools.NpmUI
+{
+    internal abstract class PackageCatalogEntryViewModel
+    {
+        private readonly SemverVersion? version;
+        private readonly SemverVersion? localVersion;
 
         protected PackageCatalogEntryViewModel(
             string name,
             SemverVersion? version,
-            IEnumerable<SemverVersion> availableVersions, 
+            IEnumerable<SemverVersion> availableVersions,
             string author,
             string description,
             IEnumerable<string> homepages,
             string keywords,
             SemverVersion? localVersion
-        ) {
-            _name = name;
-            _version = version;
-            _availableVersions = availableVersions != null ? availableVersions.ToList() : new List<SemverVersion>();
-            _author = author;
-            _description = description;
-            _homepages = homepages != null ? homepages.ToList() : new List<string>();
-            _keywords = keywords;
-            _localVersion = localVersion;
+        )
+        {
+            this.Name = name;
+            this.version = version;
+            this.AvailableVersions = availableVersions ?? Enumerable.Empty<SemverVersion>();
+            this.Author = author;
+            this.Description = description;
+            this.Homepages = homepages ?? Enumerable.Empty<string>();
+            this.Keywords = keywords;
+            this.localVersion = localVersion;
         }
 
-        public virtual string Name { 
-            get { return _name; } 
-        }
+        public virtual string Name { get; }
+        public IEnumerable<SemverVersion> AvailableVersions { get; }
+        public string Author { get; }
+        public string Description { get; }
+        public IEnumerable<string> Homepages { get; }
+        public string Keywords { get; }
 
-        public string Version { 
-            get { return ToString(_version); } 
-        }
-
-        public IEnumerable<SemverVersion> AvailableVersions {
-            get { return _availableVersions; }
-        } 
-
-        public string Author { 
-            get { return _author; } 
-        }
-
-        public Visibility AuthorVisibility { 
-            get { return string.IsNullOrEmpty(_author) ? Visibility.Collapsed : Visibility.Visible; } 
-        }
-
-        public string Description { get { return _description; } }
-
-        public Visibility DescriptionVisibility { get { return string.IsNullOrEmpty(_description) ? Visibility.Collapsed : Visibility.Visible; } }
-
-        public IEnumerable<string> Homepages { get { return _homepages; } }
-
-        public Visibility HomepagesVisibility { 
-            get { return _homepages.Any() ? Visibility.Visible : Visibility.Collapsed; } 
-        }
-        
-        public string Keywords { 
-            get { return _keywords; } 
-        }
-        
-        public bool IsInstalledLocally { 
-            get { return _localVersion.HasValue; } 
-        }
-        
-        public bool IsLocalInstallOutOfDate { 
-            get { return _localVersion.HasValue && _localVersion < _version; } 
-        }
-        
-        public string LocalVersion { 
-            get { return ToString(_localVersion); } 
-        }
-       
-        private static string ToString(SemverVersion? version) {
-            return version.HasValue ? version.ToString() : string.Empty;
+        public override string ToString()
+        {
+            return this.Name;
         }
     }
 
-    internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel {
+    internal class ReadOnlyPackageCatalogEntryViewModel : PackageCatalogEntryViewModel
+    {
         public ReadOnlyPackageCatalogEntryViewModel(IPackage package, IPackage localInstall)
             : base(
                 package.Name ?? string.Empty,
                 package.Version,
                 package.AvailableVersions,
-                package.Author == null ? string.Empty : package.Author.ToString(),
+                package.Author?.ToString() ?? string.Empty,
                 package.Description ?? string.Empty,
                 package.Homepages,
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
                     : Resources.NoKeywordsInPackage,
                 localInstall != null ? (SemverVersion?)localInstall.Version : null
-            ) {
-            if (string.IsNullOrEmpty(Name)) {
+            )
+        {
+            if (string.IsNullOrEmpty(this.Name))
+            {
                 throw new ArgumentNullException("package.Name");
             }
         }

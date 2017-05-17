@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -19,11 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace TestUtilities.SharedProject {
+namespace TestUtilities.SharedProject
+{
     /// <summary>
     /// Represents a solution element such as a project or solution folder.
     /// </summary>
-    public interface ISolutionElement {
+    public interface ISolutionElement
+    {
         /// <summary>
         /// Gets the name of the solution element
         /// </summary>
@@ -32,7 +22,8 @@ namespace TestUtilities.SharedProject {
         /// <summary>
         /// The type guid for the project type or other solution element type such as a folder.
         /// </summary>
-        Guid TypeGuid {
+        Guid TypeGuid
+        {
             get;
         }
 
@@ -40,7 +31,8 @@ namespace TestUtilities.SharedProject {
         /// Gets the flags which control how the solution element is written to the
         /// solution file.
         /// </summary>
-        SolutionElementFlags Flags {
+        SolutionElementFlags Flags
+        {
             get;
         }
 
@@ -52,3 +44,4 @@ namespace TestUtilities.SharedProject {
         MSBuild.Project Save(MSBuild.ProjectCollection collection, string location);
     }
 }
+

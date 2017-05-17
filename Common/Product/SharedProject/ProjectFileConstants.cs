@@ -1,24 +1,14 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Defines the constant strings for various msbuild targets
     /// </summary>
-    public static class MsBuildTarget {
+    public static class MsBuildTarget
+    {
         public const string ResolveProjectReferences = "ResolveProjectReferences";
         public const string ResolveAssemblyReferences = "ResolveAssemblyReferences";
         public const string ResolveComReferences = "ResolveComReferences";
@@ -27,7 +17,8 @@ namespace Microsoft.VisualStudioTools.Project {
         public const string Clean = "Clean";
     }
 
-    public static class MsBuildGeneratedItemType {
+    public static class MsBuildGeneratedItemType
+    {
         public const string ReferenceCopyLocalPaths = "ReferenceCopyLocalPaths";
         public const string ComReferenceWrappers = "ComReferenceWrappers";
     }
@@ -35,7 +26,8 @@ namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// Defines the constant strings used with project files.
     /// </summary>
-    public static class ProjectFileConstants {
+    public static class ProjectFileConstants
+    {
         public const string Include = "Include";
         public const string Name = "Name";
         public const string HintPath = "HintPath";
@@ -94,7 +86,8 @@ namespace Microsoft.VisualStudioTools.Project {
         public const string WindowsAppContainer = "WindowsAppContainer";
     }
 
-    public static class ProjectFileAttributeValue {
+    public static class ProjectFileAttributeValue
+    {
         public const string Code = "Code";
         public const string Form = "Form";
         public const string Component = "Component";
@@ -102,11 +95,13 @@ namespace Microsoft.VisualStudioTools.Project {
         public const string UserControl = "UserControl";
     }
 
-    internal static class ProjectFileValues {
+    internal static class ProjectFileValues
+    {
         internal const string AnyCPU = "AnyCPU";
     }
 
-    public enum WrapperToolAttributeValue {
+    public enum WrapperToolAttributeValue
+    {
         Primary,
         TlbImp
     }
@@ -114,11 +109,12 @@ namespace Microsoft.VisualStudioTools.Project {
     /// <summary>
     /// A set of constants that specify the default sort order for different types of hierarchy nodes.
     /// </summary>
-    public static class DefaultSortOrderNode {
+    public static class DefaultSortOrderNode
+    {
         public const int HierarchyNode = 1000;
         public const int FolderNode = 500;
         public const int NestedProjectNode = 200;
         public const int ReferenceContainerNode = 300;
     }
-
 }
+

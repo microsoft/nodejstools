@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -21,11 +7,14 @@ using Microsoft.NodejsTools.Debugger.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace NodejsTests.Debugger.Serialization {
+namespace NodejsTests.Debugger.Serialization
+{
     [TestClass]
-    public class PrototypeVariableTests {
+    public class PrototypeVariableTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreatePrototypeVariable() {
+        public void CreatePrototypeVariable()
+        {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
             JObject json = SerializationTestData.GetLookupJsonPrototype();
@@ -49,7 +38,8 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLookupVariableWithNullParent() {
+        public void CreateLookupVariableWithNullParent()
+        {
             // Arrange
             JObject json = SerializationTestData.GetLookupJsonPrototype();
             Dictionary<int, JToken> references = SerializationTestData.GetLookupJsonReferences();
@@ -72,7 +62,8 @@ namespace NodejsTests.Debugger.Serialization {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLookupVariableWithNullJsonValue() {
+        public void CreateLookupVariableWithNullJsonValue()
+        {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
             Exception exception = null;
@@ -80,20 +71,24 @@ namespace NodejsTests.Debugger.Serialization {
             NodePrototypeVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodePrototypeVariable(parent, null, references);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateLookupVariableWithNullJsonReferences() {
+        public void CreateLookupVariableWithNullJsonReferences()
+        {
             // Arrange
             var parent = new NodeEvaluationResult(0, null, null, null, null, null, NodeExpressionType.None, null);
             JObject json = SerializationTestData.GetLookupJsonPrototype();
@@ -101,16 +96,20 @@ namespace NodejsTests.Debugger.Serialization {
             NodePrototypeVariable result = null;
 
             // Act
-            try {
+            try
+            {
                 result = new NodePrototypeVariable(parent, json, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(result);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
     }
 }
+
