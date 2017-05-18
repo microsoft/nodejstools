@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -19,7 +7,8 @@ using System.Text;
 using Microsoft.VisualStudioTools;
 using MSBuild = Microsoft.Build.Evaluation;
 
-namespace TestUtilities.SharedProject {
+namespace TestUtilities.SharedProject
+{
     /// <summary>
     /// Represents a generic solution which can be generated for shared project tests based upon
     /// the language which is being tested.
@@ -30,16 +19,19 @@ namespace TestUtilities.SharedProject {
     /// You can also get a SolutionFile by calling ProjectDefinition.Generate which will create
     /// a single project SolutionFile.
     /// </summary>
-    public sealed class SolutionFile : IDisposable {
+    public sealed class SolutionFile : IDisposable
+    {
         public readonly string Filename;
         public readonly ISolutionElement[] Projects;
 
-        private SolutionFile(string slnFilename, ISolutionElement[] projects) {
+        private SolutionFile(string slnFilename, ISolutionElement[] projects)
+        {
             Filename = slnFilename;
             Projects = projects;
         }
 
-        public static SolutionFile Generate(string solutionName, params ISolutionElement[] toGenerate) {
+        public static SolutionFile Generate(string solutionName, params ISolutionElement[] toGenerate)
+        {
             return Generate(solutionName, -1, toGenerate);
         }
 
@@ -51,18 +43,21 @@ namespace TestUtilities.SharedProject {
         /// <param name="pathSpaceRemaining">The amount of path space remaining, or -1 to generate normally</param>
         /// <param name="toGenerate">The projects to be incldued in the generated solution</param>
         /// <returns></returns>
-        public static SolutionFile Generate(string solutionName, int pathSpaceRemaining, params ISolutionElement[] toGenerate) {
+        public static SolutionFile Generate(string solutionName, int pathSpaceRemaining, params ISolutionElement[] toGenerate)
+        {
             List<MSBuild.Project> projects = new List<MSBuild.Project>();
             var location = TestData.GetTempPath(randomSubPath: true);
 
-            if (pathSpaceRemaining >= 0) {
+            if (pathSpaceRemaining >= 0)
+            {
                 int targetPathLength = 260 - pathSpaceRemaining;
                 location = location + new string('X', targetPathLength - location.Length);
             }
             System.IO.Directory.CreateDirectory(location);
 
             MSBuild.ProjectCollection collection = new MSBuild.ProjectCollection();
-            foreach (var project in toGenerate) {
+            foreach (var project in toGenerate)
+            {
                 projects.Add(project.Save(collection, location));
             }
 
@@ -79,8 +74,10 @@ namespace TestUtilities.SharedProject {
 #else
 #error Unsupported VS version
 #endif
-            for (int i = 0; i < projects.Count; i++) {
-                if (toGenerate[i].Flags.HasFlag(SolutionElementFlags.ExcludeFromSolution)) {
+            for (int i = 0; i < projects.Count; i++)
+            {
+                if (toGenerate[i].Flags.HasFlag(SolutionElementFlags.ExcludeFromSolution))
+                {
                     continue;
                 }
 
@@ -91,7 +88,7 @@ namespace TestUtilities.SharedProject {
 EndProject
 ", projectTypeGuid,
  project != null ? Path.GetFileNameWithoutExtension(project.FullPath) : toGenerate[i].Name,
- project != null ? CommonUtils.GetRelativeFilePath(location, project.FullPath): toGenerate[i].Name,
+ project != null ? CommonUtils.GetRelativeFilePath(location, project.FullPath) : toGenerate[i].Name,
  project != null ? Guid.Parse(project.GetProperty("ProjectGuid").EvaluatedValue) : Guid.NewGuid());
             }
             slnFile.Append(@"Global
@@ -101,8 +98,10 @@ EndProject
     EndGlobalSection
     GlobalSection(ProjectConfigurationPlatforms) = postSolution
 ");
-            for (int i = 0; i < projects.Count; i++) {
-                if (toGenerate[i].Flags.HasFlag(SolutionElementFlags.ExcludeFromConfiguration)) {
+            for (int i = 0; i < projects.Count; i++)
+            {
+                if (toGenerate[i].Flags.HasFlag(SolutionElementFlags.ExcludeFromConfiguration))
+                {
                     continue;
                 }
 
@@ -129,17 +128,21 @@ EndGlobal
             return new SolutionFile(slnFilename, toGenerate);
         }
 
-        public string Directory {
-            get {
+        public string Directory
+        {
+            get
+            {
                 return Path.GetDirectoryName(Filename);
             }
         }
 
         #region IDisposable Members
 
-        public void Dispose() {
+        public void Dispose()
+        {
         }
 
         #endregion
     }
 }
+

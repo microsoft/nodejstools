@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -29,13 +17,15 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
-namespace TestUtilities.Mocks {
+namespace TestUtilities.Mocks
+{
 #if !NTVS_FEATURE_INTERACTIVEWINDOW && DEV14_OR_LATER
     using IReplEvaluator = IInteractiveEvaluator;
     using IReplWindow = IInteractiveWindow;
 #endif
 
-    public class MockReplWindow : IReplWindow {
+    public class MockReplWindow : IReplWindow
+    {
         private readonly StringBuilder _output = new StringBuilder();
         private readonly StringBuilder _error = new StringBuilder();
         private readonly IReplEvaluator _eval;
@@ -51,7 +41,8 @@ namespace TestUtilities.Mocks {
         }
 #endif
 
-        public MockReplWindow(IReplEvaluator eval, string contentType = "Python") {
+        public MockReplWindow(IReplEvaluator eval, string contentType = "Python")
+        {
             _eval = eval;
             _contentType = contentType;
             _view = new MockTextView(new MockTextBuffer(String.Empty, contentType, filename: "text"));
@@ -60,40 +51,49 @@ namespace TestUtilities.Mocks {
 
         public bool ShowAnsiCodes { get; set; }
 
-        public Task<ExecutionResult> Execute(string text) {
+        public Task<ExecutionResult> Execute(string text)
+        {
             _view.BufferGraph.AddBuffer(
                 new MockTextBuffer(text, contentType: _contentType)
             );
             return _eval.ExecuteText(text);
         }
 
-        public string Output {
-            get {
+        public string Output
+        {
+            get
+            {
                 return _output.ToString();
             }
         }
 
-        public string Error {
-            get {
+        public string Error
+        {
+            get
+            {
                 return _error.ToString();
             }
         }
 
         #region IReplWindow Members
 
-        public IWpfTextView TextView {
+        public IWpfTextView TextView
+        {
             get { return _view; }
         }
 
-        public ITextBuffer CurrentLanguageBuffer {
+        public ITextBuffer CurrentLanguageBuffer
+        {
             get { return _view.TextBuffer; }
         }
 
-        public IReplEvaluator Evaluator {
+        public IReplEvaluator Evaluator
+        {
             get { return _eval; }
         }
 
-        public string Title {
+        public string Title
+        {
             get { return "Mock Repl Window"; }
         }
 
@@ -147,92 +147,121 @@ namespace TestUtilities.Mocks {
         }
 #endif
 
-        public void ClearScreen() {
+        public void ClearScreen()
+        {
             _output.Clear();
             _error.Clear();
         }
 
-        public void ClearHistory() {
+        public void ClearHistory()
+        {
             throw new NotImplementedException();
         }
 
-        public void Focus() {
+        public void Focus()
+        {
             throw new NotImplementedException();
         }
 
-        public void Cancel() {
+        public void Cancel()
+        {
             throw new NotImplementedException();
         }
 
-        public void InsertCode(string text) {
+        public void InsertCode(string text)
+        {
             throw new NotImplementedException();
         }
 
 #if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
-        public void Submit(IEnumerable<string> inputs) {
+        public void Submit(IEnumerable<string> inputs)
+        {
             throw new NotImplementedException();
         }
 #endif
 
-        public System.Threading.Tasks.Task<ExecutionResult> Reset() {
+        public System.Threading.Tasks.Task<ExecutionResult> Reset()
+        {
             return _eval.Reset();
         }
 
 #if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
-        public void AbortCommand() {
+        public void AbortCommand()
+        {
             _eval.AbortCommand();
         }
 #endif
 
-        public Task<ExecutionResult> ExecuteCommand(string command) {
+        public Task<ExecutionResult> ExecuteCommand(string command)
+        {
             var tcs = new TaskCompletionSource<ExecutionResult>();
             tcs.SetException(new NotImplementedException());
             return tcs.Task;
         }
 
-        public void WriteLine(string text) {
-            if (!ShowAnsiCodes && text.IndexOf('\x1b') != -1) {
+        public void WriteLine(string text)
+        {
+            if (!ShowAnsiCodes && text.IndexOf('\x1b') != -1)
+            {
                 AppendEscapedText(text);
-            } else {
+            }
+            else
+            {
                 _output.AppendLine(text);
             }
         }
 
-        private void AppendEscapedText(string text) {
+        private void AppendEscapedText(string text)
+        {
             // http://en.wikipedia.org/wiki/ANSI_escape_code
             // process any ansi color sequences...
 
             int escape = text.IndexOf('\x1b');
             int start = 0;
-            do {
-                if (escape != start) {
+            do
+            {
+                if (escape != start)
+                {
                     // add unescaped text
                     _output.Append(text.Substring(start, escape - start));
                 }
 
                 // process the escape sequence                
-                if (escape < text.Length - 1 && text[escape + 1] == '[') {
+                if (escape < text.Length - 1 && text[escape + 1] == '[')
+                {
                     // We have the Control Sequence Introducer (CSI) - ESC [
 
                     int? value = 0;
-                    for (int i = escape + 2; i < text.Length; i++) { // skip esc + [
-                        if (text[i] >= '0' && text[i] <= '9') {
+                    for (int i = escape + 2; i < text.Length; i++)
+                    { // skip esc + [
+                        if (text[i] >= '0' && text[i] <= '9')
+                        {
                             // continue parsing the integer...
-                            if (value == null) {
+                            if (value == null)
+                            {
                                 value = 0;
                             }
                             value = 10 * value.Value + (text[i] - '0');
-                        } else if (text[i] == ';') {
-                            if (value != null) {
+                        }
+                        else if (text[i] == ';')
+                        {
+                            if (value != null)
+                            {
                                 value = null;
-                            } else {
+                            }
+                            else
+                            {
                                 // CSI ; - invalid or CSI ### ;;, both invalid
                                 break;
                             }
-                        } else if (text[i] == 'm') {
+                        }
+                        else if (text[i] == 'm')
+                        {
                             // parsed a valid code
                             start = i + 1;
-                        } else {
+                        }
+                        else
+                        {
                             // unknown char, invalid escape
                             break;
                         }
@@ -240,18 +269,20 @@ namespace TestUtilities.Mocks {
 
                     escape = text.IndexOf('\x1b', escape + 1);
                 }// else not an escape sequence, process as text
-
             } while (escape != -1);
-            if (start != text.Length - 1) {
+            if (start != text.Length - 1)
+            {
                 _output.Append(text.Substring(start));
             }
         }
 
-        public void WriteOutput(object value) {
+        public void WriteOutput(object value)
+        {
             _output.Append(value.ToString());
         }
 
-        public void WriteError(object value) {
+        public void WriteError(object value)
+        {
             _error.Append(value);
         }
 
@@ -260,16 +291,19 @@ namespace TestUtilities.Mocks {
             throw new NotImplementedException();
         }
 #else
-        public string ReadStandardInput() {
+        public string ReadStandardInput()
+        {
             throw new NotImplementedException();
         }
 #endif
 
 #if !DEV14_OR_LATER || NTVS_FEATURE_INTERACTIVEWINDOW
-        public void SetOptionValue(ReplOptions option, object value) {
+        public void SetOptionValue(ReplOptions option, object value)
+        {
         }
 
-        public object GetOptionValue(ReplOptions option) {
+        public object GetOptionValue(ReplOptions option)
+        {
             return null;
         }
 #endif
@@ -312,7 +346,8 @@ namespace TestUtilities.Mocks {
         }
 #endif
 
-        public event Action ReadyForInput {
+        public event Action ReadyForInput
+        {
             add { }
             remove { }
         }
@@ -337,3 +372,4 @@ namespace TestUtilities.Mocks {
     }
 #endif
 }
+

@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Threading.Tasks;
@@ -21,30 +7,37 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace NodejsTests.Debugger.Communication {
+namespace NodejsTests.Debugger.Communication
+{
     [TestClass]
-    public class DebuggerClientTests {
+    public class DebuggerClientTests
+    {
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void CreateDebuggerClientWithNullConnection() {
+        public void CreateDebuggerClientWithNullConnection()
+        {
             // Arrange
             Exception exception = null;
             DebuggerClient client = null;
 
             // Act
-            try {
+            try
+            {
                 client = new DebuggerClient(null);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 exception = e;
             }
 
             // Assert
             Assert.IsNull(client);
             Assert.IsNotNull(exception);
-            Assert.IsInstanceOfType(exception, typeof (ArgumentNullException));
+            Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public async Task SendMessageViaDebuggerClient() {
+        public async Task SendMessageViaDebuggerClient()
+        {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
             var messageEventArgs = new MessageEventArgs(Resources.NodeDisconnectResponse);
@@ -61,7 +54,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void RaiseCompileScriptEventViaDebuggerClient() {
+        public void RaiseCompileScriptEventViaDebuggerClient()
+        {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
             var messageEventArgs = new MessageEventArgs(Resources.NodeCompileScriptResponse);
@@ -70,7 +64,8 @@ namespace NodejsTests.Debugger.Communication {
             CompileScriptEventArgs args = null;
 
             // Act
-            client.CompileScriptEvent += (s, a) => {
+            client.CompileScriptEvent += (s, a) =>
+            {
                 sender = s;
                 args = a;
             };
@@ -83,7 +78,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void RaiseBreakpointEventViaDebuggerClient() {
+        public void RaiseBreakpointEventViaDebuggerClient()
+        {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
             var messageEventArgs = new MessageEventArgs(Resources.NodeBreakpointResponse);
@@ -92,7 +88,8 @@ namespace NodejsTests.Debugger.Communication {
             BreakpointEventArgs args = null;
 
             // Act
-            client.BreakpointEvent += (s, a) => {
+            client.BreakpointEvent += (s, a) =>
+            {
                 sender = s;
                 args = a;
             };
@@ -105,7 +102,8 @@ namespace NodejsTests.Debugger.Communication {
         }
 
         [TestMethod, Priority(0), TestCategory("Debugging")]
-        public void RaiseExceptionEventViaDebuggerClient() {
+        public void RaiseExceptionEventViaDebuggerClient()
+        {
             // Arrange
             var connectionMock = new Mock<IDebuggerConnection>();
             var messageEventArgs = new MessageEventArgs(Resources.NodeExceptionResponse);
@@ -114,7 +112,8 @@ namespace NodejsTests.Debugger.Communication {
             ExceptionEventArgs args = null;
 
             // Act
-            client.ExceptionEvent += (s, a) => {
+            client.ExceptionEvent += (s, a) =>
+            {
                 sender = s;
                 args = a;
             };
@@ -127,3 +126,4 @@ namespace NodejsTests.Debugger.Communication {
         }
     }
 }
+

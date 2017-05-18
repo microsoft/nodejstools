@@ -1,31 +1,13 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.NodejsTools.Npm {
-    public interface INpmCommander : INpmLogSource, IDisposable {
-
-        /// <summary>
-        /// Cancels the currently running command
-        /// </summary>
-        void CancelCurrentCommand();
-
+namespace Microsoft.NodejsTools.Npm
+{
+    public interface INpmCommander : INpmLogSource, IDisposable
+    {
         /// <summary>
         /// Executes npm install to install all packages in package.json.
         /// </summary>
@@ -47,12 +29,6 @@ namespace Microsoft.NodejsTools.Npm {
             DependencyType type,
             bool saveToPackageJson);
 
-        Task<bool> InstallPackageToFolderByVersionAsync(
-            string pathToRootDirectory,
-            string packageName,
-            string versionRange,
-            bool saveToPackageJson);
-
         /// <summary>
         /// 
         /// </summary>
@@ -60,8 +36,6 @@ namespace Microsoft.NodejsTools.Npm {
         /// <exception cref="PackageJsonException">If there is an error reading a package.json file when modules are refreshed.</exception>
         /// <returns></returns>
         Task<bool> UninstallPackageAsync(string packageName);
-
-        Task<IPackageCatalog> GetCatalogAsync(bool forceDownload, IProgress<string> progress);
 
         Task<bool> UpdatePackagesAsync();
 
@@ -81,3 +55,4 @@ namespace Microsoft.NodejsTools.Npm {
         Task<bool> ExecuteNpmCommandAsync(string arguments);
     }
 }
+

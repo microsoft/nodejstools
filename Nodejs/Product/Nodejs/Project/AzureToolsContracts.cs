@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -30,7 +16,8 @@ namespace Microsoft.VisualStudio.Azure
     [ComImport]
     [ComVisible(true)]
     [Guid("14A1D483-5615-4D1B-AB1A-BF404FDE31F7")]
-    internal interface IAzureRoleProject {
+    internal interface IAzureRoleProject
+    {
         /// <summary>
         /// Called on an instance of <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsHierarchy"/> for the project when
         /// that project is added as a role to an Azure project. 
@@ -68,3 +55,4 @@ namespace Microsoft.VisualStudio.Azure
         void AddedAsRole(object azureProjectHierarchy, string roleType);
     }
 }
+

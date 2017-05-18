@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -22,8 +10,10 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudioTools.Project;
 using Task = System.Threading.Tasks.Task;
 
-namespace Microsoft.VisualStudioTools {
-    static class VsTaskExtensions {
+namespace Microsoft.VisualStudioTools
+{
+    internal static class VsTaskExtensions
+    {
         private static readonly HashSet<string> _displayedMessages = new HashSet<string>();
 
         /// <summary>
@@ -38,11 +28,11 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             return task.HandleAllExceptions(productTitle, callerType, callerFile, callerLineNumber, callerName)
                 .WaitAndUnwrapExceptions();
         }
-
 
         /// <summary>
         /// Logs all exceptions from a task except those that return true from
@@ -56,12 +46,17 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             var result = default(T);
-            try {
+            try
+            {
                 result = await task;
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -71,23 +66,31 @@ namespace Microsoft.VisualStudioTools {
                 Trace.TraceError(message);
 
                 string logFile;
-                try {
+                try
+                {
                     logFile = ActivityLog.LogFilePath;
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     logFile = null;
                 }
 
-                lock (_displayedMessages) {
+                lock (_displayedMessages)
+                {
                     if (!string.IsNullOrEmpty(logFile) &&
-                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber))) {
+                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber)))
+                    {
                         // First time we've seen this error, so let the user know
                         MessageBox.Show(SR.GetString(SR.SeeActivityLog, logFile), productTitle);
                     }
                 }
 
-                try {
+                try
+                {
                     ActivityLog.LogError(productTitle, message);
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Activity Log is unavailable.
                 }
 
@@ -109,11 +112,11 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
+        )
+        {
             task.HandleAllExceptions(productTitle, callerType, callerFile, callerLineNumber, callerName)
                 .WaitAndUnwrapExceptions();
         }
-
 
         /// <summary>
         /// Logs all exceptions from a task except those that return true from
@@ -126,11 +129,16 @@ namespace Microsoft.VisualStudioTools {
             [CallerFilePath] string callerFile = null,
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerMemberName] string callerName = null
-        ) {
-            try {
+        )
+        {
+            try
+            {
                 await task;
-            } catch (Exception ex) {
-                if (ex.IsCriticalException()) {
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsCriticalException())
+                {
                     throw;
                 }
 
@@ -140,23 +148,31 @@ namespace Microsoft.VisualStudioTools {
                 Trace.TraceError(message);
 
                 string logFile;
-                try {
+                try
+                {
                     logFile = ActivityLog.LogFilePath;
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     logFile = null;
                 }
 
-                lock (_displayedMessages) {
+                lock (_displayedMessages)
+                {
                     if (!string.IsNullOrEmpty(logFile) &&
-                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber))) {
+                        _displayedMessages.Add(string.Format("{0}:{1}", callerFile, callerLineNumber)))
+                    {
                         // First time we've seen this error, so let the user know
                         MessageBox.Show(SR.GetString(SR.SeeActivityLog, logFile), productTitle);
                     }
                 }
 
-                try {
+                try
+                {
                     ActivityLog.LogError(productTitle, message);
-                } catch (InvalidOperationException) {
+                }
+                catch (InvalidOperationException)
+                {
                     // Activity Log is unavailable.
                 }
 
@@ -166,3 +182,4 @@ namespace Microsoft.VisualStudioTools {
         }
     }
 }
+

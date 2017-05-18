@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,49 +6,62 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Microsoft.NodejsTools.Profiling {
+namespace Microsoft.NodejsTools.Profiling
+{
     [Serializable]
-    public sealed class ProfilingTarget {
+    public sealed class ProfilingTarget
+    {
         internal static XmlSerializer Serializer = new XmlSerializer(typeof(ProfilingTarget));
 
         [XmlElement("ProjectTarget")]
-        public ProjectTarget ProjectTarget {
+        public ProjectTarget ProjectTarget
+        {
             get;
             set;
         }
 
         [XmlElement("StandaloneTarget")]
-        public StandaloneTarget StandaloneTarget {
+        public StandaloneTarget StandaloneTarget
+        {
             get;
             set;
         }
 
         [XmlElement("Reports")]
-        public Reports Reports {
+        public Reports Reports
+        {
             get;
             set;
         }
 
-        internal string GetProfilingName(out bool save) {
+        internal string GetProfilingName(out bool save)
+        {
             string baseName = null;
-            if (ProjectTarget != null) {
-                if (!String.IsNullOrEmpty(ProjectTarget.FriendlyName)) {
+            if (ProjectTarget != null)
+            {
+                if (!String.IsNullOrEmpty(ProjectTarget.FriendlyName))
+                {
                     baseName = ProjectTarget.FriendlyName;
                 }
-            } else if (StandaloneTarget != null) {
-                if (!String.IsNullOrEmpty(StandaloneTarget.Script)) {
+            }
+            else if (StandaloneTarget != null)
+            {
+                if (!String.IsNullOrEmpty(StandaloneTarget.Script))
+                {
                     baseName = Path.GetFileNameWithoutExtension(StandaloneTarget.Script);
                 }
             }
 
-            if (baseName == null) {
+            if (baseName == null)
+            {
                 baseName = "Performance";
             }
 
             baseName = baseName + NodejsProfilingPackage.PerfFileType;
 
             var dte = (EnvDTE.DTE)NodejsProfilingPackage.GetGlobalService(typeof(EnvDTE.DTE));
-            if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName)) {
+            if (dte.Solution.IsOpen && !String.IsNullOrEmpty(dte.Solution.FullName))
+            {
                 save = true;
                 return Path.Combine(Path.GetDirectoryName(dte.Solution.FullName), baseName);
             }
@@ -71,60 +70,75 @@ namespace Microsoft.NodejsTools.Profiling {
             return baseName;
         }
 
-        internal ProfilingTarget Clone() {
+        internal ProfilingTarget Clone()
+        {
             var res = new ProfilingTarget();
-            if (ProjectTarget != null) {
+            if (ProjectTarget != null)
+            {
                 res.ProjectTarget = ProjectTarget.Clone();
             }
 
-            if (StandaloneTarget != null) {
+            if (StandaloneTarget != null)
+            {
                 res.StandaloneTarget = StandaloneTarget.Clone();
             }
 
-            if (Reports != null) {
+            if (Reports != null)
+            {
                 res.Reports = Reports.Clone();
             }
 
             return res;
         }
 
-        internal static bool IsSame(ProfilingTarget self, ProfilingTarget other) {
-            if (self == null) {
+        internal static bool IsSame(ProfilingTarget self, ProfilingTarget other)
+        {
+            if (self == null)
+            {
                 return other == null;
-            } else if (other != null) {
+            }
+            else if (other != null)
+            {
                 return ProjectTarget.IsSame(self.ProjectTarget, other.ProjectTarget) &&
                     StandaloneTarget.IsSame(self.StandaloneTarget, other.StandaloneTarget);
             }
             return false;
         }
-        
     }
 
     [Serializable]
-    public sealed class ProjectTarget {
+    public sealed class ProjectTarget
+    {
         [XmlElement("TargetProject")]
-        public Guid TargetProject {
+        public Guid TargetProject
+        {
             get;
             set;
         }
 
         [XmlElement("FriendlyName")]
-        public string FriendlyName {
+        public string FriendlyName
+        {
             get;
             set;
         }
 
-        internal ProjectTarget Clone() {
+        internal ProjectTarget Clone()
+        {
             var res = new ProjectTarget();
             res.TargetProject = TargetProject;
             res.FriendlyName = FriendlyName;
             return res;
         }
 
-        internal static bool IsSame(ProjectTarget self, ProjectTarget other) {
-            if (self == null) {
+        internal static bool IsSame(ProjectTarget self, ProjectTarget other)
+        {
+            if (self == null)
+            {
                 return other == null;
-            } else if (other != null) {
+            }
+            else if (other != null)
+            {
                 return self.TargetProject == other.TargetProject;
             }
             return false;
@@ -132,32 +146,38 @@ namespace Microsoft.NodejsTools.Profiling {
     }
 
     [Serializable]
-    public sealed class StandaloneTarget {
+    public sealed class StandaloneTarget
+    {
         [XmlElement(ElementName = "InterpreterPath")]
-        public string InterpreterPath {
+        public string InterpreterPath
+        {
             get;
             set;
         }
 
         [XmlElement("WorkingDirectory")]
-        public string WorkingDirectory {
+        public string WorkingDirectory
+        {
             get;
             set;
         }
 
         [XmlElement("Script")]
-        public string Script {
+        public string Script
+        {
             get;
             set;
         }
 
         [XmlElement("Arguments")]
-        public string Arguments {
+        public string Arguments
+        {
             get;
             set;
         }
 
-        internal StandaloneTarget Clone() {
+        internal StandaloneTarget Clone()
+        {
             var res = new StandaloneTarget();
 
             res.InterpreterPath = InterpreterPath;
@@ -165,13 +185,16 @@ namespace Microsoft.NodejsTools.Profiling {
             res.Script = Script;
             res.Arguments = Arguments;
             return res;
-
         }
 
-        internal static bool IsSame(StandaloneTarget self, StandaloneTarget other) {
-            if (self == null) {
+        internal static bool IsSame(StandaloneTarget self, StandaloneTarget other)
+        {
+            if (self == null)
+            {
                 return other == null;
-            } else if (other != null) {
+            }
+            else if (other != null)
+            {
                 return self.InterpreterPath == other.InterpreterPath &&
                     self.WorkingDirectory == other.WorkingDirectory &&
                     self.Script == other.Script &&
@@ -181,36 +204,46 @@ namespace Microsoft.NodejsTools.Profiling {
         }
     }
 
-    public sealed class Reports {
+    public sealed class Reports
+    {
         public Reports() { }
 
-        public Reports(Profiling.Report[] reports) {
+        public Reports(Profiling.Report[] reports)
+        {
             Report = reports;
         }
 
         [XmlElement("Report")]
-        public Report[] Report {
-            get {
+        public Report[] Report
+        {
+            get
+            {
                 return AllReports.Values.ToArray();
             }
-            set {
+            set
+            {
                 AllReports = new SortedDictionary<int, Report>();
-                for (int i = 0; i < value.Length; i++) {
+                for (int i = 0; i < value.Length; i++)
+                {
                     AllReports[i + SessionNode.StartingReportId] = value[i];
                 }
             }
         }
 
-        internal SortedDictionary<int, Report> AllReports {
+        internal SortedDictionary<int, Report> AllReports
+        {
             get;
             set;
         }
 
-        internal Reports Clone() {
+        internal Reports Clone()
+        {
             var res = new Reports();
-            if (Report != null) {
+            if (Report != null)
+            {
                 res.Report = new Report[Report.Length];
-                for (int i = 0; i < res.Report.Length; i++) {
+                for (int i = 0; i < res.Report.Length; i++)
+                {
                     res.Report[i] = Report[i].Clone();
                 }
             }
@@ -218,22 +251,27 @@ namespace Microsoft.NodejsTools.Profiling {
         }
     }
 
-    public sealed class Report {
+    public sealed class Report
+    {
         public Report() { }
-        public Report(string filename) {
+        public Report(string filename)
+        {
             Filename = filename;
         }
 
         [XmlElement("Filename")]
-        public string Filename {
+        public string Filename
+        {
             get;
             set;
         }
 
-        internal Report Clone() {
+        internal Report Clone()
+        {
             var res = new Report();
             res.Filename = Filename;
             return res;
         }
     }
 }
+

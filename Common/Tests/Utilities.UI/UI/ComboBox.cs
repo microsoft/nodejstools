@@ -1,38 +1,34 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Automation;
 
-namespace TestUtilities.UI {
-    public class ComboBox : AutomationWrapper {
+namespace TestUtilities.UI
+{
+    public class ComboBox : AutomationWrapper
+    {
         public ComboBox(AutomationElement element)
-            : base(element) {
+            : base(element)
+        {
         }
 
-        public void SelectItem(string name) {
+        public void SelectItem(string name)
+        {
             ExpandCollapsePattern pat = (ExpandCollapsePattern)Element.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             pat.Expand();
-            try {
+            try
+            {
                 var item = Element.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, name));
 
-                if (item == null) {
+                if (item == null)
+                {
                     throw new ElementNotAvailableException(name + " is not in the combobox");
                 }
                 ((SelectionItemPattern)item.GetCurrentPattern(SelectionItemPattern.Pattern)).Select();
-            } finally {
+            }
+            finally
+            {
                 pat.Collapse();
             }
         }
@@ -42,12 +38,14 @@ namespace TestUtilities.UI {
         /// Only use this if SelectItem doesn't work!
         /// </summary
         /// <param name="name"></param>
-        public void ClickItem(string name) {
+        public void ClickItem(string name)
+        {
             ExpandCollapsePattern pat = (ExpandCollapsePattern)Element.GetCurrentPattern(ExpandCollapsePattern.Pattern);
             pat.Expand();
 
             var item = Element.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, name));
-            if (item == null) {
+            if (item == null)
+            {
                 throw new ElementNotAvailableException(name + " is not in the combobox");
             }
 
@@ -57,16 +55,20 @@ namespace TestUtilities.UI {
             Mouse.Click();
         }
 
-        public string GetSelectedItemName() {
+        public string GetSelectedItemName()
+        {
             var selection = Element.GetSelectionPattern().Current.GetSelection();
-            if (selection == null || selection.Length == 0) {
+            if (selection == null || selection.Length == 0)
+            {
                 return null;
             }
             return selection[0].Current.Name;
         }
 
-        public string GetEnteredText() {
+        public string GetEnteredText()
+        {
             return GetValue();
         }
     }
 }
+

@@ -1,33 +1,23 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Microsoft.NodejsTools.LogParsing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestUtilities;
 
-namespace ProfilerTests {
+namespace ProfilerTests
+{
     [TestClass]
-    public class LogParserTests {
+    public class LogParserTests
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
         }
 
         [TestMethod, Priority(0)]
-        public void SplitRecord() {
+        public void SplitRecord()
+        {
             AssertExpectedRecords(@"shared-library,""C:\Program Files\nodejs\node.exe"",0x05c60000,0x06226000",
                 "shared-library",
                 @"""C:\Program Files\nodejs\node.exe""",
@@ -67,16 +57,19 @@ namespace ProfilerTests {
                @"""foo""bar""");
         }
 
-        public void AssertExpectedRecords(string input, params string[] expected) {
+        public void AssertExpectedRecords(string input, params string[] expected)
+        {
             var records = LogConverter.SplitRecord(input);
             Assert.AreEqual(expected.Length, records.Length);
-            for (int i = 0; i < expected.Length; i++) {
+            for (int i = 0; i < expected.Length; i++)
+            {
                 Assert.AreEqual(expected[i], records[i]);
             }
         }
 
         [TestMethod, Priority(0), TestCategory("Ignore")]
-        public void FilenameParsing() {
+        public void FilenameParsing()
+        {
             AssertExpectedFileInfo(
                 " net.js:931",
                 "net",
@@ -129,8 +122,10 @@ namespace ProfilerTests {
             );
         }
 
-        public void AssertExpectedFileInfo(string input, string ns, string function, string filename, int? lineNo, string type="LazyCompile") {
-            foreach (var curInput in new[] { input, "\"" + input + "\"" }) {
+        public void AssertExpectedFileInfo(string input, string ns, string function, string filename, int? lineNo, string type = "LazyCompile")
+        {
+            foreach (var curInput in new[] { input, "\"" + input + "\"" })
+            {
                 var res = LogConverter.ExtractNamespaceAndMethodName(curInput, false, type);
                 Assert.AreEqual(ns, res.Namespace);
                 Assert.AreEqual(function, res.Function);
@@ -139,6 +134,5 @@ namespace ProfilerTests {
             }
         }
     }
-
-    
 }
+

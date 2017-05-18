@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,312 +8,400 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
 using VSLangProj;
 
-namespace Microsoft.VisualStudioTools.Project.Automation {
-    class OAProjectConfigurationProperties : ConnectionPointContainer, ProjectConfigurationProperties, IConnectionPointContainer, IEventSource<IPropertyNotifySink> {
+namespace Microsoft.VisualStudioTools.Project.Automation
+{
+    internal class OAProjectConfigurationProperties : ConnectionPointContainer, ProjectConfigurationProperties, IConnectionPointContainer, IEventSource<IPropertyNotifySink>
+    {
         private readonly ProjectNode _project;
         private readonly List<IPropertyNotifySink> _sinks = new List<IPropertyNotifySink>();
         private readonly HierarchyListener _hierarchyListener;
 
-        public OAProjectConfigurationProperties(ProjectNode node) {
-            _project = node;
+        public OAProjectConfigurationProperties(ProjectNode node)
+        {
+            this._project = node;
             AddEventSource<IPropertyNotifySink>(this);
-            _hierarchyListener = new HierarchyListener(_project, this);
+            this._hierarchyListener = new HierarchyListener(this._project, this);
         }
 
         #region ProjectConfigurationProperties Members
 
-        public bool AllowUnsafeBlocks {
-            get {
+        public bool AllowUnsafeBlocks
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public uint BaseAddress {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool CheckForOverflowUnderflow {
-            get {
+        public uint BaseAddress
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string ConfigurationOverrideFile {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool DebugSymbols {
-            get {
+        public bool CheckForOverflowUnderflow
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string DefineConstants {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool DefineDebug {
-            get {
+        public string ConfigurationOverrideFile
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool DefineTrace {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public string DocumentationFile {
-            get {
+        public bool DebugSymbols
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool EnableASPDebugging {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool EnableASPXDebugging {
-            get {
+        public string DefineConstants
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool EnableSQLServerDebugging {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool EnableUnmanagedDebugging {
-            get {
+        public bool DefineDebug
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string ExtenderCATID {
-            get { throw new NotImplementedException(); }
-        }
-
-        public object ExtenderNames {
-            get { throw new NotImplementedException(); }
-        }
-
-        public uint FileAlignment {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool IncrementalBuild {
-            get {
+        public bool DefineTrace
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string IntermediatePath {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool Optimize {
-            get {
+        public string DocumentationFile
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string OutputPath {
-            get {
-                return _project.Site.GetUIThread().Invoke(() => _project.GetProjectProperty("OutputPath"));
-            }
-            set {
-                _project.Site.GetUIThread().Invoke(() => _project.SetProjectProperty("OutputPath", value));
-            }
-        }
-
-        public bool RegisterForComInterop {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool RemoteDebugEnabled {
-            get {
+        public bool EnableASPDebugging
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string RemoteDebugMachine {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool RemoveIntegerChecks {
-            get {
+        public bool EnableASPXDebugging
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public prjStartAction StartAction {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public string StartArguments {
-            get {
+        public bool EnableSQLServerDebugging
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string StartPage {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public string StartProgram {
-            get {
+        public bool EnableUnmanagedDebugging
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string StartURL {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool StartWithIE {
-            get {
+        public string ExtenderCATID => throw new NotImplementedException();
+        public object ExtenderNames => throw new NotImplementedException();
+        public uint FileAlignment
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public string StartWorkingDirectory {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public bool TreatWarningsAsErrors {
-            get {
+        public bool IncrementalBuild
+        {
+            get
+            {
                 throw new NotImplementedException();
             }
-            set {
-                throw new NotImplementedException();
-            }
-        }
-
-        public prjWarningLevel WarningLevel {
-            get {
-                throw new NotImplementedException();
-            }
-            set {
+            set
+            {
                 throw new NotImplementedException();
             }
         }
 
-        public string __id {
-            get { throw new NotImplementedException(); }
+        public string IntermediatePath
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public object get_Extender(string ExtenderName) {
+        public bool Optimize
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string OutputPath
+        {
+            get
+            {
+                return this._project.Site.GetUIThread().Invoke(() => this._project.GetProjectProperty("OutputPath"));
+            }
+            set
+            {
+                this._project.Site.GetUIThread().Invoke(() => this._project.SetProjectProperty("OutputPath", value));
+            }
+        }
+
+        public bool RegisterForComInterop
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool RemoteDebugEnabled
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string RemoteDebugMachine
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool RemoveIntegerChecks
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public prjStartAction StartAction
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string StartArguments
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string StartPage
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string StartProgram
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string StartURL
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool StartWithIE
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string StartWorkingDirectory
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool TreatWarningsAsErrors
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public prjWarningLevel WarningLevel
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string __id => throw new NotImplementedException();
+        public object get_Extender(string ExtenderName)
+        {
             throw new NotImplementedException();
         }
 
@@ -333,55 +409,67 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
 
         #region IEventSource<IPropertyNotifySink> Members
 
-        public void OnSinkAdded(IPropertyNotifySink sink) {
-            _sinks.Add(sink);
+        public void OnSinkAdded(IPropertyNotifySink sink)
+        {
+            this._sinks.Add(sink);
         }
 
-        public void OnSinkRemoved(IPropertyNotifySink sink) {
-            _sinks.Remove(sink);
+        public void OnSinkRemoved(IPropertyNotifySink sink)
+        {
+            this._sinks.Remove(sink);
         }
 
         #endregion
 
-        internal class HierarchyListener : IVsHierarchyEvents {
+        internal class HierarchyListener : IVsHierarchyEvents
+        {
             private readonly IVsHierarchy _hierarchy;
             private readonly uint _cookie;
             private readonly OAProjectConfigurationProperties _props;
 
-            public HierarchyListener(IVsHierarchy hierarchy, OAProjectConfigurationProperties props) {
-                _hierarchy = hierarchy;
-                _props = props;
-                ErrorHandler.ThrowOnFailure(_hierarchy.AdviseHierarchyEvents(this, out _cookie));
+            public HierarchyListener(IVsHierarchy hierarchy, OAProjectConfigurationProperties props)
+            {
+                this._hierarchy = hierarchy;
+                this._props = props;
+                ErrorHandler.ThrowOnFailure(this._hierarchy.AdviseHierarchyEvents(this, out this._cookie));
             }
 
-            ~HierarchyListener() {
+            ~HierarchyListener()
+            {
                 _hierarchy.UnadviseHierarchyEvents(_cookie);
             }
 
             #region IVsHierarchyEvents Members
 
-            public int OnInvalidateIcon(IntPtr hicon) {
+            public int OnInvalidateIcon(IntPtr hicon)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnInvalidateItems(uint itemidParent) {
+            public int OnInvalidateItems(uint itemidParent)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded) {
+            public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemDeleted(uint itemid) {
+            public int OnItemDeleted(uint itemid)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnItemsAppended(uint itemidParent) {
+            public int OnItemsAppended(uint itemidParent)
+            {
                 return VSConstants.S_OK;
             }
 
-            public int OnPropertyChanged(uint itemid, int propid, uint flags) {
-                foreach (var sink in _props._sinks) {
+            public int OnPropertyChanged(uint itemid, int propid, uint flags)
+            {
+                foreach (var sink in this._props._sinks)
+                {
                     sink.OnChanged(propid);
                 }
                 return VSConstants.S_OK;
@@ -391,3 +479,4 @@ namespace Microsoft.VisualStudioTools.Project.Automation {
         }
     }
 }
+

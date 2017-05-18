@@ -1,28 +1,17 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.NodejsTools.TestFrameworks;
 
-namespace TestAdapterTests {
-
+namespace TestAdapterTests
+{
     [TestClass]
-    public class FrameworkDiscoverTest {
+    public class FrameworkDiscoverTest
+    {
         [TestMethod, Priority(0)]
-        public void InitializeAllFrameworks() {
+        public void InitializeAllFrameworks()
+        {
             //Arrange and Act
             string[] frameworkDirectories = new string[] {
                 "c:\\nodejstools\\" + TestFrameworkDirectories.ExportRunnerFramework,
@@ -40,7 +29,8 @@ namespace TestAdapterTests {
         }
 
         [TestMethod, Priority(0)]
-        public void DefaultFramework_HasCorrectFolderInformation() {
+        public void DefaultFramework_HasCorrectFolderInformation()
+        {
             //Arrange
             string testName = "dummyUT";
             string testFile = "dummyTestFile.js";
@@ -63,3 +53,4 @@ namespace TestAdapterTests {
         }
     }
 }
+

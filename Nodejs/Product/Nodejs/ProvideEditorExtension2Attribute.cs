@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -21,8 +7,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Microsoft.NodejsTools {
-
+namespace Microsoft.NodejsTools
+{
     /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute"]' />
     /// <devdoc>
     ///     This attribute associates a file extension to a given editor factory.  
@@ -33,7 +19,8 @@ namespace Microsoft.NodejsTools {
     /// a linked editor GUID can be supplied.
     /// </devdoc>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    internal sealed class ProvideEditorExtension2Attribute : RegistrationAttribute {
+    internal sealed class ProvideEditorExtension2Attribute : RegistrationAttribute
+    {
         private Guid _factory;
         private string _extension;
         private int _priority;
@@ -51,7 +38,8 @@ namespace Microsoft.NodejsTools {
         /// <devdoc>
         ///     Creates a new attribute.
         /// </devdoc>
-        public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, params string[] extensions) {
+        public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, params string[] extensions)
+        {
             // figure out what type of object they passed in and get the GUID from it
             if (factoryType is string)
                 this._factory = new Guid((string)factoryType);
@@ -62,122 +50,107 @@ namespace Microsoft.NodejsTools {
             else
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "invalid factory type: {0}", factoryType));
 
-            _extension = extension;
-            _priority = priority;
-            _project = Guid.Empty;
-            _templateDir = "./NullPath";
-            _resId = 0;
-            _editorFactoryNotify = false;
-            _extensions = extensions;
+            this._extension = extension;
+            this._priority = priority;
+            this._project = Guid.Empty;
+            this._templateDir = "./NullPath";
+            this._resId = 0;
+            this._editorFactoryNotify = false;
+            this._extensions = extensions;
         }
 
         public ProvideEditorExtension2Attribute(object factoryType, string extension, int priority, __VSPHYSICALVIEWATTRIBUTES commonViewAttributes, params string[] extensions) :
-            this(factoryType, extension, priority, extensions) {
-            _commonViewAttrs = commonViewAttributes;
+            this(factoryType, extension, priority, extensions)
+        {
+            this._commonViewAttrs = commonViewAttributes;
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Extension"]' />
         /// <devdoc>
         ///     The file extension of the file.
         /// </devdoc>
-        public string Extension {
-            get {
-                return _extension;
-            }
-        }
+        public string Extension => this._extension;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Factory"]' />
         /// <devdoc>
         ///     The editor factory guid.
         /// </devdoc>
-        public Guid Factory {
-            get {
-                return _factory;
-            }
-        }
+        public Guid Factory => this._factory;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.Priority"]' />
         /// <devdoc>
         ///     The priority of this extension registration.
         /// </devdoc>
-        public int Priority {
-            get {
-                return _priority;
-            }
-        }
+        public int Priority => this._priority;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.ProjectGuid"]/*' />
-        public string ProjectGuid {
-            set { _project = new System.Guid(value); }
-            get { return _project.ToString(); }
+        public string ProjectGuid
+        {
+            set { this._project = new System.Guid(value); }
+            get { return this._project.ToString(); }
         }
 
-        public string LinkedEditorGuid {
-            get { return _linkedEditorGuid.ToString(); }
-            set { _linkedEditorGuid = new System.Guid(value); }
+        public string LinkedEditorGuid
+        {
+            get { return this._linkedEditorGuid.ToString(); }
+            set { this._linkedEditorGuid = new System.Guid(value); }
         }
 
-        public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes {
-            get {
-                return _commonViewAttrs;
-            }
-        }
+        public __VSPHYSICALVIEWATTRIBUTES CommonPhysicalViewAttributes => this._commonViewAttrs;
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.EditorFactoryNotify"]/*' />
-        public bool EditorFactoryNotify {
+        public bool EditorFactoryNotify
+        {
             get { return this._editorFactoryNotify; }
             set { this._editorFactoryNotify = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.TemplateDir"]/*' />
-        public string TemplateDir {
-            get { return _templateDir; }
-            set { _templateDir = value; }
+        public string TemplateDir
+        {
+            get { return this._templateDir; }
+            set { this._templateDir = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.NameResourceID"]/*' />
-        public int NameResourceID {
-            get { return _resId; }
-            set { _resId = value; }
+        public int NameResourceID
+        {
+            get { return this._resId; }
+            set { this._resId = value; }
         }
 
-        public int EditorNameResourceId {
-            get { return _editorNameResId; }
-            set { _editorNameResId = value; }
+        public int EditorNameResourceId
+        {
+            get { return this._editorNameResId; }
+            set { this._editorNameResId = value; }
         }
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="ProvideEditorExtensionAttribute.DefaultName"]/*' />
-        public string DefaultName {
-            get { return _editorName; }
-            set { _editorName = value; }
+        public string DefaultName
+        {
+            get { return this._editorName; }
+            set { this._editorName = value; }
         }
 
         /// <summary>
         ///        The reg key name of this extension.
         /// </summary>
-        private string RegKeyName {
-            get {
-                return string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", Factory.ToString("B"));
-            }
-        }
+        private string RegKeyName => string.Format(CultureInfo.InvariantCulture, "Editors\\{0}", this.Factory.ToString("B"));
 
         /// <summary>
         ///        The reg key name of the project.
         /// </summary>
-        private string ProjectRegKeyName(RegistrationContext context) {
+        private string ProjectRegKeyName(RegistrationContext context)
+        {
             return string.Format(CultureInfo.InvariantCulture,
                                  "Projects\\{0}\\AddItemTemplates\\TemplateDirs\\{1}",
-                                 _project.ToString("B"),
+                                 this._project.ToString("B"),
                                  context.ComponentType.GUID.ToString("B"));
         }
 
-        private string EditorFactoryNotifyKey {
-            get {
-                return string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\FileExtensions\\{1}",
-                                     _project.ToString("B"),
-                                     Extension);
-            }
-        }
+        private string EditorFactoryNotifyKey => string.Format(CultureInfo.InvariantCulture, "Projects\\{0}\\FileExtensions\\{1}",
+                                     this._project.ToString("B"),
+                                     this.Extension);
 
         /// <include file='doc\ProvideEditorExtensionAttribute.uex' path='docs/doc[@for="Register"]' />
         /// <devdoc>
@@ -188,32 +161,41 @@ namespace Microsoft.NodejsTools {
         ///     This method is called both for registration and unregistration.  The difference is
         ///     that unregistering just uses a hive that reverses the changes applied to it.
         /// </devdoc>
-        public override void Register(RegistrationContext context) {
-            using (Key editorKey = context.CreateKey(RegKeyName)) {
-                if (!string.IsNullOrEmpty(DefaultName)) {
-                    editorKey.SetValue(null, DefaultName);
+        public override void Register(RegistrationContext context)
+        {
+            using (var editorKey = context.CreateKey(this.RegKeyName))
+            {
+                if (!string.IsNullOrEmpty(this.DefaultName))
+                {
+                    editorKey.SetValue(null, this.DefaultName);
                 }
-                if (0 != _editorNameResId)
-                    editorKey.SetValue("DisplayName", "#" + _editorNameResId.ToString(CultureInfo.InvariantCulture));
-                else if (0 != _resId)
-                    editorKey.SetValue("DisplayName", "#" + _resId.ToString(CultureInfo.InvariantCulture));
-                if (_linkedEditorGuid != Guid.Empty) {
-                    editorKey.SetValue("LinkedEditorGuid", _linkedEditorGuid.ToString("B"));
+                if (0 != this._editorNameResId)
+                    editorKey.SetValue("DisplayName", "#" + this._editorNameResId.ToString(CultureInfo.InvariantCulture));
+                else if (0 != this._resId)
+                    editorKey.SetValue("DisplayName", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                if (this._linkedEditorGuid != Guid.Empty)
+                {
+                    editorKey.SetValue("LinkedEditorGuid", this._linkedEditorGuid.ToString("B"));
                 }
-                if (_commonViewAttrs != 0) {
-                    editorKey.SetValue("CommonPhysicalViewAttributes", (int)_commonViewAttrs);
+                if (this._commonViewAttrs != 0)
+                {
+                    editorKey.SetValue("CommonPhysicalViewAttributes", (int)this._commonViewAttrs);
                 }
                 editorKey.SetValue("Package", context.ComponentType.GUID.ToString("B"));
             }
 
-            using (Key extensionKey = context.CreateKey(RegKeyName + "\\Extensions")) {
-                extensionKey.SetValue(Extension.Substring(1), Priority);
+            using (var extensionKey = context.CreateKey(this.RegKeyName + "\\Extensions"))
+            {
+                extensionKey.SetValue(this.Extension.Substring(1), this.Priority);
 
-                if (_extensions != null && _extensions.Length > 0) {
-                    foreach (var extension in _extensions) {
+                if (this._extensions != null && this._extensions.Length > 0)
+                {
+                    foreach (var extension in this._extensions)
+                    {
                         var extensionAndPri = extension.Split(':');
                         int pri;
-                        if (extensionAndPri.Length != 2 || !Int32.TryParse(extensionAndPri[1], out pri)) {
+                        if (extensionAndPri.Length != 2 || !Int32.TryParse(extensionAndPri[1], out pri))
+                        {
                             throw new InvalidOperationException("Expected extension:priority");
                         }
 
@@ -223,32 +205,37 @@ namespace Microsoft.NodejsTools {
             }
 
             // Build the path of the registry key for the "Add file to project" entry
-            if (_project != Guid.Empty) {
-                string prjRegKey = ProjectRegKeyName(context) + "\\/1";
-                using (Key projectKey = context.CreateKey(prjRegKey)) {
-                    if (0 != _resId)
-                        projectKey.SetValue("", "#" + _resId.ToString(CultureInfo.InvariantCulture));
-                    if (_templateDir.Length != 0) {
-                        Uri url = new Uri(context.ComponentType.Assembly.CodeBase);
-                        string templates = url.LocalPath;
-                        templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), _templateDir);
+            if (this._project != Guid.Empty)
+            {
+                var prjRegKey = ProjectRegKeyName(context) + "\\/1";
+                using (var projectKey = context.CreateKey(prjRegKey))
+                {
+                    if (0 != this._resId)
+                        projectKey.SetValue("", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                    if (this._templateDir.Length != 0)
+                    {
+                        var url = new Uri(context.ComponentType.Assembly.CodeBase);
+                        var templates = url.LocalPath;
+                        templates = CommonUtils.GetAbsoluteDirectoryPath(Path.GetDirectoryName(templates), this._templateDir);
                         templates = context.EscapePath(templates);
                         projectKey.SetValue("TemplatesDir", templates);
                     }
-                    projectKey.SetValue("SortPriority", Priority);
+                    projectKey.SetValue("SortPriority", this.Priority);
                 }
             }
 
             // Register the EditorFactoryNotify
-            if (EditorFactoryNotify) {
+            if (this.EditorFactoryNotify)
+            {
                 // The IVsEditorFactoryNotify interface is called by the project system, so it doesn't make sense to
                 // register it if there is no project associated to this editor.
-                if (_project == Guid.Empty)
+                if (this._project == Guid.Empty)
                     throw new ArgumentException("project");
 
                 // Create the registry key
-                using (Key edtFactoryNotifyKey = context.CreateKey(EditorFactoryNotifyKey)) {
-                    edtFactoryNotifyKey.SetValue("EditorFactoryNotify", Factory.ToString("B"));
+                using (var edtFactoryNotifyKey = context.CreateKey(this.EditorFactoryNotifyKey))
+                {
+                    edtFactoryNotifyKey.SetValue("EditorFactoryNotify", this.Factory.ToString("B"));
                 }
             }
         }
@@ -258,14 +245,16 @@ namespace Microsoft.NodejsTools {
         /// Unregister this editor.
         /// </devdoc>
         /// <param name="context"></param>
-        public override void Unregister(RegistrationContext context) {
-            context.RemoveKey(RegKeyName);
-            if (_project != Guid.Empty) {
+        public override void Unregister(RegistrationContext context)
+        {
+            context.RemoveKey(this.RegKeyName);
+            if (this._project != Guid.Empty)
+            {
                 context.RemoveKey(ProjectRegKeyName(context));
-                if (EditorFactoryNotify)
-                    context.RemoveKey(EditorFactoryNotifyKey);
+                if (this.EditorFactoryNotify)
+                    context.RemoveKey(this.EditorFactoryNotifyKey);
             }
         }
     }
-
 }
+

@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -34,29 +20,37 @@ using TestUtilities.Nodejs;
 using Key = System.Windows.Input.Key;
 using MouseButton = System.Windows.Input.MouseButton;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class NodejsBasicProjectTests : NodejsProjectTest {
+    public class NodejsBasicProjectTests : NodejsProjectTest
+    {
         [ClassInitialize]
-        public static void DoDeployment(TestContext context) {
+        public static void DoDeployment(TestContext context)
+        {
             AssertListener.Initialize();
             NodejsTestData.Deploy();
         }
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void AddNewTypeScriptItem() {
-            using (var solution = Project("AddNewTypeScriptItem", Compile("server")).Generate().ToVs()) {
+        public void AddNewTypeScriptItem()
+        {
+            using (var solution = Project("AddNewTypeScriptItem", Compile("server")).Generate().ToVs())
+            {
                 var project = solution.WaitForItem("AddNewTypeScriptItem", "server.js");
                 AutomationWrapper.Select(project);
 
-                using (var newItem = solution.AddNewItem()) {
+                using (var newItem = solution.AddNewItem())
+                {
                     newItem.FileName = "NewTSFile.ts";
                     newItem.OK();
                 }
 
-                using (AutoResetEvent buildDone = new AutoResetEvent(false)) {
-                    VSTestContext.DTE.Events.BuildEvents.OnBuildDone += (sender, args) => {
+                using (AutoResetEvent buildDone = new AutoResetEvent(false))
+                {
+                    VSTestContext.DTE.Events.BuildEvents.OnBuildDone += (sender, args) =>
+                    {
                         buildDone.Set();
                     };
 
@@ -72,13 +66,15 @@ namespace Microsoft.Nodejs.Tests.UI {
         /// </summary>
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void ExcludedErrors() {
+        public void ExcludedErrors()
+        {
             var project = Project("TestExcludedErrors",
                 Compile("server", "function f(a, b, c) { }\r\n\r\n"),
                 Compile("excluded", "aa bb", isExcluded: true)
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 List<IVsTaskItem> allItems = solution.WaitForErrorListItems(0);
                 Assert.AreEqual(0, allItems.Count);
 
@@ -101,7 +97,8 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void DebuggerPort() {
+        public void DebuggerPort()
+        {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -115,11 +112,13 @@ while(true) {{
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 solution.ExecuteCommand("Debug.Start");
                 solution.WaitForMode(dbgDebugMode.dbgRunMode);
 
-                for (int i = 0; i < 10 && !File.Exists(filename); i++) {
+                for (int i = 0; i < 10 && !File.Exists(filename); i++)
+                {
                     System.Threading.Thread.Sleep(1000);
                 }
                 Assert.IsTrue(File.Exists(filename), "debugger port not written out");
@@ -134,7 +133,8 @@ while(true) {{
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void EnvironmentVariables() {
+        public void EnvironmentVariables()
+        {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -148,11 +148,13 @@ while(true) {{
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 solution.ExecuteCommand("Debug.Start");
                 solution.WaitForMode(dbgDebugMode.dbgRunMode);
 
-                for (int i = 0; i < 10 && !File.Exists(filename); i++) {
+                for (int i = 0; i < 10 && !File.Exists(filename); i++)
+                {
                     System.Threading.Thread.Sleep(1000);
                 }
                 Assert.IsTrue(File.Exists(filename), "environment variables not written out");
@@ -167,7 +169,8 @@ while(true) {{
 
         [TestMethod, Priority(0), TestCategory("Core")]
         [HostType("VSTestHost")]
-        public void EnvironmentVariablesNoDebugging() {
+        public void EnvironmentVariablesNoDebugging()
+        {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
             Console.WriteLine("Temp file is: {0}", filename);
             var code = String.Format(@"
@@ -180,10 +183,12 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 solution.ExecuteCommand("Debug.StartWithoutDebugging");
 
-                for (int i = 0; i < 10 && !File.Exists(filename); i++) {
+                for (int i = 0; i < 10 && !File.Exists(filename); i++)
+                {
                     System.Threading.Thread.Sleep(1000);
                 }
                 Assert.IsTrue(File.Exists(filename), "environment variables not written out");
@@ -197,7 +202,8 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
 
         [TestMethod, Priority(0), TestCategory("Core"), TestCategory("Ignore")]
         [HostType("VSTestHost")]
-        public void ProjectProperties() {
+        public void ProjectProperties()
+        {
             var filename = Path.Combine(TestData.GetTempPath(), Path.GetRandomFileName());
 
             var project = Project("ProjectProperties",
@@ -207,15 +213,18 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
                 Property(CommonConstants.StartupFile, "server.js")
             );
 
-            using (var solution = project.Generate().ToVs()) {
+            using (var solution = project.Generate().ToVs())
+            {
                 var projectNode = solution.WaitForItem("ProjectProperties");
                 AutomationWrapper.Select(projectNode);
 
                 solution.ExecuteCommand("ClassViewContextMenus.ClassViewMultiselectProjectReferencesItems.Properties");
                 AutomationElement doc = null;
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++)
+                {
                     doc = ((VisualStudioInstance)solution).App.GetDocumentTab("ProjectProperties");
-                    if (doc != null) {
+                    if (doc != null)
+                    {
                         break;
                     }
                     System.Threading.Thread.Sleep(1000);
@@ -250,3 +259,4 @@ require('fs').writeFileSync('{0}', process.env.fob + process.env.bar + process.e
         }
     }
 }
+

@@ -20,7 +20,6 @@
     <!--This header contains the command ids for the menus provided by the shell. -->
     <Extern href="vsshlids.h"/>
 
-
     <KeyBindings>
         <KeyBinding guid="guidReplWindowCmdSet" id="cmdidSmartExecute" key1="VK_RETURN" mod1="C" editor="guidReplWindow" />
         <!-- cmdidBreakRepl should not be visible until we implement command cancellation. https://nodejstools.codeplex.com/workitem/1609 -->
@@ -34,8 +33,6 @@
 
     </KeyBindings>
 
-
-
     <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
     <Commands package="guidReplWindowPkg">
@@ -46,7 +43,6 @@
     called "command set" and is used to group different command inside a logically related  
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
-
 
         <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
@@ -66,7 +62,6 @@
             <Group guid="guidReplWindowCmdSet" id="ConsoleMenuClearGroup" priority="0x300">
                 <Parent guid="guidReplWindowCmdSet" id="menuIdConsoleContextMenu"/>
             </Group>
-
 
         </Groups>
 

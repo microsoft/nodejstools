@@ -998,7 +998,6 @@ declare module "express-serve-static-core" {
         render(name: string, options?: Object, callback?: (err: Error, html: string) => void): void;
         render(name: string, callback: (err: Error, html: string) => void): void;
 
-
         /**
             * Listen for connections.
             *

@@ -1,27 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Choose>
-    <When Condition=" '$(VisualStudioVersion)'=='15.0'  Or '$(TargetVisualStudioVersion)'=='VS150' ">
-      <PropertyGroup>
-        <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-        <FileUpgradeFlags>
-        </FileUpgradeFlags>
-        <UpgradeBackupLocation>
-        </UpgradeBackupLocation>
-        <OldToolsVersion>4.0</OldToolsVersion>
-      </PropertyGroup>
-    </When>
-    <When Condition=" '$(VisualStudioVersion)'=='14.0'  Or '$(TargetVisualStudioVersion)'=='VS140' ">
-      <PropertyGroup>
-        <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-        <FileUpgradeFlags>
-        </FileUpgradeFlags>
-        <UpgradeBackupLocation>
-        </UpgradeBackupLocation>
-        <OldToolsVersion>4.0</OldToolsVersion>
-      </PropertyGroup>
-    </When>
-  </Choose>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+  </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -45,15 +31,13 @@
     <DefineConstants>$(DefineConstants);NO_WINDOWS</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Serialization" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
@@ -90,7 +74,6 @@
     <Compile Include="INpmLogSource.cs" />
     <Compile Include="INpmPathProvider.cs" />
     <Compile Include="IPackage.cs" />
-    <Compile Include="IPackageCatalog.cs" />
     <Compile Include="IPackageJson.cs" />
     <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
@@ -109,8 +92,6 @@
     <Compile Include="NpmNotFoundException.cs" />
     <Compile Include="SPI\GenericNpmCommand.cs" />
     <Compile Include="SPI\Homepages.cs" />
-    <Compile Include="SPI\NpmSearchRegexComparer.cs" />
-    <Compile Include="SPI\NpmSearchFilterStringComparer.cs" />
     <Compile Include="PackageComparer.cs" />
     <Compile Include="PackageFlags.cs" />
     <Compile Include="PackageJsonException.cs" />
@@ -123,10 +104,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RootPackageFactory.cs" />
-    <Compile Include="ScriptName.cs" />
     <Compile Include="SPI\AbstractNpmLogSource.cs" />
     <Compile Include="SPI\NpmCommander.cs" />
-    <Compile Include="SPI\NpmGetCatalogCommand.cs" />
     <Compile Include="SemverVersion.cs" />
     <Compile Include="SemverVersionFormatException.cs" />
     <Compile Include="SPI\AbstractNodeModules.cs" />
@@ -143,26 +122,14 @@
     <Compile Include="SPI\NpmUninstallCommand.cs" />
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />
-    <Compile Include="SPI\DatabasePackageCatalogFilter.cs" />
-    <Compile Include="SPI\PackageCatalogHelper.cs" />
     <Compile Include="SPI\PackageJson.cs" />
     <Compile Include="SPI\PackageProxy.cs" />
     <Compile Include="SPI\Person.cs" />
     <Compile Include="SPI\PkgStringArray.cs" />
     <Compile Include="SPI\PkgFiles.cs" />
     <Compile Include="SPI\RootPackage.cs" />
-    <Compile Include="SQLite\CatalogTables.cs" />
-    <Compile Include="SQLite\SQLite.cs" />
-    <Compile Include="SQLite\SQLiteAsync.cs" />
   </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="Resources.cs.resx" />
     <EmbeddedResource Include="Resources.de.resx" />
     <EmbeddedResource Include="Resources.en.resx">
@@ -181,14 +148,6 @@
     <EmbeddedResource Include="Resources.tr.resx" />
     <EmbeddedResource Include="Resources.zh-Hans.resx" />
     <EmbeddedResource Include="Resources.zh-Hant.resx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\Common\SQLite\sqlite3.dll">
-      <Link>sqlite3.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>True</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -21,71 +7,77 @@ using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal abstract class PkgStringArray : IPkgStringArray {
-        private IList<string> elements;
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal abstract class PkgStringArray : IPkgStringArray
+    {
+        private readonly IList<string> elements;
 
-        protected PkgStringArray(JObject package, params string[] arrayPropertyNames) {
-
+        protected PkgStringArray(JObject package, params string[] arrayPropertyNames)
+        {
             var token = GetArrayProperty(package, arrayPropertyNames);
-            if (token == null) {
-                elements = new List<string>();
-            } else {
-                switch (token.Type) {
+            if (token == null)
+            {
+                this.elements = new List<string>();
+            }
+            else
+            {
+                switch (token.Type)
+                {
                     case JTokenType.String:
-                        elements = new[] { token.Value<string>() };
+                        this.elements = new[] { token.Value<string>() };
                         break;
 
                     case JTokenType.Array:
-                        elements = (token as JArray).Select(value => value.Value<string>()).ToList();
+                        this.elements = (token as JArray).Select(value => value.Value<string>()).ToList();
                         break;
 
                     default:
-                        elements = new List<string>();
+                        this.elements = new List<string>();
                         break;
                 }
             }
         }
 
-        private static JToken GetArrayProperty(JObject package, string[] arrayPropertyNames) {
-            foreach (var name in arrayPropertyNames) {
+        private static JToken GetArrayProperty(JObject package, string[] arrayPropertyNames)
+        {
+            foreach (var name in arrayPropertyNames)
+            {
                 var array = package[name] as JToken;
-                if (null != array) {
+                if (null != array)
+                {
                     return array;
                 }
             }
             return null;
         }
 
-        public int Count {
-            get {
-                return elements.Count;
-            }
-        }
+        public int Count => this.elements.Count;
 
-        public string this[int index] {
-            get {
-                if (Count <= 0) {
+        public string this[int index]
+        {
+            get
+            {
+                if (this.Count <= 0)
+                {
                     throw new IndexOutOfRangeException(
                         "Cannot retrieve item from empty package.json string array.");
                 }
 
-                if (index > Count) {
+                if (index > this.Count)
+                {
                     throw new IndexOutOfRangeException(
                         string.Format(CultureInfo.CurrentCulture,
                             "Cannot retrieve value from index '{0}' in a package.json string array containing only 1 item.",
                             index));
                 }
-                return elements[index];
+                return this.elements[index];
             }
         }
 
-        public IEnumerator<string> GetEnumerator() {
-            return elements.GetEnumerator();
-        }
+        public IEnumerator<string> GetEnumerator() => this.elements.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
+

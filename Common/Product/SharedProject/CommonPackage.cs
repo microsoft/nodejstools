@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -28,8 +16,10 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace Microsoft.VisualStudioTools {
-    public abstract class CommonPackage : Package, IOleComponent {
+namespace Microsoft.VisualStudioTools
+{
+    public abstract class CommonPackage : Package, IOleComponent
+    {
         private uint _componentID;
         private LibraryManager _libraryManager;
         private IOleComponentManager _compMgr;
@@ -47,17 +37,23 @@ namespace Microsoft.VisualStudioTools {
 
         #endregion
 
-        internal CommonPackage() {
+        internal CommonPackage()
+        {
 #if DEBUG
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-                if (e.IsTerminating) {
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                if (e.IsTerminating)
+                {
                     var ex = e.ExceptionObject as Exception;
-                    if (ex != null) {
+                    if (ex != null)
+                    {
                         Debug.Fail(
                             string.Format("An unhandled exception is about to terminate the process:\n\n{0}", ex.Message),
                             ex.ToString()
                         );
-                    } else {
+                    }
+                    else
+                    {
                         Debug.Fail(string.Format(
                             "An unhandled exception is about to terminate the process:\n\n{0}",
                             e.ExceptionObject
@@ -68,53 +64,59 @@ namespace Microsoft.VisualStudioTools {
 #endif
         }
 
-        
-        internal static Dictionary<Command, MenuCommand> Commands {
-            get {
-                return _commands;
-            }
-        }
 
-        internal static object CommandsLock {
-            get {
-                return _commandsLock;
-            }
-        }
+        internal static Dictionary<Command, MenuCommand> Commands => _commands;
 
-        protected override void Dispose(bool disposing) {
-            try {
-                if (_componentID != 0) {
-                    IOleComponentManager mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
-                    if (mgr != null) {
-                        mgr.FRevokeComponent(_componentID);
+        internal static object CommandsLock => _commandsLock;
+
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (this._componentID != 0)
+                {
+                    var mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
+                    if (mgr != null)
+                    {
+                        mgr.FRevokeComponent(this._componentID);
                     }
-                    _componentID = 0;
+                    this._componentID = 0;
                 }
-                if (null != _libraryManager) {
-                    _libraryManager.Dispose();
-                    _libraryManager = null;
+                if (null != this._libraryManager)
+                {
+                    this._libraryManager.Dispose();
+                    this._libraryManager = null;
                 }
-            } finally {
+            }
+            finally
+            {
                 base.Dispose(disposing);
             }
         }
 
-        private object CreateService(IServiceContainer container, Type serviceType) {
-            if (GetLibraryManagerType() == serviceType) {
-                return _libraryManager = CreateLibraryManager(this);
+        private object CreateService(IServiceContainer container, Type serviceType)
+        {
+            if (GetLibraryManagerType() == serviceType)
+            {
+                return this._libraryManager = CreateLibraryManager(this);
             }
             return null;
         }
 
-        internal void RegisterCommands(IEnumerable<Command> commands, Guid cmdSet) {
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (null != mcs) {
-                lock (_commandsLock) {
-                    foreach (var command in commands) {
+        internal void RegisterCommands(IEnumerable<Command> commands, Guid cmdSet)
+        {
+            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            if (null != mcs)
+            {
+                lock (_commandsLock)
+                {
+                    foreach (var command in commands)
+                    {
                         var beforeQueryStatus = command.BeforeQueryStatus;
-                        CommandID toolwndCommandID = new CommandID(cmdSet, command.CommandId);
-                        OleMenuCommand menuToolWin = new OleMenuCommand(command.DoCommand, toolwndCommandID);
-                        if (beforeQueryStatus != null) {
+                        var toolwndCommandID = new CommandID(cmdSet, command.CommandId);
+                        var menuToolWin = new OleMenuCommand(command.DoCommand, toolwndCommandID);
+                        if (beforeQueryStatus != null)
+                        {
                             menuToolWin.BeforeQueryStatus += beforeQueryStatus;
                         }
                         mcs.AddCommand(menuToolWin);
@@ -128,37 +130,45 @@ namespace Microsoft.VisualStudioTools {
         /// Gets the current IWpfTextView that is the active document.
         /// </summary>
         /// <returns></returns>
-        public static IWpfTextView GetActiveTextView(System.IServiceProvider serviceProvider) {
-            if (serviceProvider == null) {
+        public static IWpfTextView GetActiveTextView(System.IServiceProvider serviceProvider)
+        {
+            if (serviceProvider == null)
+            {
                 Debug.Assert(false, "No service provider");
                 return null;
             }
 
             var monitorSelection = (IVsMonitorSelection)serviceProvider.GetService(typeof(SVsShellMonitorSelection));
-            if (monitorSelection == null) {
+            if (monitorSelection == null)
+            {
                 return null;
             }
             object curDocument;
-            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument))) {
+            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+            {
                 // TODO: Report error
                 return null;
             }
 
-            IVsWindowFrame frame = curDocument as IVsWindowFrame;
-            if (frame == null) {
+            var frame = curDocument as IVsWindowFrame;
+            if (frame == null)
+            {
                 // TODO: Report error
                 return null;
             }
 
             object docView = null;
-            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView))) {
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            {
                 // TODO: Report error
                 return null;
             }
 
-            if (docView is IVsCodeWindow) {
+            if (docView is IVsCodeWindow)
+            {
                 IVsTextView textView;
-                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView))) {
+                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
+                {
                     // TODO: Report error
                     return null;
                 }
@@ -172,51 +182,55 @@ namespace Microsoft.VisualStudioTools {
         }
 
         [Obsolete("ComponentModel should be retrieved from an IServiceProvider")]
-        public static IComponentModel ComponentModel {
-            get {
-                return (IComponentModel)GetGlobalService(typeof(SComponentModel));
-            }
-        }
+        public static IComponentModel ComponentModel => (IComponentModel)GetGlobalService(typeof(SComponentModel));
 
-        internal static CommonProjectNode GetStartupProject(System.IServiceProvider serviceProvider) {
-            if (serviceProvider == null) {
+        internal static CommonProjectNode GetStartupProject(System.IServiceProvider serviceProvider)
+        {
+            if (serviceProvider == null)
+            {
                 Debug.Assert(false, "No service provider");
                 return null;
             }
             var buildMgr = (IVsSolutionBuildManager)serviceProvider.GetService(typeof(IVsSolutionBuildManager));
             IVsHierarchy hierarchy;
-            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null) {
+            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null)
+            {
                 return hierarchy.GetProject().GetCommonProject();
             }
             return null;
         }
 
-        protected override void Initialize() {
+        protected override void Initialize()
+        {
             var container = (IServiceContainer)this;
             UIThread.EnsureService(this);
-            container.AddService(GetLibraryManagerType(), CreateService, true);
+            container.AddService(GetLibraryManagerType(), this.CreateService, true);
 
-            var componentManager = _compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
-            OLECRINFO[] crinfo = new OLECRINFO[1];
+            var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
+            var crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
             crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime;
             crinfo[0].grfcadvf = (uint)_OLECADVF.olecadvfModal | (uint)_OLECADVF.olecadvfRedrawOff | (uint)_OLECADVF.olecadvfWarningsOff;
             crinfo[0].uIdleTimeInterval = 0;
-            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out _componentID));
+            ErrorHandler.ThrowOnFailure(componentManager.FRegisterComponent(this, crinfo, out this._componentID));
 
             base.Initialize();
         }
 
-        internal static void OpenWebBrowser(string url) {
+        internal static void OpenWebBrowser(string url)
+        {
             var uri = new Uri(url);
             Process.Start(new ProcessStartInfo(uri.AbsoluteUri));
             return;
         }
 
-        internal static void OpenVsWebBrowser(System.IServiceProvider serviceProvider, string url) {
-            serviceProvider.GetUIThread().Invoke(() => {
+        internal static void OpenVsWebBrowser(System.IServiceProvider serviceProvider, string url)
+        {
+            serviceProvider.GetUIThread().Invoke(() =>
+            {
                 var web = serviceProvider.GetService(typeof(SVsWebBrowsingService)) as IVsWebBrowsingService;
-                if (web == null) {
+                if (web == null)
+                {
                     OpenWebBrowser(url);
                     return;
                 }
@@ -229,18 +243,22 @@ namespace Microsoft.VisualStudioTools {
 
         #region IOleComponent Members
 
-        public int FContinueMessageLoop(uint uReason, IntPtr pvLoopData, MSG[] pMsgPeeked) {
+        public int FContinueMessageLoop(uint uReason, IntPtr pvLoopData, MSG[] pMsgPeeked)
+        {
             return 1;
         }
 
-        public virtual int FDoIdle(uint grfidlef) {
-            if (null != _libraryManager) {
-                _libraryManager.OnIdle(_compMgr);
+        public virtual int FDoIdle(uint grfidlef)
+        {
+            if (null != this._libraryManager)
+            {
+                this._libraryManager.OnIdle(this._compMgr);
             }
 
             var onIdle = OnIdle;
-            if (onIdle != null) {
-                onIdle(this, new ComponentManagerEventArgs(_compMgr));
+            if (onIdle != null)
+            {
+                onIdle(this, new ComponentManagerEventArgs(this._compMgr));
             }
 
             return 0;
@@ -248,51 +266,59 @@ namespace Microsoft.VisualStudioTools {
 
         internal event EventHandler<ComponentManagerEventArgs> OnIdle;
 
-        public int FPreTranslateMessage(MSG[] pMsg) {
+        public int FPreTranslateMessage(MSG[] pMsg)
+        {
             return 0;
         }
 
-        public int FQueryTerminate(int fPromptUser) {
+        public int FQueryTerminate(int fPromptUser)
+        {
             return 1;
         }
 
-        public int FReserved1(uint dwReserved, uint message, IntPtr wParam, IntPtr lParam) {
+        public int FReserved1(uint dwReserved, uint message, IntPtr wParam, IntPtr lParam)
+        {
             return 1;
         }
 
-        public IntPtr HwndGetWindow(uint dwWhich, uint dwReserved) {
+        public IntPtr HwndGetWindow(uint dwWhich, uint dwReserved)
+        {
             return IntPtr.Zero;
         }
 
-        public void OnActivationChange(IOleComponent pic, int fSameComponent, OLECRINFO[] pcrinfo, int fHostIsActivating, OLECHOSTINFO[] pchostinfo, uint dwReserved) {
+        public void OnActivationChange(IOleComponent pic, int fSameComponent, OLECRINFO[] pcrinfo, int fHostIsActivating, OLECHOSTINFO[] pchostinfo, uint dwReserved)
+        {
         }
 
-        public void OnAppActivate(int fActive, uint dwOtherThreadID) {
+        public void OnAppActivate(int fActive, uint dwOtherThreadID)
+        {
         }
 
-        public void OnEnterState(uint uStateID, int fEnter) {
+        public void OnEnterState(uint uStateID, int fEnter)
+        {
         }
 
-        public void OnLoseActivation() {
+        public void OnLoseActivation()
+        {
         }
 
-        public void Terminate() {
+        public void Terminate()
+        {
         }
 
         #endregion
     }
 
-    class ComponentManagerEventArgs : EventArgs {
+    internal class ComponentManagerEventArgs : EventArgs
+    {
         private readonly IOleComponentManager _compMgr;
 
-        public ComponentManagerEventArgs(IOleComponentManager compMgr) {
-            _compMgr = compMgr;
+        public ComponentManagerEventArgs(IOleComponentManager compMgr)
+        {
+            this._compMgr = compMgr;
         }
 
-        public IOleComponentManager ComponentManager {
-            get {
-                return _compMgr;
-            }
-        }
+        public IOleComponentManager ComponentManager => this._compMgr;
     }
 }
+

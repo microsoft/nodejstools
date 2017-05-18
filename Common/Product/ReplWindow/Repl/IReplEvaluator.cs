@@ -1,31 +1,17 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
+namespace Microsoft.NodejsTools.Repl
+{
     /// <summary>
     /// Implements an evaluator for a specific REPL implementation.  The evaluator is provided to the
     /// REPL implementation by the IReplEvaluatorProvider interface.
     /// </summary>
-    public interface IReplEvaluator : IDisposable {
+    public interface IReplEvaluator : IDisposable
+    {
         /// <summary>
         /// Initializes the interactive session. 
         /// </summary>
@@ -73,7 +59,7 @@ namespace Microsoft.VisualStudio.Repl {
         /// <param name="text">The code snippet to execute.</param>
         /// <returns>Task that completes the execution.</returns>
         Task<ExecutionResult> ExecuteText(string text);
-        
+
         void ExecuteFile(string filename);
 
         /// <summary>
@@ -91,3 +77,4 @@ namespace Microsoft.VisualStudio.Repl {
         void AbortCommand();
     }
 }
+

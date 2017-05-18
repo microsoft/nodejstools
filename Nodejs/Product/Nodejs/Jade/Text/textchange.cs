@@ -1,23 +1,11 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
-namespace Microsoft.NodejsTools.Jade {
-    class TextChange : ICloneable {
+namespace Microsoft.NodejsTools.Jade
+{
+    internal class TextChange : ICloneable
+    {
         /// <summary>
         /// Text snapshot version
         /// </summary>
@@ -43,71 +31,82 @@ namespace Microsoft.NodejsTools.Jade {
         /// </summary>
         public ITextProvider NewText;
 
-        public TextChange() {
+        public TextChange()
+        {
             Clear();
         }
 
         public TextChange(int start, int oldLength, int newLength) :
-            this() {
-            OldRange = new TextRange(start, start + oldLength);
-            NewRange = new TextRange(start, start + newLength);
+            this()
+        {
+            this.OldRange = new TextRange(start, start + oldLength);
+            this.NewRange = new TextRange(start, start + newLength);
         }
 
         public TextChange(int start, int oldLength, int newLength, ITextProvider oldText, ITextProvider newText)
-            : this() {
+            : this()
+        {
             this.Combine(new TextChange(start, oldLength, newLength));
 
-            OldText = oldText;
-            NewText = newText;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
 
         public TextChange(TextChange change, ITextProvider oldText, ITextProvider newText)
-            : this() {
+            : this()
+        {
             this.Combine(change);
 
-            OldText = oldText;
-            NewText = newText;
+            this.OldText = oldText;
+            this.NewText = newText;
         }
 
-        public virtual void Clear() {
-            OldRange = TextRange.EmptyRange;
-            NewRange = TextRange.EmptyRange;
+        public virtual void Clear()
+        {
+            this.OldRange = TextRange.EmptyRange;
+            this.NewRange = TextRange.EmptyRange;
 
-            OldText = null;
-            NewText = null;
+            this.OldText = null;
+            this.NewText = null;
         }
 
         /// <summary>
         /// True if no changes are pending.
         /// </summary>
-        public virtual bool IsEmpty() {
-            return (OldRange.Length == 0 && NewRange.Length == 0);
+        public virtual bool IsEmpty()
+        {
+            return (this.OldRange.Length == 0 && this.NewRange.Length == 0);
         }
 
-        public void Combine(TextChange other) {
+        public void Combine(TextChange other)
+        {
             if (other.IsEmpty())
                 return;
 
-            if (OldRange == TextRange.EmptyRange || NewRange == TextRange.EmptyRange) {
-                OldRange = other.OldRange;
-                NewRange = other.NewRange;
-            } else {
-                int oldStart = Math.Min(other.OldRange.Start, this.OldRange.Start);
-                int oldEnd = Math.Max(other.OldRange.End, this.OldRange.End);
+            if (this.OldRange == TextRange.EmptyRange || this.NewRange == TextRange.EmptyRange)
+            {
+                this.OldRange = other.OldRange;
+                this.NewRange = other.NewRange;
+            }
+            else
+            {
+                var oldStart = Math.Min(other.OldRange.Start, this.OldRange.Start);
+                var oldEnd = Math.Max(other.OldRange.End, this.OldRange.End);
 
-                int newStart = Math.Min(other.NewRange.Start, this.NewRange.Start);
-                int newEnd = Math.Max(other.NewRange.End, this.NewRange.End);
+                var newStart = Math.Min(other.NewRange.Start, this.NewRange.Start);
+                var newEnd = Math.Max(other.NewRange.End, this.NewRange.End);
 
                 this.OldRange = new TextRange(oldStart, oldEnd);
                 this.NewRange = new TextRange(newStart, newEnd);
             }
 
-            Version = Math.Max(this.Version, other.Version);
+            this.Version = Math.Max(this.Version, other.Version);
         }
 
         #region ICloneable Members
-        public object Clone() {
-            TextChange clone = this.MemberwiseClone() as TextChange;
+        public object Clone()
+        {
+            var clone = this.MemberwiseClone() as TextChange;
 
             clone.OldRange = this.OldRange.Clone() as TextRange;
             clone.NewRange = this.NewRange.Clone() as TextRange;
@@ -117,3 +116,4 @@ namespace Microsoft.NodejsTools.Jade {
         #endregion
     }
 }
+

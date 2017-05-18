@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.ObjectModel;
@@ -20,8 +8,10 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 
-namespace Microsoft.VisualStudioTools.MockVsTests {
-    class MockCompletionSession : ICompletionSession {
+namespace Microsoft.VisualStudioTools.MockVsTests
+{
+    internal class MockCompletionSession : ICompletionSession
+    {
         private bool _dismissed, _started;
         private readonly ITextView _view;
         private readonly ReadOnlyObservableCollection<CompletionSet> _sets;
@@ -29,26 +19,33 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
         private readonly PropertyCollection _properties = new PropertyCollection();
         private CompletionSet _active;
 
-        public MockCompletionSession(ITextView view, ObservableCollection<CompletionSet> sets, ITrackingPoint triggerPoint) {
+        public MockCompletionSession(ITextView view, ObservableCollection<CompletionSet> sets, ITrackingPoint triggerPoint)
+        {
             _view = view;
             sets.CollectionChanged += sets_CollectionChanged;
             _triggerPoint = triggerPoint;
             _sets = new ReadOnlyObservableCollection<CompletionSet>(sets);
         }
 
-        void sets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-            if (e.Action != NotifyCollectionChangedAction.Add) {
+        private void sets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action != NotifyCollectionChangedAction.Add)
+            {
                 throw new NotImplementedException();
             }
-            if (_active == null) {
+            if (_active == null)
+            {
                 _active = _sets[0];
             }
         }
 
-        public void Commit() {
-            if (SelectedCompletionSet != null) {
+        public void Commit()
+        {
+            if (SelectedCompletionSet != null)
+            {
                 Completion selectedCompletion = SelectedCompletionSet.SelectionStatus.Completion;
-                if (selectedCompletion != null && selectedCompletion.InsertionText != null) {
+                if (selectedCompletion != null && selectedCompletion.InsertionText != null)
+                {
                     ITrackingSpan applicableTo = SelectedCompletionSet.ApplicableTo;
                     ITextBuffer buffer = applicableTo.TextBuffer;
                     ITextSnapshot snapshot = buffer.CurrentSnapshot;
@@ -60,7 +57,8 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             }
 
             var committed = Committed;
-            if (committed != null) {
+            if (committed != null)
+            {
                 committed(this, EventArgs.Empty);
             }
             Dismiss();
@@ -68,12 +66,15 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
 
         public event EventHandler Committed;
 
-        public System.Collections.ObjectModel.ReadOnlyObservableCollection<CompletionSet> CompletionSets {
+        public System.Collections.ObjectModel.ReadOnlyObservableCollection<CompletionSet> CompletionSets
+        {
             get { return _sets; }
         }
 
-        public void Filter() {
-            foreach (CompletionSet completionSet in _sets) {
+        public void Filter()
+        {
+            foreach (CompletionSet completionSet in _sets)
+            {
                 completionSet.Filter();
             }
 
@@ -81,89 +82,111 @@ namespace Microsoft.VisualStudioTools.MockVsTests {
             this.Match();
         }
 
-        public bool IsStarted {
+        public bool IsStarted
+        {
             get { return _started; }
         }
 
-        public CompletionSet SelectedCompletionSet {
-            get {
+        public CompletionSet SelectedCompletionSet
+        {
+            get
+            {
                 return _active;
             }
-            set {
+            set
+            {
                 _active = value;
             }
         }
 
-        public event EventHandler<ValueChangedEventArgs<CompletionSet>> SelectedCompletionSetChanged {
+        public event EventHandler<ValueChangedEventArgs<CompletionSet>> SelectedCompletionSetChanged
+        {
             add { throw new NotImplementedException(); }
             remove { throw new NotImplementedException(); }
         }
 
-        public void Collapse() {
+        public void Collapse()
+        {
             throw new NotImplementedException();
         }
 
-        public void Dismiss() {
+        public void Dismiss()
+        {
             _dismissed = true;
             var dismissed = Dismissed;
-            if (dismissed != null) {
+            if (dismissed != null)
+            {
                 dismissed(this, EventArgs.Empty);
             }
         }
 
         public event EventHandler Dismissed;
 
-        public VisualStudio.Text.SnapshotPoint? GetTriggerPoint(VisualStudio.Text.ITextSnapshot textSnapshot) {
+        public VisualStudio.Text.SnapshotPoint? GetTriggerPoint(VisualStudio.Text.ITextSnapshot textSnapshot)
+        {
             return GetTriggerPoint(textSnapshot.TextBuffer).GetPoint(textSnapshot);
         }
 
-        public VisualStudio.Text.ITrackingPoint GetTriggerPoint(VisualStudio.Text.ITextBuffer textBuffer) {
-            if (textBuffer == _triggerPoint.TextBuffer) {
+        public VisualStudio.Text.ITrackingPoint GetTriggerPoint(VisualStudio.Text.ITextBuffer textBuffer)
+        {
+            if (textBuffer == _triggerPoint.TextBuffer)
+            {
                 return _triggerPoint;
             }
             throw new NotImplementedException();
         }
 
-        public bool IsDismissed {
+        public bool IsDismissed
+        {
             get { return _dismissed; }
         }
 
-        public bool Match() {
-            foreach (CompletionSet completionSet in _sets) {
+        public bool Match()
+        {
+            foreach (CompletionSet completionSet in _sets)
+            {
                 completionSet.SelectBestMatch();
             }
 
             return true;
         }
 
-        public IIntellisensePresenter Presenter {
+        public IIntellisensePresenter Presenter
+        {
             get { throw new NotImplementedException(); }
         }
 
-        public event EventHandler PresenterChanged {
+        public event EventHandler PresenterChanged
+        {
             add { throw new NotImplementedException(); }
             remove { throw new NotImplementedException(); }
         }
 
-        public void Recalculate() {
+        public void Recalculate()
+        {
             throw new NotImplementedException();
         }
 
-        public event EventHandler Recalculated {
+        public event EventHandler Recalculated
+        {
             add { throw new NotImplementedException(); }
             remove { throw new NotImplementedException(); }
         }
 
-        public void Start() {
+        public void Start()
+        {
             _started = true;
         }
 
-        public VisualStudio.Text.Editor.ITextView TextView {
+        public VisualStudio.Text.Editor.ITextView TextView
+        {
             get { return _view; }
         }
 
-        public VisualStudio.Utilities.PropertyCollection Properties {
+        public VisualStudio.Utilities.PropertyCollection Properties
+        {
             get { return _properties; }
         }
     }
 }
+

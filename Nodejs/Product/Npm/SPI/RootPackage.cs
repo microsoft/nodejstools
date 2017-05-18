@@ -1,39 +1,33 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Microsoft.CSharp.RuntimeBinder;
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class RootPackage : IRootPackage {
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class RootPackage : IRootPackage
+    {
         public RootPackage(
             string fullPathToRootDirectory,
             bool showMissingDevOptionalSubPackages,
             Dictionary<string, ModuleInfo> allModules = null,
             int depth = 0,
-            int maxDepth = 1) {
-            Path = fullPathToRootDirectory;
+            int maxDepth = 1)
+        {
+            this.Path = fullPathToRootDirectory;
             var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
-            try {
-                if (packageJsonFile.Length < 260) {
-                    PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+            try
+            {
+                if (packageJsonFile.Length < 260)
+                {
+                    this.PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
                 }
-            } catch (RuntimeBinderException rbe) {
+            }
+            catch (RuntimeBinderException rbe)
+            {
                 throw new PackageJsonException(
                     string.Format(CultureInfo.CurrentCulture, @"Error processing package.json at '{0}'. The file was successfully read, and may be valid JSON, but the objects may not match the expected form for a package.json file.
 
@@ -45,41 +39,32 @@ The following error was reported:
                     rbe);
             }
 
-            try {
-                Modules = new NodeModules(this, showMissingDevOptionalSubPackages, allModules, depth, maxDepth);
-            }  catch (PathTooLongException) {
+            try
+            {
+                this.Modules = new NodeModules(this, showMissingDevOptionalSubPackages, allModules, depth, maxDepth);
+            }
+            catch (PathTooLongException)
+            {
                 // otherwise we fail to create it completely...
             }
         }
 
-        public IPackageJson PackageJson { get; private set; }
+        public IPackageJson PackageJson { get; }
 
-        public bool HasPackageJson {
-            get { return null != PackageJson; }
-        }
+        public INodeModules Modules { get; }
 
-        public string Name {
-            get { return null == PackageJson ? new DirectoryInfo(Path).Name : PackageJson.Name; }
-        }
+        public string Path { get; }
 
-        public SemverVersion Version {
-            get { return null == PackageJson ? new SemverVersion() : PackageJson.Version; }
-        }
+        public IEnumerable<string> Homepages => this.PackageJson?.Homepages ?? Enumerable.Empty<string>();
 
-        public IPerson Author {
-            get { return null == PackageJson ? null : PackageJson.Author; }
-        }
+        public bool HasPackageJson => this.PackageJson != null;
 
-        public string Description {
-            get { return null == PackageJson ? null : PackageJson.Description; }
-        }
+        public string Name => this.PackageJson?.Name ?? new DirectoryInfo(this.Path).Name;
 
-        public IEnumerable<string> Homepages {
-            get { return null == PackageJson ? null : PackageJson.Homepages; }
-        }
+        public SemverVersion Version => this.PackageJson?.Version ?? new SemverVersion();
 
-        public string Path { get; private set; }
+        public IPerson Author => this.PackageJson?.Author;
 
-        public INodeModules Modules { get; private set; }
+        public string Description => this.PackageJson?.Description;
     }
 }

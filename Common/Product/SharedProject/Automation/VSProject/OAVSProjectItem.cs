@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -38,21 +26,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region VSProjectItem Members
 
-        public virtual EnvDTE.Project ContainingProject
-        {
-            get { return fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project; }
-        }
-
-        public virtual ProjectItem ProjectItem
-        {
-            get { return fileNode.GetAutomationObject() as ProjectItem; }
-        }
-
-        public virtual DTE DTE
-        {
-            get { return (DTE)this.fileNode.ProjectMgr.Site.GetService(typeof(DTE)); }
-        }
-
+        public virtual EnvDTE.Project ContainingProject => this.fileNode.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
+        public virtual ProjectItem ProjectItem => this.fileNode.GetAutomationObject() as ProjectItem;
+        public virtual DTE DTE => (DTE)this.fileNode.ProjectMgr.Site.GetService(typeof(DTE));
         public void RunCustomTool()
         {
         }
@@ -67,14 +43,15 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return fileNode;
+                return this.fileNode;
             }
             set
             {
-                fileNode = value;
+                this.fileNode = value;
             }
         }
         #endregion
 
     }
 }
+

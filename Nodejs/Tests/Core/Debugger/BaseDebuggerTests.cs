@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -27,22 +13,30 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudioTools;
 using TestUtilities;
 
-namespace NodejsTests.Debugger {
-    internal enum NodeVersion {
+namespace NodejsTests.Debugger
+{
+    internal enum NodeVersion
+    {
         NodeVersion_Unknown,
     };
 
-    internal static class Extensions {
-        internal static async Task Remove(this NodeBreakpoint breakpoint) {
-            foreach (var binding in breakpoint.GetBindings()) {
+    internal static class Extensions
+    {
+        internal static async Task Remove(this NodeBreakpoint breakpoint)
+        {
+            foreach (var binding in breakpoint.GetBindings())
+            {
                 await binding.Remove().ConfigureAwait(false);
             }
         }
     }
 
-    public class BaseDebuggerTests {
-        internal virtual string DebuggerTestPath {
-            get {
+    public class BaseDebuggerTests
+    {
+        internal virtual string DebuggerTestPath
+        {
+            get
+            {
                 return TestUtilities.TestData.GetPath(@"TestData\DebuggerProject\");
             }
         }
@@ -55,7 +49,8 @@ namespace NodejsTests.Debugger {
             bool enabled = true,
             BreakOn breakOn = new BreakOn(),
             string condition = ""
-        ) {
+        )
+        {
             NodeBreakpoint breakPoint = newproc.AddBreakpoint(fileName, line, column, enabled, breakOn, condition);
             breakPoint.BindAsync().WaitAndUnwrapExceptions();
             return breakPoint;
@@ -70,15 +65,20 @@ namespace NodejsTests.Debugger {
             string cwd = null,
             string arguments = "",
             bool resumeOnProcessLoad = true
-        ) {
-            if (!Path.IsPathRooted(filename)) {
+        )
+        {
+            if (!Path.IsPathRooted(filename))
+            {
                 filename = DebuggerTestPath + filename;
             }
             string fullPath = Path.GetFullPath(filename);
             string dir = cwd ?? Path.GetFullPath(Path.GetDirectoryName(filename));
-            if (!String.IsNullOrEmpty(arguments)) {
+            if (!String.IsNullOrEmpty(arguments))
+            {
                 arguments = "\"" + fullPath + "\" " + arguments;
-            } else {
+            }
+            else
+            {
                 arguments = "\"" + fullPath + "\"";
             }
 
@@ -95,12 +95,15 @@ namespace NodejsTests.Debugger {
                     debugOptions,
                     null,
                     createNodeWindow: false);
-            if (onProcessCreated != null) {
+            if (onProcessCreated != null)
+            {
                 onProcessCreated(process);
             }
-            process.ProcessLoaded += (sender, args) => {
+            process.ProcessLoaded += (sender, args) =>
+            {
                 // Invoke onLoadComplete delegate, if requested
-                if (onLoadComplete != null) {
+                if (onLoadComplete != null)
+                {
                     onLoadComplete(process, args.Thread);
                 }
                 processLoaded.Set();
@@ -109,7 +112,8 @@ namespace NodejsTests.Debugger {
             AssertWaited(processLoaded);
 
             // Resume, if requested
-            if (resumeOnProcessLoad) {
+            if (resumeOnProcessLoad)
+            {
                 process.Resume();
             }
 
@@ -122,8 +126,10 @@ namespace NodejsTests.Debugger {
             string cwd = null,
             string arguments = "",
             bool startBrokenAtEntryPoint = false
-        ) {
-            if (!Path.IsPathRooted(filename)) {
+        )
+        {
+            if (!Path.IsPathRooted(filename))
+            {
                 filename = DebuggerTestPath + filename;
             }
             string fullPath = Path.GetFullPath(filename);
@@ -150,16 +156,20 @@ namespace NodejsTests.Debugger {
             string hostName = "localhost",
             ushort portNumber = 5858,
             int id = 0,
-            bool resumeOnProcessLoad = false) {
+            bool resumeOnProcessLoad = false)
+        {
             // Load process
             AutoResetEvent processLoaded = new AutoResetEvent(false);
             var process = new NodeDebugger(new UriBuilder { Scheme = "tcp", Host = hostName, Port = portNumber }.Uri, id);
-            if (onProcessCreated != null) {
+            if (onProcessCreated != null)
+            {
                 onProcessCreated(process);
             }
-            process.ProcessLoaded += (sender, args) => {
+            process.ProcessLoaded += (sender, args) =>
+            {
                 // Invoke onLoadComplete delegate, if requested
-                if (onLoadComplete != null) {
+                if (onLoadComplete != null)
+                {
                     onLoadComplete(process, args.Thread);
                 }
                 processLoaded.Set();
@@ -168,15 +178,18 @@ namespace NodejsTests.Debugger {
             AssertWaited(processLoaded);
 
             // Resume, if requested
-            if (resumeOnProcessLoad) {
+            if (resumeOnProcessLoad)
+            {
                 process.Resume();
             }
 
             return process;
         }
 
-        internal virtual NodeVersion Version {
-            get {
+        internal virtual NodeVersion Version
+        {
+            get
+            {
                 return NodeVersion.NodeVersion_Unknown;
             }
         }
@@ -189,7 +202,8 @@ namespace NodejsTests.Debugger {
             string[] expectedLocals = null,
             string[] expectedValues = null,
             string[] expectedHexValues = null
-        ) {
+        )
+        {
             TestDebuggerSteps(
                 filename,
                 new[] {
@@ -251,63 +265,76 @@ namespace NodejsTests.Debugger {
             string expectedValue = null,
             string expectedException = null,
             string expectedFrame = null
-        ) {
+        )
+        {
             var frame = thread.Frames[frameIndex];
             NodeEvaluationResult evaluationResult = null;
             Exception exception = null;
 
-            try {
+            try
+            {
                 evaluationResult = frame.ExecuteTextAsync(expression).WaitAndUnwrapExceptions();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 exception = ex;
             }
 
-            if (expectedType != null) {
+            if (expectedType != null)
+            {
                 Assert.IsNotNull(evaluationResult);
                 Assert.AreEqual(expectedType, evaluationResult.TypeName);
             }
-            if (expectedValue != null) {
+            if (expectedValue != null)
+            {
                 Assert.IsNotNull(evaluationResult);
                 Assert.AreEqual(expectedValue, evaluationResult.StringValue);
             }
-            if (expectedException != null) {
+            if (expectedException != null)
+            {
                 Assert.IsNotNull(exception);
                 Assert.AreEqual(expectedException, exception.Message);
             }
-            if (expectedFrame != null) {
+            if (expectedFrame != null)
+            {
                 Assert.AreEqual(expectedFrame, frame.FunctionName);
             }
         }
 
-        internal class ExceptionHandlerInfo {
+        internal class ExceptionHandlerInfo
+        {
             public readonly int FirstLine;
             public readonly int LastLine;
             public readonly HashSet<string> Expressions;
 
-            public ExceptionHandlerInfo(int firstLine, int lastLine, params string[] expressions) {
+            public ExceptionHandlerInfo(int firstLine, int lastLine, params string[] expressions)
+            {
                 FirstLine = firstLine;
                 LastLine = lastLine;
                 Expressions = new HashSet<string>(expressions);
             }
         }
 
-        const ExceptionHitTreatment _breakNever = ExceptionHitTreatment.BreakNever;
-        const ExceptionHitTreatment _breakAlways = ExceptionHitTreatment.BreakAlways;
-        const ExceptionHitTreatment _breakOnUnhandled = ExceptionHitTreatment.BreakOnUnhandled;
+        private const ExceptionHitTreatment _breakNever = ExceptionHitTreatment.BreakNever;
+        private const ExceptionHitTreatment _breakAlways = ExceptionHitTreatment.BreakAlways;
+        private const ExceptionHitTreatment _breakOnUnhandled = ExceptionHitTreatment.BreakOnUnhandled;
 
-        internal class ExceptionInfo {
+        internal class ExceptionInfo
+        {
             public readonly string TypeName;
             public readonly string Description;
             public readonly int? LineNo;
 
-            public ExceptionInfo(string typeName, string description, int? lineNo = null) {
+            public ExceptionInfo(string typeName, string description, int? lineNo = null)
+            {
                 TypeName = typeName;
                 Description = description;
                 LineNo = lineNo;
             }
         }
 
-        internal ICollection<KeyValuePair<string, ExceptionHitTreatment>> CollectExceptionTreatments(ExceptionHitTreatment exceptionTreatment = ExceptionHitTreatment.BreakAlways, params string[] exceptionNames) {
+        internal ICollection<KeyValuePair<string, ExceptionHitTreatment>> CollectExceptionTreatments(ExceptionHitTreatment exceptionTreatment = ExceptionHitTreatment.BreakAlways, params string[] exceptionNames)
+        {
             return exceptionNames.Select(
                 name => new KeyValuePair<string, ExceptionHitTreatment>(name, exceptionTreatment)
             ).ToArray();
@@ -319,9 +346,11 @@ namespace NodejsTests.Debugger {
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments,
             int expectedExitCode,
             params ExceptionInfo[] exceptions
-        ) {
+        )
+        {
             var steps = new List<TestStep>();
-            foreach (var exception in exceptions) {
+            foreach (var exception in exceptions)
+            {
                 steps.Add(new TestStep(action: TestAction.ResumeProcess, expectedExceptionRaised: exception));
             }
             steps.Add(new TestStep(action: TestAction.ResumeProcess, expectedExitCode: expectedExitCode));
@@ -333,7 +362,8 @@ namespace NodejsTests.Debugger {
                 );
         }
 
-        internal enum TestAction {
+        internal enum TestAction
+        {
             None = 0,
             Wait,
             ResumeThread,
@@ -348,7 +378,8 @@ namespace NodejsTests.Debugger {
             Detach,
         }
 
-        internal struct TestStep {
+        internal struct TestStep
+        {
             public TestAction _action;
             public int? _expectedEntryPointHit;
             public int? _expectedBreakpointHit;
@@ -390,7 +421,8 @@ namespace NodejsTests.Debugger {
                 Action<NodeDebugger, NodeThread> validation = null,
                 int? expectedExitCode = null,
                 string expectedBreakFunction = null
-            ) {
+            )
+            {
                 _action = action;
                 _expectedEntryPointHit = expectedEntryPointHit;
                 _expectedBreakpointHit = expectedBreakpointHit;
@@ -422,8 +454,10 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment? defaultExceptionTreatment = null,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null,
             string scriptArguments = null
-        ) {
-            if (!Path.IsPathRooted(filename)) {
+        )
+        {
+            if (!Path.IsPathRooted(filename))
+            {
                 filename = DebuggerTestPath + filename;
             }
 
@@ -431,13 +465,15 @@ namespace NodejsTests.Debugger {
             using (var process = DebugProcess(
                 filename,
                 onProcessCreated: onProcessCreated,
-                onLoadComplete: (newproc, newthread) => {
+                onLoadComplete: (newproc, newthread) =>
+                {
                     thread = newthread;
                 },
                 interpreterOptions: interpreterOptions,
                 arguments: scriptArguments,
                 resumeOnProcessLoad: false
-            )) {
+            ))
+            {
                 TestDebuggerSteps(
                     process,
                     thread,
@@ -449,8 +485,10 @@ namespace NodejsTests.Debugger {
             }
         }
 
-        internal struct Breakpoint {
-            internal Breakpoint(string fileName, int line, int column) {
+        internal struct Breakpoint
+        {
+            internal Breakpoint(string fileName, int line, int column)
+            {
                 _fileName = fileName;
                 _line = line;
                 _column = column;
@@ -468,8 +506,10 @@ namespace NodejsTests.Debugger {
             ExceptionHitTreatment? defaultExceptionTreatment = null,
             ICollection<KeyValuePair<string, ExceptionHitTreatment>> exceptionTreatments = null,
             bool waitForExit = false
-        ) {
-            if (!Path.IsPathRooted(filename)) {
+        )
+        {
+            if (!Path.IsPathRooted(filename))
+            {
                 filename = DebuggerTestPath + filename;
             }
 
@@ -479,39 +519,45 @@ namespace NodejsTests.Debugger {
             // TODO: Remove once exception treatment is updated for just my code support when it is added after Alpha
             process.SetExceptionTreatment(null, CollectExceptionTreatments(ExceptionHitTreatment.BreakAlways, "SyntaxError"));
 
-            if (defaultExceptionTreatment != null || exceptionTreatments != null) {
+            if (defaultExceptionTreatment != null || exceptionTreatments != null)
+            {
                 process.SetExceptionTreatment(defaultExceptionTreatment, exceptionTreatments);
             }
 
             Dictionary<Breakpoint, NodeBreakpoint> breakpoints = new Dictionary<Breakpoint, NodeBreakpoint>();
 
             AutoResetEvent entryPointHit = new AutoResetEvent(false);
-            process.EntryPointHit += (sender, e) => {
+            process.EntryPointHit += (sender, e) =>
+            {
                 Console.WriteLine("EntryPointHit");
                 Assert.AreEqual(e.Thread, thread);
                 entryPointHit.Set();
             };
 
             AutoResetEvent breakpointBound = new AutoResetEvent(false);
-            process.BreakpointBound += (sender, e) => {
+            process.BreakpointBound += (sender, e) =>
+            {
                 Console.WriteLine("BreakpointBound {0} {1}", e.BreakpointBinding.Position.FileName, e.BreakpointBinding.Position.Line);
                 breakpointBound.Set();
             };
 
             AutoResetEvent breakpointUnbound = new AutoResetEvent(false);
-            process.BreakpointUnbound += (sender, e) => {
+            process.BreakpointUnbound += (sender, e) =>
+            {
                 Console.WriteLine("BreakpointUnbound");
                 breakpointUnbound.Set();
             };
 
             AutoResetEvent breakpointBindFailure = new AutoResetEvent(false);
-            process.BreakpointBindFailure += (sender, e) => {
+            process.BreakpointBindFailure += (sender, e) =>
+            {
                 Console.WriteLine("BreakpointBindFailure");
                 breakpointBindFailure.Set();
             };
 
             AutoResetEvent breakpointHit = new AutoResetEvent(false);
-            process.BreakpointHit += (sender, e) => {
+            process.BreakpointHit += (sender, e) =>
+            {
                 Console.WriteLine("BreakpointHit {0}", e.BreakpointBinding.Target.Line);
                 Assert.AreEqual(e.Thread, thread);
                 Assert.AreEqual(e.BreakpointBinding.Target.Line, thread.Frames.First().Line);
@@ -519,7 +565,8 @@ namespace NodejsTests.Debugger {
             };
 
             AutoResetEvent stepComplete = new AutoResetEvent(false);
-            process.StepComplete += (sender, e) => {
+            process.StepComplete += (sender, e) =>
+            {
                 Console.WriteLine("StepComplete");
                 Assert.AreEqual(e.Thread, thread);
                 stepComplete.Set();
@@ -527,7 +574,8 @@ namespace NodejsTests.Debugger {
 
             AutoResetEvent exceptionRaised = new AutoResetEvent(false);
             NodeException exception = null;
-            process.ExceptionRaised += (sender, e) => {
+            process.ExceptionRaised += (sender, e) =>
+            {
                 Console.WriteLine("ExceptionRaised");
                 Assert.AreEqual(e.Thread, thread);
                 exception = e.Exception;
@@ -536,7 +584,8 @@ namespace NodejsTests.Debugger {
 
             AutoResetEvent processExited = new AutoResetEvent(false);
             int exitCode = 0;
-            process.ProcessExited += (sender, e) => {
+            process.ProcessExited += (sender, e) =>
+            {
                 Console.WriteLine("ProcessExited {0}", e.ExitCode);
                 exitCode = e.ExitCode;
                 processExited.Set();
@@ -544,7 +593,8 @@ namespace NodejsTests.Debugger {
 
             Console.WriteLine("-----------------------------------------");
             Console.WriteLine("Begin debugger step test");
-            foreach (var step in steps) {
+            foreach (var step in steps)
+            {
                 Console.WriteLine("Step: {0}", step._action);
                 Assert.IsFalse(
                     ((step._expectedEntryPointHit != null ? 1 : 0) +
@@ -553,7 +603,8 @@ namespace NodejsTests.Debugger {
                      (step._expectedExceptionRaised != null ? 1 : 0)) > 1);
                 bool wait = false;
                 NodeBreakpoint nodeBreakpoint;
-                switch (step._action) {
+                switch (step._action)
+                {
                     case TestAction.None:
                         break;
                     case TestAction.Wait:
@@ -581,11 +632,15 @@ namespace NodejsTests.Debugger {
                         break;
                     case TestAction.AddBreakpoint:
                         string breakpointFileName = step._targetBreakpointFile;
-                        if (breakpointFileName != null) {
-                            if (!step._builtin && !Path.IsPathRooted(breakpointFileName)) {
+                        if (breakpointFileName != null)
+                        {
+                            if (!step._builtin && !Path.IsPathRooted(breakpointFileName))
+                            {
                                 breakpointFileName = DebuggerTestPath + breakpointFileName;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             breakpointFileName = filename;
                         }
                         int breakpointLine = step._targetBreakpoint.Value;
@@ -602,11 +657,14 @@ namespace NodejsTests.Debugger {
                                 step._breakOn ?? new BreakOn(),
                                 step._condition
                             );
-                        if (step._expectFailure) {
+                        if (step._expectFailure)
+                        {
                             AssertWaited(breakpointBindFailure);
                             AssertNotSet(breakpointBound);
                             breakpointBindFailure.Reset();
-                        } else {
+                        }
+                        else
+                        {
                             AssertWaited(breakpointBound);
                             AssertNotSet(breakpointBindFailure);
                             breakpointBound.Reset();
@@ -628,17 +686,22 @@ namespace NodejsTests.Debugger {
                         breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
                         breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                         nodeBreakpoint = breakpoints[breakpoint];
-                        foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
-                            if (step._hitCount != null) {
+                        foreach (var breakpointBinding in nodeBreakpoint.GetBindings())
+                        {
+                            if (step._hitCount != null)
+                            {
                                 Assert.IsTrue(breakpointBinding.SetHitCountAsync(step._hitCount.Value).WaitAndUnwrapExceptions());
                             }
-                            if (step._enabled != null) {
+                            if (step._enabled != null)
+                            {
                                 Assert.IsTrue(breakpointBinding.SetEnabledAsync(step._enabled.Value).WaitAndUnwrapExceptions());
                             }
-                            if (step._breakOn != null) {
+                            if (step._breakOn != null)
+                            {
                                 Assert.IsTrue(breakpointBinding.SetBreakOnAsync(step._breakOn.Value).WaitAndUnwrapExceptions());
                             }
-                            if (step._condition != null) {
+                            if (step._condition != null)
+                            {
                                 Assert.IsTrue(breakpointBinding.SetConditionAsync(step._condition).WaitAndUnwrapExceptions());
                             }
                         }
@@ -651,16 +714,21 @@ namespace NodejsTests.Debugger {
                         break;
                 }
 
-                if (wait) {
-                    if (step._expectedEntryPointHit != null) {
+                if (wait)
+                {
+                    if (step._expectedEntryPointHit != null)
+                    {
                         AssertWaited(entryPointHit);
                         AssertNotSet(breakpointHit);
                         AssertNotSet(stepComplete);
                         AssertNotSet(exceptionRaised);
                         Assert.IsNull(exception);
                         entryPointHit.Reset();
-                    } else if (step._expectedBreakpointHit != null) {
-                        if (step._expectReBind) {
+                    }
+                    else if (step._expectedBreakpointHit != null)
+                    {
+                        if (step._expectReBind)
+                        {
                             AssertWaited(breakpointUnbound);
                             AssertWaited(breakpointBound);
                             breakpointUnbound.Reset();
@@ -672,20 +740,26 @@ namespace NodejsTests.Debugger {
                         AssertNotSet(exceptionRaised);
                         Assert.IsNull(exception);
                         breakpointHit.Reset();
-                    } else if (step._expectedStepComplete != null) {
+                    }
+                    else if (step._expectedStepComplete != null)
+                    {
                         AssertWaited(stepComplete);
                         AssertNotSet(entryPointHit);
                         AssertNotSet(breakpointHit);
                         AssertNotSet(exceptionRaised);
                         Assert.IsNull(exception);
                         stepComplete.Reset();
-                    } else if (step._expectedExceptionRaised != null) {
+                    }
+                    else if (step._expectedExceptionRaised != null)
+                    {
                         AssertWaited(exceptionRaised);
                         AssertNotSet(entryPointHit);
                         AssertNotSet(breakpointHit);
                         AssertNotSet(stepComplete);
                         exceptionRaised.Reset();
-                    } else {
+                    }
+                    else
+                    {
                         AssertNotSet(entryPointHit);
                         AssertNotSet(breakpointHit);
                         AssertNotSet(stepComplete);
@@ -694,57 +768,74 @@ namespace NodejsTests.Debugger {
                     }
                 }
 
-                if (step._expectedEntryPointHit != null) {
+                if (step._expectedEntryPointHit != null)
+                {
                     Assert.AreEqual(step._expectedEntryPointHit.Value, thread.Frames.First().Line);
-                } else if (step._expectedBreakpointHit != null) {
+                }
+                else if (step._expectedBreakpointHit != null)
+                {
                     Assert.AreEqual(step._expectedBreakpointHit.Value, thread.Frames.First().Line);
-                } else if (step._expectedStepComplete != null) {
+                }
+                else if (step._expectedStepComplete != null)
+                {
                     Assert.AreEqual(step._expectedStepComplete.Value, thread.Frames.First().Line);
-                } else if (step._expectedExceptionRaised != null) {
+                }
+                else if (step._expectedExceptionRaised != null)
+                {
                     Assert.AreEqual(step._expectedExceptionRaised.TypeName, exception.TypeName);
                     Assert.AreEqual(step._expectedExceptionRaised.Description, exception.Description);
-                    if (step._expectedExceptionRaised.LineNo != null) {
+                    if (step._expectedExceptionRaised.LineNo != null)
+                    {
                         Assert.AreEqual(step._expectedExceptionRaised.LineNo.Value, thread.Frames[0].Line);
                     }
                     exception = null;
                 }
                 var expectedBreakFile = step._expectedBreakFile;
-                if (expectedBreakFile != null) {
-                    if (!step._builtin && !Path.IsPathRooted(expectedBreakFile)) {
+                if (expectedBreakFile != null)
+                {
+                    if (!step._builtin && !Path.IsPathRooted(expectedBreakFile))
+                    {
                         expectedBreakFile = DebuggerTestPath + expectedBreakFile;
                     }
                     Assert.AreEqual(expectedBreakFile, thread.Frames.First().FileName);
                 }
                 var expectedBreakFunction = step._expectedBreakFunction;
-                if (expectedBreakFunction != null) {
+                if (expectedBreakFunction != null)
+                {
                     Assert.AreEqual(expectedBreakFunction, thread.Frames.First().FunctionName);
                 }
 
-                if (step._expectedHitCount != null) {
+                if (step._expectedHitCount != null)
+                {
                     string breakpointFileName = step._targetBreakpointFile ?? filename;
-                    if (!step._builtin && !Path.IsPathRooted(breakpointFileName)) {
+                    if (!step._builtin && !Path.IsPathRooted(breakpointFileName))
+                    {
                         breakpointFileName = DebuggerTestPath + breakpointFileName;
                     }
                     int breakpointLine = step._targetBreakpoint.Value;
                     int breakpointColumn = step._targetBreakpointColumn.HasValue ? step._targetBreakpointColumn.Value : 0;
                     var breakpoint = new Breakpoint(breakpointFileName, breakpointLine, breakpointColumn);
                     nodeBreakpoint = breakpoints[breakpoint];
-                    foreach (var breakpointBinding in nodeBreakpoint.GetBindings()) {
+                    foreach (var breakpointBinding in nodeBreakpoint.GetBindings())
+                    {
                         Assert.AreEqual(step._expectedHitCount.Value, breakpointBinding.GetHitCount());
                     }
                 }
 
-                if (step._validation != null) {
+                if (step._validation != null)
+                {
                     step._validation(process, thread);
                 }
 
-                if (step._expectedExitCode != null) {
+                if (step._expectedExitCode != null)
+                {
                     AssertWaited(processExited);
                     Assert.AreEqual(step._expectedExitCode.Value, exitCode);
                 }
             }
 
-            if (waitForExit) {
+            if (waitForExit)
+            {
                 process.WaitForExit(10000);
             }
 
@@ -755,17 +846,21 @@ namespace NodejsTests.Debugger {
             Assert.IsNull(exception);
         }
 
-        internal static void AssertWaited(EventWaitHandle eventObj) {
-            if (!eventObj.WaitOne(10000)) {
+        internal static void AssertWaited(EventWaitHandle eventObj)
+        {
+            if (!eventObj.WaitOne(10000))
+            {
                 Assert.Fail("Failed to wait on event");
             }
         }
 
-        internal static void AssertNotSet(EventWaitHandle eventObj) {
-            if (eventObj.WaitOne(10)) {
+        internal static void AssertNotSet(EventWaitHandle eventObj)
+        {
+            if (eventObj.WaitOne(10))
+            {
                 Assert.Fail("Unexpected set EventWaitHandle");
             }
         }
-
     }
 }
+

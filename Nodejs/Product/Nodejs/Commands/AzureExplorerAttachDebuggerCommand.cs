@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -35,53 +21,63 @@ using Microsoft.VisualStudio.WindowsAzure.Authentication;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 
-namespace Microsoft.NodejsTools.Commands {
+namespace Microsoft.NodejsTools.Commands
+{
     /// <summary>
     /// Provides the command to attach to an Azure Website selected in Server Explorer.
     /// </summary>
-    internal class AzureExplorerAttachDebuggerCommand : Command {
-        private readonly Type _azureServicesType;
+    internal class AzureExplorerAttachDebuggerCommand : Command
+    {
+        private readonly Type azureServicesType;
 
-        public AzureExplorerAttachDebuggerCommand() {
+        public AzureExplorerAttachDebuggerCommand()
+        {
             // Will throw PlatformNotSupportedException on any unsupported OS (Win7 and below).
             using (new ClientWebSocket()) { }
 
-            try {
+            try
+            {
                 var contractsAssembly = Assembly.Load("Microsoft.VisualStudio.Web.WindowsAzure.Contracts, Version=2.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a");
-                _azureServicesType = contractsAssembly.GetType("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.IVsAzureServices", throwOnError: true);
-            } catch (FileNotFoundException) {
+                this.azureServicesType = contractsAssembly.GetType("Microsoft.VisualStudio.Web.WindowsAzure.Contracts.IVsAzureServices", throwOnError: true);
+            }
+            catch (FileNotFoundException)
+            {
                 throw new NotSupportedException();
-            } catch (FileLoadException) {
+            }
+            catch (FileLoadException)
+            {
                 throw new NotSupportedException();
-            } catch (TypeLoadException) {
+            }
+            catch (TypeLoadException)
+            {
                 throw new NotSupportedException();
             }
         }
 
-        public override int CommandId {
-            get { return (int)PkgCmdId.cmdidAzureExplorerAttachNodejsDebugger; }
-        }
+        public override int CommandId => (int)PkgCmdId.cmdidAzureExplorerAttachNodejsDebugger;
 
-        public override EventHandler BeforeQueryStatus {
-            get {
-                return (sender, args) => {
-                    var oleMenuCmd = (OleMenuCommand)sender;
-                    oleMenuCmd.Supported = oleMenuCmd.Visible = (GetSelectedAzureWebSite() != null);
-                };
-            }
-        }
+        public override EventHandler BeforeQueryStatus => (sender, args) =>
+                                                                        {
+                                                                            var oleMenuCmd = (OleMenuCommand)sender;
+                                                                            oleMenuCmd.Supported = oleMenuCmd.Visible = (GetSelectedAzureWebSite() != null);
+                                                                        };
 
-        public override void DoCommand(object sender, EventArgs args) {
+        public override void DoCommand(object sender, EventArgs args)
+        {
             var webSite = GetSelectedAzureWebSite();
-            if (webSite == null) {
+            if (webSite == null)
+            {
                 throw new NotSupportedException();
             }
 
             Action<Task<bool>> onAttach = null;
-            onAttach = (attachTask) => {
-                if (!attachTask.Result) {
-                    string msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
-                    if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry) {
+            onAttach = (attachTask) =>
+            {
+                if (!attachTask.Result)
+                {
+                    var msg = string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage, webSite.Uri);
+                    if (MessageBox.Show(msg, null, MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Retry)
+                    {
                         AttachWorker(webSite).ContinueWith(onAttach);
                     }
                 }
@@ -96,36 +92,38 @@ namespace Microsoft.NodejsTools.Commands {
         /// Information about the current selected Azure Website node in Solution Explorer, or <c>null</c>
         /// if no node is selected, it's not a website node, or the information could not be retrieved.
         /// </returns>
-        private AzureWebSiteInfo GetSelectedAzureWebSite() {
+        private AzureWebSiteInfo GetSelectedAzureWebSite()
+        {
             // Get the current selected node in Solution Explorer.
 
             var shell = (IVsUIShell)NodejsPackage.GetGlobalService(typeof(SVsUIShell));
             var serverExplorerToolWindowGuid = new Guid(ToolWindowGuids.ServerExplorer);
-            IVsWindowFrame serverExplorerFrame;
-            shell.FindToolWindow(0, ref serverExplorerToolWindowGuid, out serverExplorerFrame);
-            if (serverExplorerFrame == null) {
+            shell.FindToolWindow(0, ref serverExplorerToolWindowGuid, out var serverExplorerFrame);
+            if (serverExplorerFrame == null)
+            {
                 return null;
             }
 
-            object obj;
-            serverExplorerFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out obj);
+            serverExplorerFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var obj);
             var serverExplorerHierWnd = obj as IVsUIHierarchyWindow;
-            if (serverExplorerHierWnd == null) {
+            if (serverExplorerHierWnd == null)
+            {
                 return null;
             }
 
-            IntPtr hierPtr;
-            uint itemid;
-            IVsMultiItemSelect mis;
-            serverExplorerHierWnd.GetCurrentSelection(out hierPtr, out itemid, out mis);
-            if (hierPtr == IntPtr.Zero) {
+            serverExplorerHierWnd.GetCurrentSelection(out var hierPtr, out var itemid, out var mis);
+            if (hierPtr == IntPtr.Zero)
+            {
                 return null;
             }
 
             IVsHierarchy hier;
-            try {
+            try
+            {
                 hier = (IVsHierarchy)Marshal.GetObjectForIUnknown(hierPtr);
-            } finally {
+            }
+            finally
+            {
                 Marshal.Release(hierPtr);
             }
 
@@ -133,14 +131,16 @@ namespace Microsoft.NodejsTools.Commands {
 
             hier.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_SelContainer, out obj);
             var selCtr = obj as ISelectionContainer;
-            if (selCtr == null) {
+            if (selCtr == null)
+            {
                 return null;
             }
 
             var objs = new object[1];
             selCtr.GetObjects((uint)Microsoft.VisualStudio.Shell.Interop.Constants.GETOBJS_SELECTED, 1, objs);
             obj = objs[0];
-            if (obj == null) {
+            if (obj == null)
+            {
                 return null;
             }
 
@@ -154,54 +154,68 @@ namespace Microsoft.NodejsTools.Commands {
             if (statusProp == null ||
                 (statusProp.PropertyType.FullName != "Microsoft.VisualStudio.Web.WindowsAzure.Contracts.WebSiteState" &&
                 statusProp.PropertyType.FullName != "Microsoft.VisualStudio.Web.Internal.Contracts.WebSiteState")
-            ) {
+            )
+            {
                 return null;
             }
 
             // Is the website running?
-            int status = (int)statusProp.GetValue(obj);
-            if (status != 1) {
+            var status = (int)statusProp.GetValue(obj);
+            if (status != 1)
+            {
                 return null;
             }
 
             // Get the URI
             var urlProp = obj.GetType().GetProperty("Url");
-            if (urlProp == null || urlProp.PropertyType != typeof(string)) {
+            if (urlProp == null || urlProp.PropertyType != typeof(string))
+            {
                 return null;
             }
-            Uri uri;
-            if (!Uri.TryCreate((string)urlProp.GetValue(obj), UriKind.Absolute, out uri)) {
+            if (!Uri.TryCreate((string)urlProp.GetValue(obj), UriKind.Absolute, out var uri))
+            {
                 return null;
             }
 
             // Get Azure subscription ID
             var subIdProp = obj.GetType().GetProperty("SubscriptionID");
-            if (subIdProp == null || subIdProp.PropertyType != typeof(string)) {
+            if (subIdProp == null || subIdProp.PropertyType != typeof(string))
+            {
                 return null;
             }
-            string subscriptionId = (string)subIdProp.GetValue(obj);
+            var subscriptionId = (string)subIdProp.GetValue(obj);
 
             return new AzureWebSiteInfo(uri, subscriptionId);
         }
 
-        private async Task<bool> AttachWorker(AzureWebSiteInfo webSite) {
+        private async Task<bool> AttachWorker(AzureWebSiteInfo webSite)
+        {
             using (new WaitDialog(
                 Resources.AzureRemoteDebugWaitCaption,
                 string.Format(CultureInfo.CurrentCulture, Resources.AzureRemoteDebugWaitMessage, webSite.Uri),
                 NodejsPackage.Instance,
-                showProgress: true)) {
+                showProgress: true))
+            {
                 // Get path (relative to site URL) for the debugger endpoint.
                 XDocument webConfig;
-                try {
+                try
+                {
                     webConfig = await GetWebConfig(webSite);
-                } catch (WebException) {
-                    return false;
-                } catch (IOException) {
-                    return false;
-                } catch (XmlException) {
+                }
+                catch (WebException)
+                {
                     return false;
                 }
-                if (webConfig == null) {
+                catch (IOException)
+                {
+                    return false;
+                }
+                catch (XmlException)
+                {
+                    return false;
+                }
+                if (webConfig == null)
+                {
                     return false;
                 }
 
@@ -213,13 +227,17 @@ namespace Microsoft.NodejsTools.Commands {
                      where components[0].Trim() == "Microsoft.NodejsTools.Debugger.WebSocketProxy"
                      select (string)add.Attribute("path")
                     ).FirstOrDefault();
-                if (path == null) {
+                if (path == null)
+                {
                     return false;
                 }
 
-                try {
+                try
+                {
                     AttachDebugger(new UriBuilder(webSite.Uri) { Scheme = "wss", Port = -1, Path = path }.Uri);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     // If we got to this point, the attach logic in debug engine will catch exceptions, display proper error message and
                     // ask the user to retry, so the only case where we actually get here is if user canceled on error. If this is the case,
                     // we don't want to pop any additional error messages, so always return true, but log the error in the Output window.
@@ -235,47 +253,54 @@ namespace Microsoft.NodejsTools.Commands {
         /// Retrieves web.config for a given Azure Website.
         /// </summary>
         /// <returns>XML document with the contents of web.config, or <c>null</c> if it could not be retrieved.</returns>
-        private async Task<XDocument> GetWebConfig(AzureWebSiteInfo webSite) {
+        private async Task<XDocument> GetWebConfig(AzureWebSiteInfo webSite)
+        {
             var publishXml = await GetPublishXml(webSite);
-            if (publishXml == null) {
+            if (publishXml == null)
+            {
                 return null;
             }
 
             // Get FTP publish URL and credentials from publish settings.
 
             var publishProfile = publishXml.Elements("publishData").Elements("publishProfile").FirstOrDefault(el => (string)el.Attribute("publishMethod") == "FTP");
-            if (publishProfile == null) {
+            if (publishProfile == null)
+            {
                 return null;
             }
 
             var publishUrl = (string)publishProfile.Attribute("publishUrl");
             var userName = (string)publishProfile.Attribute("userName");
             var userPwd = (string)publishProfile.Attribute("userPWD");
-            if (publishUrl == null || userName == null || userPwd == null) {
+            if (publishUrl == null || userName == null || userPwd == null)
+            {
                 return null;
             }
 
             // Get web.config for the site via FTP.
 
-            if (!publishUrl.EndsWith("/", StringComparison.Ordinal)) {
+            if (!publishUrl.EndsWith("/", StringComparison.Ordinal))
+            {
                 publishUrl += "/";
             }
             publishUrl += "web.config";
 
-            Uri webConfigUri;
-            if (!Uri.TryCreate(publishUrl, UriKind.Absolute, out webConfigUri)) {
+            if (!Uri.TryCreate(publishUrl, UriKind.Absolute, out var webConfigUri))
+            {
                 return null;
             }
 
             var request = WebRequest.Create(webConfigUri) as FtpWebRequest;
             // Check that this is actually an FTP request, in case we get some valid but weird URL back.
-            if (request == null) {
+            if (request == null)
+            {
                 return null;
             }
             request.Credentials = new NetworkCredential(userName, userPwd);
 
             using (var response = await request.GetResponseAsync())
-            using (var stream = response.GetResponseStream()) {
+            using (var stream = response.GetResponseStream())
+            {
                 // There is no XDocument.LoadAsync, but we want the networked I/O at least to be async, even if parsing is not.
                 var xmlData = new MemoryStream();
                 await stream.CopyToAsync(xmlData);
@@ -288,46 +313,51 @@ namespace Microsoft.NodejsTools.Commands {
         /// Retrieves the publish settings file (.pubxml) for the given Azure Website.
         /// </summary>
         /// <returns>XML document with the contents of .pubxml, or <c>null</c> if it could not be retrieved.</returns>
-        private async Task<XDocument> GetPublishXml(AzureWebSiteInfo webSiteInfo) {
+        private async Task<XDocument> GetPublishXml(AzureWebSiteInfo webSiteInfo)
+        {
             // To build the publish settings request URL, we need to know subscription ID, site name, and web region to which it belongs,
             // but we only have subscription ID and the public URL of the site at this point. Use the Azure Website service to look up
             // the site from those two, and retrieve the missing info.
 
-            IVsAzureServices webSiteServices = new VsAzureServicesShim(NodejsPackage.GetGlobalService(_azureServicesType));
-            if (webSiteServices == null) {
+            var webSiteServices = new VsAzureServicesShim(NodejsPackage.GetGlobalService(this.azureServicesType));
+            if (webSiteServices == null)
+            {
                 return null;
             }
 
             var webSiteService = webSiteServices.GetAzureWebSitesService();
-            if (webSiteService == null) {
+            if (webSiteService == null)
+            {
                 return null;
             }
 
             var subscriptions = await webSiteService.GetSubscriptionsAsync();
             var subscription = subscriptions.FirstOrDefault(sub => sub.SubscriptionId == webSiteInfo.SubscriptionId);
-            if (subscription == null) {
+            if (subscription == null)
+            {
                 return null;
             }
 
             var resources = await subscription.GetResourcesAsync(false);
-            var webSite = resources.OfType<IAzureWebSite>().FirstOrDefault(ws => {
-                Uri browseUri;
-                Uri.TryCreate(ws.BrowseURL, UriKind.Absolute, out browseUri);
+            var webSite = resources.OfType<IAzureWebSite>().FirstOrDefault(ws =>
+            {
+                Uri.TryCreate(ws.BrowseURL, UriKind.Absolute, out var browseUri);
                 return browseUri != null && browseUri.Equals(webSiteInfo.Uri);
             });
-            if (webSite == null) {
+            if (webSite == null)
+            {
                 return null;
             }
 
             // Prepare a web request to get the publish settings.
             // See http://msdn.microsoft.com/en-us/library/windowsazure/dn166996.aspx
-            string requestPath = string.Format(CultureInfo.InvariantCulture,
+            var requestPath = string.Format(CultureInfo.InvariantCulture,
                 "{0}/services/WebSpaces/{1}/sites/{2}/publishxml",
                 subscription.SubscriptionId,
                 webSite.WebSpace,
                 webSite.Name);
-            Uri requestUri = new Uri(((IAzureSubscription)subscription).ServiceManagementEndpointUri, requestPath);
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
+            var requestUri = new Uri(((IAzureSubscription)subscription).ServiceManagementEndpointUri, requestPath);
+            var request = (HttpWebRequest)WebRequest.Create(requestUri);
             request.Method = "GET";
             request.ContentType = "application/xml";
             request.Headers.Add("x-ms-version", "2010-10-28");
@@ -335,22 +365,27 @@ namespace Microsoft.NodejsTools.Commands {
             // Set up authentication for the request, depending on whether the associated subscription context is 
             // account-based or certificate-based.
             object context = subscription.AzureCredentials;
-            var certContext = context as IAzureAuthenticationCertificateSubscriptionContext;
-            if (certContext != null) {
+            if (context is IAzureAuthenticationCertificateSubscriptionContext certContext)
+            {
                 var cert = await certContext.AuthenticationCertificate.GetCertificateFromStoreAsync();
                 request.ClientCertificates.Add(cert);
-            } else {
-                var accountCountext = context as IAzureUserAccountSubscriptionContext;
-                if (accountCountext != null) {
-                    string authHeader = await accountCountext.GetAuthenticationHeaderAsync(false);
+            }
+            else
+            {
+                if (context is IAzureUserAccountSubscriptionContext accountCountext)
+                {
+                    var authHeader = await accountCountext.GetAuthenticationHeaderAsync(false);
                     request.Headers.Add(HttpRequestHeader.Authorization, authHeader);
-                } else {
+                }
+                else
+                {
                     return null;
                 }
             }
 
-            using (WebResponse response = await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream()) {
+            using (var response = await request.GetResponseAsync())
+            using (var stream = response.GetResponseStream())
+            {
                 // There is no XDocument.LoadAsync, but we want the networked I/O at least to be async, even if parsing is not.
                 Stream xmlData = new MemoryStream();
                 await stream.CopyToAsync(xmlData);
@@ -359,7 +394,8 @@ namespace Microsoft.NodejsTools.Commands {
             }
         }
 
-        private unsafe void AttachDebugger(Uri uri) {
+        private unsafe void AttachDebugger(Uri uri)
+        {
             var debugger = (IVsDebugger2)NodejsPackage.GetGlobalService(typeof(SVsShellDebugger));
             var debugInfo = new VsDebugTargetInfo2();
 
@@ -382,18 +418,20 @@ namespace Microsoft.NodejsTools.Commands {
             Marshal.ThrowExceptionForHR(debugger.LaunchDebugTargets2(1, (IntPtr)pDebugInfo));
         }
 
-
         /// <summary>
         /// Information about an Azure Website node in Server Explorer.
         /// </summary>
-        private class AzureWebSiteInfo {
+        private class AzureWebSiteInfo
+        {
             public readonly Uri Uri;
             public readonly string SubscriptionId;
 
-            public AzureWebSiteInfo(Uri uri, string subscriptionId) {
-                Uri = uri;
-                SubscriptionId = subscriptionId;
+            public AzureWebSiteInfo(Uri uri, string subscriptionId)
+            {
+                this.Uri = uri;
+                this.SubscriptionId = subscriptionId;
             }
         }
     }
 }
+

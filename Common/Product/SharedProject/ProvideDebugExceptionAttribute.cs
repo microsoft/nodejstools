@@ -1,23 +1,12 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Linq;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
 
-namespace Microsoft.VisualStudioTools {
+namespace Microsoft.VisualStudioTools
+{
     /// <summary>
     /// Registers an exception in the Debug->Exceptions window.
     /// 
@@ -25,7 +14,8 @@ namespace Microsoft.VisualStudioTools {
     /// to be registered independently (to provide their code/state settings).
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    class ProvideDebugExceptionAttribute : RegistrationAttribute {
+    internal class ProvideDebugExceptionAttribute : RegistrationAttribute
+    {
         // EXCEPTION_STATE flags that are valid for DKM exception entries (directly under the engine key)
         private const enum_EXCEPTION_STATE DkmValidFlags =
             enum_EXCEPTION_STATE.EXCEPTION_STOP_FIRST_CHANCE |
@@ -39,59 +29,76 @@ namespace Microsoft.VisualStudioTools {
         private int _code;
         private enum_EXCEPTION_STATE _state;
 
-        public ProvideDebugExceptionAttribute(string engineGuid, string category, params string[] path) {
-            _engineGuid = engineGuid;
-            _category = category;
-            _path = path;
-            _state = enum_EXCEPTION_STATE.EXCEPTION_JUST_MY_CODE_SUPPORTED | enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+        public ProvideDebugExceptionAttribute(string engineGuid, string category, params string[] path)
+        {
+            this._engineGuid = engineGuid;
+            this._category = category;
+            this._path = path;
+            this._state = enum_EXCEPTION_STATE.EXCEPTION_JUST_MY_CODE_SUPPORTED | enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
         }
 
-        public int Code {
-            get {
-                return _code;
+        public int Code
+        {
+            get
+            {
+                return this._code;
             }
-            set {
-                _code = value;
-            }
-        }
-
-        public enum_EXCEPTION_STATE State {
-            get {
-                return _state;
-            }
-            set {
-                _state = value;
+            set
+            {
+                this._code = value;
             }
         }
 
-        public bool BreakByDefault {
-            get {
-                return _state.HasFlag(enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT);
+        public enum_EXCEPTION_STATE State
+        {
+            get
+            {
+                return this._state;
             }
-            set {
-                if (value) {
-                    _state |= enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
-                } else {
-                    _state &= ~enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+            set
+            {
+                this._state = value;
+            }
+        }
+
+        public bool BreakByDefault
+        {
+            get
+            {
+                return this._state.HasFlag(enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT);
+            }
+            set
+            {
+                if (value)
+                {
+                    this._state |= enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
+                }
+                else
+                {
+                    this._state &= ~enum_EXCEPTION_STATE.EXCEPTION_STOP_USER_UNCAUGHT;
                 }
             }
         }
 
-        public override void Register(RegistrationAttribute.RegistrationContext context) {
-            var engineKey = context.CreateKey("AD7Metrics\\Exception\\" + _engineGuid);
+        public override void Register(RegistrationAttribute.RegistrationContext context)
+        {
+            var engineKey = context.CreateKey("AD7Metrics\\Exception\\" + this._engineGuid);
 
-            var key = engineKey.CreateSubkey(_category);
-            foreach (var pathElem in _path) {
+            var key = engineKey.CreateSubkey(this._category);
+            foreach (var pathElem in this._path)
+            {
                 key = key.CreateSubkey(pathElem);
             }
-            key.SetValue("Code", _code);
-            key.SetValue("State", (int)_state);
+            key.SetValue("Code", this._code);
+            key.SetValue("State", (int)this._state);
 
-            string name = _path.LastOrDefault() ?? "*";
-            engineKey.SetValue(name, (int)(_state & DkmValidFlags));
+            var name = this._path.LastOrDefault() ?? "*";
+            engineKey.SetValue(name, (int)(this._state & DkmValidFlags));
         }
 
-        public override void Unregister(RegistrationAttribute.RegistrationContext context) {
+        public override void Unregister(RegistrationAttribute.RegistrationContext context)
+        {
         }
     }
 }
+

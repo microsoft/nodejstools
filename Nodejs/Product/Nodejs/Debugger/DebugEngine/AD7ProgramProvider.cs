@@ -1,39 +1,28 @@
-//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace Microsoft.NodejsTools.Debugger.DebugEngine {
+namespace Microsoft.NodejsTools.Debugger.DebugEngine
+{
     // This class implments IDebugProgramProvider2. 
     // This registered interface allows the session debug manager (SDM) to obtain information about programs 
     // that have been "published" through the IDebugProgramPublisher2 interface.
     [ComVisible(true)]
     [Guid(Guids.DebugProgramProvider)]
-    public class AD7ProgramProvider : IDebugProgramProvider2 {
-        public AD7ProgramProvider() {
+    public class AD7ProgramProvider : IDebugProgramProvider2
+    {
+        public AD7ProgramProvider()
+        {
         }
 
         #region IDebugProgramProvider2 Members
 
         // Obtains information about programs running, filtered in a variety of ways.
-        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray) {
-
+        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
+        {
             processArray[0] = new PROVIDER_PROCESS_DATA();
 
             // we handle creation of the remote program provider ourselves.  This is because we always load our program provider locally which keeps
@@ -41,28 +30,38 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
             // we install into the GAC so these types are available to create and then remote debugging works as well.  When we're running in the
             // experimental hive we are not in the GAC so if we're created outside of VS (e.g. in msvsmon on the local machine) then we can't get
             // at our program provider and debug->attach doesn't work.
-            if (port != null && port.QueryIsLocal() == VSConstants.S_FALSE) {
+            if (port != null && port.QueryIsLocal() == VSConstants.S_FALSE)
+            {
                 IDebugCoreServer3 server;
-                if (ErrorHandler.Succeeded(port.GetServer(out server))) {
-                    IDebugCoreServer90 dbgServer = server as IDebugCoreServer90;
-                    if (dbgServer != null) {
-                        Guid g = typeof(IDebugProgramProvider2).GUID;
+                if (ErrorHandler.Succeeded(port.GetServer(out server)))
+                {
+                    var dbgServer = server as IDebugCoreServer90;
+                    if (dbgServer != null)
+                    {
+                        var g = typeof(IDebugProgramProvider2).GUID;
                         IntPtr remoteProviderPunk;
 
-                        int hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out remoteProviderPunk);
-                        try {
-                            if (ErrorHandler.Succeeded(hr)) {
+                        var hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out remoteProviderPunk);
+                        try
+                        {
+                            if (ErrorHandler.Succeeded(hr))
+                            {
                                 var remoteProvider = (IDebugProgramProvider2)Marshal.GetObjectForIUnknown(remoteProviderPunk);
                                 return remoteProvider.GetProviderProcessData(Flags, null, ProcessId, EngineFilter, processArray);
                             }
-                        } finally {
-                            if (remoteProviderPunk != IntPtr.Zero) {
+                        }
+                        finally
+                        {
+                            if (remoteProviderPunk != IntPtr.Zero)
+                            {
                                 Marshal.Release(remoteProviderPunk);
                             }
                         }
                     }
                 }
-            } else if ((Flags & enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0 ) {
+            }
+            else if ((Flags & enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0)
+            {
                 // The debugger is asking the engine to return the program nodes it can debug. We check
                 // each process if it has a python##.dll or python##_d.dll loaded and if it does
                 // then we report the program as being a Python process.
@@ -87,20 +86,22 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         }
 
         // Gets a program node, given a specific process ID.
-        int IDebugProgramProvider2.GetProviderProgramNode(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode) {
+        int IDebugProgramProvider2.GetProviderProgramNode(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode)
+        {
             // This method is used for Just-In-Time debugging support, which this program provider does not support
             programNode = null;
             return VSConstants.E_NOTIMPL;
         }
 
-
         // Establishes a locale for any language-specific resources needed by the DE. This engine only supports Enu.
-        int IDebugProgramProvider2.SetLocale(ushort wLangID) {
+        int IDebugProgramProvider2.SetLocale(ushort wLangID)
+        {
             return VSConstants.S_OK;
         }
 
         // Establishes a callback to watch for provider events associated with specific kinds of processes
-        int IDebugProgramProvider2.WatchForProviderEvents(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 ad7EventCallback) {
+        int IDebugProgramProvider2.WatchForProviderEvents(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 ad7EventCallback)
+        {
             // The sample debug engine is a native debugger, and can therefore always provide a program node
             // in GetProviderProcessData. Non-native debuggers may wish to implement this method as a way
             // of monitoring the process before code for their runtime starts. For example, if implementing a 
@@ -118,3 +119,4 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine {
         #endregion
     }
 }
+

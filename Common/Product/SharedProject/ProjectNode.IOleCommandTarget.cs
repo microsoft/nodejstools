@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -28,11 +16,13 @@ using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
-namespace Microsoft.VisualStudioTools.Project {
+namespace Microsoft.VisualStudioTools.Project
+{
     /// <summary>
     /// Contains the IOleCommandTarget implementation for ProjectNode
     /// </summary>
-    internal abstract partial class ProjectNode {
+    internal abstract partial class ProjectNode
+    {
         #region initiation of command execution
 
         /// <summary>
@@ -47,10 +37,13 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="selectedNodes">The list of the selected nodes.</param>
         /// <param name="handled">An out parameter specifying that the command was handled.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        protected virtual int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled) {
+        protected virtual int ExecCommandThatDependsOnSelectedNodes(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, IList<HierarchyNode> selectedNodes, out bool handled)
+        {
             handled = false;
-            if (cmdGroup == VsMenus.guidVsUIHierarchyWindowCmds) {
-                switch (cmdId) {
+            if (cmdGroup == VsMenus.guidVsUIHierarchyWindowCmds)
+            {
+                switch (cmdId)
+                {
                     case (uint)VSConstants.VsUIHierarchyWindowCmdIds.UIHWCMDID_RightClick:
                         // The UIHWCMDID_RightClick is what tells an IVsUIHierarchy in a UIHierarchyWindow 
                         // to put up the context menu.  Since the mouse may have moved between the 
@@ -68,8 +61,11 @@ namespace Microsoft.VisualStudioTools.Project {
                     default:
                         break;
                 }
-            } else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
-                switch ((VsCommands2K)cmdId) {
+            }
+            else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
+            {
+                switch ((VsCommands2K)cmdId)
+                {
                     case VsCommands2K.ViewInClassDiagram:
                         handled = true;
                         return this.ShowInDesigner(selectedNodes);
@@ -90,16 +86,21 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="commandOrigin">The origin of the command. From IOleCommandTarget or hierarchy.</param>
         /// <param name="handled">An out parameter specifying that the command was handled.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        protected virtual int ExecCommandIndependentOfSelection(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, out bool handled) {
+        protected virtual int ExecCommandIndependentOfSelection(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin, out bool handled)
+        {
             handled = false;
 
-            if (IsClosed) {
+            if (this.IsClosed)
+            {
                 return VSConstants.E_FAIL;
             }
 
-            if (cmdGroup == VsMenus.guidStandardCommandSet97) {
-                if (commandOrigin == CommandOrigin.OleCommandTarget) {
-                    switch ((VsCommands)cmdId) {
+            if (cmdGroup == VsMenus.guidStandardCommandSet97)
+            {
+                if (commandOrigin == CommandOrigin.OleCommandTarget)
+                {
+                    switch ((VsCommands)cmdId)
+                    {
                         case VsCommands.Cut:
                         case VsCommands.Copy:
                         case VsCommands.Paste:
@@ -109,7 +110,8 @@ namespace Microsoft.VisualStudioTools.Project {
                     }
                 }
 
-                switch ((VsCommands)cmdId) {
+                switch ((VsCommands)cmdId)
+                {
                     case VsCommands.Copy:
                         handled = true;
                         return this.CopyToClipboard();
@@ -125,11 +127,13 @@ namespace Microsoft.VisualStudioTools.Project {
                     case VsCommands.SearchCombo:
                         handled = true;
                         return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
-
                 }
-            } else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
+            }
+            else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
+            {
                 // There should only be the project node who handles these and should manifest in the same action regardles of selection.
-                switch ((VsCommands2K)cmdId) {
+                switch ((VsCommands2K)cmdId)
+                {
                     case VsCommands2K.SHOWALLFILES:
                         handled = true;
                         return this.ShowAllFiles();
@@ -152,70 +156,84 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="vaOut">VARIANTARG structure to receive command output. Can be NULL.</param>
         /// <param name="commandOrigin">The origin of the command. From IOleCommandTarget or hierarchy.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        protected virtual int InternalExecCommand(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin) {
-            if (IsClosed) {
+        protected virtual int InternalExecCommand(Guid cmdGroup, uint cmdId, uint cmdExecOpt, IntPtr vaIn, IntPtr vaOut, CommandOrigin commandOrigin)
+        {
+            if (this.IsClosed)
+            {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
 
-            if (cmdGroup == Guid.Empty) {
+            if (cmdGroup == Guid.Empty)
+            {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
 
             if ((cmdExecOpt & 0xFFFF) == (uint)OLECMDEXECOPT.OLECMDEXECOPT_SHOWHELP &&
                 (cmdExecOpt >> 16) == (uint)VsMenus.VSCmdOptQueryParameterList &&
-                vaOut != IntPtr.Zero) {
+                vaOut != IntPtr.Zero)
+            {
                 // The command accepts arguments and VS is trying to get the
                 // format string before executing the actual command.
                 // Format strings are space-separated lists of switches:
                 //
                 //   s,s1,switch1 w,s2,switch2 ...
                 var args = QueryCommandArguments(cmdGroup, cmdId, commandOrigin);
-                if (string.IsNullOrEmpty(args)) {
+                if (string.IsNullOrEmpty(args))
+                {
                     return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
                 }
                 Marshal.GetNativeVariantForObject(args, vaOut);
                 return VSConstants.S_OK;
             }
 
-            IList<HierarchyNode> selectedNodes = GetSelectedNodes();
+            var selectedNodes = GetSelectedNodes();
 
             // Check if all nodes can execute a command. If there is at least one that cannot return not handled.
-            foreach (HierarchyNode node in selectedNodes) {
-                if (!node.CanExecuteCommand) {
+            foreach (var node in selectedNodes)
+            {
+                if (!node.CanExecuteCommand)
+                {
                     return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
                 }
             }
 
             // Handle commands that are independent of a selection.
-            bool handled = false;
-            int returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out handled);
-            if (handled) {
+            var handled = false;
+            var returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out handled);
+            if (handled)
+            {
                 return returnValue;
             }
 
-
             // Now handle commands that need the selected nodes as input parameter.
             returnValue = this.ExecCommandThatDependsOnSelectedNodes(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, selectedNodes, out handled);
-            if (handled) {
+            if (handled)
+            {
                 return returnValue;
             }
 
             returnValue = (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
 
             // Handle commands iteratively. The same action will be executed for all of the selected items.
-            foreach (HierarchyNode node in selectedNodes) {
-                try {
+            foreach (var node in selectedNodes)
+            {
+                try
+                {
                     returnValue = node.ExecCommandOnNode(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut);
-                } catch (COMException e) {
+                }
+                catch (COMException e)
+                {
                     Trace.WriteLine("Exception : " + e.Message);
                     returnValue = e.ErrorCode;
                 }
-                if (returnValue != VSConstants.S_OK) {
+                if (returnValue != VSConstants.S_OK)
+                {
                     break;
                 }
             }
 
-            if (returnValue == VSConstants.E_ABORT || returnValue == VSConstants.OLE_E_PROMPTSAVECANCELLED) {
+            if (returnValue == VSConstants.E_ABORT || returnValue == VSConstants.OLE_E_PROMPTSAVECANCELLED)
+            {
                 returnValue = VSConstants.S_OK;
             }
 
@@ -226,7 +244,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Returns a space-separated string representing the supported switches
         /// for the specified command.
         /// </summary>
-        protected internal virtual string QueryCommandArguments(Guid cmdGroup, uint cmdId, CommandOrigin commandOrigin) {
+        protected internal virtual string QueryCommandArguments(Guid cmdGroup, uint cmdId, CommandOrigin commandOrigin)
+        {
             return null;
         }
 
@@ -241,16 +260,18 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="cmd">The command to be executed.</param>
         /// <param name="handled">Specifies whether the menu was handled.</param>
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
-        protected virtual QueryStatusResult QueryStatusCommandFromOleCommandTarget(Guid cmdGroup, uint cmd, out bool handled) {
+        protected virtual QueryStatusResult QueryStatusCommandFromOleCommandTarget(Guid cmdGroup, uint cmd, out bool handled)
+        {
             handled = false;
             // NOTE: We only want to support Cut/Copy/Paste/Delete/Rename commands
             // if focus is in the project window. This means that we should only
             // support these commands if they are dispatched via IVsUIHierarchy
             // interface and not if they are dispatch through IOleCommandTarget
             // during the command routing to the active project/hierarchy.
-            if (VsMenus.guidStandardCommandSet97 == cmdGroup) {
-
-                switch ((VsCommands)cmd) {
+            if (VsMenus.guidStandardCommandSet97 == cmdGroup)
+            {
+                switch ((VsCommands)cmd)
+                {
                     case VsCommands.Copy:
                     case VsCommands.Paste:
                     case VsCommands.Cut:
@@ -259,14 +280,19 @@ namespace Microsoft.VisualStudioTools.Project {
                         return QueryStatusResult.NOTSUPPORTED;
                 }
             }
-                // The reference menu and the web reference menu should always be shown.
-            else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
-                switch ((VsCommands2K)cmd) {
+            // The reference menu and the web reference menu should always be shown.
+            else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
+            {
+                switch ((VsCommands2K)cmd)
+                {
                     case VsCommands2K.ADDREFERENCE:
                         handled = true;
-                        if (GetReferenceContainer() != null) {
+                        if (GetReferenceContainer() != null)
+                        {
                             return QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                        } else {
+                        }
+                        else
+                        {
                             return QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
                         }
                 }
@@ -282,19 +308,24 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="selectedNodes">The list of selected nodes.</param>
         /// <param name="handled">Specifies whether the menu was handled.</param>
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
-        protected virtual QueryStatusResult DisableCommandOnNodesThatDoNotSupportMultiSelection(Guid cmdGroup, uint cmd, IList<HierarchyNode> selectedNodes, out bool handled) {
+        protected virtual QueryStatusResult DisableCommandOnNodesThatDoNotSupportMultiSelection(Guid cmdGroup, uint cmd, IList<HierarchyNode> selectedNodes, out bool handled)
+        {
             handled = false;
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
-            if (selectedNodes == null || selectedNodes.Count == 1) {
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
+            if (selectedNodes == null || selectedNodes.Count == 1)
+            {
                 return queryResult;
             }
 
-            if (VsMenus.guidStandardCommandSet97 == cmdGroup) {
-                switch ((VsCommands)cmd) {
+            if (VsMenus.guidStandardCommandSet97 == cmdGroup)
+            {
+                switch ((VsCommands)cmd)
+                {
                     case VsCommands.Cut:
                     case VsCommands.Copy:
                         // If the project node is selected then cut and copy is not supported.
-                        if (selectedNodes.Contains(this)) {
+                        if (selectedNodes.Contains(this))
+                        {
                             queryResult = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
                             handled = true;
                         }
@@ -306,8 +337,11 @@ namespace Microsoft.VisualStudioTools.Project {
                         handled = true;
                         break;
                 }
-            } else if (cmdGroup == VsMenus.guidStandardCommandSet2K) {
-                switch ((VsCommands2K)cmd) {
+            }
+            else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
+            {
+                switch ((VsCommands2K)cmd)
+                {
                     case VsCommands2K.QUICKOBJECTSEARCH:
                     case VsCommands2K.SETASSTARTPAGE:
                     case VsCommands2K.ViewInClassDiagram:
@@ -326,18 +360,24 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="commandGroup">Unique identifier of the command group</param>
         /// <param name="command">The command to be executed.</param>
         /// <returns>A QueryStatusResult describing the status of the menu.</returns>
-        protected virtual bool DisableCmdInCurrentMode(Guid commandGroup, uint command) {
-            if (IsClosed) {
+        protected virtual bool DisableCmdInCurrentMode(Guid commandGroup, uint command)
+        {
+            if (this.IsClosed)
+            {
                 return false;
             }
 
             // Don't ask if it is not these commandgroups.
             if (commandGroup == VsMenus.guidStandardCommandSet97 ||
                 commandGroup == VsMenus.guidStandardCommandSet2K ||
-                commandGroup == SharedCommandGuid) {
-                if (this.IsCurrentStateASuppressCommandsMode()) {
-                    if (commandGroup == VsMenus.guidStandardCommandSet97) {
-                        switch ((VsCommands)command) {
+                commandGroup == this.SharedCommandGuid)
+            {
+                if (this.IsCurrentStateASuppressCommandsMode())
+                {
+                    if (commandGroup == VsMenus.guidStandardCommandSet97)
+                    {
+                        switch ((VsCommands)command)
+                        {
                             default:
                                 break;
                             case VsCommands.AddExistingItem:
@@ -352,8 +392,11 @@ namespace Microsoft.VisualStudioTools.Project {
                             case VsCommands.UnloadProject:
                                 return true;
                         }
-                    } else if (commandGroup == VsMenus.guidStandardCommandSet2K) {
-                        switch ((VsCommands2K)command) {
+                    }
+                    else if (commandGroup == VsMenus.guidStandardCommandSet2K)
+                    {
+                        switch ((VsCommands2K)command)
+                        {
                             default:
                                 break;
                             case VsCommands2K.EXCLUDEFROMPROJECT:
@@ -364,22 +407,25 @@ namespace Microsoft.VisualStudioTools.Project {
                             case VsCommands2K.SETASSTARTPAGE:
                                 return true;
                         }
-                    } else if (commandGroup == SharedCommandGuid) {
-                        switch ((SharedCommands)command) {
+                    }
+                    else if (commandGroup == this.SharedCommandGuid)
+                    {
+                        switch ((SharedCommands)command)
+                        {
                             case SharedCommands.AddExistingFolder:
                                 return true;
                         }
                     }
                 }
                 // If we are not in a cut or copy mode then disable the paste command
-                else if (commandGroup == VsMenus.guidStandardCommandSet97 && (VsCommands)command == VsCommands.Paste) {
+                else if (commandGroup == VsMenus.guidStandardCommandSet97 && (VsCommands)command == VsCommands.Paste)
+                {
                     return !this.AllowPasteCommand();
                 }
             }
 
             return false;
         }
-
 
         /// <summary>
         /// Queries the object for the command status on a list of selected nodes.
@@ -390,19 +436,22 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="pCmdText">Pointer to an OLECMDTEXT structure in which to return the name and/or status information of a single command. Can be NULL to indicate that the caller does not require this information. </param>
         /// <param name="commandOrigin">Specifies the origin of the command. Either it was called from the QueryStatusCommand on IVsUIHierarchy or from the IOleCommandTarget</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
-        protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin) {
-            if (IsClosed) {
+        protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin)
+        {
+            if (this.IsClosed)
+            {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
             }
 
-            if (cmdGroup == Guid.Empty) {
+            if (cmdGroup == Guid.Empty)
+            {
                 return (int)OleConstants.OLECMDERR_E_UNKNOWNGROUP;
             }
 
             Utilities.ArgumentNotNull("prgCmds", prgCmds);
 
-            uint cmd = prgCmds[0].cmdID;
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
+            var cmd = prgCmds[0].cmdID;
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
 
             // For now ask this node (that is the project node) to disable or enable a node.
             // This is an optimization. Why should we ask each node for its current state? They all are in the same state.
@@ -411,45 +460,55 @@ namespace Microsoft.VisualStudioTools.Project {
             // What will happen is that the nested project will show grayed commands that belong to this project and does not belong to the nested project. (like special commands implemented by subclassed projects).
             // The reason is that a special command comes in that is not handled because we are in debug mode. Then VsCore asks the nested project can you handle it.
             // The nested project does not know about it, thus it shows it on the nested project as grayed.
-            if (this.DisableCmdInCurrentMode(cmdGroup, cmd)) {
+            if (this.DisableCmdInCurrentMode(cmdGroup, cmd))
+            {
                 queryResult = QueryStatusResult.SUPPORTED | QueryStatusResult.INVISIBLE;
-            } else {
-                bool handled = false;
+            }
+            else
+            {
+                var handled = false;
 
-                if (commandOrigin == CommandOrigin.OleCommandTarget) {
+                if (commandOrigin == CommandOrigin.OleCommandTarget)
+                {
                     queryResult = this.QueryStatusCommandFromOleCommandTarget(cmdGroup, cmd, out handled);
                 }
 
-                if (!handled) {
-                    IList<HierarchyNode> selectedNodes = GetSelectedNodes();
+                if (!handled)
+                {
+                    var selectedNodes = GetSelectedNodes();
 
                     // Want to disable in multiselect case.
-                    if (selectedNodes != null && selectedNodes.Count > 1) {
+                    if (selectedNodes != null && selectedNodes.Count > 1)
+                    {
                         queryResult = this.DisableCommandOnNodesThatDoNotSupportMultiSelection(cmdGroup, cmd, selectedNodes, out handled);
                     }
 
                     // Now go and do the job on the nodes.
-                    if (!handled) {
+                    if (!handled)
+                    {
                         queryResult = this.QueryStatusSelectionOnNodes(selectedNodes, cmdGroup, cmd, pCmdText);
                     }
-
                 }
             }
 
             // Process the results set in the QueryStatusResult
-            if (queryResult != QueryStatusResult.NOTSUPPORTED) {
+            if (queryResult != QueryStatusResult.NOTSUPPORTED)
+            {
                 // Set initial value
                 prgCmds[0].cmdf = (uint)OLECMDF.OLECMDF_SUPPORTED;
 
-                if ((queryResult & QueryStatusResult.ENABLED) != 0) {
+                if ((queryResult & QueryStatusResult.ENABLED) != 0)
+                {
                     prgCmds[0].cmdf |= (uint)OLECMDF.OLECMDF_ENABLED;
                 }
 
-                if ((queryResult & QueryStatusResult.INVISIBLE) != 0) {
+                if ((queryResult & QueryStatusResult.INVISIBLE) != 0)
+                {
                     prgCmds[0].cmdf |= (uint)OLECMDF.OLECMDF_INVISIBLE;
                 }
 
-                if ((queryResult & QueryStatusResult.LATCHED) != 0) {
+                if ((queryResult & QueryStatusResult.LATCHED) != 0)
+                {
                     prgCmds[0].cmdf |= (uint)OLECMDF.OLECMDF_LATCHED;
                 }
 
@@ -471,21 +530,25 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <param name="cmd">The command id to query for.</param>
         /// <param name="pCmdText">Pointer to an OLECMDTEXT structure in which to return the name and/or status information of a single command. Can be NULL to indicate that the caller does not require this information. </param>
         /// <returns>Retuns the result of the query on the slected nodes.</returns>
-        protected virtual QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText) {
-            if (selectedNodes == null || selectedNodes.Count == 0) {
+        protected virtual QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText)
+        {
+            if (selectedNodes == null || selectedNodes.Count == 0)
+            {
                 return QueryStatusResult.NOTSUPPORTED;
             }
 
-            int result = 0;
-            bool supported = false;
-            bool enabled = true;
-            bool invisible = false;
-            bool latched = true;
-            QueryStatusResult tempQueryResult = QueryStatusResult.NOTSUPPORTED;
+            var result = 0;
+            var supported = false;
+            var enabled = true;
+            var invisible = false;
+            var latched = true;
+            var tempQueryResult = QueryStatusResult.NOTSUPPORTED;
 
-            foreach (HierarchyNode node in selectedNodes) {
+            foreach (var node in selectedNodes)
+            {
                 result = node.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref tempQueryResult);
-                if (result < 0) {
+                if (result < 0)
+                {
                     break;
                 }
 
@@ -499,20 +562,24 @@ namespace Microsoft.VisualStudioTools.Project {
                 latched = latched && ((tempQueryResult & QueryStatusResult.LATCHED) != 0);
             }
 
-            QueryStatusResult queryResult = QueryStatusResult.NOTSUPPORTED;
+            var queryResult = QueryStatusResult.NOTSUPPORTED;
 
-            if (result >= 0 && supported) {
+            if (result >= 0 && supported)
+            {
                 queryResult = QueryStatusResult.SUPPORTED;
 
-                if (enabled) {
+                if (enabled)
+                {
                     queryResult |= QueryStatusResult.ENABLED;
                 }
 
-                if (invisible) {
+                if (invisible)
+                {
                     queryResult |= QueryStatusResult.INVISIBLE;
                 }
 
-                if (latched) {
+                if (latched)
+                {
                     queryResult |= QueryStatusResult.LATCHED;
                 }
             }
@@ -525,7 +592,8 @@ namespace Microsoft.VisualStudioTools.Project {
         /// <summary>
         /// CommandTarget.Exec is called for most major operations if they are NOT UI based. Otherwise IVSUInode::exec is called first
         /// </summary>
-        public virtual int Exec(ref Guid guidCmdGroup, uint nCmdId, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut) {
+        public virtual int Exec(ref Guid guidCmdGroup, uint nCmdId, uint nCmdExecOpt, IntPtr pvaIn, IntPtr pvaOut)
+        {
             return this.InternalExecCommand(guidCmdGroup, nCmdId, nCmdExecOpt, pvaIn, pvaOut, CommandOrigin.OleCommandTarget);
         }
 
@@ -533,8 +601,10 @@ namespace Microsoft.VisualStudioTools.Project {
         /// Queries the object for the command status
         /// </summary>
         /// <remarks>we only support one command at a time, i.e. the first member in the OLECMD array</remarks>
-        public virtual int QueryStatus(ref Guid guidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText) {
+        public virtual int QueryStatus(ref Guid guidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
+        {
             return this.QueryStatusSelection(guidCmdGroup, cCmds, prgCmds, pCmdText, CommandOrigin.OleCommandTarget);
         }
     }
 }
+

@@ -1,20 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
-
-#if DEV15
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel.Composition;
@@ -23,12 +7,14 @@ using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.Extensions.VS.Debug;
 
-namespace Microsoft.NodejsTools.Debugger {
+namespace Microsoft.NodejsTools.Debugger
+{
     /// <summary>
     /// Extension to Vs Launch Debugger to handle js files from a Node Js project
     /// </summary>
-    [ExportVsDebugLaunchTarget(ProviderType, new string[] { ".js" }, ProviderPriority.Highest)]
-    internal class NodeJsDebugLaunchProvider : IVsDebugLaunchTargetProvider {
+    [ExportVsDebugLaunchTarget(ProviderType, new[] { ".js" }, ProviderPriority.Highest)]
+    internal class NodeJsDebugLaunchProvider : IVsDebugLaunchTargetProvider
+    {
         private const string ProviderType = "6C01D598-DE83-4D5B-B7E5-757FBA8443DD";
         private const string NodeExeKey = "nodeExe";
 
@@ -55,10 +41,11 @@ namespace Microsoft.NodejsTools.Debugger {
     ""configuration"": ""#/definitions/nodejsFile""
 }";
 
-        public void SetupDebugTargetInfo(ref VsDebugTargetInfo vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext) {
-            string target = vsDebugTargetInfo.bstrExe;
+        public void SetupDebugTargetInfo(ref VsDebugTargetInfo vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext)
+        {
+            var target = vsDebugTargetInfo.bstrExe;
             vsDebugTargetInfo.bstrExe = debugLaunchContext.LaunchConfiguration.GetValue<string>(NodeExeKey, Nodejs.GetPathToNodeExecutableFromEnvironment());
-            string nodeJsArgs = vsDebugTargetInfo.bstrArg;
+            var nodeJsArgs = vsDebugTargetInfo.bstrArg;
             vsDebugTargetInfo.bstrArg = "\"" + target + "\"";
             if (!string.IsNullOrEmpty(nodeJsArgs))
             {
@@ -71,24 +58,22 @@ namespace Microsoft.NodejsTools.Debugger {
             vsDebugTargetInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
         }
 
-        [ExportLaunchConfigurationProvider(
-            LaunchConfigurationProviderType,
-            new string[] { ".js" },
-            "nodejs",
-            NodeJsSchema)]
-        public class LaunchConfigurationProvider : ILaunchConfigurationProvider {
+        [ExportLaunchConfigurationProvider(LaunchConfigurationProviderType, new[] { ".js" }, "nodejs", NodeJsSchema)]
+        public class LaunchConfigurationProvider : ILaunchConfigurationProvider
+        {
             private const string LaunchConfigurationProviderType = "1DB21619-2C53-4BEF-84E4-B1C4D6771A51";
 
-            public void CustomizeLaunchConfiguration(DebugLaunchActionContext debugLaunchActionContext, IPropertySettings launchSettings) {
+            public void CustomizeLaunchConfiguration(DebugLaunchActionContext debugLaunchActionContext, IPropertySettings launchSettings)
+            {
                 // noop
             }
 
             /// <inheritdoc />
-            public bool IsDebugLaunchActionSupported(DebugLaunchActionContext debugLaunchActionContext) {
+            public bool IsDebugLaunchActionSupported(DebugLaunchActionContext debugLaunchActionContext)
+            {
                 throw new NotImplementedException();
             }
         }
     }
 }
 
-#endif

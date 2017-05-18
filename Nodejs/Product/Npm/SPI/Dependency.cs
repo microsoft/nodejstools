@@ -1,40 +1,24 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-namespace Microsoft.NodejsTools.Npm.SPI {
-    internal class Dependency : IDependency {
-        private string _versionRangeUrlText;
+namespace Microsoft.NodejsTools.Npm.SPI
+{
+    internal class Dependency : IDependency
+    {
+        private readonly string versionRangeUrlText;
 
-        public Dependency(string name, string retreivalInfo) {
-            Name = name;
-            _versionRangeUrlText = retreivalInfo;
+        public Dependency(string name, string retreivalInfo)
+        {
+            this.Name = name;
+            this.versionRangeUrlText = retreivalInfo;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        private bool IsVersionRange {
-            get { return _versionRangeUrlText.IndexOf('/') < 0; }
-        }
+        private bool IsVersionRange => this.versionRangeUrlText.IndexOf('/') < 0;
 
-        public IDependencyUrl Url {
-            get { return IsVersionRange ? null : new DependencyUrl(_versionRangeUrlText); }
-        }
+        public IDependencyUrl Url => this.IsVersionRange ? null : new DependencyUrl(this.versionRangeUrlText);
 
-        public string VersionRangeText {
-            get { return IsVersionRange ? _versionRangeUrlText : null; }
-        }
+        public string VersionRangeText => this.IsVersionRange ? this.versionRangeUrlText : null;
     }
 }
+

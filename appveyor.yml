@@ -4,23 +4,21 @@
     except:
     - v1.1.x
     - v1.2.x
+    - v1.3.x
   skip_tags: true
-  image: Visual Studio 2015
+  image: Visual Studio 2017
   environment:
     matrix:
-    - nodejs_version: 4
-      vs_version: 14.0
+    - nodejs_version: Stable
+      vs_version: 15.0
       architecture: x64
-    - nodejs_version: 5
-      vs_version: 14.0
-      architecture: x86
   install: &default_install_script
     - ps: >-
         Install-Product node $env:nodejs_version $env:architecture
 
         node -v
 
-        "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"
+        "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
         $node = which node
 
@@ -35,54 +33,10 @@
 
         msiexec /package C:\projects\nodejstools\Common\Tests\Prerequisites\VSTestHost.msi /quiet
 
-        powershell -ExecutionPolicy RemoteSigned C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipcopy -skipdebug -skipclean -vsTarget $env:vs_version
-  test_script: &default_test_script
-    - ps: >-
-        $testsettings_version = $env:vs_version -replace '11.0', '12.0'
+        c:\projects\nodejstools\Nodejs\.nuget\nuget.exe restore "c:\projects\nodejstools\Nodejs\NodejsTools.sln" -PackagesDirectory c:\projects\nodejstools\Nodejs\packages -ConfigFile c:\projects\nodejstools\Nodejs\.nuget\appveyor.Config
 
-        vstest.console /TestCaseFilter:"TestCategory!=AppVeyorIgnore&TestCategory!=Ignore" /logger:Appveyor $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NpmTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\NodeTests.dll") $("C:\projects\nodejstools\BuildOutput\Release" + $env:vs_version + "\Tests\ProfilerTests.dll") /settings:$("C:\projects\nodejstools\Build\default." + $testsettings_version + "Exp.testsettings")
+        C:\projects\nodejstools\Nodejs\Setup\BuildRelease.ps1 .\NTVS_Out -skipsetup -skipcopy -skipdebug -skipclean -skiptests -vsTarget $env:vs_version -vsroot "$(${env:programfiles(x86)} + "\Microsoft Visual Studio\2017\Community")"
   artifacts: &default_artifacts
     - path: NTVS_Out
       name: NtvsOut
       type: zip
--
-  version: 1.0.{build}
-  branches:
-    only:
-    - v1.2.x
-  skip_tags: true
-  image: Visual Studio 2015
-  environment:
-    matrix:
-    - nodejs_version: 4
-      vs_version: 14.0
-      architecture: x64
-    - nodejs_version: 5
-      vs_version: 14.0
-      architecture: x86
-  install: *default_install_script
-  build_script: *default_build_script
-  test_script: *default_test_script
-  artifacts: *default_artifacts
--
-  version: 1.0.{build}
-  branches:
-    only:
-    - v1.1.x
-  skip_tags: true
-  image: Visual Studio 2015
-  environment:
-    matrix:
-    - nodejs_version: 4
-      vs_version: 14.0
-      architecture: x64
-    - nodejs_version: 0.12
-      vs_version: 12.0
-      architecture: x64
-    - nodejs_version: 5
-      vs_version: 14.0
-      architecture: x86
-  install: *default_install_script
-  build_script: *default_build_script
-  test_script: *default_test_script
-  artifacts: *default_artifacts

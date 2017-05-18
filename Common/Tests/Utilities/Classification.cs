@@ -1,16 +1,4 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,24 +8,31 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.Text.Classification;
 
-namespace TestUtilities {
-    public class Classification {
+namespace TestUtilities
+{
+    public class Classification
+    {
         public readonly int Start, End;
         public readonly string Text;
         public readonly string ClassificationType;
 
-        public Classification(string classificationType, int start, int end, string text) {
+        public Classification(string classificationType, int start, int end, string text)
+        {
             ClassificationType = classificationType;
             Start = start;
             End = end;
             Text = text;
         }
 
-        public static void Verify(IList<ClassificationSpan> spans, params Classification[] expected) {
+        public static void Verify(IList<ClassificationSpan> spans, params Classification[] expected)
+        {
             bool passed = false;
-            try {
-                for (int i = 0; i < spans.Count; i++) {
-                    if (i >= expected.Length) {
+            try
+            {
+                for (int i = 0; i < spans.Count; i++)
+                {
+                    if (i >= expected.Length)
+                    {
                         Assert.Fail();
                         break;
                     }
@@ -51,13 +46,16 @@ namespace TestUtilities {
                     Assert.AreEqual(expected[i].Start, start, spanInfo);
                     Assert.AreEqual(expected[i].End, end, spanInfo);
                     Assert.AreEqual(expected[i].Text, curSpan.Span.GetText(), spanInfo);
-                    Assert.IsTrue(curSpan.ClassificationType.IsOfType(expected[i].ClassificationType), 
+                    Assert.IsTrue(curSpan.ClassificationType.IsOfType(expected[i].ClassificationType),
                         "Classifier incorrect for '{0}'.  Expected:{1} Actual:{2}", expected[i].Text, expected[i].ClassificationType, curSpan.ClassificationType);
                 }
 
                 passed = true;
-            } finally {
-                if (!passed) {
+            }
+            finally
+            {
+                if (!passed)
+                {
                     // Output expected and actual results as Classification objects for easy diffing and copy-pasting.
 
                     Console.WriteLine("Expected:\r\n" +
@@ -89,10 +87,13 @@ namespace TestUtilities {
             }
         }
 
-        public static string FormatString(string p) {
+        public static string FormatString(string p)
+        {
             StringBuilder res = new StringBuilder();
-            for (int i = 0; i < p.Length; i++) {
-                switch (p[i]) {
+            for (int i = 0; i < p.Length; i++)
+            {
+                switch (p[i])
+                {
                     case '\\': res.Append("\\\\"); break;
                     case '\n': res.Append("\\n"); break;
                     case '\r': res.Append("\\r"); break;
@@ -103,7 +104,6 @@ namespace TestUtilities {
             }
             return res.ToString();
         }
-
     }
-
 }
+

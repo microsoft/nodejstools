@@ -700,14 +700,7 @@
       <Visible>true</Visible>
     </Compile>
   </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '14.0'">
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
-      <Link>SharedProject\ProjectResources.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup Condition="$(VSTarget) == '15.0'">
+  <ItemGroup>
     <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.cs.resx">
       <Link>SharedProject\ProjectResources.cs.resx</Link>
       <ManifestResourceName>Microsoft.VisualStudio.Project.cs</ManifestResourceName>

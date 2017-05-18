@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -45,14 +33,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException();
         }
 
-        public virtual BuildManager BuildManager
-        {
-            get
-            {
-                throw new NotImplementedException();
-                //return new OABuildManager(this.project);
-            }
-        }
+        public virtual BuildManager BuildManager => throw new NotImplementedException();
 
         public virtual void CopyProject(string bstrDestFolder, string bstrDestUNCPath, prjCopyProjectOption copyProjectOption, string bstrUsername, string bstrPassword)
         {
@@ -64,21 +45,15 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException();
         }
 
-        public virtual DTE DTE
-        {
-            get
-            {
-                return (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
-            }
-        }
+        public virtual DTE DTE => (EnvDTE.DTE)this.project.Site.GetService(typeof(EnvDTE.DTE));
 
         public virtual VSProjectEvents Events
         {
             get
             {
-                if (events == null)
-                    events = new OAVSProjectEvents(this);
-                return events;
+                if (this.events == null)
+                    this.events = new OAVSProjectEvents(this);
+                return this.events;
             }
         }
 
@@ -97,30 +72,18 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             throw new NotImplementedException(); ;
         }
 
-        public virtual Imports Imports
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual Imports Imports => throw new NotImplementedException();
 
-        public virtual EnvDTE.Project Project
-        {
-            get
-            {
-                return this.project.GetAutomationObject() as EnvDTE.Project;
-            }
-        }
+        public virtual EnvDTE.Project Project => this.project.GetAutomationObject() as EnvDTE.Project;
 
         public virtual References References
         {
             get
             {
-                ReferenceContainerNode references = project.GetReferenceContainer() as ReferenceContainerNode;
+                var references = this.project.GetReferenceContainer() as ReferenceContainerNode;
                 if (null == references)
                 {
-                    return new OAReferences(null, project);
+                    return new OAReferences(null, this.project);
                 }
                 return references.Object as References;
             }
@@ -130,21 +93,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
         }
 
-        public virtual string TemplatePath
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual string TemplatePath => throw new NotImplementedException();
 
-        public virtual ProjectItem WebReferencesFolder
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual ProjectItem WebReferencesFolder => throw new NotImplementedException();
 
         public virtual bool WorkOffline
         {
@@ -180,31 +131,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region VSProjectEvents Members
 
-        public virtual BuildManagerEvents BuildManagerEvents
-        {
-            get
-            {
-                return vsProject.BuildManager as BuildManagerEvents;
-            }
-        }
+        public virtual BuildManagerEvents BuildManagerEvents => this.vsProject.BuildManager as BuildManagerEvents;
 
-        public virtual ImportsEvents ImportsEvents
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public virtual ImportsEvents ImportsEvents => throw new NotImplementedException();
 
-        public virtual ReferencesEvents ReferencesEvents
-        {
-            get
-            {
-                return vsProject.References as ReferencesEvents;
-            }
-        }
+        public virtual ReferencesEvents ReferencesEvents => this.vsProject.References as ReferencesEvents;
 
         #endregion
     }
-
 }
+

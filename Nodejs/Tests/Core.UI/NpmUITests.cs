@@ -1,18 +1,4 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -27,16 +13,21 @@ using Moq;
 using NpmTests;
 using TestUtilities.UI;
 
-namespace Microsoft.Nodejs.Tests.UI {
+namespace Microsoft.Nodejs.Tests.UI
+{
     [TestClass]
-    public class NpmUITests : NodejsProjectTest {
+    public class NpmUITests : NodejsProjectTest
+    {
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void NpmUIInitialization() {
-            using (var app = new VisualStudioApp()) {
+        public void NpmUIInitialization()
+        {
+            using (var app = new VisualStudioApp())
+            {
                 // Initialize call is required because NTVS does not autoload its package
                 // We may not be on UI thread, but Dev11 and Dev12 know how to sort that out.
-                app.ServiceProvider.GetUIThread().Invoke(() => {
+                app.ServiceProvider.GetUIThread().Invoke(() =>
+                {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     Assert.IsTrue(npmWindow.FilterTextBox.IsKeyboardFocused, "FilterTextBox should be keyboard focused");
@@ -47,9 +38,12 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void NpmUIArrowKeyBehavior() {
-            using (var app = new VisualStudioApp()) {
-                app.ServiceProvider.GetUIThread().Invoke(() => {
+        public void NpmUIArrowKeyBehavior()
+        {
+            using (var app = new VisualStudioApp())
+            {
+                app.ServiceProvider.GetUIThread().Invoke(() =>
+                {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     System.Windows.Input.Keyboard.Focus(npmWindow.FilterTextBox);
@@ -88,7 +82,7 @@ namespace Microsoft.Nodejs.Tests.UI {
 
                     TestUtilities.UI.Keyboard.PressAndRelease(Key.Enter);
                     WaitForUIInputIdle();
-                    
+
                     selectedItem = GetSelectedPackageListItemContainer(npmWindow);
                     Assert.IsTrue(selectedItem.IsKeyboardFocused, "Focus should be on newly selected item");
                     Assert.AreEqual(0, npmWindow._packageList.SelectedIndex);
@@ -98,9 +92,12 @@ namespace Microsoft.Nodejs.Tests.UI {
 
         [TestMethod, Priority(0), TestCategory("Npm UI")]
         [HostType("VSTestHost")]
-        public void NpmUITabKeyBehavior() {
-            using (var app = new VisualStudioApp()) {
-                app.ServiceProvider.GetUIThread().Invoke(() => {
+        public void NpmUITabKeyBehavior()
+        {
+            using (var app = new VisualStudioApp())
+            {
+                app.ServiceProvider.GetUIThread().Invoke(() =>
+                {
                     NpmPackageInstallWindow npmWindow = OpenNpmWindowAndWaitForReady();
 
                     npmWindow.FilterTextBox.Focus();
@@ -142,7 +139,8 @@ namespace Microsoft.Nodejs.Tests.UI {
             }
         }
 
-        private NpmPackageInstallWindow OpenNpmWindowAndWaitForReady() {
+        private NpmPackageInstallWindow OpenNpmWindowAndWaitForReady()
+        {
             var npmControllerMock = GetNpmControllerMock();
             NpmPackageInstallWindow npmWindow = new NpmPackageInstallWindow(npmControllerMock.Object, new NpmOutputViewModel(npmControllerMock.Object));
             npmWindow.Show();
@@ -158,11 +156,13 @@ namespace Microsoft.Nodejs.Tests.UI {
             return npmWindow;
         }
 
-        private static ListViewItem GetSelectedPackageListItemContainer(NpmPackageInstallWindow npmWindow) {
-            return (ListViewItem) npmWindow._packageList.ItemContainerGenerator.ContainerFromItem(npmWindow._packageList.SelectedItem);
+        private static ListViewItem GetSelectedPackageListItemContainer(NpmPackageInstallWindow npmWindow)
+        {
+            return (ListViewItem)npmWindow._packageList.ItemContainerGenerator.ContainerFromItem(npmWindow._packageList.SelectedItem);
         }
 
-        private static Mock<INpmController> GetNpmControllerMock() {
+        private static Mock<INpmController> GetNpmControllerMock()
+        {
             var npmControllerMock = new Mock<INpmController>();
             var packageMock = new Mock<IPackage>();
             packageMock.Setup(mock => mock.Name).Returns("mock package");
@@ -185,14 +185,18 @@ namespace Microsoft.Nodejs.Tests.UI {
             return npmControllerMock;
         }
 
-        private void WaitForUIInputIdle() {
+        private void WaitForUIInputIdle()
+        {
             Dispatcher.CurrentDispatcher.Invoke((Action)(() => { }),
                 DispatcherPriority.ApplicationIdle);
         }
 
-        private void WaitForPackageListItemsToAppear(NpmPackageInstallWindow npmWindow) {
-            for (int i = 0; i < 100; i++) {
-                if (npmWindow._packageList.Items.Count > 0) {
+        private void WaitForPackageListItemsToAppear(NpmPackageInstallWindow npmWindow)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                if (npmWindow._packageList.Items.Count > 0)
+                {
                     return;
                 }
 
@@ -204,3 +208,4 @@ namespace Microsoft.Nodejs.Tests.UI {
         }
     }
 }
+

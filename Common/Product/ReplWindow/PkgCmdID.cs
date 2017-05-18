@@ -1,26 +1,13 @@
-﻿/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-// PkgCmdID.cs
 // MUST match PkgCmdID.h
 
-#if NTVS_FEATURE_INTERACTIVEWINDOW
-namespace Microsoft.NodejsTools.Repl {
-#else
-namespace Microsoft.VisualStudio.Repl {
-#endif
-    static class PkgCmdIDList {
+
+namespace Microsoft.NodejsTools.Repl
+{
+
+    internal static class PkgCmdIDList
+    {
         public const uint cmdidSmartExecute = 0x103;
         public const uint cmdidBreakRepl = 0x104;
         public const uint cmdidResetRepl = 0x105;

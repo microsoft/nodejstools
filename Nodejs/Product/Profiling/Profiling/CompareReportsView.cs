@@ -1,26 +1,14 @@
-﻿//*********************************************************//
-//    Copyright (c) Microsoft. All rights reserved.
-//    
-//    Apache 2.0 License
-//    
-//    You may obtain a copy of the License at
-//    http://www.apache.org/licenses/LICENSE-2.0
-//    
-//    Unless required by applicable law or agreed to in writing, software 
-//    distributed under the License is distributed on an "AS IS" BASIS, 
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-//    implied. See the License for the specific language governing 
-//    permissions and limitations under the License.
-//
-//*********************************************************//
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 
-namespace Microsoft.NodejsTools.Profiling {
-    public sealed class CompareReportsView : INotifyPropertyChanged {
+namespace Microsoft.NodejsTools.Profiling
+{
+    public sealed class CompareReportsView : INotifyPropertyChanged
+    {
         private string _baselineFile;
         private string _comparisonFile;
         private bool _isValid;
@@ -28,7 +16,8 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Create a CompareReportsView with default values.
         /// </summary>
-        public CompareReportsView() {
+        public CompareReportsView()
+        {
             _baselineFile = null;
             _comparisonFile = null;
             _isValid = false;
@@ -41,7 +30,8 @@ namespace Microsoft.NodejsTools.Profiling {
         /// </summary>
         /// <param name="baselineFile"></param>
         public CompareReportsView(string baselineFile)
-        : this(){
+        : this()
+        {
             BaselineFile = baselineFile;
         }
 
@@ -49,14 +39,18 @@ namespace Microsoft.NodejsTools.Profiling {
         /// Returns a vsp:// comparison URI if the settings are valid; otherwise, null.
         /// </summary>
         /// <returns></returns>
-        public string GetComparisonUri() {
-            if (IsValid) {
+        public string GetComparisonUri()
+        {
+            if (IsValid)
+            {
                 return string.Format(CultureInfo.InvariantCulture,
                     "vsp://diff/?baseline={0}&comparison={1}",
                     Uri.EscapeDataString(BaselineFile),
                     Uri.EscapeDataString(ComparisonFile)
                 );
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
@@ -64,8 +58,10 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// The file filter for performance files.
         /// </summary>
-        public string PerformanceFileFilter {
-            get {
+        public string PerformanceFileFilter
+        {
+            get
+            {
                 return NodejsProfilingPackage.PerformanceFileFilter;
             }
         }
@@ -73,12 +69,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// The path to the baseline file.
         /// </summary>
-        public string BaselineFile {
-            get {
+        public string BaselineFile
+        {
+            get
+            {
                 return _baselineFile;
             }
-            set {
-                if (_baselineFile != value) {
+            set
+            {
+                if (_baselineFile != value)
+                {
                     _baselineFile = value;
                     OnPropertyChanged(nameof(BaselineFile));
                 }
@@ -88,12 +88,16 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// The path to the file to compare against.
         /// </summary>
-        public string ComparisonFile {
-            get {
+        public string ComparisonFile
+        {
+            get
+            {
                 return _comparisonFile;
             }
-            set {
-                if (_comparisonFile != value) {
+            set
+            {
+                if (_comparisonFile != value)
+                {
                     _comparisonFile = value;
                     OnPropertyChanged(nameof(ComparisonFile));
                 }
@@ -103,8 +107,10 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// Receives our own property change events to update IsValid.
         /// </summary>
-        void CompareReportsView_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName != "IsValid") {
+        private void CompareReportsView_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != "IsValid")
+            {
                 IsValid = File.Exists(BaselineFile) && File.Exists(ComparisonFile);
             }
         }
@@ -112,21 +118,27 @@ namespace Microsoft.NodejsTools.Profiling {
         /// <summary>
         /// True if both paths are valid; otherwise, false.
         /// </summary>
-        public bool IsValid {
-            get {
+        public bool IsValid
+        {
+            get
+            {
                 return _isValid;
             }
-            private set {
-                if (_isValid != value) {
+            private set
+            {
+                if (_isValid != value)
+                {
                     _isValid = value;
                     OnPropertyChanged(nameof(IsValid));
                 }
             }
         }
 
-        private void OnPropertyChanged(string propertyName) {
+        private void OnPropertyChanged(string propertyName)
+        {
             var evt = PropertyChanged;
-            if (evt != null) {
+            if (evt != null)
+            {
                 evt(this, new PropertyChangedEventArgs(propertyName));
             }
         }
@@ -136,4 +148,5 @@ namespace Microsoft.NodejsTools.Profiling {
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
- 
+
+

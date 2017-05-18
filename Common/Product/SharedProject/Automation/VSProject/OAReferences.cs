@@ -1,16 +1,4 @@
-/* ****************************************************************************
- *
- * Copyright (c) Microsoft Corporation. 
- *
- * This source code is subject to terms and conditions of the Apache License, Version 2.0. A 
- * copy of the license can be found in the License.html file at the root of this distribution. If 
- * you cannot locate the Apache License, Version 2.0, please send an email to 
- * vspython@microsoft.com. By using this source code in any fashion, you are agreeing to be bound 
- * by the terms of the Apache License, Version 2.0.
- *
- * You must not remove this notice, or any other, from this software.
- *
- * ***************************************************************************/
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -43,23 +31,25 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <param name="project"></param>
         internal OAReferences(ReferenceContainerNode containerNode, ProjectNode project)
         {
-            _container = containerNode;
-            _project = project;
+            this._container = containerNode;
+            this._project = project;
 
             AddEventSource<_dispReferencesEvents>(this as IEventSource<_dispReferencesEvents>);
-            if (_container != null) {
-                _container.OnChildAdded += new EventHandler<HierarchyNodeEventArgs>(OnReferenceAdded);
-                _container.OnChildRemoved += new EventHandler<HierarchyNodeEventArgs>(OnReferenceRemoved);
+            if (this._container != null)
+            {
+                this._container.OnChildAdded += new EventHandler<HierarchyNodeEventArgs>(this.OnReferenceAdded);
+                this._container.OnChildRemoved += new EventHandler<HierarchyNodeEventArgs>(this.OnReferenceRemoved);
             }
         }
 
         #region Private Members
         private Reference AddFromSelectorData(VSCOMPONENTSELECTORDATA selector)
         {
-            if (_container == null) {
+            if (this._container == null)
+            {
                 return null;
             }
-            ReferenceNode refNode = _container.AddReferenceFromSelectorData(selector);
+            ReferenceNode refNode = this._container.AddReferenceFromSelectorData(selector);
             if (null == refNode)
             {
                 return null;
@@ -72,7 +62,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             foreach (Reference refNode in this)
             {
-                if (0 == string.Compare(refNode.Name, stringIndex, StringComparison.Ordinal))
+                if (StringComparer.Ordinal.Equals(refNode.Name, stringIndex))
                 {
                     return refNode;
                 }
@@ -111,12 +101,12 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public Reference AddProject(EnvDTE.Project project)
         {
-            if (null == project || _container == null)
+            if (null == project || this._container == null)
             {
                 return null;
             }
             // Get the soulution.
-            IVsSolution solution = _container.ProjectMgr.Site.GetService(typeof(SVsSolution)) as IVsSolution;
+            IVsSolution solution = this._container.ProjectMgr.Site.GetService(typeof(SVsSolution)) as IVsSolution;
             if (null == solution)
             {
                 return null;
@@ -143,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return _project.GetAutomationObject() as EnvDTE.Project;
+                return this._project.GetAutomationObject() as EnvDTE.Project;
             }
         }
 
@@ -151,11 +141,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if (_container == null) 
+                if (this._container == null)
                 {
                     return 0;
                 }
-                return _container.EnumReferences().Count;
+                return this._container.EnumReferences().Count;
             }
         }
 
@@ -163,7 +153,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                return _project.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                return this._project.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
             }
         }
 
@@ -177,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 if (null != refNode)
                 {
-                    if (0 == string.Compare(bstrIdentity, refNode.Identity, StringComparison.Ordinal))
+                    if (StringComparer.Ordinal.Equals(bstrIdentity, refNode.Identity))
                     {
                         return refNode;
                     }
@@ -188,12 +178,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public IEnumerator GetEnumerator()
         {
-            if (_container == null) {
+            if (this._container == null)
+            {
                 return new List<Reference>().GetEnumerator();
             }
 
             List<Reference> references = new List<Reference>();
-            IEnumerator baseEnum = _container.EnumReferences().GetEnumerator();
+            IEnumerator baseEnum = this._container.EnumReferences().GetEnumerator();
             if (null == baseEnum)
             {
                 return references.GetEnumerator();
@@ -216,7 +207,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public Reference Item(object index)
         {
-            if (_container == null) 
+            if (this._container == null)
             {
                 throw new ArgumentOutOfRangeException("index");
             }
@@ -228,7 +219,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
             // Note that this cast will throw if the index is not convertible to int.
             int intIndex = (int)index;
-            IList<ReferenceNode> refs = _container.EnumReferences();
+            IList<ReferenceNode> refs = this._container.EnumReferences();
             if (null == refs)
             {
                 throw new ArgumentOutOfRangeException("index");
@@ -245,11 +236,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                if (_container == null) 
+                if (this._container == null)
                 {
-                    return _project.Object;
+                    return this._project.Object;
                 }
-                return _container.Parent.Object;
+                return this._container.Parent.Object;
             }
         }
 
@@ -257,7 +248,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         #region _dispReferencesEvents_Event Members
         public event _dispReferencesEvents_ReferenceAddedEventHandler ReferenceAdded;
-        public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged {
+        public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged
+        {
             add { }
             remove { }
         }
@@ -268,7 +260,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         private void OnReferenceAdded(object sender, HierarchyNodeEventArgs args)
         {
             // Validate the parameters.
-            if ((_container != sender as ReferenceContainerNode) ||
+            if ((this._container != sender as ReferenceContainerNode) ||
                 (null == args) || (null == args.Child))
             {
                 return;
@@ -287,11 +279,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 ReferenceAdded(reference);
             }
         }
-        
+
         private void OnReferenceRemoved(object sender, HierarchyNodeEventArgs args)
         {
             // Validate the parameters.
-            if ((_container != sender as ReferenceContainerNode) ||
+            if ((this._container != sender as ReferenceContainerNode) ||
                 (null == args) || (null == args.Child))
             {
                 return;
@@ -329,3 +321,4 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
     }
 }
+
