@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                             }
                             break;
                         case "pending":
-                            { 
+                            {
                                 _currentResult = new TestResult(tests.First());
                                 RecordEnd(_frameworkHandle, tests.First(), _currentResult, testEvent.result);
                             }
@@ -356,7 +356,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
             String[] standardOutputLines = resultObject.stdout.Split('\n');
             String[] standardErrorLines = resultObject.stderr.Split('\n');
-            
+
             if (null != resultObject.pending && (bool)resultObject.pending)
             {
                 result.Outcome = TestOutcome.Skipped;

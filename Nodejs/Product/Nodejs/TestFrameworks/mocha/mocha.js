@@ -178,8 +178,7 @@ var run_tests = function (testCases, callback) {
         post({
             type: 'result',
             title: result.title,
-            result: result,
-            pending: false
+            result: result
         });
         result = reset_result();
     });
@@ -189,8 +188,7 @@ var run_tests = function (testCases, callback) {
         post({
             type: 'result',
             title: result.title,
-            result: result,
-            pending: false
+            result: result
         });
         result = reset_result();
     });
