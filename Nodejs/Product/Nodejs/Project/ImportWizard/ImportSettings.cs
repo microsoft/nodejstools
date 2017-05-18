@@ -12,6 +12,7 @@ using System.Windows;
 using System.Xml;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Project.ImportWizard
@@ -256,9 +257,10 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                 Guid projectGuid;
                 try
                 {
+                    string typeScriptVersion = GetLatestAvailableTypeScriptVersionFromSetup();
                     using (var writer = GetDefaultWriter(projectPath))
                     {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, true, out projectGuid);
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, typeScriptVersion, true, out projectGuid);
                     }
                     NodejsPackage.Instance?.TelemetryLogger.LogProjectImported(projectGuid);
                     success = true;
@@ -304,6 +306,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
             string sourcePath,
             string filters,
             string startupFile,
+            string typeScriptVersion,
             bool excludeNodeModules,
             out Guid projectGuid
         )
@@ -346,6 +349,10 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                 writer.WriteElementString("TypeScriptSourceMap", "true");
                 writer.WriteElementString("TypeScriptModuleKind", "CommonJS");
                 writer.WriteElementString("EnableTypeScript", "true");
+                if (typeScriptVersion != null)
+                {
+                    writer.WriteElementString("TypeScriptToolsVersion", typeScriptVersion);
+                }
             }
 
             writer.WriteStartElement("VisualStudioVersion");
@@ -519,6 +526,35 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                 .Distinct(StringComparer.OrdinalIgnoreCase);
 
             return res;
+        }
+
+        private const string tsSdkSetupPackageIdPrefix = "Microsoft.VisualStudio.Component.TypeScript.";
+
+        private static string GetLatestAvailableTypeScriptVersionFromSetup()
+        {
+            var setupCompositionService = (IVsSetupCompositionService)CommonPackage.GetGlobalService(typeof(SVsSetupCompositionService));
+
+            // Populate the package status
+            uint count = 0;
+            uint sizeNeeded = 0;
+            IVsSetupPackageInfo[] packages = null;
+            setupCompositionService.GetSetupPackagesInfo(count, packages, out sizeNeeded);
+
+            if (sizeNeeded > 0)
+            {
+                packages = new IVsSetupPackageInfo[sizeNeeded];
+                count = sizeNeeded;
+                setupCompositionService.GetSetupPackagesInfo(count, packages, out sizeNeeded);
+
+                return packages.Where(p => (__VsSetupPackageState)p.CurrentState == __VsSetupPackageState.INSTALL_PACKAGE_PRESENT)
+                    .Select(p => p.PackageId)
+                    .Where(p => p.StartsWith(tsSdkSetupPackageIdPrefix))
+                    .Select(p => p.Substring(tsSdkSetupPackageIdPrefix.Length, p.Length - tsSdkSetupPackageIdPrefix.Length))
+                    .OrderByDescending(v => v)
+                    .First();
+            }
+
+            return "";
         }
     }
 }
