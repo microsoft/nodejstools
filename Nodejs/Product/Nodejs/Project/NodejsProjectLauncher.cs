@@ -417,7 +417,7 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("env", JObject.FromObject(envVars)),
-                new JProperty("diagnosticLogging", CheckEnableDiagnosticLoggingOption()),
+                new JProperty("trace", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
                 new JProperty("$adapter", pathToNodeExe),
