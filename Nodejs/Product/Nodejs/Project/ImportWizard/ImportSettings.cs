@@ -554,7 +554,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                     .First();
             }
 
-            return null;
+            return "";
         }
     }
 }

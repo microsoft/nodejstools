@@ -90,7 +90,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
                     .First();
             }
 
-            return null;
+            return "";
         }
     }
 }
