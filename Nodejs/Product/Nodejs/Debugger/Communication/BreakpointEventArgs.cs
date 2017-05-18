@@ -15,4 +15,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         public BreakpointEvent BreakpointEvent { get; private set; }
     }
 }
-

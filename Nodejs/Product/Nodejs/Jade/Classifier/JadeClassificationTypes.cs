@@ -11,4 +11,3 @@ namespace Microsoft.NodejsTools.Jade
         public const string IdLiteral = "JadeIdLiteral"; // a#foo
     }
 }
-

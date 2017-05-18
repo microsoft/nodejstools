@@ -10,4 +10,3 @@ namespace Microsoft.NodejsTools.Telemetry
         public const string ProjectGuid = "ProjectGuid";
     }
 }
-

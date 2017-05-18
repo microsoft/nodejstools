@@ -8,4 +8,3 @@ namespace Microsoft.NodejsTools.Npm
         ILicense this[int index] { get; }
     }
 }
-

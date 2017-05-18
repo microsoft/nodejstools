@@ -17,4 +17,3 @@ namespace Microsoft.VisualStudioTools.Project
         IsVisible = 0x08
     }
 }
-

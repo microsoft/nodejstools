@@ -188,4 +188,3 @@ namespace Microsoft.NodejsTools
         }
     }
 }
-

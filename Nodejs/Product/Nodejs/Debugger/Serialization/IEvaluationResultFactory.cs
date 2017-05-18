@@ -12,4 +12,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         NodeEvaluationResult Create(INodeVariable variable);
     }
 }
-

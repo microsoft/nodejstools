@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public override int GetDepth(string filepath) => throw new NotImplementedException();
     }
 }
-

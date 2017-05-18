@@ -55,4 +55,3 @@ namespace Microsoft.VisualStudio.Azure
         void AddedAsRole(object azureProjectHierarchy, string roleType);
     }
 }
-

@@ -38,4 +38,3 @@ namespace Microsoft.NodejsTools.PressAnyKey
         }
     }
 }
-

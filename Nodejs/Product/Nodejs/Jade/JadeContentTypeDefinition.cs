@@ -40,4 +40,3 @@ namespace Microsoft.NodejsTools.Jade
         public FileExtensionToContentTypeDefinition IPugFileExtension { get; set; }
     }
 }
-

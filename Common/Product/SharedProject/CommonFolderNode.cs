@@ -270,4 +270,3 @@ namespace Microsoft.VisualStudioTools.Project
         public new CommonProjectNode ProjectMgr => (CommonProjectNode)base.ProjectMgr;
     }
 }
-

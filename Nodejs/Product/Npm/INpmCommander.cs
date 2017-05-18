@@ -55,4 +55,3 @@ namespace Microsoft.NodejsTools.Npm
         Task<bool> ExecuteNpmCommandAsync(string arguments);
     }
 }
-

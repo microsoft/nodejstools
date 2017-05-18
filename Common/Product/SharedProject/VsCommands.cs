@@ -38,4 +38,3 @@ namespace Microsoft.VisualStudioTools.Project
         public const int IDM_VS_CTXT_XPROJ_PROJITEM = 0x0417;
     }
 }
-

@@ -232,4 +232,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         }
     }
 }
-

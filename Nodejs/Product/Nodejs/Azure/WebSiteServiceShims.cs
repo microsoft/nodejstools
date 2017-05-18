@@ -209,4 +209,3 @@ namespace Microsoft.VisualStudio.Web.WindowsAzure.Contracts.Shims
         public string Name => (string)Get();
     }
 }
-

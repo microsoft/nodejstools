@@ -87,4 +87,3 @@ namespace Microsoft.NodejsTools.Repl
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
     }
 }
-

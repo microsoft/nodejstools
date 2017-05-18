@@ -22,4 +22,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public abstract int Compare(IPackage x, IPackage y);
     }
 }
-

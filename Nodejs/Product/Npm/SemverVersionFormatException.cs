@@ -22,4 +22,3 @@ namespace Microsoft.NodejsTools.Npm
         protected SemverVersionFormatException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
-

@@ -549,4 +549,3 @@ namespace Microsoft.NodejsTools.Repl
         }
     }
 }
-

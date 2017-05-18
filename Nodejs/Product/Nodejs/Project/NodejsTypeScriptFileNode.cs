@@ -32,4 +32,3 @@ namespace Microsoft.NodejsTools.Project
         public new NodejsProjectNode ProjectMgr => (NodejsProjectNode)base.ProjectMgr;
     }
 }
-

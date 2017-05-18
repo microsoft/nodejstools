@@ -32,4 +32,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         event EventHandler<ExceptionEventArgs> ExceptionEvent;
     }
 }
-

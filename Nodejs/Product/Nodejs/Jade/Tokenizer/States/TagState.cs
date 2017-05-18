@@ -198,4 +198,3 @@ namespace Microsoft.NodejsTools.Jade
         }
     }
 }
-

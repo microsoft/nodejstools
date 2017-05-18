@@ -57,4 +57,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         }
     }
 }
-

@@ -760,4 +760,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

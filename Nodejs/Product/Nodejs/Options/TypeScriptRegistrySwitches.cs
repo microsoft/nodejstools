@@ -52,4 +52,3 @@ namespace Microsoft.NodejsTools.Options
         public const string CompletionChars = "CompletionChars";
     }
 }
-

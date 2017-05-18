@@ -42,4 +42,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         public override StandardGlyphGroup GlyphType => StandardGlyphGroup.GlyphCoolProject;
     }
 }
-

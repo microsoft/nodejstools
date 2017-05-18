@@ -18,4 +18,3 @@ namespace Microsoft.VisualStudioTools.Navigation
     }
     internal delegate void TextLineChangeEvent(object sender, TextLineChange[] changes, int last);
 }
-

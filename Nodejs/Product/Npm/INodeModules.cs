@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Npm
         int GetDepth(string filepath);
     }
 }
-

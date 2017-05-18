@@ -9,4 +9,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public Keywords(JObject package) : base(package, "keywords") { }
     }
 }
-

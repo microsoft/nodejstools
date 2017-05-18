@@ -12,4 +12,3 @@ namespace Microsoft.NodejsTools.Debugger
         string GetLocalFileName(string remoteFileName);
     }
 }
-

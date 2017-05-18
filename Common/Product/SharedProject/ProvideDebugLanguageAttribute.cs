@@ -37,4 +37,3 @@ namespace Microsoft.VisualStudioTools
         }
     }
 }
-

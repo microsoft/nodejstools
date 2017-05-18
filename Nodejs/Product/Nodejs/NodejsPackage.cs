@@ -378,4 +378,3 @@ namespace Microsoft.NodejsTools
         }
     }
 }
-

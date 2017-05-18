@@ -33,4 +33,3 @@ namespace Microsoft.NodejsTools.Project
         internal static string ProductName => GetString(NodejsToolsForVisualStudio);
     }
 }
-

@@ -84,4 +84,3 @@ namespace Microsoft.NodejsTools.Project {
         private System.Windows.Forms.Button okButton;
     }
 }
-

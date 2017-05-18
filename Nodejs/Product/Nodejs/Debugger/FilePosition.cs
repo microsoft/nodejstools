@@ -19,4 +19,3 @@ namespace Microsoft.NodejsTools.Debugger
         }
     }
 }
-
