@@ -17,4 +17,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         Nonexistent = 7
     }
 }
-

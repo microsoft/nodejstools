@@ -10,4 +10,3 @@ namespace Microsoft.NodejsTools.Project
         DependencyMissing
     }
 }
-

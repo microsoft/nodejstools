@@ -7,4 +7,3 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public SuspendCommand(int id) : base(id, "suspend") { }
     }
 }
-

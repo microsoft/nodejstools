@@ -28,4 +28,3 @@ namespace Microsoft.NodejsTools.Repl
         #endregion
     }
 }
-

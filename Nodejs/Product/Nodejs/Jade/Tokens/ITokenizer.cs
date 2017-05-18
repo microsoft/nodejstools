@@ -30,4 +30,3 @@ namespace Microsoft.NodejsTools.Jade
         ReadOnlyTextRangeCollection<T> Tokenize(ITextProvider textProvider, int start, int length);
     }
 }
-

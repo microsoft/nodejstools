@@ -25,4 +25,3 @@ namespace Microsoft.NodejsTools.Npm
         string Path { get; }
     }
 }
-

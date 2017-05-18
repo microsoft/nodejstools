@@ -21,4 +21,3 @@ namespace Microsoft.NodejsTools.Repl
         }
     }
 }
-

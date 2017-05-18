@@ -24,4 +24,3 @@ namespace Microsoft.VisualStudioTools.Project
         public string DestinationUrl => this._destination;
     }
 }
-

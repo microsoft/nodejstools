@@ -168,4 +168,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

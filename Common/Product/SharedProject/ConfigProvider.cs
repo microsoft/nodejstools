@@ -638,4 +638,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

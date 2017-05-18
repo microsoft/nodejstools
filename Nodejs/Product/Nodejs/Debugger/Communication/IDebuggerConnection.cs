@@ -44,4 +44,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         event EventHandler<EventArgs> ConnectionClosed;
     }
 }
-

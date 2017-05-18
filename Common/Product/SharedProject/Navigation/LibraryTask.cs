@@ -32,4 +32,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         public ITextBuffer TextBuffer => this._textBuffer;
     }
 }
-

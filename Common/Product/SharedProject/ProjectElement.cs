@@ -177,4 +177,3 @@ namespace Microsoft.VisualStudioTools.Project
         public abstract override int GetHashCode();
     }
 }
-

@@ -791,4 +791,3 @@ namespace Microsoft.VisualStudioTools
         Shield
     }
 }
-

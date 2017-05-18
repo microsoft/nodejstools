@@ -84,4 +84,3 @@ namespace Microsoft.NodejsTools.Project
         public override string Name => "General";
     }
 }
-

@@ -28,4 +28,3 @@ namespace Microsoft.VisualStudioTools.Project
         IDictionary<string, string> GetEnvironment(bool includeSearchPaths);
     }
 }
-

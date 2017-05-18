@@ -434,4 +434,3 @@ namespace Microsoft.NodejsTools.Commands
         }
     }
 }
-

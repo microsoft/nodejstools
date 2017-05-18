@@ -356,4 +356,3 @@ namespace Microsoft.VisualStudioTools.Project
         public _VSFILECHANGEFLAGS FileChangeFlag => this.fileChangeFlag;
     }
 }
-

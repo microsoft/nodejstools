@@ -20,4 +20,3 @@ namespace Microsoft.NodejsTools.Logging
         AnalysisLevel
     }
 }
-

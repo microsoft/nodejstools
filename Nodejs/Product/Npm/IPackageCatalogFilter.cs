@@ -26,4 +26,3 @@ namespace Microsoft.NodejsTools.Npm
         IEnumerable<IPackage> Filter(string filterString);
     }
 }
-

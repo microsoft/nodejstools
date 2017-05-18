@@ -33,4 +33,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

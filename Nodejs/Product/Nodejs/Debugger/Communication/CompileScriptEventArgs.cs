@@ -15,4 +15,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         public CompileScriptEvent CompileScriptEvent { get; private set; }
     }
 }
-

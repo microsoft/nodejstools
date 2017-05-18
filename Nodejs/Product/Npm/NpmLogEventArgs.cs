@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Npm
         public string LogText { get; private set; }
     }
 }
-

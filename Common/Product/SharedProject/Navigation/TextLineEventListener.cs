@@ -98,4 +98,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         #endregion
     }
 }
-

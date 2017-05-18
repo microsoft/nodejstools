@@ -1504,4 +1504,3 @@ namespace Microsoft.NodejsTools.Debugger
         #endregion
     }
 }
-

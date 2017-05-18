@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Npm
         protected NpmExecutionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
-

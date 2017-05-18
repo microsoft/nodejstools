@@ -11,4 +11,3 @@ namespace Microsoft.NodejsTools.Npm
         bool Contains(string name);
     }
 }
-

@@ -42,4 +42,3 @@ namespace Microsoft.NodejsTools.Jade
         event EventHandler<TextChangeEventArgs> OnTextChange;
     }
 }
-

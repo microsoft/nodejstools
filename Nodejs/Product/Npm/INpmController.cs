@@ -17,4 +17,3 @@ namespace Microsoft.NodejsTools.Npm
         INpmCommander CreateNpmCommander();
     }
 }
-

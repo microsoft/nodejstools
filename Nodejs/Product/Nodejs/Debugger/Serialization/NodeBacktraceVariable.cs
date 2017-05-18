@@ -45,4 +45,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         public NodeStackFrame StackFrame { get; private set; }
     }
 }
-

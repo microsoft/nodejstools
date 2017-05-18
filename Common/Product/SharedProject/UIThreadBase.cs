@@ -71,4 +71,3 @@ namespace Microsoft.VisualStudioTools
         public override bool InvokeRequired => throw new NotImplementedException();
     }
 }
-

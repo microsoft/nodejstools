@@ -7,4 +7,3 @@ namespace Microsoft.NodejsTools.Npm
         dynamic Package { get; }
     }
 }
-

@@ -7,4 +7,3 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public DisconnectCommand(int id) : base(id, "disconnect") { }
     }
 }
-

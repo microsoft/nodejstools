@@ -16,4 +16,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         DontDelete = 4
     }
 }
-

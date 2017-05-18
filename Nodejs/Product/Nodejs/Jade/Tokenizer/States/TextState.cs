@@ -55,4 +55,3 @@ namespace Microsoft.NodejsTools.Jade
         }
     }
 }
-

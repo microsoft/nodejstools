@@ -377,4 +377,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         }
     }
 }
-

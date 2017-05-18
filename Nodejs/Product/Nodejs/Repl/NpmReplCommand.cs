@@ -310,4 +310,3 @@ namespace Microsoft.NodejsTools.Repl
         }
     }
 }
-

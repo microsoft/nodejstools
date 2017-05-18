@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         public string Message { get; private set; }
     }
 }
-

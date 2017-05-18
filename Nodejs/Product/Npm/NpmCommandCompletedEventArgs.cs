@@ -36,4 +36,3 @@ namespace Microsoft.NodejsTools.Npm
         public bool Cancelled { get; }
     }
 }
-

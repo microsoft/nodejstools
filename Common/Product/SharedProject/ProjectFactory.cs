@@ -734,4 +734,3 @@ namespace Microsoft.VisualStudioTools.Project
         Deprecated
     }
 }
-

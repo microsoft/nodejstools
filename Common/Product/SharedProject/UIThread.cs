@@ -264,4 +264,3 @@ namespace Microsoft.VisualStudioTools
         #endregion
     }
 }
-

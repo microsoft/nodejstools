@@ -82,4 +82,3 @@ namespace Microsoft.NodejsTools
         public const int IDM_VS_CTXT_WEBITEMNODE = 0x472;
     }
 }
-

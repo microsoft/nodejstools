@@ -523,4 +523,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         void LeaveNode(LibraryNode node, CancellationToken ct);
     }
 }
-

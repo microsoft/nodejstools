@@ -173,4 +173,3 @@ namespace Microsoft.VisualStudioTools
         }
     }
 }
-

@@ -30,4 +30,3 @@ namespace Microsoft.VisualStudioTools.Project
         int LaunchFile(string file, bool debug, IProjectLaunchProperties properties);
     }
 }
-

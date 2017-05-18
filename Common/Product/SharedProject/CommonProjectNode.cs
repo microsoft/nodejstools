@@ -2035,4 +2035,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

@@ -16,4 +16,3 @@ namespace Microsoft.NodejsTools.Commands
         public override int CommandId => (int)PkgCmdId.cmdidShowDocumentation;
     }
 }
-

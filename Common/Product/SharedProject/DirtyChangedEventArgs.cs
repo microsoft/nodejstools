@@ -18,4 +18,3 @@ namespace Microsoft.VisualStudioTools.Project
         public bool IsDirty => this._isDirty;
     }
 }
-

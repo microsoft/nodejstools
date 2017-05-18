@@ -161,4 +161,3 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         private string Title => this._version;
     }
 }
-

@@ -321,4 +321,3 @@ namespace Microsoft.VisualStudioTools
         public IOleComponentManager ComponentManager => this._compMgr;
     }
 }
-

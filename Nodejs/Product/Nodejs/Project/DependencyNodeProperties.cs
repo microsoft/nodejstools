@@ -180,4 +180,3 @@ namespace Microsoft.NodejsTools.Project
         public bool IsBundledDependency => null != this.Package && this.Package.IsBundledDependency;
     }
 }
-

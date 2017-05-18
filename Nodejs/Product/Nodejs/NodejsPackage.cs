@@ -370,4 +370,3 @@ namespace Microsoft.NodejsTools
         }
     }
 }
-

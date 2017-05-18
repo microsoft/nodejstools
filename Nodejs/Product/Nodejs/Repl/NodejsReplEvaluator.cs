@@ -560,4 +560,3 @@ namespace Microsoft.NodejsTools.Repl
         }
     }
 }
-

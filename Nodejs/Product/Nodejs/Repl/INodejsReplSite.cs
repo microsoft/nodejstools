@@ -13,4 +13,3 @@ namespace Microsoft.NodejsTools.Repl
         bool TryGetStartupFileAndDirectory(out string fileName, out string directory);
     }
 }
-

@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Npm
         public Exception Exception { get; }
     }
 }
-

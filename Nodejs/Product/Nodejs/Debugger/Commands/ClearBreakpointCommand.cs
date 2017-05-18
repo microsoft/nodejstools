@@ -18,4 +18,3 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         protected override IDictionary<string, object> Arguments => this._arguments;
     }
 }
-

@@ -18,4 +18,3 @@ namespace Microsoft.NodejsTools.Logging
         void LogEvent(NodejsToolsLogEvent logEvent, object argument);
     }
 }
-

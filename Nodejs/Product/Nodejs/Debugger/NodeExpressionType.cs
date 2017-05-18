@@ -45,4 +45,3 @@ namespace Microsoft.NodejsTools.Debugger
         String = 0x40
     }
 }
-

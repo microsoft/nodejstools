@@ -259,4 +259,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

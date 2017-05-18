@@ -9,4 +9,3 @@ namespace Microsoft.NodejsTools.Jade
         ITextSnapshot Snapshot { get; }
     }
 }
-
