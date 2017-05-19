@@ -88,18 +88,29 @@ namespace Microsoft.NodejsTools.TestAdapter {
             {
                 TestEvent testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
                 // Extract test from list of tests
-                var test = _currentTests.Where(n => n.DisplayName == testEvent.title);
-                if (test.Count() > 0)
+                var tests = _currentTests.Where(n => n.DisplayName == testEvent.title);
+                if (tests.Count() > 0)
                 {
-                    if (testEvent.type == "test start")
+                    switch (testEvent.type)
                     {
-                        _currentResult = new TestResult(test.First());
-                        _currentResult.StartTime = DateTimeOffset.Now;
-                        _frameworkHandle.RecordStart(test.First());
-                    }
-                    else if (testEvent.type == "result")
-                    {
-                        RecordEnd(_frameworkHandle, test.First(), _currentResult, testEvent.result);
+                        case "test start":
+                            {
+                                _currentResult = new TestResult(tests.First());
+                                _currentResult.StartTime = DateTimeOffset.Now;
+                                _frameworkHandle.RecordStart(tests.First());
+                            }
+                            break;
+                        case "result":
+                            {
+                                RecordEnd(_frameworkHandle, tests.First(), _currentResult, testEvent.result);
+                            }
+                            break;
+                        case "pending":
+                            {
+                                _currentResult = new TestResult(tests.First());
+                                RecordEnd(_frameworkHandle, tests.First(), _currentResult, testEvent.result);
+                            }
+                            break;
                     }
                 }
                 else if (testEvent.type == "suite end")
@@ -345,9 +356,17 @@ namespace Microsoft.NodejsTools.TestAdapter {
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
             String[] standardOutputLines = resultObject.stdout.Split('\n');
             String[] standardErrorLines = resultObject.stderr.Split('\n');
-            result.EndTime = DateTimeOffset.Now;
-            result.Duration = result.EndTime - result.StartTime;
-            result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
+
+            if (null != resultObject.pending && (bool)resultObject.pending)
+            {
+                result.Outcome = TestOutcome.Skipped;
+            }
+            else
+            {
+                result.EndTime = DateTimeOffset.Now;
+                result.Duration = result.EndTime - result.StartTime;
+                result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
+            }
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, String.Join(Environment.NewLine, standardOutputLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, String.Join(Environment.NewLine, standardErrorLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, String.Join(Environment.NewLine, standardErrorLines)));
@@ -397,11 +416,13 @@ class ResultObject {
     public ResultObject() {
         title = String.Empty;
         passed = false;
+        pending = false;
         stdout = String.Empty;
         stderr = String.Empty;
     }
     public string title { get; set; }
     public bool passed { get; set; }
+    public bool? pending { get; set; }
     public string stdout { get; set; }
     public string stderr { get; set; }
 }
