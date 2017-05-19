@@ -41,7 +41,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void QueueCommand(QueuedNpmCommandInfo info)
         {
-            if (!this.commandQueue.IsAddingCompleted
+            if (this.commandQueue.IsAddingCompleted
                 || this.commandQueue.Contains(info)
                 || info.Equals(this.currentCommand))
             {
@@ -88,9 +88,9 @@ namespace Microsoft.NodejsTools.NpmUI
                 // The Take method will block the worker thread when there are no items left in the queue
                 // and the thread will be signalled when new items are items to the queue, or the queue is
                 // marked completed.
-                this.currentCommand = this.commandQueue.Take();
-                if (this.currentCommand != null)
+                if (this.commandQueue.TryTake(out var command, Timeout.Infinite) && command != null)
                 {
+                    this.currentCommand = command;
                     Execute(this.currentCommand);
                 }
             }
