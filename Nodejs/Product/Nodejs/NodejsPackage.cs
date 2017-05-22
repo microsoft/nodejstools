@@ -70,7 +70,6 @@ namespace Microsoft.NodejsTools
         internal static NodejsPackage Instance;
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
         private NodejsToolsLogger _logger;
-        private ITelemetryLogger _telemetryLogger;
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
         // after the initialization
         private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
@@ -185,19 +184,14 @@ namespace Microsoft.NodejsTools
 
         private void InitializeTelemetry()
         {
-            var thisAssembly = typeof(NodejsPackage).Assembly;
-
-            // Get telemetry logger
-            this._telemetryLogger = TelemetrySetup.Instance.GetLogger(thisAssembly);
-
-            TelemetrySetup.Instance.LogPackageLoad(this._telemetryLogger, Guid.Parse(Guids.NodejsPackageString), thisAssembly, Application.ProductVersion);
+            // Fetch the session synchronously on the UI thread; if this doesn't happen before we try using this on 
+            // the background thread then the VS process will deadlock.
+            TelemetryHelper.Initialize();
         }
 
         public new IComponentModel ComponentModel => this.GetComponentModel();
 
         internal NodejsToolsLogger Logger => this._logger;
-
-        internal ITelemetryLogger TelemetryLogger => this._telemetryLogger;
 
         /// <summary>
         /// Makes the debugger context available - this enables our debugger when we're installed into

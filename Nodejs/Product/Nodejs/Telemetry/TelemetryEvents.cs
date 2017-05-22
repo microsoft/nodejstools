@@ -7,7 +7,12 @@ namespace Microsoft.NodejsTools.Telemetry
     /// </summary>
     internal static class TelemetryEvents
     {
-        public const string ProjectImported = "ProjectImported";
+        private const string Prefix = "VS/NodejsTools/";
+
+        /// <summary>
+        /// User created a new project from existing code.
+        /// </summary>
+        public const string ProjectImported = Prefix + "ProjectImported";
+
     }
 }
-
