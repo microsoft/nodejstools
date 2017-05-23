@@ -5,6 +5,9 @@ using Microsoft.VisualStudio.Telemetry;
 
 namespace Microsoft.NodejsTools.Telemetry
 {
+    using static TelemetryEvents;
+    using static TelemetryProperties;
+
     /// <summary>
     /// Extensions for logging telemetry events.
     /// </summary>
@@ -20,8 +23,17 @@ namespace Microsoft.NodejsTools.Telemetry
 
         public static void LogProjectImported()
         {
-            defaultSession.PostUserTask(TelemetryEvents.ProjectImported, TelemetryResult.Success);
+            defaultSession.PostUserTask(ProjectImported, TelemetryResult.Success);
+        }
+
+        public static void LogDebuggingStarted(string debuggerName, string nodeVersion, bool isProject = true)
+        {
+            var userTask = new UserTaskEvent(DebbugerStarted, TelemetryResult.Success);
+            userTask.Properties[DebuggerEngine] = debuggerName;
+            userTask.Properties[NodeVersion] = nodeVersion;
+            userTask.Properties[IsProject] = isProject;
+
+            defaultSession.PostEvent(userTask);
         }
     }
 }
-
