@@ -62,13 +62,9 @@ namespace Microsoft.NodejsTools.Telemetry
             defaultSession.PostEvent(userTask);
         }
 
-        public static void LogUpdateNpmPackage(string packageName, string version)
+        internal static void LogReplUse()
         {
-            var userTask = new UserTaskEvent(UpdateNpm, TelemetryResult.Success);
-            userTask.Properties[NpmPackageName] = packageName;
-            userTask.Properties[NpmPackageVersion] = version;
-
-            defaultSession.PostEvent(userTask);
+            defaultSession.PostUserTask(UsedRepl, TelemetryResult.Success);
         }
     }
 }

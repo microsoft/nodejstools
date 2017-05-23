@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 
@@ -26,6 +27,8 @@ namespace Microsoft.NodejsTools.Repl
         private IReplWindow _window;
         private readonly INodejsReplSite _site;
         internal static readonly object InputBeforeReset = new object();    // used to mark buffers which are no longer valid because we've done a reset
+
+        private static bool LoggedReplUse = false;
 
         public NodejsReplEvaluator()
             : this(VsNodejsReplSite.Site)
@@ -91,6 +94,14 @@ namespace Microsoft.NodejsTools.Repl
             if (this._listener == null)
             {
                 return ExecutionResult.Failed;
+            }
+
+            if (!LoggedReplUse)
+            {
+                // we only want to log the first time each session, 
+                // and not flood the telemetry with every command.
+                TelemetryHelper.LogReplUse();
+                LoggedReplUse = true;
             }
 
             return this._listener.ExecuteText(text);
