@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
@@ -620,6 +621,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 foreach (var node in selected.OfType<DependencyNode>().Where(this.CheckValidCommandTarget))
                 {
+                    TelemetryHelper.LogUnInstallNpmPackage(node.Package.Name);
                     await commander.UninstallPackageAsync(node.Package.Name);
                 }
             });
@@ -631,6 +633,8 @@ namespace Microsoft.NodejsTools.Project
             {
                 return;
             }
+
+            TelemetryHelper.LogUnInstallNpmPackage(node.Package.Name);
 
             await RunNpmCommand(async commander =>
             {

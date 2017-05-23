@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Telemetry;
 
 namespace Microsoft.NodejsTools.Telemetry
 {
+    using System;
     using static TelemetryEvents;
     using static TelemetryProperties;
 
@@ -32,6 +33,40 @@ namespace Microsoft.NodejsTools.Telemetry
             userTask.Properties[DebuggerEngine] = debuggerName;
             userTask.Properties[NodeVersion] = nodeVersion;
             userTask.Properties[IsProject] = isProject;
+
+            defaultSession.PostEvent(userTask);
+        }
+
+        public static void LogSearchNpm(string query)
+        {
+            var userTask = new UserTaskEvent(SearchNpm, TelemetryResult.Success);
+            userTask.Properties[NpmSearchQuery] = query;
+
+            defaultSession.PostEvent(userTask);
+        }
+
+        public static void LogInstallNpmPackage(string packageName, string version)
+        {
+            var userTask = new UserTaskEvent(InstallNpm, TelemetryResult.Success);
+            userTask.Properties[NpmPackageName] = packageName;
+            userTask.Properties[NpmPackageVersion] = packageName;
+
+            defaultSession.PostEvent(userTask);
+        }
+
+        public static void LogUnInstallNpmPackage(string packageName)
+        {
+            var userTask = new UserTaskEvent(UnInstallNpm, TelemetryResult.Success);
+            userTask.Properties[NpmPackageName] = packageName;
+
+            defaultSession.PostEvent(userTask);
+        }
+
+        public static void LogUpdateNpmPackage(string packageName, string version)
+        {
+            var userTask = new UserTaskEvent(UpdateNpm, TelemetryResult.Success);
+            userTask.Properties[NpmPackageName] = packageName;
+            userTask.Properties[NpmPackageVersion] = version;
 
             defaultSession.PostEvent(userTask);
         }

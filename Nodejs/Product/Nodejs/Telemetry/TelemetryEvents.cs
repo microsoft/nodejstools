@@ -18,6 +18,21 @@ namespace Microsoft.NodejsTools.Telemetry
         /// User started debugging.
         /// </summary>
         public const string DebbugerStarted = Prefix + "DebuggerStarted";
+
+        /// <summary>
+        /// User queried NPM for a package.
+        /// </summary>
+        public const string SearchNpm = Prefix + "SearchNpm";
+
+        /// <summary>
+        /// User installed NPM package.
+        /// </summary>
+        public const string InstallNpm = Prefix + "InstallNpm";
+
+        /// <summary>
+        /// User uninstalled package.
+        /// </summary>
+        public const string UnInstallNpm = Prefix + "UnInstallNpm";
     }
 
     internal static class TelemetryProperties
@@ -42,5 +57,20 @@ namespace Microsoft.NodejsTools.Telemetry
         /// The version of Node the user is using.
         /// </summary>
         public const string NodeVersion = Prefix + "NodeVersion";
+
+        /// <summary>
+        /// The query the user send to NPM.
+        /// </summary>
+        public const string NpmSearchQuery = Prefix + "NpmSearchQuery";
+
+        /// <summary>
+        /// The NPM package being installed/uninstalled/updated.
+        /// </summary>
+        public const string NpmPackageName = Prefix + "NpmPackageName";
+
+        /// <summary>
+        /// The version of the NPM package being installed/uninstalled/updated.
+        /// </summary>
+        public const string NpmPackageVersion = Prefix + "NpmPackageVersion";
     }
 }
