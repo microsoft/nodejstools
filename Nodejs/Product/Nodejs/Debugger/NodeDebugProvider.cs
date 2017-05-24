@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Workspace;
@@ -47,16 +48,18 @@ namespace Microsoft.NodejsTools.Debugger
 
         public void SetupDebugTargetInfo(ref VsDebugTargetInfo vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext)
         {
-            var nodeExe = debugLaunchContext.LaunchConfiguration.GetValue<string>(NodeExeKey, defaultValue: Nodejs.GetPathToNodeExecutableFromEnvironment());
+            var nodeExe = debugLaunchContext.LaunchConfiguration.GetValue(NodeExeKey, defaultValue: Nodejs.GetPathToNodeExecutableFromEnvironment());
 
             var nodeVersion = Nodejs.GetNodeVersion(nodeExe);
             if (nodeVersion >= new Version(8, 0) || NodejsProjectLauncher.CheckDebugProtocolOption())
             {
                 SetupDebugTargetInfoForWebkitV2Protocol(ref vsDebugTargetInfo, debugLaunchContext, nodeExe);
+                TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString(), isProject: false);
             }
             else
             {
                 this.SetupDebugTargetInfoForNodeProtocol(ref vsDebugTargetInfo, debugLaunchContext, nodeExe);
+                TelemetryHelper.LogDebuggingStarted("Node6", nodeVersion.ToString(), isProject: false);
             }
         }
 
@@ -117,7 +120,7 @@ namespace Microsoft.NodejsTools.Debugger
                 new JProperty("runtimeExecutable", nodeExe),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
-                new JProperty("diagnosticLogging", NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption()),
+                new JProperty("trace", NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
                 new JProperty("stopOnEntry", true),
                 new JProperty("$adapter", pathToNodeExe),

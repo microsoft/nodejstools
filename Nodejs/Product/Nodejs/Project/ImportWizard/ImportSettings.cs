@@ -262,7 +262,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                     {
                         WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, typeScriptVersion, true, out projectGuid);
                     }
-                    NodejsPackage.Instance?.TelemetryLogger.LogProjectImported(projectGuid);
+                    TelemetryHelper.LogProjectImported();
                     success = true;
                     return projectPath;
                 }

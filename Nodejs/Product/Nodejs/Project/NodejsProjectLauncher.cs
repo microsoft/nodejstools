@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Options;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Setup.Configuration;
@@ -32,8 +33,8 @@ namespace Microsoft.NodejsTools.Project
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        public static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
-        public static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
+        private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
+        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
         internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
 
         public NodejsProjectLauncher(NodejsProjectNode project)
@@ -71,27 +72,33 @@ namespace Microsoft.NodejsTools.Project
                 return VSConstants.S_OK;
             }
 
-            var chromeProtocolRequired = Nodejs.GetNodeVersion(nodePath) >= new Version(8, 0) || CheckDebugProtocolOption();
+            var nodeVersion = Nodejs.GetNodeVersion(nodePath);
+            var chromeProtocolRequired = nodeVersion >= new Version(8, 0) || CheckDebugProtocolOption();
             var startBrowser = ShouldStartBrowser();
 
+            // The call to Version.ToString() is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
             if (debug && !chromeProtocolRequired)
             {
                 StartWithDebugger(file);
+                TelemetryHelper.LogDebuggingStarted("Node6", nodeVersion.ToString());
             }
             else if (debug && chromeProtocolRequired)
             {
                 if (CheckUseNewChromeDebugProtocolOption())
                 {
                     StartWithChromeV2Debugger(file, nodePath, startBrowser);
+                    TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
                 }
                 else
                 {
                     StartAndAttachDebugger(file, nodePath, startBrowser);
+                    TelemetryHelper.LogDebuggingStarted("Chrome", nodeVersion.ToString());
                 }
             }
             else
             {
                 StartNodeProcess(file, nodePath, startBrowser);
+                TelemetryHelper.LogDebuggingStarted("None", nodeVersion.ToString());
             }
 
             return VSConstants.S_OK;

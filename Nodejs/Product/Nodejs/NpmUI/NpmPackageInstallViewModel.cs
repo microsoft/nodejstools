@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.NodejsTools.NpmUI
@@ -302,6 +303,9 @@ namespace Microsoft.NodejsTools.NpmUI
             if (!string.IsNullOrEmpty(package.Name))
             {
                 var selectedVersion = this.SelectedVersion is SemverVersion ? ((SemverVersion)this.SelectedVersion).ToString() : string.Empty;
+
+                TelemetryHelper.LogInstallNpmPackage();
+
                 this.npmWorker.QueueCommand(
                     NpmArgumentBuilder.GetNpmInstallArguments(
                         package.Name,

@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -182,6 +183,20 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
+        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging)
+        {
+            var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
+            userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
+            // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
+            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString(); 
+            userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
+
+            //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
+
+            var defaultSession = TelemetryService.DefaultSession;
+            defaultSession.PostEvent(userTask);
+        }
+
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
         {
             // May be null, but this is handled by RunTestCase if it matters.
@@ -191,6 +206,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 return;
             }
+
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable))
             {
                 var port = 0;
@@ -208,6 +224,16 @@ namespace Microsoft.NodejsTools.TestAdapter
                 // All tests being run are for the same test file, so just use the first test listed to get the working dir
                 var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+
+                var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
+
+                // We can only log telemetry when we're running in VS.
+                // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
+                // this way the .NET framework only tries to load the assemblies when we actually need them.
+                if (app != null)
+                {
+                    LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged);
+                }
 
                 foreach (var test in tests)
                 {
@@ -365,7 +391,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             };
         }
 
-        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
+        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)
+        {
             String[] standardOutputLines = resultObject.stdout.Split('\n');
             String[] standardErrorLines = resultObject.stderr.Split('\n');
 

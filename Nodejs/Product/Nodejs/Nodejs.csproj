@@ -7,6 +7,8 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
@@ -60,6 +62,9 @@
     <Reference Include="Microsoft.ApplicationInsights.PersistenceChannel, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.3\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Diagnostics.Tracing.EventSource, Version=1.1.16.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\lib\net45\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <!-- 
@@ -68,6 +73,9 @@
     -->
     <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.RemoteControl, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.RemoteControl.14.0.262-masterA5CACE98\lib\net45\Microsoft.VisualStudio.RemoteControl.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.8.24\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
@@ -88,6 +96,9 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.15.3.DesignTime, Version=15.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Telemetry, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Telemetry.15.3.789-masterCC863119\lib\net45\Microsoft.VisualStudio.Telemetry.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +113,9 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Utilities.Internal, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.Internal.14.0.72-masterF9EB1D39\lib\net45\Microsoft.VisualStudio.Utilities.Internal.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Validation, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.0.82\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
@@ -136,9 +150,6 @@
     <Reference Include="Microsoft.Build.Utilities.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.JScript" />
-    <Reference Include="Microsoft.NodejsTools.Telemetry">
-      <HintPath>..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.15.0.dll</HintPath>
-    </Reference>
     <Reference Include="microsoft.msxml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -205,9 +216,6 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  </ItemGroup>
-  <ItemGroup>
-    <OutputBinariesToSign Include="Microsoft.NodejsTools.Telemetry.$(VSTarget).dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
@@ -459,6 +467,7 @@
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
+    <Compile Include="Telemetry\TelemetryEvents.cs" />
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
@@ -525,14 +534,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Telemetry\NodejsTelemetryExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <TelemetryFiles Include="..\..\Common\Telemetry\*.cs" />
-    <Compile Include="@(TelemetryFiles)">
-      <Link>Telemetry\%(TelemetryFiles.FileName).cs</Link>
-      <Visible>true</Visible>
-    </Compile>
+    <Compile Include="Telemetry\TelemetryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ImportWizardResources.cs.resx" />
@@ -866,11 +868,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
-    <Content Include="..\..\Common\Telemetry\Microsoft.NodejsTools.Telemetry.$(VSTarget).dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
     <Content Include="$(OutputPath)\Newtonsoft.Json.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1046,6 +1043,7 @@
     <Content Include="TestFrameworks\Tape\tape.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="version.txt" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>false</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1284,6 +1282,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -1319,4 +1318,5 @@
   <Target Name="_DeleteAfterCreatePkgDef" AfterTargets="GeneratePkgDef">
     <Delete Files="@(_CopiedForCreatePkgdef)" />
   </Target>
+  <Import Project="..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets" Condition="Exists('..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.16-beta\build\portable-net45+win8+wpa81\Microsoft.Diagnostics.Tracing.EventSource.Redist.targets')" />
 </Project>

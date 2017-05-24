@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.Telemetry;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -102,6 +103,8 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 return Enumerable.Empty<IPackage>();
             }
+
+            TelemetryHelper.LogSearchNpm();
 
             var relativeUri = string.Format("/-/v1/search?text={0}", WebUtility.UrlEncode(filterText));
             var searchUri = new Uri(defaultRegistryUri, relativeUri);
