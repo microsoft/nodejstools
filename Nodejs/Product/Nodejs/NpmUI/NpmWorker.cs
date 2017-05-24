@@ -104,7 +104,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 return Enumerable.Empty<IPackage>();
             }
 
-            TelemetryHelper.LogSearchNpm(filterText);
+            TelemetryHelper.LogSearchNpm();
 
             var relativeUri = string.Format("/-/v1/search?text={0}", WebUtility.UrlEncode(filterText));
             var searchUri = new Uri(defaultRegistryUri, relativeUri);

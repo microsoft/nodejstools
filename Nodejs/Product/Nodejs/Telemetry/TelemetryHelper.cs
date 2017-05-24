@@ -37,32 +37,22 @@ namespace Microsoft.NodejsTools.Telemetry
             defaultSession.PostEvent(userTask);
         }
 
-        public static void LogSearchNpm(string query)
+        public static void LogSearchNpm()
         {
-            var userTask = new UserTaskEvent(SearchNpm, TelemetryResult.Success);
-            userTask.Properties[NpmSearchQuery] = query;
-
-            defaultSession.PostEvent(userTask);
+            defaultSession.PostUserTask(SearchNpm, TelemetryResult.Success);
         }
 
-        public static void LogInstallNpmPackage(string packageName, string version)
+        public static void LogInstallNpmPackage()
         {
-            var userTask = new UserTaskEvent(InstallNpm, TelemetryResult.Success);
-            userTask.Properties[NpmPackageName] = packageName;
-            userTask.Properties[NpmPackageVersion] = packageName;
-
-            defaultSession.PostEvent(userTask);
+            defaultSession.PostUserTask(InstallNpm, TelemetryResult.Success);
         }
 
-        public static void LogUnInstallNpmPackage(string packageName)
+        public static void LogUnInstallNpmPackage()
         {
-            var userTask = new UserTaskEvent(UnInstallNpm, TelemetryResult.Success);
-            userTask.Properties[NpmPackageName] = packageName;
-
-            defaultSession.PostEvent(userTask);
+            defaultSession.PostUserTask(UnInstallNpm, TelemetryResult.Success);
         }
 
-        internal static void LogReplUse()
+        public static void LogReplUse()
         {
             defaultSession.PostUserTask(UsedRepl, TelemetryResult.Success);
         }

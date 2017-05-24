@@ -183,11 +183,15 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void LogTelemetry(int testCount, bool isDebugging)
+        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging)
         {
             var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
             userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
+            // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
+            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString(); 
             userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
+
+            //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
 
             var defaultSession = TelemetryService.DefaultSession;
             defaultSession.PostEvent(userTask);
@@ -221,12 +225,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
 
-                // we can only log telemetry when we're running in VS,
-                // the required assemblies are not on disk, so we have to keep the call in a separate method
-                // this way the .NET framework only loads the assemblies when we actually need them.
+                var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
+
+                // We can only log telemetry when we're running in VS.
+                // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
+                // this way the .NET framework only tries to load the assemblies when we actually need them.
                 if (app != null)
                 {
-                    LogTelemetry(tests.Count(), runContext.IsBeingDebugged);
+                    LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged);
                 }
 
                 foreach (var test in tests)

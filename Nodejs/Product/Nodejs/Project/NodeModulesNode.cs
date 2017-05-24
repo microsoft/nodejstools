@@ -621,7 +621,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 foreach (var node in selected.OfType<DependencyNode>().Where(this.CheckValidCommandTarget))
                 {
-                    TelemetryHelper.LogUnInstallNpmPackage(node.Package.Name);
+                    TelemetryHelper.LogUnInstallNpmPackage();
                     await commander.UninstallPackageAsync(node.Package.Name);
                 }
             });
@@ -634,7 +634,7 @@ namespace Microsoft.NodejsTools.Project
                 return;
             }
 
-            TelemetryHelper.LogUnInstallNpmPackage(node.Package.Name);
+            TelemetryHelper.LogUnInstallNpmPackage();
 
             await RunNpmCommand(async commander =>
             {

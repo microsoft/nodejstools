@@ -62,20 +62,5 @@ namespace Microsoft.NodejsTools.Telemetry
         /// The version of Node the user is using.
         /// </summary>
         public const string NodeVersion = Prefix + "NodeVersion";
-
-        /// <summary>
-        /// The query the user send to NPM.
-        /// </summary>
-        public const string NpmSearchQuery = Prefix + "NpmSearchQuery";
-
-        /// <summary>
-        /// The NPM package being installed/uninstalled/updated.
-        /// </summary>
-        public const string NpmPackageName = Prefix + "NpmPackageName";
-
-        /// <summary>
-        /// The version of the NPM package being installed/uninstalled/updated.
-        /// </summary>
-        public const string NpmPackageVersion = Prefix + "NpmPackageVersion";
     }
 }

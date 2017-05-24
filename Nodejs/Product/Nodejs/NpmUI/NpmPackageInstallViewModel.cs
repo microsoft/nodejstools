@@ -304,7 +304,7 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 var selectedVersion = this.SelectedVersion is SemverVersion ? ((SemverVersion)this.SelectedVersion).ToString() : string.Empty;
 
-                TelemetryHelper.LogInstallNpmPackage(package.Name, selectedVersion);
+                TelemetryHelper.LogInstallNpmPackage();
 
                 this.npmWorker.QueueCommand(
                     NpmArgumentBuilder.GetNpmInstallArguments(

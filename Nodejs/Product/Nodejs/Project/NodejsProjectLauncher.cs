@@ -76,6 +76,7 @@ namespace Microsoft.NodejsTools.Project
             var chromeProtocolRequired = nodeVersion >= new Version(8, 0) || CheckDebugProtocolOption();
             var startBrowser = ShouldStartBrowser();
 
+            // The call to Version.ToString() is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
             if (debug && !chromeProtocolRequired)
             {
                 StartWithDebugger(file);
