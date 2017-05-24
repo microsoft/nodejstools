@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -182,6 +183,16 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
+        private void LogTelemetry(int testCount, bool isDebugging)
+        {
+            var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
+            userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
+            userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
+
+            var defaultSession = TelemetryService.DefaultSession;
+            defaultSession.PostEvent(userTask);
+        }
+
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
         {
             // May be null, but this is handled by RunTestCase if it matters.
@@ -191,6 +202,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 return;
             }
+
             using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable))
             {
                 var port = 0;
@@ -208,6 +220,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                 // All tests being run are for the same test file, so just use the first test listed to get the working dir
                 var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+
+                // we can only log telemetry when we're running in VS,
+                // the required assemblies are not on disk, so we have to keep the call in a separate method
+                // this way the .NET framework only loads the assemblies when we actually need them.
+                if (app != null)
+                {
+                    LogTelemetry(tests.Count(), runContext.IsBeingDebugged);
+                }
 
                 foreach (var test in tests)
                 {
@@ -365,7 +385,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             };
         }
 
-        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject) {
+        private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)
+        {
             String[] standardOutputLines = resultObject.stdout.Split('\n');
             String[] standardErrorLines = resultObject.stderr.Split('\n');
 
