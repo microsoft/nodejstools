@@ -50,4 +50,3 @@ function Update-Manifest
 
 Update-Manifest 'InteractiveWindow'
 Update-Manifest 'NodeJs'
-Update-Manifest 'Profiling'
