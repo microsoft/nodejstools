@@ -52,7 +52,7 @@ namespace Microsoft.NodejsTools.NpmUI
             Exception ex)
         {
             var nnfe = GetNpmNotFoundException(ex);
-            if (null == nnfe)
+            if (nnfe == null)
             {
                 nnfe = ex;
             }
@@ -60,7 +60,7 @@ namespace Microsoft.NodejsTools.NpmUI
             {
                 //  Don't want to keep bombarding user with same message - there's a real danger this popup
                 //  could appear quite a lot if changes are made to the filesystem.
-                var report = (null == _lastNpmNotFoundException || ex.Message != _lastNpmNotFoundException.Message);
+                var report = (_lastNpmNotFoundException == null || ex.Message != _lastNpmNotFoundException.Message);
 
                 _lastNpmNotFoundException = nnfe;
 
@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.NpmUI
             }
 
             var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmNotInstalledMessageText, nnfe.Message);
-            if (null == owner)
+            if (owner == null)
             {
                 MessageBox.Show(
                     message,
