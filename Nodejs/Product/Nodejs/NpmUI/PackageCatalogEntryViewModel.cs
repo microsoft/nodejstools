@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using Microsoft.NodejsTools.Npm;
 
 namespace Microsoft.NodejsTools.NpmUI
@@ -34,11 +35,25 @@ namespace Microsoft.NodejsTools.NpmUI
         }
 
         public virtual string Name { get; }
+
+        public string Version => this.version?.ToString() ?? string.Empty;
+
         public IEnumerable<SemverVersion> AvailableVersions { get; }
+
         public string Author { get; }
+        public Visibility AuthorVisibility => string.IsNullOrEmpty(this.Author) ? Visibility.Collapsed : Visibility.Visible;
+
         public string Description { get; }
+        public Visibility DescriptionVisibility => string.IsNullOrEmpty(this.Description) ? Visibility.Collapsed : Visibility.Visible;
+
         public IEnumerable<string> Homepages { get; }
+        public Visibility HomepagesVisibility => this.Homepages.Any() ? Visibility.Visible : Visibility.Collapsed;
+
         public string Keywords { get; }
+
+        public bool IsInstalledLocally => this.localVersion.HasValue;
+        public bool IsLocalInstallOutOfDate => this.localVersion.HasValue && this.localVersion < this.version;
+        public string LocalVersion => this.localVersion?.ToString() ?? string.Empty;
 
         public override string ToString()
         {
