@@ -620,4 +620,40 @@ NAME2=value2
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>启动 URL“{0}”无效</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Node.exe 选项(&amp;O):</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Node.exe 路径(&amp;P):</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>调试程序端口(&amp;D):</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>环境变量(&amp;V):</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>启动 URL (&amp;U):</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.js 端口(&amp;J):</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>脚本(启动文件) (&amp;S):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>脚本参数(&amp;G):</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>启动时启动 web 浏览器(&amp;A)</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>工作目录(&amp;Y):</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

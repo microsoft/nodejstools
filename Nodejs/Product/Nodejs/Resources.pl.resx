@@ -620,4 +620,43 @@ Błąd podczas pobierania informacji o serwerze proxy debugowania websocket z pl
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>Adres URL uruchamiania „{0}” jest nieprawidłowy</value>
   </data>
+  <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
+    <value>Adres URL pro spuštění {0} není platná.</value>
+  </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Opcje programu n&amp;ode.exe:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Ścieżka do &amp;programu node.exe:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Port debugera:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>&amp;Zmienne środowiskowe:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>Adres &amp;URL uruchamiania:</value>
+  </data>
+  <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Port programu node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Skrypt (plik startowy):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Ar&amp;gumenty skryptu:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>&amp;Uruchom przeglądarkę sieci Web przy uruchamianiu</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Katalog robocz&amp;y:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>  
 </root>

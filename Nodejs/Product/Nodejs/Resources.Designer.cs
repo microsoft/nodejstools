@@ -660,16 +660,7 @@ namespace Microsoft.NodejsTools {
                 return ResourceManager.GetString("NodejsToolsForVisualStudio", resourceCulture);
             }
         }
-#if !DEV15
-        /// <summary>
-        ///   Looks up a localized string similar to Your project is configured to use Node V8 or newer. Debugging Node V8 is not supported in VS 2015, please upgrade to VS 2017..
-        /// </summary>
-        public static string NodejsVersionNotSupported {
-            get {
-                return ResourceManager.GetString("NodejsVersionNotSupported", resourceCulture);
-            }
-        }
-#endif
+        
         /// <summary>
         ///   Looks up a localized string similar to Unable to parse {0} from your project.  Please fix any errors and try again..
         /// </summary>
@@ -1251,6 +1242,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse for working directory.
+        /// </summary>
+        public static string PropertiesBrowseDirectoryAccessibleName {
+            get {
+                return ResourceManager.GetString("PropertiesBrowseDirectoryAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse for node.exe.
+        /// </summary>
+        public static string PropertiesBrowsePathAccessibleName {
+            get {
+                return ResourceManager.GetString("PropertiesBrowsePathAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Local Package Properties.
         /// </summary>
         public static string PropertiesClassLocalPackage {
@@ -1274,6 +1283,96 @@ namespace Microsoft.NodejsTools {
         public static string PropertiesClassNpm {
             get {
                 return ResourceManager.GetString("PropertiesClassNpm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Debugger port:.
+        /// </summary>
+        public static string PropertiesDebuggerPort {
+            get {
+                return ResourceManager.GetString("PropertiesDebuggerPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Environment &amp;Variables:.
+        /// </summary>
+        public static string PropertiesEnvVars {
+            get {
+                return ResourceManager.GetString("PropertiesEnvVars", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch &amp;URL:.
+        /// </summary>
+        public static string PropertiesLaunchUrl {
+            get {
+                return ResourceManager.GetString("PropertiesLaunchUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to N&amp;ode.exe options:.
+        /// </summary>
+        public static string PropertiesNodeExeOptions {
+            get {
+                return ResourceManager.GetString("PropertiesNodeExeOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.exe &amp;path:.
+        /// </summary>
+        public static string PropertiesNodeExePath {
+            get {
+                return ResourceManager.GetString("PropertiesNodeExePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.&amp;js port:.
+        /// </summary>
+        public static string PropertiesNodePort {
+            get {
+                return ResourceManager.GetString("PropertiesNodePort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Script (startup file):.
+        /// </summary>
+        public static string PropertiesScript {
+            get {
+                return ResourceManager.GetString("PropertiesScript", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script ar&amp;guments:.
+        /// </summary>
+        public static string PropertiesScriptArgs {
+            get {
+                return ResourceManager.GetString("PropertiesScriptArgs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to St&amp;art web browser on launch.
+        /// </summary>
+        public static string PropertiesStartBrowser {
+            get {
+                return ResourceManager.GetString("PropertiesStartBrowser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working director&amp;y:.
+        /// </summary>
+        public static string PropertiesWorkingDir {
+            get {
+                return ResourceManager.GetString("PropertiesWorkingDir", resourceCulture);
             }
         }
         

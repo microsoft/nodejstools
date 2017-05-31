@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Drawing;
@@ -19,9 +19,10 @@ namespace Microsoft.NodejsTools.Project
         {
             InitializeComponent();
 
+            LocalizeLabels();
             SetCueBanner();
-
             AddToolTips();
+
             this._nodeExeErrorProvider.SetIconAlignment(this._nodeExePath, ErrorIconAlignment.MiddleLeft);
             this._nodeExeErrorProvider.SetIconAlignment(this._workingDir, ErrorIconAlignment.MiddleLeft);
         }
@@ -29,6 +30,26 @@ namespace Microsoft.NodejsTools.Project
         public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this()
         {
             this._propPage = page;
+        }
+
+        private void LocalizeLabels()
+        {
+            // There's a bug in winforms, where if you use the default localization infra structure
+            // the control is correctly sized in the property page.
+
+            this._nodeExePathLabel.Text = Resources.PropertiesNodeExePath;
+            this._nodeArgumentsLabel.Text = Resources.PropertiesNodeExeOptions;
+            this._scriptLabel.Text = Resources.PropertiesScript;
+            this._scriptArgsLabel.Text = Resources.PropertiesScriptArgs;
+            this._workingDirLabel.Text = Resources.PropertiesWorkingDir;
+            this._launchUrlLabel.Text = Resources.PropertiesLaunchUrl;
+            this._nodePortLabel.Text = Resources.PropertiesNodePort;
+            this._debuggerPortLabel.Text = Resources.PropertiesDebuggerPort;
+            this._envVarsLabel.Text = Resources.PropertiesEnvVars;
+            this._startBrowser.Text = Resources.PropertiesStartBrowser;
+
+            this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
+            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
         }
 
         private void AddToolTips()
@@ -141,7 +162,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private static Regex lfToCrLfRegex = new Regex(@"(?<!\r)\n");
+        private static readonly Regex lfToCrLfRegex = new Regex(@"(?<!\r)\n");
 
         public string Environment
         {
@@ -245,7 +266,7 @@ namespace Microsoft.NodejsTools.Project
             Changed(sender, e);
         }
 
-        private void WorkingDirTextChanged(object sender, EventArgs e)
+        private void WorkingDirChanged(object sender, EventArgs e)
         {
             if (!this._workingDir.Text.Contains("$(") && !Directory.Exists(this._workingDir.Text))
             {
@@ -259,4 +280,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

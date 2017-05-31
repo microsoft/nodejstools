@@ -620,4 +620,40 @@ NAME2=value2
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>啟動 URL &apos;{0}&apos; 無效</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Node.exe 選項(&amp;O):</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Node.exe 路徑(&amp;P):</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>偵錯工具連接埠(&amp;D):</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>環境變數(&amp;V):</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>啟動 URL(&amp;U):</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.js 連接埠(&amp;J):</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>編寫 (啟動檔案)(&amp;S):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>編寫引數(&amp;G):</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>啟動時開啟網頁瀏覽器(&amp;A)</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>工作目錄(&amp;Y):</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>
