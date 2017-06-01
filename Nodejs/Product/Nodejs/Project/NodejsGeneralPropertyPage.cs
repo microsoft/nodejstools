@@ -18,6 +18,7 @@ namespace Microsoft.NodejsTools.Project
         }
 
         public override System.Windows.Forms.Control Control => this._control;
+
         internal override CommonProjectNode Project
         {
             get
@@ -68,8 +69,7 @@ namespace Microsoft.NodejsTools.Project
                 this._control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
 
                 // Attempt to parse the boolean.  If we fail, assume it is true.
-                bool startWebBrowser;
-                if (!Boolean.TryParse(this.Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out startWebBrowser))
+                if (!Boolean.TryParse(this.Project.GetUnevaluatedProperty(NodeProjectProperty.StartWebBrowser), out var startWebBrowser))
                 {
                     startWebBrowser = true;
                 }

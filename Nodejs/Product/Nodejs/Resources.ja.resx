@@ -620,4 +620,40 @@ web.config から websocket デバッグ プロキシ情報を取得しようと
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>起動 URL &apos;{0}&apos; が正しくありません</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Node.exe オプション(&amp;O):</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Node.exe のパス(&amp;P):</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>デバッガー ポート(&amp;D):</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>環境変数(&amp;V):</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>起動 URL(&amp;U):</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.js ポート(&amp;J):</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>スクリプト (スタートアップ ファイル)(&amp;S):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>スクリプトの引数(&amp;G):</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>起動時に Web ブラウザーを開始(&amp;A)</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>作業ディレクトリ(&amp;Y):</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

@@ -620,4 +620,40 @@ Fehler beim Abrufen von Informationen zum Websocket-Debugproxy von &quot;web.con
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>Die Start-URL &quot;{0}&quot; ist ungültig.</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>&amp;Optionen für &quot;Node.exe&quot;:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Pfad für &quot;Node.exe&quot;:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Debuggerport:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>Umgebungs&amp;variablen:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>Start-&amp;URL:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.&amp;js-Port:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Skript (Startdatei):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Skriptar&amp;gumente:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>Webbrowser beim St&amp;art öffnen</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Arbeitsver&amp;zeichnis:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data> 
 </root>

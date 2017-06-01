@@ -619,4 +619,40 @@
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>Недопустимый URL-адрес запуска &quot;{0}&quot;</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Параметр&amp;ы Node.exe:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Путь к Node.exe:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Порт отладчика:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>Переменн&amp;ые среды:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>URL-адрес з&amp;апуска:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Porta do Node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Скрипт (файл автозагрузки):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Аргу&amp;менты скрипта:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>&amp;Открывать браузер при запуске</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Рабочий катало&amp;г:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>
