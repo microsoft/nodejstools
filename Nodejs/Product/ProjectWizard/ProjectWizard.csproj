@@ -7,6 +7,8 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
@@ -111,8 +113,19 @@
     <EmbeddedResource Include="ProjectWizardResources.zh-Hans.resx" />
     <EmbeddedResource Include="ProjectWizardResources.zh-Hant.resx" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="..\ProjectAfter.settings" />
+  <Import Project="..\..\packages\SourceLink.Create.CommandLine.2.1.2\build\SourceLink.Create.CommandLine.targets" Condition="Exists('..\..\packages\SourceLink.Create.CommandLine.2.1.2\build\SourceLink.Create.CommandLine.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\SourceLink.Create.CommandLine.2.1.2\build\SourceLink.Create.CommandLine.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SourceLink.Create.CommandLine.2.1.2\build\SourceLink.Create.CommandLine.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
