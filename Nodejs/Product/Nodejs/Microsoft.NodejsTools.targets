@@ -168,7 +168,7 @@
     <PublishPipelineCollectFilesCore>$(PublishPipelineCollectFilesCore);CollectNodejsFiles</PublishPipelineCollectFilesCore>
   </PropertyGroup>
 
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != '' and Exists('$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets')" />
 
   <!--- Detects if we're deploying via web deploy, and sets _NodejsDeploymentMethod appropriately.
         Otherwise we'll assume we're deploying to cloud service. -->
