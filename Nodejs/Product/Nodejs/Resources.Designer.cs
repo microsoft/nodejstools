@@ -1647,5 +1647,23 @@ namespace Microsoft.NodejsTools {
                 return ResourceManager.GetString("WorkingDirToolTip", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Package.json not checked out.
+        /// </summary>
+        public static string PackageJsonNotCheckedOutCaption {
+            get {
+                return ResourceManager.GetString("PackageJsonNotCheckedOutCaption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to checkout 'package.json'. Please ..
+        /// </summary>
+        public static string PackageJsonNotCheckedOutMessage {
+            get {
+                return ResourceManager.GetString("PackageJsonNotCheckedOutMessage", resourceCulture);
+            }
+        }
     }
 }

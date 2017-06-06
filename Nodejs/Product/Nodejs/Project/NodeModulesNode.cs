@@ -3,8 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.NodejsTools.Telemetry;
@@ -39,7 +41,6 @@ namespace Microsoft.NodejsTools.Project
         private readonly LocalModulesNode _optionalModulesNode;
 
         private Timer _npmIdleTimer;
-        private INpmController _npmController;
         private int _npmCommandsExecuting;
         private bool _suppressCommands;
         private bool _firstHierarchyLoad = true;
@@ -55,8 +56,8 @@ namespace Microsoft.NodejsTools.Project
         public NodeModulesNode(NodejsProjectNode root)
             : base(root)
         {
-            this._npmController = DefaultNpmController(this._projectNode.ProjectHome, new NpmPathProvider(this));
-            RegisterWithNpmController(this._npmController);
+            this.NpmController = DefaultNpmController(this._projectNode.ProjectHome, new NpmPathProvider(this));
+            RegisterWithNpmController(this.NpmController);
 
             this._devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
             AddChild(this._devModulesNode);
@@ -78,21 +79,21 @@ namespace Microsoft.NodejsTools.Project
         {
             if (!this._isDisposed)
             {
-                this._npmController.Dispose();
+                this.NpmController.Dispose();
 
-                if (null != this._npmIdleTimer)
+                if (this._npmIdleTimer != null)
                 {
                     this._npmIdleTimer.Dispose();
                     this._npmIdleTimer = null;
                 }
 
-                if (null != this._npmController)
+                if (this.NpmController != null)
                 {
-                    this._npmController.CommandStarted -= this.NpmController_CommandStarted;
-                    this._npmController.OutputLogged -= this.NpmController_OutputLogged;
-                    this._npmController.ErrorLogged -= this.NpmController_ErrorLogged;
-                    this._npmController.ExceptionLogged -= this.NpmController_ExceptionLogged;
-                    this._npmController.CommandCompleted -= this.NpmController_CommandCompleted;
+                    this.NpmController.CommandStarted -= this.NpmController_CommandStarted;
+                    this.NpmController.OutputLogged -= this.NpmController_OutputLogged;
+                    this.NpmController.ErrorLogged -= this.NpmController_ErrorLogged;
+                    this.NpmController.ExceptionLogged -= this.NpmController_ExceptionLogged;
+                    this.NpmController.CommandCompleted -= this.NpmController_CommandCompleted;
                 }
 
                 this._devModulesNode.Dispose();
@@ -148,7 +149,7 @@ namespace Microsoft.NodejsTools.Project
             ReloadHierarchySafe();
         }
 
-        public INpmController NpmController => this._npmController;
+        public INpmController NpmController { get; }
 
         internal IRootPackage RootPackage => this.NpmController?.RootPackage;
 
@@ -331,8 +332,8 @@ namespace Microsoft.NodejsTools.Project
                 return;
             }
 
-            var controller = this._npmController;
-            if (null == controller)
+            var controller = this.NpmController;
+            if (controller == null)
             {
                 return;
             }
@@ -476,6 +477,14 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
 
+            // Probably overkill to check out before the user actually makes changes, but this is the easiest 
+            // and most reliable in the current codebase.
+            if (!EnsurePackageJsonCheckedOut())
+            {
+                ErrorHelper.ReportPackageJsonNotCheckedOut(Application.Current.MainWindow);
+                return;
+            }
+
             if (this.NpmController.RootPackage == null)
             {
                 this.NpmController.Refresh();
@@ -489,7 +498,7 @@ namespace Microsoft.NodejsTools.Project
             using (var npmWorker = new NpmWorker(this.NpmController))
             using (var manager = new NpmPackageInstallWindow(this.NpmController, npmWorker, dependencyType))
             {
-                manager.Owner = System.Windows.Application.Current.MainWindow;
+                manager.Owner = Application.Current.MainWindow;
                 manager.ShowModal();
             }
             ReloadHierarchy();
@@ -499,6 +508,18 @@ namespace Microsoft.NodejsTools.Project
         {
             CheckNotDisposed();
             SuppressCommands();
+        }
+
+        private bool EnsurePackageJsonCheckedOut()
+        {
+            // No need to check if the files exist or is actually under sourcecontrol before the call to check them out,
+            // since the API handles that and returns QER_EditOK.
+            var packageJsonFileName = Path.Combine(this.NpmController.RootPackage.Path, "package.json");
+            var packageJsonLockFileName = Path.Combine(this.NpmController.RootPackage.Path, "package-lock.json");
+
+            var queryEditService = (IVsQueryEditQuerySave2)this._projectNode.GetService(typeof(SVsQueryEditQuerySave));
+            queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out var _);
+            return result == (uint)tagVSQueryEditResult.QER_EditOK;
         }
 
         private bool CheckValidCommandTarget(DependencyNode node)
@@ -523,6 +544,12 @@ namespace Microsoft.NodejsTools.Project
         private async System.Threading.Tasks.Task RunNpmCommand(Func<INpmCommander, System.Threading.Tasks.Task> impl)
         {
             DoPreCommandActions();
+            if (!EnsurePackageJsonCheckedOut())
+            {
+                ErrorHelper.ReportPackageJsonNotCheckedOut(Application.Current.MainWindow);
+                return;
+            }
+
             try
             {
                 using (var commander = this.NpmController.CreateNpmCommander())
@@ -552,8 +579,8 @@ namespace Microsoft.NodejsTools.Project
                 return;
             }
 
-            var root = this._npmController.RootPackage;
-            if (null == root)
+            var root = this.NpmController.RootPackage;
+            if (root == null)
             {
                 return;
             }
