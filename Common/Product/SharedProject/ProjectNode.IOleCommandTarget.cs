@@ -438,6 +438,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin)
         {
+            // See comments at the end of this method about why these return values
+            // are the right thing to do.
             if (this.IsClosed)
             {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
@@ -515,6 +517,11 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.S_OK;
             }
 
+            // This is not the right constant to return here, since we're
+            // mixing HResults and OLE return values.
+            // However due to the sloppy implementation in a bunch of components 
+            // this ends up giving the expected result. i.e. we don't end up with 
+            // a ton of greyed out options in the menu.
             return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
         }
 
