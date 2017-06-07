@@ -435,11 +435,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="prgCmds">A caller-allocated array of OLECMD structures that indicate the commands for which the caller requires status information. This method fills the cmdf member of each structure with values taken from the OLECMDF enumeration</param>
         /// <param name="pCmdText">Pointer to an OLECMDTEXT structure in which to return the name and/or status information of a single command. Can be NULL to indicate that the caller does not require this information. </param>
         /// <param name="commandOrigin">Specifies the origin of the command. Either it was called from the QueryStatusCommand on IVsUIHierarchy or from the IOleCommandTarget</param>
-        /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
+        /// <returns>
+        /// A complex combination of error codes, and values set on the items in the prgCmds array.
+        /// More info see: https://docs.microsoft.com/en-us/visualstudio/extensibility/internals/command-implementation
+        /// </returns>
         protected virtual int QueryStatusSelection(Guid cmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText, CommandOrigin commandOrigin)
         {
-            // See comments at the end of this method about why these return values
-            // are the right thing to do.
             if (this.IsClosed)
             {
                 return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
@@ -517,11 +518,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.S_OK;
             }
 
-            // This is not the right constant to return here, since we're
-            // mixing HResults and OLE return values.
-            // However due to the sloppy implementation in a bunch of components 
-            // this ends up giving the expected result. i.e. we don't end up with 
-            // a ton of greyed out options in the menu.
+            // 
             return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
         }
 

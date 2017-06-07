@@ -238,14 +238,14 @@ namespace Microsoft.NodejsTools.Project
             if (commandGroup == Guids.ConnectedServicesCmdSet)
             {
                 // none of the commands in the Connected Services group make sense and aren't supported
-                // on out project type
+                // on our project type
                 return true;
             }
 
             if (commandGroup == Guids.NuGetManagerCmdSet)
             {
                 // none of the commands in the Nuget group make sense and aren't supported
-                // on out project type
+                // on our project type
                 return true;
             }
 
