@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudioTools.Project
             get;
         }
 
+        public virtual Size DefaultSize { get; } = new Size(800, 600);
+
         public abstract void Apply();
         public abstract void LoadSettings();
 
@@ -310,8 +312,8 @@ namespace Microsoft.VisualStudioTools.Project
             info.pszDocString = null;
             info.pszHelpFile = null;
             info.pszTitle = this.Name;
-            info.SIZE.cx = this.Control.Width;
-            info.SIZE.cy = this.Control.Height;
+            info.SIZE.cx = this.DefaultSize.Width;
+            info.SIZE.cy = this.DefaultSize.Height;
             pPageInfo[0] = info;
         }
 

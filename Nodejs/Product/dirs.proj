@@ -8,13 +8,7 @@
     <ProjectFile Include="Npm\Npm.csproj"/>
     <ProjectFile Include="PressAnyKey\PressAnyKey.csproj"/>
     <ProjectFile Include="WebRole\WebRole.csproj"/>
-    
-    <ProjectFile Include="LogConverter\LogConverter.csproj"/>
-    
     <ProjectFile Include="Nodejs\Nodejs.csproj"/>
-    
-    <ProjectFile Include="Profiling\Profiling.csproj"/>
-    
     <ProjectFile Include="TestAdapter\TestAdapter.csproj"/>
   </ItemGroup>
 

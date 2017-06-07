@@ -621,4 +621,40 @@ Node.js no Windows 8 e superiores.</value>
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>A URL de inicialização &apos;{0}&apos; não é válida</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Opções do N&amp;ode.exe:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Caminho do Node.exe</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Porta do depurador:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>Va&amp;riáveis de ambiente:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>&amp;URL de inicialização:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Porta do Node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Script (arquivo de inicialização):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Arg&amp;umentos de script:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>I&amp;niciar o navegador da web durante a inicialização</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Dir&amp;etório de trabalho:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

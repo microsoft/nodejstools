@@ -620,4 +620,40 @@ Při načítání informací o serveru proxy pro ladění websocketu ze souboru 
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>Adres URL pro spuštění {0} není platná.</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>N&amp;ode.exe – možnosti:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Cesta k souboru Node.exe:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Port ladicího programu:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>&amp;Proměnné prostředí:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>Spustit &amp;URL:</value>
+  </data>
+  <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Port Node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Skript (spouštěcí soubor):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Ar&amp;gumenty skriptu:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>&amp;Při spouštění spustit webový prohlížeč</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>&amp;Pracovní adresář:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

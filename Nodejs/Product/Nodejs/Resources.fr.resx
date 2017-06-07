@@ -620,4 +620,40 @@ Erreur pendant la récupération des informations de proxy de débogage websocke
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>L&apos;URL de lancement &apos;{0}&apos; n&apos;est pas valide </value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Options de N&amp;ode.exe :</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Chemin de Node.exe :</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Port du débogueur :</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>&amp;Variables d&apos;environnement :</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>&amp;URL de lancement :</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Port de Node.&amp;js :</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Script (fichier de démarrage) :</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Ar&amp;guments de script :</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>Dém&amp;arrer le navigateur web au lancement</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Répertoire de &amp;travail :</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

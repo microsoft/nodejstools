@@ -620,4 +620,40 @@ web.config에서 websocket 디버그 프록시 정보를 검색하는 동안 오
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>시작 URL &apos;{0}&apos;이(가) 잘못되었습니다.</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>N&amp;ode.exe 옵션(&amp;O):</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Node.exe 경로(&amp;P):</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>디버거 포트(&amp;D):</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>환경 변수(&amp;V):</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>시작 URL(&amp;U):</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.js 포트(&amp;J):</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>스크립트(시작 파일)(&amp;S):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>스크립트 인수(&amp;G):</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>시작 시 웹 브라우저 시작(&amp;A)</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>작업 디렉터리(&amp;Y):</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

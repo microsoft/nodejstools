@@ -620,4 +620,40 @@ Web.config dosyasından websocket hata ayıklama proxy&apos;si bilgileri alını
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>&apos;{0}&apos; başlatma URL&apos;si geçerli değil</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>N&amp;ode.exe seçenekleri:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>Node.exe &amp;yolu:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Hata ayıklayıcısı bağlantı noktası:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>Ortam &amp;Değişkenleri:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>&amp;URL&apos;yi başlat:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Node.&amp;js bağlantı noktası:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Betik (başlangıç dosyası):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Betik bağı&amp;msız değişkenleri:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>B&amp;aşlangıçta web tarayıcısını başlat</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Çalışma dizi&amp;ni:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

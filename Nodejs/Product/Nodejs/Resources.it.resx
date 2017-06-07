@@ -620,4 +620,40 @@ Si è verificato un errore durante il recupero delle informazioni sul proxy di d
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>L&apos;URL di avvio &apos;{0}&apos; non è valido </value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Opzioni di N&amp;ode.exe:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Percorso di Node.exe:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Porta del debugger:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>&amp;Variabili di ambiente:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>&amp;URL di avvio:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Porta di Node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Script (file di avvio):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Ar&amp;gomenti dello script:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>&amp;Avvia il Web browser all&apos;avvio</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Director&amp;y di lavoro:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data>
 </root>

@@ -247,7 +247,8 @@
                          Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
                          PreviewKeyDown="FilterTextBox_PreviewKeyDown"
                          TabIndex="0"
-                         AutomationProperties.Name="{x:Static resx:NpmInstallWindowResources.SearchForPackagesLabel}" />
+                         AutomationProperties.Name="{x:Static resx:NpmInstallWindowResources.SearchForPackagesLabel}"
+                         Padding="0,0,15,0"/>
                 <TextBlock IsEnabled="False" Background="{x:Null}"
                            Focusable="False"
                            IsHitTestVisible="False"

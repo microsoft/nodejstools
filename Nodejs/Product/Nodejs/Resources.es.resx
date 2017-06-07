@@ -620,4 +620,40 @@ Error al recuperar la información del proxy de depuración de WebSocket de web.
   <data name="ErrorInvalidLaunchUrl" xml:space="preserve">
     <value>La dirección URL de inicio &apos;{0}&apos; no es válida</value>
   </data>
+  <data name="PropertiesNodeExeOptions" xml:space="preserve">
+    <value>Opciones de N&amp;ode.exe:</value>
+  </data>
+  <data name="PropertiesNodeExePath" xml:space="preserve">
+    <value>&amp;Ruta de acceso de Node.exe:</value>
+  </data>
+  <data name="PropertiesDebuggerPort" xml:space="preserve">
+    <value>&amp;Puerto del depurador:</value>
+  </data>
+  <data name="PropertiesEnvVars" xml:space="preserve">
+    <value>&amp;Variables de entorno:</value>
+  </data>
+  <data name="PropertiesLaunchUrl" xml:space="preserve">
+    <value>&amp;URL de inicio:</value>
+  </data>
+ <data name="PropertiesNodePort" xml:space="preserve">
+    <value>Puerto de Node.&amp;js:</value>
+  </data>
+  <data name="PropertiesScript" xml:space="preserve">
+    <value>&amp;Script (archivo de inicio):</value>
+  </data>
+  <data name="PropertiesScriptArgs" xml:space="preserve">
+    <value>Ar&amp;gumentos de script:</value>
+  </data>
+  <data name="PropertiesStartBrowser" xml:space="preserve">
+    <value>Ini&amp;ciar explorador web al inicio</value>
+  </data>
+  <data name="PropertiesWorkingDir" xml:space="preserve">
+    <value>Director&amp;io de trabajo:</value>
+  </data>
+  <data name="PropertiesBrowsePathAccessibleName" xml:space="preserve">
+    <value>Browse for node.exe</value>
+  </data>
+  <data name="PropertiesBrowseDirectoryAccessibleName" xml:space="preserve">
+    <value>Browse for working directory</value>
+  </data> 
 </root>
