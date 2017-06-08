@@ -94,7 +94,7 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             var message = Resources.PackageJsonNotCheckedOutMessage;
             var caption = Resources.PackageJsonNotCheckedOutCaption;
-            MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

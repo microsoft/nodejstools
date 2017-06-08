@@ -660,6 +660,6 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Package.json not checked out</value>
   </data>
   <data name="PackageJsonNotCheckedOutMessage" xml:space="preserve">
-    <value>Failed to checkout 'package.json'. Please ensure the file is checked out, before adding or removing NPM packages.</value>
+    <value>Failed to check out 'package.json'. Please ensure the file is checked out, before adding or removing NPM packages.</value>
   </data>
 </root>

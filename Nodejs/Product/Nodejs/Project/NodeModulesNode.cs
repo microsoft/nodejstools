@@ -512,14 +512,16 @@ namespace Microsoft.NodejsTools.Project
 
         private bool EnsurePackageJsonCheckedOut()
         {
-            // No need to check if the files exist or is actually under sourcecontrol before the call to check them out,
+            // No need to check if the files exist or is actually under source control before the call to check them out,
             // since the API handles that and returns QER_EditOK.
-            var packageJsonFileName = Path.Combine(this.NpmController.RootPackage.Path, "package.json");
-            var packageJsonLockFileName = Path.Combine(this.NpmController.RootPackage.Path, "package-lock.json");
+
+            var rootPath = this.NpmController.RootPackage.Path;
+            var packageJsonFileName = Path.Combine(rootPath, "package.json");
+            var packageJsonLockFileName = Path.Combine(rootPath, "package-lock.json");
 
             var queryEditService = (IVsQueryEditQuerySave2)this._projectNode.GetService(typeof(SVsQueryEditQuerySave));
-            queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out var _);
-            return result == (uint)tagVSQueryEditResult.QER_EditOK;
+            var hr = queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out var _);
+            return ErrorHandler.Succeeded(hr) && result == (uint)tagVSQueryEditResult.QER_EditOK;
         }
 
         private bool CheckValidCommandTarget(DependencyNode node)
