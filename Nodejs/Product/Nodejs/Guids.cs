@@ -53,6 +53,9 @@ namespace Microsoft.NodejsTools
         public const string OfficeToolsBootstrapperCmdSetString = "{D26C976C-8EE8-4EC4-8746-F5F7702A17C5}";
         public static readonly Guid OfficeToolsBootstrapperCmdSet = new Guid(OfficeToolsBootstrapperCmdSetString);
 
+        public static readonly Guid ConnectedServicesCmdSet = new Guid("{A114CF9C-BD45-4A48-92EF-D9BBBC0B3DF0}");
+        public static readonly Guid NuGetManagerCmdSet = new Guid("{25fd982b-8cae-4cbd-a440-e03ffccde106}");
+
         // UWP project flavor guid
         public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
     };
