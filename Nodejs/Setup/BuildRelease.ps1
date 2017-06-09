@@ -154,7 +154,7 @@ $project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "pvanbren", "billti", "mhegazy"
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "huvalo", "jinglou", "pvanbren", "crwilcox"
 
 # These people are the contacts for the symbols uploaded to the symbol server
 $symbol_contacts = "$env:username;pvanbren;billti"
