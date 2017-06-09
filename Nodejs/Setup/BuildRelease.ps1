@@ -154,10 +154,10 @@ $project_url = "https://github.com/Microsoft/nodejstools"
 $project_keywords = "NTVS; Visual Studio; Node.js"
 
 # These people are able to approve code signing operations
-$approvers = "smortaz", "dinov", "stevdo", "pminaev", "huvalo", "jinglou", "sitani", "crwilcox"
+$approvers = "smortaz", "dinov", "stevdo", "pminaev", "huvalo", "jinglou", "pvanbren", "crwilcox"
 
 # These people are the contacts for the symbols uploaded to the symbol server
-$symbol_contacts = "$env:username;dinov;smortaz;jinglou"
+$symbol_contacts = "$env:username;pvanbren;billti"
 
 # This single person or DL is the contact for virus scan notifications
 $vcs_contact = "ntvscore"
