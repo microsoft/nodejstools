@@ -47,6 +47,7 @@
   
   <ItemGroup> 
     <Package Include="Targets_files.swr" /> 
+    <Node Include="packages.config" />
   </ItemGroup>
   
   <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>

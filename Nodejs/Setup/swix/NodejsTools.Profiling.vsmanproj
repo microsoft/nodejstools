@@ -25,6 +25,7 @@
     
     <ItemGroup>
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\Profiling\Microsoft.VisualStudio.NodejsTools.Profiling.json"/>
+        <Node Include="packages.config" />
     </ItemGroup>
 
     <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>

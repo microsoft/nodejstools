@@ -26,8 +26,8 @@
     <ItemGroup>
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\InteractiveWindow\Microsoft.VisualStudio.NodeJsTools.InteractiveWindow.json" />
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\NodeJs\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
-
         <MergeManifest Include="$(BuildOutputRoot)\Setup\Microsoft.VisualStudio.NodejsTools.Targets.json" />
+        <Node Include="packages.config" />
     </ItemGroup>
 
     <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
