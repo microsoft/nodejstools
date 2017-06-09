@@ -235,6 +235,20 @@ namespace Microsoft.NodejsTools.Project
                 }
             }
 
+            if (commandGroup == Guids.ConnectedServicesCmdSet)
+            {
+                // none of the commands in the Connected Services group make sense and aren't supported
+                // on our project type
+                return true;
+            }
+
+            if (commandGroup == Guids.NuGetManagerCmdSet)
+            {
+                // none of the commands in the Nuget group make sense and aren't supported
+                // on our project type
+                return true;
+            }
+
             if (commandGroup == VSConstants.GUID_VSStandardCommandSet97)
             {
                 if (this.IsCurrentStateASuppressCommandsMode())
@@ -642,7 +656,7 @@ namespace Microsoft.NodejsTools.Project
                     }
                 };
 
-            recheck:
+                recheck:
 
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(this.ProjectHome)

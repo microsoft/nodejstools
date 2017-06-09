@@ -89,5 +89,12 @@ namespace Microsoft.NodejsTools.NpmUI
                     MessageBoxImage.Error);
             }
         }
+
+        public static void ReportPackageJsonNotCheckedOut(Window owner)
+        {
+            var message = Resources.PackageJsonNotCheckedOutMessage;
+            var caption = Resources.PackageJsonNotCheckedOutCaption;
+            MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }
