@@ -33,16 +33,30 @@ namespace Microsoft.NodejsTools.PressAnyKey
                 proc.WaitForExit();
                 exitCode = proc.ExitCode;
             }
-            catch (Win32Exception exc)
+            catch (Win32Exception)
             {
-                Console.WriteLine($"Failed to start process: '{exc.Message}'.");
-                Console.WriteLine("Probable cause is the Nodejs exe is corrupt, please re-install.");
+                Console.WriteLine("Failed to start process.");
+                Console.WriteLine("Probable cause is the Node.js exe is corrupt, please re-install.");
+                Console.WriteLine($"path: '{args[2]}'.");
                 exitCode = -1;
             }
 
-            if (args[0] == "both" ||
-                (exitCode == 0 && args[0] == "normal") ||
-                (exitCode != 0 && args[0] == "abnormal"))
+            var shouldWait = true;
+
+            switch (args[0])
+            {
+                case "both":
+                    shouldWait = true;
+                    break;
+                case "normal":
+                    shouldWait = exitCode == 0;
+                    break;
+                case "abnormal":
+                    shouldWait = exitCode != 0;
+                    break;
+            }
+
+            if (shouldWait)
             {
                 Console.Write("Press any key to continue...");
                 Console.ReadKey();
