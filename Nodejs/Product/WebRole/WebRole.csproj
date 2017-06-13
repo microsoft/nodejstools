@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-      <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-      <FileUpgradeFlags>
-      </FileUpgradeFlags>
-      <UpgradeBackupLocation>
-      </UpgradeBackupLocation>
-      <OldToolsVersion>4.0</OldToolsVersion>
-    </PropertyGroup>
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <UseIISExpress>false</UseIISExpress>
@@ -26,12 +29,6 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- This typically defaults to True, but unless we're going to completely
-         sign this assembly, we'd prefer it wasn't delay signed. -->
-    <SignAssembly>false</SignAssembly>
-    <SignAssembly Condition="'$(ReleaseBuild)' != ''">$(ReleaseBuild)</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -66,8 +63,26 @@
     </Compile>
     <EmbeddedResource Include="WebSocketProxy.html" />
   </ItemGroup>
+  <ItemGroup>
+    <FilesToSign Include="$(OutDir)\Microsoft.NodejsTools.WebRole.dll">
+      <Authenticode>Microsoft</Authenticode>
+      <StrongName>StrongName</StrongName>
+      <InProject>false</InProject>
+    </FilesToSign>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="..\ProjectAfter.settings" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VSTarget)\WebApplications\Microsoft.WebApplication.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

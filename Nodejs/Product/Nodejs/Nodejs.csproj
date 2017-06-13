@@ -1037,12 +1037,6 @@
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\server.js" />
-    <Content Include="Microsoft.NodejsTools.targets">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <TargetPath>Microsoft.NodejsTools.Developer.targets</TargetPath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\AzureNodejsApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
