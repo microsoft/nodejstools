@@ -214,7 +214,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
                 }
 
                 // All tests being run are for the same test file, so just use the first test listed to get the working dir
-                NodejsTestInfo testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
+                NodejsTestInfo testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName, tests.First().CodeFilePath);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
 
                 foreach (var test in tests) {
@@ -314,7 +314,7 @@ namespace Microsoft.NodejsTools.TestAdapter {
         }
 
         private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir) {
-            TestFrameworks.NodejsTestInfo testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
+            TestFrameworks.NodejsTestInfo testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
             TestFrameworks.FrameworkDiscover discover = new TestFrameworks.FrameworkDiscover();
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
