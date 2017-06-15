@@ -24,8 +24,7 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <MergeManifest Include="$(BuildOutputRoot)\Binaries\InteractiveWindow\Microsoft.VisualStudio.NodeJsTools.InteractiveWindow.json" />
-        <MergeManifest Include="$(BuildOutputRoot)\Binaries\NodeJs\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
+        <MergeManifest Include="$(BuildOutputRoot)\Binaries\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\Targets\Microsoft.VisualStudio.NodejsTools.Targets.json" />
         <MergeManifest Include="$(BuildOutputRoot)\Binaries\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
         <Node Include="packages.config" />

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -7,11 +8,17 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <DeployExtension>False</DeployExtension>
   </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{24A3887F-DA50-4989-8D6C-4A5B04D5D457}</ProjectGuid>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -27,9 +34,6 @@
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'x86' ">
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NTVS_FEATURE_INTERACTIVEWINDOW</DefineConstants>
@@ -93,6 +97,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -160,24 +165,24 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.en.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Resources.en.resx">
+    <ConditionalEmbeddedResource Include="Resources.en.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources.de.resx" />
-    <EmbeddedResource Include="Resources.cs.resx" />
-    <EmbeddedResource Include="Resources.es.resx" />
-    <EmbeddedResource Include="Resources.fr.resx" />
-    <EmbeddedResource Include="Resources.it.resx" />
-    <EmbeddedResource Include="Resources.ja.resx" />
-    <EmbeddedResource Include="Resources.ko.resx" />
-    <EmbeddedResource Include="Resources.pl.resx" />
-    <EmbeddedResource Include="Resources.pt-BR.resx" />
-    <EmbeddedResource Include="Resources.ru.resx" />
-    <EmbeddedResource Include="Resources.tr.resx" />
-    <EmbeddedResource Include="Resources.zh-Hans.resx" />
-    <EmbeddedResource Include="Resources.zh-Hant.resx" />
+    </ConditionalEmbeddedResource>
+    <ConditionalEmbeddedResource Include="Resources.de.resx" />
+    <ConditionalEmbeddedResource Include="Resources.cs.resx" />
+    <ConditionalEmbeddedResource Include="Resources.es.resx" />
+    <ConditionalEmbeddedResource Include="Resources.fr.resx" />
+    <ConditionalEmbeddedResource Include="Resources.it.resx" />
+    <ConditionalEmbeddedResource Include="Resources.ja.resx" />
+    <ConditionalEmbeddedResource Include="Resources.ko.resx" />
+    <ConditionalEmbeddedResource Include="Resources.pl.resx" />
+    <ConditionalEmbeddedResource Include="Resources.pt-BR.resx" />
+    <ConditionalEmbeddedResource Include="Resources.ru.resx" />
+    <ConditionalEmbeddedResource Include="Resources.tr.resx" />
+    <ConditionalEmbeddedResource Include="Resources.zh-Hans.resx" />
+    <ConditionalEmbeddedResource Include="Resources.zh-Hant.resx" />
     <ConditionalEmbeddedResource Include="VSPackage.de.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.de.Resources</LogicalName>
@@ -189,6 +194,7 @@
     <ConditionalEmbeddedResource Include="VSPackage.cs.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.cs.Resources</LogicalName>
+      <SubType>Designer</SubType>
     </ConditionalEmbeddedResource>
     <ConditionalEmbeddedResource Include="VSPackage.es.resx">
       <MergeWithCTO>true</MergeWithCTO>
@@ -235,6 +241,13 @@
       <LogicalName>VSPackage.zh-Hant.Resources</LogicalName>
     </ConditionalEmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
+      <Authenticode>Microsoft</Authenticode>
+      <StrongName>StrongName</StrongName>
+      <InProject>false</InProject>
+    </FilesToSign>
+  </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
     <RegisterOutputPackage>true</RegisterOutputPackage>
@@ -244,12 +257,19 @@
     <DelaySign>true</DelaySign>
   </PropertyGroup>
   <PropertyGroup>
-    <CreateVsixContainer>True</CreateVsixContainer>
-    <CopyVsixExtensionFiles>True</CopyVsixExtensionFiles>
-    <IsProductComponent>true</IsProductComponent>
-    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
-    <ExtensionInstallationFolder>Microsoft\NodeJsTools\Repl</ExtensionInstallationFolder>
+    <CreateVsixContainer>False</CreateVsixContainer>
+    <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
   <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
-  <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="..\ProjectAfter.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
 </Project>
