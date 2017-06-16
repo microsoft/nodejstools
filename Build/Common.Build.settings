@@ -4,7 +4,7 @@
   <!-- Ensures that if this file changes it forces a rebuild -->
   <PropertyGroup>
     <MSBuildAllProjects>
-        $(MSBuildAllProjects);$(MSBuildThisFileFullPath)
+      $(MSBuildAllProjects);$(MSBuildThisFileFullPath)
     </MSBuildAllProjects>
   </PropertyGroup>
 
@@ -19,17 +19,16 @@
     <ReleaseBuild Condition="'$(ReleaseBuild)' == ''">false</ReleaseBuild>
 
     <!-- The default Platform value is specified in the imports below -->
-    
+
     <RunFXCop Condition="'$(RunFXCop)' == ''">false</RunFXCop>
     <RunStyleCop Condition="'$(RunStyleCop)' == ''">false</RunStyleCop>
 
-    <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">true</CodeCoverageEnabled>
+    <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">false</CodeCoverageEnabled>
 
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
-    <VSTarget Condition="$(VSTarget)=='' and '$(VisualStudioVersion)'=='15.0'">15.0</VSTarget>    
-    <VSTarget Condition="$(VSTarget)==''">14.0</VSTarget>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSTarget Condition="$(VSTarget)==''">15.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
-    
+
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6</TargetFrameworkVersion>
     <TargetFrameworkMoniker>.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>
 
@@ -38,7 +37,7 @@
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
     <BuildRoot Condition="!HasTrailingSlash($(BuildRoot))">$(BuildRoot)\</BuildRoot>
     <TargetsPath>$(BuildRoot)Build</TargetsPath>
-    
+
     <PackagesPath Condition="'$(PackagesPath)' == ''">$(BUILD_BINARIESDIRECTORY)</PackagesPath>
     <PackagesPath Condition="'$(PackagesPath)' == ''">$(BuildRoot)\packages\</PackagesPath>
     <PackagesPath Condition="!HasTrailingSlash($(PackagesPath))">$(PackagesPath)\</PackagesPath>
@@ -64,7 +63,7 @@
 
     <!-- Allows assemblies to specify their own version -->
     <SuppressCommonAssemblyVersion Condition="'$(SuppressCommonAssemblyVersion)' == ''">false</SuppressCommonAssemblyVersion>
-    
+
     <!-- Enables VS SDK build steps.
     
     Set CreateVsixContainer for projects that create a .vsix file.
@@ -98,23 +97,10 @@
 
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 
-    <DevEnvDir Condition="'$(DevEnvDir)' == ''">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</DevEnvDir> 
+    <DevEnvDir Condition="'$(DevEnvDir)' == ''">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</DevEnvDir>
     <VSSDKDir>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\VSIP\$(VSTarget)', 'InstallDir', null, RegistryView.Registry32))\</VSSDKDir>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!--
-    Read the update version for the build machine so we can exclude
-    features that require a particular update to build.
-    
-    See language-specific settings files for feature preprocessor
-    definitions.
-    -->
-    <VSMajorVersion>$([System.Double]::Parse($(VSTarget)))</VSMajorVersion>
-    <_VSUpdateVersion Condition="$(VSUpdateVersion)=='' and $(VisualStudioVersion)!='10.0'">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DevDiv\vs\Servicing\$(VSTarget)\devenv', 'UpdateVersion', null, RegistryView.Registry32))</_VSUpdateVersion>
-    <VSUpdateVersion Condition="$(VSUpdateVersion)=='' and $(_VSUpdateVersion)!=''">$([System.Int32]::Parse($(_VSUpdateVersion.Substring($([MSBuild]::Add(1, $(_VSUpdateVersion.LastIndexOf(`.`))))))))</VSUpdateVersion>
-  </PropertyGroup>
-  
   <ItemDefinitionGroup>
     <!-- By default, project references are never copied.
     
@@ -125,12 +111,9 @@
     <ProjectReference>
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference2>
-      <Visible>false</Visible>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <BuildReference>true</BuildReference>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </ProjectReference2>
+    <Reference>
+      <Private>False</Private>
+    </Reference>
   </ItemDefinitionGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />
@@ -169,7 +152,7 @@
          Built on 4/6/2019,  targeting Visual Studio 1.4: 1.4.30406.1 -->
     <BuildVersion>$(MajorVersion).$(MinorVersion).$(VersionCurrentYearOffset)$(BUILD_BUILDNUMBER.Substring(4))</BuildVersion>
   </PropertyGroup>
-    
+
   <PropertyGroup>
     <BuildVersionExtended>$(BuildVersion)</BuildVersionExtended>
     <BuildVersionExtended Condition="'$(BUILD_SOURCEVERSION)'!=''">$(BuildVersionExtended) commit:$(BUILD_SOURCEVERSION)</BuildVersionExtended>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -43,9 +43,11 @@
       <Language>JavaScript</Language>
       <Culture>1033</Culture>
       <OutputSubPath>Node.js</OutputSubPath>
+      <VSIXSubpath>ProjectTemplates</VSIXSubpath>
     </ZipProject>
     <ZipItem>
       <Language>JavaScript</Language>
+      <VSIXSubpath>ItemTemplates</VSIXSubpath>
     </ZipItem>
     <VSTemplate>
       <Language>JavaScript</Language>
@@ -56,6 +58,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.ApplicationInsights.2.3.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights.PersistenceChannel, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.3\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll</HintPath>
@@ -121,20 +124,20 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -853,26 +856,6 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
-    <Content Include="$(OutputPath)\Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
-    <Content Include="$(OutputPath)\Microsoft.VisualStudio.Shell.Interop.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
-    <Content Include="$(OutputPath)\Microsoft.VisualStudio.Shell.Interop.8.0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
-    <Content Include="$(OutputPath)\envdte.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>.</VSIXSubPath>
-    </Content>
     <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1162,6 +1145,10 @@
       <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
       <Name>Npm</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PressAnyKey\PressAnyKey.csproj">
+      <Project>{cb61d8bd-48dc-40f4-a4ba-5b68a10a7481}</Project>
+      <Name>PressAnyKey</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebRole\WebRole.csproj">
       <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>
       <Name>WebRole</Name>
@@ -1259,6 +1246,7 @@
         <Language>TypeScript</Language>
         <Culture>1033</Culture>
         <OutputSubPath>Node.js</OutputSubPath>
+        <VSIXSubpath>ProjectTemplates</VSIXSubpath>
       </ZipProject>
     </ItemGroup>
   </Target>

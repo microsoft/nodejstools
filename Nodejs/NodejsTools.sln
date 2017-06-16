@@ -1,11 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26606.0
+VisualStudioVersion = 15.0.26615.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
-		{5085DF35-3A32-4894-835E-E5A3956D4F57} = {5085DF35-3A32-4894-835E-E5A3956D4F57}
 		{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481} = {CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}
 	EndProjectSection
 EndProject
@@ -90,5 +89,8 @@ Global
 		{CBA217C4-4338-4E50-9DEC-9227705F8124} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{4EB09870-7422-4368-B8C8-74582764EAB3} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{F3DB625F-EA2D-420F-BBC7-E4026CC6ECA3} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B1CAB318-7961-42BF-A7B1-FBDB3EC225E9}
 	EndGlobalSection
 EndGlobal
