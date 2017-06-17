@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="90B6AE2E-9BDC-4D22-A670-78978E6AE4DF" Version="|%CurrentProject%;GetVSIXVersion|" Language="en-US" Publisher="Microsoft" />
-        <DisplayName>Microsoft.VisualStudio.NodejsTools.Targets</DisplayName>
+        <DisplayName>Node.js Tools MSBuild Targets</DisplayName>
         <Description xml:space="preserve">MSBuild files for NodejsTools for Visual Studio</Description>
         <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
         <GettingStartedGuide>http://go.microsoft.com/fwlink/?LinkId=785972</GettingStartedGuide>

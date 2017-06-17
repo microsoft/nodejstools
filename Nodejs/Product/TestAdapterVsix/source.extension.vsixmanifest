@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
         <Identity Id="{69795897-7116-44CA-B20F-958C56A5399C}" Version="|%CurrentProject%;GetVSIXVersion|" Language="en-US" Publisher="Microsoft" />
-        <DisplayName>Microsoft.VisualStudio.NodejsTools.TestAdapter</DisplayName>
+        <DisplayName>Node.js Test Adapter</DisplayName>
         <Description xml:space="preserve">Unit test adapter for JavaScript files.</Description>
         <MoreInfo>http://go.microsoft.com/fwlink/?LinkId=785971</MoreInfo>
         <GettingStartedGuide>http://go.microsoft.com/fwlink/?LinkId=785972</GettingStartedGuide>
