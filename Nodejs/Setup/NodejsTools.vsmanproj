@@ -5,7 +5,7 @@
     <PropertyGroup>
         <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     </PropertyGroup>
-
+    <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" />
     <Import Project=".\SetupProjectBefore.settings" />
 
     <PropertyGroup>
@@ -30,6 +30,6 @@
         <Node Include="packages.config" />
     </ItemGroup>
 
-    <Import Project="$(PackagesPath)\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets"/>
+    <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" />
     <Import Project=".\SetupProjectAfter.settings" />
 </Project>
