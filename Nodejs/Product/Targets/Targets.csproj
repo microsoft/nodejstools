@@ -71,7 +71,7 @@
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
       <InstallRoot>MSBuild</InstallRoot>
       <VSIXSubPath>Microsoft\VisualStudio\v15.0\Node.js Tools</VSIXSubPath>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
