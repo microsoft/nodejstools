@@ -83,6 +83,7 @@
     <IncludeVsixItemsFromTargets Condition="'$(IncludeVsixItemsFromTargets)' == ''">BuiltProjectOutputGroup;SatelliteDllsProjectOutputGroup;</IncludeVsixItemsFromTargets>
     <!-- Copies entire VSIX contents to the output directory. -->
     <CopyLocalReferenceVsixItems Condition="'$(CopyLocalReferenceVsixItems)' == ''">false</CopyLocalReferenceVsixItems>
+    <DeployExtension Condition="'$(BUILD_BUILDNUMBER)' != ''">False</DeployExtension>
   </PropertyGroup>
 
 
