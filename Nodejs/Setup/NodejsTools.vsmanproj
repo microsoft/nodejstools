@@ -25,7 +25,7 @@
     
     <ItemGroup>
         <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
-        <MergeManifest Include="$(BuildOutputRoot)\Setup\Targets\Microsoft.VisualStudio.NodejsTools.Targets.json" />
+        <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" />
         <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
         <Node Include="packages.config" />
     </ItemGroup>

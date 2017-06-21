@@ -18,8 +18,8 @@
     <ProjectGuid>{CBA217C4-4338-4E50-9DEC-9227705F8124}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.NodejsTools.Targets</RootNamespace>
-    <AssemblyName>Microsoft.NodejsTools.Targets</AssemblyName>
+    <RootNamespace>NodejsToolsTargetsVsix</RootNamespace>
+    <AssemblyName>NodejsToolsTargetsVsix</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
@@ -75,7 +75,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <FilesToSign Include="$(OutDir)\Microsoft.NodejsTools.Targets.vsix">
+    <FilesToSign Include="$(OutDir)\$(AssemblyName).vsix">
       <Authenticode>VsixSHA2</Authenticode>
       <InProject>false</InProject>
     </FilesToSign>
