@@ -97,28 +97,23 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ProjectWizardResources.cs.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.de.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.en.resx">
+    <EmbeddedResource Include="ProjectWizardResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProjectWizardResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizardResources.es.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.fr.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.it.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ja.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ko.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.pl.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.pt-BR.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ru.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.tr.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.zh-Hans.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.zh-Hant.resx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
+      <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).lcl</TranslationFile>
+      <LciCommentFile>$(BuildRoot)\loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
+      <InProject>false</InProject>
+    </FilesToLocalize>
+    <SignFilesDependsOn Include="GatherLocalizedOutputsForSigning">
+      <InProject>false</InProject>
+    </SignFilesDependsOn>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
       <Authenticode>Microsoft</Authenticode>
       <StrongName>StrongName</StrongName>

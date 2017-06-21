@@ -115,131 +115,34 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="InteractiveWindow.cs.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.es.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.fr.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.it.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.ja.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.ko.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.pl.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.pt-BR.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.ru.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.tr.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.zh-Hans.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.zh-Hant.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.de.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-    </VSCTCompile>
-    <VSCTCompile Include="InteractiveWindow.en.vsct">
+    <VSCTCompile Include="InteractiveWindow.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <Compile Include="Repl\InteractiveWindowColor.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.en.resx</DependentUpon>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Resources.en.resx">
+    <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources.de.resx" />
-    <EmbeddedResource Include="Resources.cs.resx" />
-    <EmbeddedResource Include="Resources.es.resx" />
-    <EmbeddedResource Include="Resources.fr.resx" />
-    <EmbeddedResource Include="Resources.it.resx" />
-    <EmbeddedResource Include="Resources.ja.resx" />
-    <EmbeddedResource Include="Resources.ko.resx" />
-    <EmbeddedResource Include="Resources.pl.resx" />
-    <EmbeddedResource Include="Resources.pt-BR.resx" />
-    <EmbeddedResource Include="Resources.ru.resx" />
-    <EmbeddedResource Include="Resources.tr.resx" />
-    <EmbeddedResource Include="Resources.zh-Hans.resx" />
-    <EmbeddedResource Include="Resources.zh-Hant.resx" />
-    <ConditionalEmbeddedResource Include="VSPackage.de.resx">
+    <ConditionalEmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.de.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.en.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.en.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.cs.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.cs.Resources</LogicalName>
-      <SubType>Designer</SubType>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.es.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.es.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.fr.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.fr.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.it.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.it.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.ja.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.ja.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.ko.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.ko.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.pl.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.pl.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.pt-BR.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.pt-BR.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.ru.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.ru.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.tr.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.tr.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.zh-Hans.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.zh-Hans.Resources</LogicalName>
-    </ConditionalEmbeddedResource>
-    <ConditionalEmbeddedResource Include="VSPackage.zh-Hant.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <LogicalName>VSPackage.zh-Hant.Resources</LogicalName>
+      <LogicalName>VSPackage.Resources</LogicalName>
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
+      <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).lcl</TranslationFile>
+      <LciCommentFile>$(BuildRoot)\loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
+      <InProject>false</InProject>
+    </FilesToLocalize>
+    <SignFilesDependsOn Include="GatherLocalizedOutputsForSigning">
+      <InProject>false</InProject>
+    </SignFilesDependsOn>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
       <Authenticode>Microsoft</Authenticode>
       <StrongName>StrongName</StrongName>

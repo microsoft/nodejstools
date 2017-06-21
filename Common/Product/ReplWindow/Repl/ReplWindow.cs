@@ -1585,6 +1585,7 @@ namespace Microsoft.NodejsTools.Repl
                         return VSConstants.S_OK;
 
                     case PkgCmdIDList.cmdidResetRepl:
+                    case PkgCmdIDList.cmdidToolBarResetRepl:
                         Reset();
                         return VSConstants.S_OK;
 
@@ -1614,6 +1615,7 @@ namespace Microsoft.NodejsTools.Repl
                         return VSConstants.S_OK;
 
                     case PkgCmdIDList.cmdidReplClearScreen:
+                    case PkgCmdIDList.cmdidToolBarReplClearScreen:
                         ClearScreen(insertInputPrompt: !_isRunning);
                         return VSConstants.S_OK;
 
