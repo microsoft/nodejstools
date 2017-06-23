@@ -49,11 +49,11 @@
       <Language>JavaScript</Language>
       <VSIXSubpath>ItemTemplates</VSIXSubpath>
     </ZipItem>
-    <VSTemplate>
+    <!--<VSTemplate>
       <Language>JavaScript</Language>
       <Culture>1033</Culture>
       <OutputSubPath>Node.js</OutputSubPath>
-    </VSTemplate>
+    </VSTemplate>-->
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ApplicationInsights, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -648,7 +648,6 @@
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.json" />
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.vstemplate" />
-    <None Include="app.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
@@ -808,7 +807,6 @@
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
-    <None Include="Theme\Microsoft.NodejsTools.theme.v14.0.pkgdef" />
     <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
     <Resource Include="version.txt" />
     <Content Include="VSTemplateStore.pkgdef">
@@ -1042,9 +1040,6 @@
     <RegisterWithCodebase>true</RegisterWithCodebase>
   </PropertyGroup>
   <PropertyGroup>
-    <!--<IsProductComponent>true</IsProductComponent>
-    <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
-    <ExtensionInstallationFolder>Microsoft\NodeJsTools\NodeJsTools</ExtensionInstallationFolder>-->
     <CreateVsixContainer>false</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>

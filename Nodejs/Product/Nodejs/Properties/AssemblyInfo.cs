@@ -16,7 +16,6 @@ using Microsoft.VisualStudio.Shell;
 
 [assembly: ComVisible(false)]
 [assembly: CLSCompliant(false)]
-[assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.Satellite)]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools", CodeBase = "Microsoft.NodejsTools.dll", Version = "1.0.0.0")]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.Npm", CodeBase = "Microsoft.NodejsTools.Npm.dll", Version = "1.0.0.0")]
 [assembly: ProvideCodeBase(AssemblyName = "Microsoft.NodejsTools.PressAnyKey", CodeBase = "Microsoft.NodejsTools.PressAnyKey.exe", Version = "1.0.0.0")]

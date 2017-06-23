@@ -21,6 +21,7 @@ using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
@@ -180,6 +181,15 @@ namespace Microsoft.NodejsTools.Repl
         }
 
         #region Initialization
+
+        protected override void Initialize()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            base.Initialize();
+
+            //ensure Telemetry is initialized
+            var defaultSession = TelemetryService.DefaultSession;
+        }
 
         protected override void OnCreate()
         {
