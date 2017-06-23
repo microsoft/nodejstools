@@ -11,12 +11,11 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using MSBuild = Microsoft.Build.Evaluation;
+using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [FileExtension(NodejsConstants.NodejsProjectExtension)]
-    [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
-    internal class TestDiscoverer : ITestDiscoverer
+    public class TestDiscoverer
     {
         public TestDiscoverer()
         {
@@ -86,7 +85,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                             fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
                         }
 
-                        //Debug.Fail("Before Discover");
                         DiscoverTests(testItems, proj, discoverySink, logger);
                     }
                 }
@@ -108,7 +106,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var result = new List<TestFrameworks.NodejsTestInfo>();
             var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
-            var projSource = ((MSBuild.Project)proj).FullPath;
+            var projSource = proj.FullPath;
 
             var nodeExePath =
                 Nodejs.GetAbsoluteNodeExePath(
@@ -192,8 +190,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             public TestFileEntry(string file, bool isTypeScriptTest)
             {
-                File = file;
-                IsTypeScriptTest = isTypeScriptTest;
+                this.File = file;
+                this.IsTypeScriptTest = isTypeScriptTest;
             }
         }
     }

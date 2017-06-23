@@ -78,13 +78,10 @@ namespace Microsoft.VisualStudioTools
             return dte;
         }
 
-#if DEV15
         private static bool DTELoaded = false;
-#endif
 
         private static DTE GetDTE(int processId)
         {
-#if DEV15
             // VS 2017 doesn't install some assemblies to the GAC that are needed to work with the
             // debugger, and as the tests don't execute in the devenv.exe process, those assemblies
             // fail to load - so load them manually from PublicAssemblies.
@@ -107,7 +104,7 @@ namespace Microsoft.VisualStudioTools
                 }
                 DTELoaded = true;
             }
-#endif
+
             MessageFilter.Register();
 
             var prefix = Process.GetProcessById(processId).ProcessName;
@@ -227,32 +224,30 @@ namespace Microsoft.VisualStudioTools
             // dialog to the user.
             var dte = GetDTE();
             dte.SuppressUI = true;
+
             try
             {
-                try
+                if (engines == null)
                 {
-                    if (engines == null)
-                    {
-                        process.Attach();
-                    }
-                    else
-                    {
-                        var process3 = process as EnvDTE90.Process3;
-                        if (process3 == null)
-                        {
-                            return false;
-                        }
-                        process3.Attach2(engines.Select(engine => engine.ToString("B")).ToArray());
-                    }
-                    return true;
+                    process.Attach();
                 }
-                catch (COMException)
+                else
                 {
-                    if (processOutput.Wait(TimeSpan.FromMilliseconds(500)))
+                    var process3 = process as EnvDTE90.Process3;
+                    if (process3 == null)
                     {
-                        // Process exited while we were trying
                         return false;
                     }
+                    process3.Attach2(engines.Select(engine => engine.ToString("B")).ToArray());
+                }
+                return true;
+            }
+            catch (COMException)
+            {
+                if (processOutput.Wait(TimeSpan.FromMilliseconds(500)))
+                {
+                    // Process exited while we were trying
+                    return false;
                 }
             }
             finally
