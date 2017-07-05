@@ -16,7 +16,7 @@ namespace TestAdapterTests {
             //Act
             NodejsTestInfo testInfo = new NodejsTestInfo(testFile, testName, testFramework, 0, 0);
             //Assert
-            string expected = testFile + "::" + testName + "::" + testFramework;
+            string expected = testInfo.ModuleName + "::" + testName + "::" + testFramework;
             Assert.AreEqual(expected, testInfo.FullyQualifiedName);
             Assert.AreEqual(testName, testInfo.TestName);
             Assert.AreEqual(testFramework, testInfo.TestFramework);
@@ -29,9 +29,10 @@ namespace TestAdapterTests {
         public void ConstructFromQualifiedName_ThrowOnInValidInput() {
             //Arrange
             string badDummy = "c:\\dummy.js::dummy::dumm2::test1";
+            string dummyPath = "c:\\dummyTest.js";
 
             //Act
-            NodejsTestInfo testInfo = new NodejsTestInfo(badDummy);
+            NodejsTestInfo testInfo = new NodejsTestInfo(badDummy, dummyPath);
 
             //Assert: N/A
         }
