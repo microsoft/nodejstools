@@ -158,6 +158,7 @@
     <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
       <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).lcl</TranslationFile>
       <LciCommentFile>$(BuildRoot)\loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
+      <SettingsFile>$(LSBuildRoot)\MCP_excludeBaml.lss</SettingsFile>
       <InProject>false</InProject>
     </FilesToLocalize>
     <SignFilesDependsOn Include="GatherLocalizedOutputsForSigning">
