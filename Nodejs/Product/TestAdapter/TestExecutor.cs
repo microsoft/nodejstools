@@ -145,8 +145,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            Debugger.Launch();
-
             ValidateArg.NotNull(tests, "tests");
             ValidateArg.NotNull(runContext, "runContext");
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
