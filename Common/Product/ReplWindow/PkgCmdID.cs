@@ -17,6 +17,8 @@ namespace Microsoft.NodejsTools.Repl
         public const uint cmdidBreakLine = 0x0109;
         public const uint cmdidReplSearchHistoryNext = 0x010A;
         public const uint cmdidReplSearchHistoryPrevious = 0x010B;
+        public const uint cmdidToolBarResetRepl = 0x010C;
+        public const uint cmdidToolBarReplClearScreen = 0x010D;
         public const uint menuIdReplToolbar = 0x2000;
 
         public const uint comboIdReplScopes = 0x3000;

@@ -164,5 +164,4 @@
     </Content>
   </ItemGroup>
   <Import Project="..\TestProjectAfter.settings" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

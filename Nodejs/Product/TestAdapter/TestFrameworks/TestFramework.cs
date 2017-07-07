@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                     File.Delete(discoverResultFile);
                 }
                 catch (Exception)
-                { //
+                {
                     //Unable to delete for some reason
                     //We leave the file behind in this case, its in TEMP so eventually OS will clean up
                 }
@@ -98,8 +98,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 
         public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory, string projectRootDir)
         {
-            workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            projectRootDir = projectRootDir.TrimEnd(new char['\\']);
+            workingDirectory = workingDirectory.TrimEnd('\\');
+            projectRootDir = projectRootDir.TrimEnd('\\');
             return new[] {
                 WrapWithQuotes(_runTestsScriptFile),
                 Name,

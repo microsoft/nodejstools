@@ -9,17 +9,10 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
     internal class FrameworkDiscover
     {
         private readonly Dictionary<String, TestFramework> _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
-        public FrameworkDiscover() : this(null)
+        public FrameworkDiscover()
         {
-        }
-
-        public FrameworkDiscover(IEnumerable<string> testFrameworkDirectories)
-        {
-            if (testFrameworkDirectories == null)
-            {
-                var directoryLoader = new TestFrameworkDirectories();
-                testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
-            }
+            var directoryLoader = new TestFrameworkDirectories();
+            var testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
 
             foreach (var directory in testFrameworkDirectories)
             {
