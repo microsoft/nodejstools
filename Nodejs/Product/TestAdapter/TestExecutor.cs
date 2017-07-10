@@ -23,25 +23,18 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     internal class TestExecutionRedirector : Redirector
     {
-        Action<string> writer;
+        private readonly Action<string> writer;
+
         public TestExecutionRedirector(Action<string> onWriteLine)
         {
-            writer = onWriteLine;
-        }
-        public override void WriteErrorLine(string line)
-        {
-            writer(line);
+            this.writer = onWriteLine;
         }
 
-        public override void WriteLine(string line)
-        {
-            writer(line);
-        }
+        public override void WriteErrorLine(string line) => this.writer(line);
 
-        public override bool CloseStandardInput()
-        {
-            return false;
-        }
+        public override void WriteLine(string line) => this.writer(line);
+
+        public override bool CloseStandardInput() => false;
     }
 
     public class TestExecutor
@@ -51,22 +44,22 @@ namespace Microsoft.NodejsTools.TestAdapter
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
         private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}");
 
-        private readonly ManualResetEvent _cancelRequested = new ManualResetEvent(false);
+        private readonly ManualResetEvent cancelRequested = new ManualResetEvent(false);
 
-        private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
-        private ProcessOutput _nodeProcess;
-        private object _syncObject = new object();
-        private List<TestCase> _currentTests;
-        private IFrameworkHandle _frameworkHandle;
-        private TestResult _currentResult = null;
-        private ResultObject _currentResultObject = null;
+        private static readonly char[] NeedToBeQuoted = new[] { ' ', '"' };
+        private ProcessOutput nodeProcess;
+        private object syncObject = new object();
+        private List<TestCase> currentTests;
+        private IFrameworkHandle frameworkHandle;
+        private TestResult currentResult = null;
+        private ResultObject currentResultObject = null;
 
         public void Cancel()
         {
             //let us just kill the node process there, rather do it late, because VS engine process 
             //could exit right after this call and our node process will be left running.
             KillNodeProcess();
-            _cancelRequested.Set();
+            this.cancelRequested.Set();
         }
 
         private void ProcessTestRunnerEmit(string line)
@@ -75,34 +68,37 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 var testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
                 // Extract test from list of tests
-                var tests = _currentTests.Where(n => n.DisplayName == testEvent.title);
+                var tests = this.currentTests.Where(n => n.DisplayName == testEvent.title);
                 if (tests.Count() > 0)
                 {
                     switch (testEvent.type)
                     {
                         case "test start":
                             {
-                                _currentResult = new TestResult(tests.First());
-                                _currentResult.StartTime = DateTimeOffset.Now;
-                                _frameworkHandle.RecordStart(tests.First());
+                                this.currentResult = new TestResult(tests.First())
+                                {
+                                    StartTime = DateTimeOffset.Now
+                                };
+
+                                this.frameworkHandle.RecordStart(tests.First());
                             }
                             break;
                         case "result":
                             {
-                                RecordEnd(_frameworkHandle, tests.First(), _currentResult, testEvent.result);
+                                RecordEnd(this.frameworkHandle, tests.First(), this.currentResult, testEvent.result);
                             }
                             break;
                         case "pending":
                             {
-                                _currentResult = new TestResult(tests.First());
-                                RecordEnd(_frameworkHandle, tests.First(), _currentResult, testEvent.result);
+                                this.currentResult = new TestResult(tests.First());
+                                RecordEnd(this.frameworkHandle, tests.First(), this.currentResult, testEvent.result);
                             }
                             break;
                     }
                 }
                 else if (testEvent.type == "suite end")
                 {
-                    _currentResultObject = testEvent.result;
+                    this.currentResultObject = testEvent.result;
                 }
             }
             catch (JsonReaderException)
@@ -123,13 +119,13 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(runContext, "runContext");
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
 
-            _cancelRequested.Reset();
+            this.cancelRequested.Reset();
 
             var receiver = new TestReceiver();
             var discoverer = new TestDiscoverer();
             discoverer.DiscoverTests(sources, null, frameworkHandle, receiver);
 
-            if (_cancelRequested.WaitOne(0))
+            if (this.cancelRequested.WaitOne(0))
             {
                 return;
             }
@@ -148,7 +144,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(tests, "tests");
             ValidateArg.NotNull(runContext, "runContext");
             ValidateArg.NotNull(frameworkHandle, "frameworkHandle");
-            _cancelRequested.Reset();
+            this.cancelRequested.Reset();
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
@@ -174,8 +170,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     sourceToSettings[firstTest.Source] = projectSettings = LoadProjectSettings(firstTest.Source);
                 }
 
-                _currentTests = entry.Value;
-                _frameworkHandle = frameworkHandle;
+                this.currentTests = entry.Value;
+                this.frameworkHandle = frameworkHandle;
 
                 // Run all test cases in a given file
                 RunTestCases(entry.Value, runContext, frameworkHandle, projectSettings);
@@ -221,7 +217,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
 
                 // All tests being run are for the same test file, so just use the first test listed to get the working dir
-                var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
+                var firstTest = tests.First();
+                var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
 
                 var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
@@ -236,7 +233,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 foreach (var test in tests)
                 {
-                    if (_cancelRequested.WaitOne(0))
+                    if (this.cancelRequested.WaitOne(0))
                     {
                         break;
                     }
@@ -268,14 +265,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                     nodeArgs.InsertRange(0, GetDebugArgs(out port));
                 }
 
-                _nodeProcess = ProcessOutput.Run(
+                this.nodeProcess = ProcessOutput.Run(
                     settings.NodeExePath,
                     nodeArgs,
                     settings.WorkingDir,
-                    /* env */        null,
-                    /* visible */    false,
-                    /* redirector */ new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                    /* quote args */ false);
+                    env: null,
+                    visible: false,
+                    redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                    quoteArgs: false);
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
@@ -284,9 +281,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                         //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
                         //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
                         var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(_nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
+                        while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
                         {
-                            if (_nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                            if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
                             {
                                 break;
                             }
@@ -307,18 +304,21 @@ namespace Microsoft.NodejsTools.TestAdapter
 #endif
                 }
                 // Send the process the list of tests to run and wait for it to complete
-                _nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
-                _nodeProcess.Wait();
+                this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
+                this.nodeProcess.Wait();
 
                 // Automatically fail tests that haven't been run by this point (failures in before() hooks)
-                foreach (var notRunTest in _currentTests)
+                foreach (var notRunTest in this.currentTests)
                 {
-                    var result = new TestResult(notRunTest);
-                    result.Outcome = TestOutcome.Failed;
-                    if (_currentResultObject != null)
+                    var result = new TestResult(notRunTest)
                     {
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, _currentResultObject.stdout));
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, _currentResultObject.stderr));
+                        Outcome = TestOutcome.Failed
+                    };
+
+                    if (this.currentResultObject != null)
+                    {
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, this.currentResultObject.stdout));
+                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, this.currentResultObject.stderr));
                     }
                     frameworkHandle.RecordResult(result);
                     frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
@@ -328,11 +328,11 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void KillNodeProcess()
         {
-            lock (_syncObject)
+            lock (this.syncObject)
             {
-                if (_nodeProcess != null)
+                if (this.nodeProcess != null)
                 {
-                    _nodeProcess.Kill();
+                    this.nodeProcess.Kill();
                 }
             }
         }
@@ -347,8 +347,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
-            var testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
-            var discover = new TestFrameworks.FrameworkDiscover();
+            var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
+            var discover = new FrameworkDiscover();
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
@@ -395,7 +395,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             string[] standardOutputLines = resultObject.stdout.Split('\n');
             string[] standardErrorLines = resultObject.stderr.Split('\n');
 
-            if (null != resultObject.pending && (bool)resultObject.pending)
+            if (resultObject.pending.HasValue && (bool)resultObject.pending)
             {
                 result.Outcome = TestOutcome.Skipped;
             }
@@ -405,12 +405,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                 result.Duration = result.EndTime - result.StartTime;
                 result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
             }
+
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
-            _currentTests.Remove(test);
+            this.currentTests.Remove(test);
         }
     }
 }
@@ -423,23 +424,22 @@ internal class DataReceiver
     {
         if (e.Data != null)
         {
-            Data.AppendLine(e.Data);
+            this.Data.AppendLine(e.Data);
         }
     }
 }
 
 internal class TestReceiver : ITestCaseDiscoverySink
 {
-    public List<TestCase> Tests { get; private set; }
+    public List<TestCase> Tests { get; } = new List<TestCase>();
 
     public TestReceiver()
     {
-        Tests = new List<TestCase>();
     }
 
     public void SendTestCase(TestCase discoveredTest)
     {
-        Tests.Add(discoveredTest);
+        this.Tests.Add(discoveredTest);
     }
 }
 
@@ -447,32 +447,25 @@ internal class NodejsProjectSettings
 {
     public NodejsProjectSettings()
     {
-        NodeExePath = string.Empty;
-        SearchPath = string.Empty;
-        WorkingDir = string.Empty;
     }
 
-    public string NodeExePath { get; set; }
-    public string SearchPath { get; set; }
-    public string WorkingDir { get; set; }
-    public string ProjectRootDir { get; set; }
+    public string NodeExePath { get; set; } = string.Empty;
+    public string SearchPath { get; set; } = string.Empty;
+    public string WorkingDir { get; set; } = string.Empty;
+    public string ProjectRootDir { get; set; } = string.Empty;
 }
 
 internal class ResultObject
 {
     public ResultObject()
     {
-        title = string.Empty;
-        passed = false;
-        pending = false;
-        stdout = string.Empty;
-        stderr = string.Empty;
     }
-    public string title { get; set; }
-    public bool passed { get; set; }
-    public bool? pending { get; set; }
-    public string stdout { get; set; }
-    public string stderr { get; set; }
+
+    public string title { get; set; } = string.Empty;
+    public bool passed { get; set; } = false;
+    public bool? pending { get; set; } = false;
+    public string stdout { get; set; } = string.Empty;
+    public string stderr { get; set; } = string.Empty;
 }
 
 internal class TestEvent
@@ -486,11 +479,6 @@ internal class TestCaseObject
 {
     public TestCaseObject()
     {
-        framework = string.Empty;
-        testName = string.Empty;
-        testFile = string.Empty;
-        workingFolder = string.Empty;
-        projectFolder = string.Empty;
     }
 
     public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder)
@@ -501,9 +489,10 @@ internal class TestCaseObject
         this.workingFolder = workingFolder;
         this.projectFolder = projectFolder;
     }
-    public string framework { get; set; }
-    public string testName { get; set; }
-    public string testFile { get; set; }
-    public string workingFolder { get; set; }
-    public string projectFolder { get; set; }
+
+    public string framework { get; set; } = string.Empty;
+    public string testName { get; set; } = string.Empty;
+    public string testFile { get; set; } = string.Empty;
+    public string workingFolder { get; set; } = string.Empty;
+    public string projectFolder { get; set; } = string.Empty;
 }
