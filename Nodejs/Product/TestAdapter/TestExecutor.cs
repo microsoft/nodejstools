@@ -44,8 +44,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         }
     }
 
-    [ExtensionUri(TestExecutor.ExecutorUriString)]
-    internal class TestExecutor : ITestExecutor
+    public class TestExecutor
     {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
@@ -188,7 +187,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
             userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
             // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
-            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString(); 
+            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
             userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
 
             //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
@@ -366,14 +365,14 @@ namespace Microsoft.NodejsTools.TestAdapter
         private NodejsProjectSettings LoadProjectSettings(string projectFile)
         {
             var env = new Dictionary<string, string>();
-#if DEV15
+
             var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
             if (!string.IsNullOrEmpty(root))
             {
                 env["VsInstallRoot"] = root;
                 env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
             }
-#endif
+
             var buildEngine = new MSBuild.ProjectCollection(env);
             var proj = buildEngine.LoadProject(projectFile);
 
@@ -393,8 +392,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)
         {
-            String[] standardOutputLines = resultObject.stdout.Split('\n');
-            String[] standardErrorLines = resultObject.stderr.Split('\n');
+            string[] standardOutputLines = resultObject.stdout.Split('\n');
+            string[] standardErrorLines = resultObject.stderr.Split('\n');
 
             if (null != resultObject.pending && (bool)resultObject.pending)
             {
@@ -406,9 +405,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 result.Duration = result.EndTime - result.StartTime;
                 result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
             }
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, String.Join(Environment.NewLine, standardOutputLines)));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, String.Join(Environment.NewLine, standardErrorLines)));
-            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, String.Join(Environment.NewLine, standardErrorLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
+            result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
             _currentTests.Remove(test);
@@ -448,9 +447,9 @@ internal class NodejsProjectSettings
 {
     public NodejsProjectSettings()
     {
-        NodeExePath = String.Empty;
-        SearchPath = String.Empty;
-        WorkingDir = String.Empty;
+        NodeExePath = string.Empty;
+        SearchPath = string.Empty;
+        WorkingDir = string.Empty;
     }
 
     public string NodeExePath { get; set; }
@@ -463,11 +462,11 @@ internal class ResultObject
 {
     public ResultObject()
     {
-        title = String.Empty;
+        title = string.Empty;
         passed = false;
         pending = false;
-        stdout = String.Empty;
-        stderr = String.Empty;
+        stdout = string.Empty;
+        stderr = string.Empty;
     }
     public string title { get; set; }
     public bool passed { get; set; }
@@ -487,11 +486,11 @@ internal class TestCaseObject
 {
     public TestCaseObject()
     {
-        framework = String.Empty;
-        testName = String.Empty;
-        testFile = String.Empty;
-        workingFolder = String.Empty;
-        projectFolder = String.Empty;
+        framework = string.Empty;
+        testName = string.Empty;
+        testFile = string.Empty;
+        workingFolder = string.Empty;
+        projectFolder = string.Empty;
     }
 
     public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder)

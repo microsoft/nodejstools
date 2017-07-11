@@ -538,8 +538,6 @@
     <Page Include="$(_ProjectSystemFilesLocation)\TaskProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
       <Link>SharedProject\TaskProgressBar.xaml</Link>
       <Visible>true</Visible>
     </Page>
@@ -701,74 +699,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.cs.resx">
-      <Link>SharedProject\ProjectResources.cs.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.cs</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.de.resx">
-      <Link>SharedProject\ProjectResources.de.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.de</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-        <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.en.resx">
-      <Link>SharedProject\ProjectResources.en.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.en</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.es.resx">
-      <Link>SharedProject\ProjectResources.es.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.es</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.fr.resx">
-      <Link>SharedProject\ProjectResources.fr.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.fr</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.it.resx">
-      <Link>SharedProject\ProjectResources.it.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.it</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.ja.resx">
-      <Link>SharedProject\ProjectResources.ja.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.ja</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.ko.resx">
-      <Link>SharedProject\ProjectResources.ko.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.ko</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.pl.resx">
-      <Link>SharedProject\ProjectResources.pl.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.pl</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.pt-BR.resx">
-      <Link>SharedProject\ProjectResources.pt-BR.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.pt-BR</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.ru.resx">
-      <Link>SharedProject\ProjectResources.ru.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.ru</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.tr.resx">
-      <Link>SharedProject\ProjectResources.tr.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.tr</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.zh-Hans.resx">
-      <Link>SharedProject\ProjectResources.zh-Hans.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.zh-Hans</ManifestResourceName>
-      <Visible>true</Visible>
-    </EmbeddedResource>
-    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.zh-Hant.resx">
-      <Link>SharedProject\ProjectResources.zh-Hant.resx</Link>
-      <ManifestResourceName>Microsoft.VisualStudio.Project.zh-Hant</ManifestResourceName>
+    <EmbeddedResource Include="$(_ProjectSystemFilesLocation)\ProjectResources.resx">
+      <Link>SharedProject\ProjectResources.resx</Link>
+      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
       <Visible>true</Visible>
     </EmbeddedResource>
   </ItemGroup>

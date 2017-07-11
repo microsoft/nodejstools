@@ -2,29 +2,25 @@
 
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Telemetry;
+using static Microsoft.NodejsTools.Telemetry.TelemetryEvents;
+using static Microsoft.NodejsTools.Telemetry.TelemetryProperties;
 
 namespace Microsoft.NodejsTools.Telemetry
 {
-    using System;
-    using static TelemetryEvents;
-    using static TelemetryProperties;
-
     /// <summary>
     /// Extensions for logging telemetry events.
     /// </summary>
     internal static class TelemetryHelper
     {
-        private static TelemetrySession defaultSession;
-
         public static void Initialize()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            defaultSession = TelemetryService.DefaultSession;
+            var defaultSession = TelemetryService.DefaultSession;
         }
 
         public static void LogProjectImported()
         {
-            defaultSession.PostUserTask(ProjectImported, TelemetryResult.Success);
+            TelemetryService.DefaultSession.PostUserTask(ProjectImported, TelemetryResult.Success);
         }
 
         public static void LogDebuggingStarted(string debuggerName, string nodeVersion, bool isProject = true)
@@ -34,27 +30,27 @@ namespace Microsoft.NodejsTools.Telemetry
             userTask.Properties[NodeVersion] = nodeVersion;
             userTask.Properties[IsProject] = isProject;
 
-            defaultSession.PostEvent(userTask);
+            TelemetryService.DefaultSession.PostEvent(userTask);
         }
 
         public static void LogSearchNpm()
         {
-            defaultSession.PostUserTask(SearchNpm, TelemetryResult.Success);
+            TelemetryService.DefaultSession.PostUserTask(SearchNpm, TelemetryResult.Success);
         }
 
         public static void LogInstallNpmPackage()
         {
-            defaultSession.PostUserTask(InstallNpm, TelemetryResult.Success);
+            TelemetryService.DefaultSession.PostUserTask(InstallNpm, TelemetryResult.Success);
         }
 
         public static void LogUnInstallNpmPackage()
         {
-            defaultSession.PostUserTask(UnInstallNpm, TelemetryResult.Success);
+            TelemetryService.DefaultSession.PostUserTask(UnInstallNpm, TelemetryResult.Success);
         }
 
         public static void LogReplUse()
         {
-            defaultSession.PostUserTask(UsedRepl, TelemetryResult.Success);
+            TelemetryService.DefaultSession.PostUserTask(UsedRepl, TelemetryResult.Success);
         }
     }
 }

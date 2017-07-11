@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -7,8 +8,11 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -93,26 +97,41 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ProjectWizardResources.cs.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.de.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.en.resx">
+    <EmbeddedResource Include="ProjectWizardResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ProjectWizardResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProjectWizardResources.es.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.fr.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.it.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ja.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ko.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.pl.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.pt-BR.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.ru.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.tr.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.zh-Hans.resx" />
-    <EmbeddedResource Include="ProjectWizardResources.zh-Hant.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
+      <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).lcl</TranslationFile>
+      <LciCommentFile>$(BuildRoot)\loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
+      <SettingsFile>$(LSBuildRoot)\MCP_excludeBaml.lss</SettingsFile>
+      <InProject>false</InProject>
+    </FilesToLocalize>
+    <SignFilesDependsOn Include="GatherLocalizedOutputsForSigning">
+      <InProject>false</InProject>
+    </SignFilesDependsOn>
+    <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
+      <Authenticode>Microsoft</Authenticode>
+      <StrongName>StrongName</StrongName>
+      <InProject>false</InProject>
+    </FilesToSign>
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
-  <Import Project="..\ProjectAfter.settings" />
+  <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
+  <Import Project="..\ProjectAfter.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
+    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
+  </Target>
+  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

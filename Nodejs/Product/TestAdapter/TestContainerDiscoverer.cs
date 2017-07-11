@@ -36,8 +36,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                    new SolutionEventsListener(serviceProvider),
                    new TestFilesUpdateWatcher(),
                    new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
-                    operationState)
-        { }
+                   operationState)
+        {
+        }
 
         public TestContainerDiscoverer(IServiceProvider serviceProvider,
                                        SolutionEventsListener solutionListener,

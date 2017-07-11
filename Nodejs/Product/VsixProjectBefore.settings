@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
+    <OutputPathSuffix Condition="'$(OutputPathSuffix)' == ''">Setup\$(MSBuildProjectName)\</OutputPathSuffix>
+    <IntermediateOutputPathSuffix>obj\$(MSBuildProjectName)\</IntermediateOutputPathSuffix>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(BuildRoot)\Nodejs\</SolutionDir>
+  </PropertyGroup>
+  <Import Project="$(BuildRoot)\Build\Common.Build.settings" />
+</Project>

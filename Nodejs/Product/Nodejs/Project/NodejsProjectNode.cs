@@ -213,6 +213,7 @@ namespace Microsoft.NodejsTools.Project
                 return node.ItemNode.ItemTypeName;
             }
 
+            // TODO: make sure this also works for .tsx
             if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension))
             {
                 return NodejsConstants.TypeScriptCompileItemType;

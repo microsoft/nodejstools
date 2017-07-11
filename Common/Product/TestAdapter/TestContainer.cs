@@ -10,19 +10,18 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 {
     internal class TestContainer : ITestContainer
     {
-        private readonly DateTime _timeStamp;
-        private readonly Architecture _architecture;
+        private readonly DateTime timeStamp;
 
         public TestContainer(ITestContainerDiscoverer discoverer, string source, DateTime timeStamp, Architecture architecture)
         {
-            Discoverer = discoverer;
-            Source = source;
-            _timeStamp = timeStamp;
-            _architecture = architecture;
+            this.Discoverer = discoverer;
+            this.Source = source;
+            this.TargetPlatform = architecture;
+            this.timeStamp = timeStamp;
         }
 
         private TestContainer(TestContainer copy)
-            : this(copy.Discoverer, copy.Source, copy._timeStamp, copy._architecture)
+            : this(copy.Discoverer, copy.Source, copy.timeStamp, copy.TargetPlatform)
         { }
 
         public int CompareTo(ITestContainer other)
@@ -39,7 +38,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 return result;
             }
 
-            return _timeStamp.CompareTo(container._timeStamp);
+            return timeStamp.CompareTo(container.timeStamp);
         }
 
         public IEnumerable<Guid> DebugEngines
@@ -61,29 +60,20 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             return null;
         }
 
-        public ITestContainerDiscoverer Discoverer { get; private set; }
+        public ITestContainerDiscoverer Discoverer { get; }
 
-        public bool IsAppContainerTestContainer
-        {
-            get { return false; }
-        }
+        public bool IsAppContainerTestContainer => false;
 
         public ITestContainer Snapshot()
         {
             return new TestContainer(this);
         }
 
-        public string Source { get; private set; }
+        public string Source { get; }
 
-        public FrameworkVersion TargetFramework
-        {
-            get { return FrameworkVersion.None; }
-        }
+        public FrameworkVersion TargetFramework=> FrameworkVersion.None;
 
-        public Architecture TargetPlatform
-        {
-            get { return _architecture; }
-        }
+        public Architecture TargetPlatform { get; }
 
         public override string ToString()
         {
