@@ -18,11 +18,11 @@ namespace Microsoft.VisualStudioTools
 
     internal class SolutionEventsListener : IVsSolutionEvents3, IVsSolutionEvents4, IVsUpdateSolutionEvents2, IVsUpdateSolutionEvents3, IDisposable
     {
-        private readonly IVsSolution _solution;
-        private readonly IVsSolutionBuildManager3 _buildManager;
-        private uint _cookie1 = VSConstants.VSCOOKIE_NIL;
-        private uint _cookie2 = VSConstants.VSCOOKIE_NIL;
-        private uint _cookie3 = VSConstants.VSCOOKIE_NIL;
+        private readonly IVsSolution solution;
+        private readonly IVsSolutionBuildManager3 buildManager;
+        private uint cookie1 = VSConstants.VSCOOKIE_NIL;
+        private uint cookie2 = VSConstants.VSCOOKIE_NIL;
+        private uint cookie3 = VSConstants.VSCOOKIE_NIL;
 
         public event EventHandler SolutionOpened;
         public event EventHandler SolutionClosed;
@@ -41,77 +41,55 @@ namespace Microsoft.VisualStudioTools
                 throw new ArgumentNullException("serviceProvider");
             }
 
-            this._solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
-            if (this._solution == null)
+            this.solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
+            if (this.solution == null)
             {
                 throw new InvalidOperationException("Cannot get solution service");
             }
-            this._buildManager = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager3;
-        }
-
-        public SolutionEventsListener(IVsSolution service, IVsSolutionBuildManager3 buildManager = null)
-        {
-            if (service == null)
-            {
-                throw new ArgumentNullException("service");
-            }
-            this._solution = service;
-            this._buildManager = buildManager;
+            this.buildManager = serviceProvider.GetService(typeof(SVsSolutionBuildManager)) as IVsSolutionBuildManager3;
         }
 
         public void StartListeningForChanges()
         {
-            ErrorHandler.ThrowOnFailure(this._solution.AdviseSolutionEvents(this, out this._cookie1));
-            if (this._buildManager != null)
+            ErrorHandler.ThrowOnFailure(this.solution.AdviseSolutionEvents(this, out this.cookie1));
+            if (this.buildManager != null)
             {
-                var bm2 = this._buildManager as IVsSolutionBuildManager2;
+                var bm2 = this.buildManager as IVsSolutionBuildManager2;
                 if (bm2 != null)
                 {
-                    ErrorHandler.ThrowOnFailure(bm2.AdviseUpdateSolutionEvents(this, out this._cookie2));
+                    ErrorHandler.ThrowOnFailure(bm2.AdviseUpdateSolutionEvents(this, out this.cookie2));
                 }
-                ErrorHandler.ThrowOnFailure(this._buildManager.AdviseUpdateSolutionEvents3(this, out this._cookie3));
+                ErrorHandler.ThrowOnFailure(this.buildManager.AdviseUpdateSolutionEvents3(this, out this.cookie3));
             }
         }
 
         public void Dispose()
         {
             // Ignore failures in UnadviseSolutionEvents
-            if (this._cookie1 != VSConstants.VSCOOKIE_NIL)
+            if (this.cookie1 != VSConstants.VSCOOKIE_NIL)
             {
-                this._solution.UnadviseSolutionEvents(this._cookie1);
-                this._cookie1 = VSConstants.VSCOOKIE_NIL;
+                this.solution.UnadviseSolutionEvents(this.cookie1);
+                this.cookie1 = VSConstants.VSCOOKIE_NIL;
             }
-            if (this._cookie2 != VSConstants.VSCOOKIE_NIL)
+            if (this.cookie2 != VSConstants.VSCOOKIE_NIL)
             {
-                ((IVsSolutionBuildManager2)this._buildManager).UnadviseUpdateSolutionEvents(this._cookie2);
-                this._cookie2 = VSConstants.VSCOOKIE_NIL;
+                ((IVsSolutionBuildManager2)this.buildManager).UnadviseUpdateSolutionEvents(this.cookie2);
+                this.cookie2 = VSConstants.VSCOOKIE_NIL;
             }
-            if (this._cookie3 != VSConstants.VSCOOKIE_NIL)
+            if (this.cookie3 != VSConstants.VSCOOKIE_NIL)
             {
-                this._buildManager.UnadviseUpdateSolutionEvents3(this._cookie3);
-                this._cookie3 = VSConstants.VSCOOKIE_NIL;
+                this.buildManager.UnadviseUpdateSolutionEvents3(this.cookie3);
+                this.cookie3 = VSConstants.VSCOOKIE_NIL;
             }
         }
 
-        int IVsUpdateSolutionEvents2.OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        int IVsUpdateSolutionEvents2.OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy) => VSConstants.E_NOTIMPL;
 
-        int IVsUpdateSolutionEvents2.UpdateProjectCfg_Begin(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, ref int pfCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        int IVsUpdateSolutionEvents2.UpdateProjectCfg_Begin(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, ref int pfCancel) => VSConstants.E_NOTIMPL;
 
-        int IVsUpdateSolutionEvents2.UpdateProjectCfg_Done(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, int fSuccess, int fCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        int IVsUpdateSolutionEvents2.UpdateProjectCfg_Done(IVsHierarchy pHierProj, IVsCfg pCfgProj, IVsCfg pCfgSln, uint dwAction, int fSuccess, int fCancel) => VSConstants.E_NOTIMPL;
 
-        public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnActiveProjectCfgChange(IVsHierarchy pIVsHierarchy) => VSConstants.E_NOTIMPL;
 
         public int UpdateSolution_Begin(ref int pfCancelUpdate)
         {
@@ -123,10 +101,7 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int UpdateSolution_Cancel()
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int UpdateSolution_Cancel() => VSConstants.E_NOTIMPL;
 
         public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand)
         {
@@ -138,10 +113,7 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int UpdateSolution_StartUpdate(ref int pfCancelUpdate)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int UpdateSolution_StartUpdate(ref int pfCancelUpdate) => VSConstants.E_NOTIMPL;
 
         int IVsUpdateSolutionEvents3.OnAfterActiveSolutionCfgChange(IVsCfg pOldActiveSlnCfg, IVsCfg pNewActiveSlnCfg)
         {
@@ -153,10 +125,7 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        int IVsUpdateSolutionEvents3.OnBeforeActiveSolutionCfgChange(IVsCfg pOldActiveSlnCfg, IVsCfg pNewActiveSlnCfg)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        int IVsUpdateSolutionEvents3.OnBeforeActiveSolutionCfgChange(IVsCfg pOldActiveSlnCfg, IVsCfg pNewActiveSlnCfg) => VSConstants.E_NOTIMPL;
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
@@ -168,20 +137,11 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int OnAfterClosingChildren(IVsHierarchy pHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterClosingChildren(IVsHierarchy pHierarchy) => VSConstants.E_NOTIMPL;
 
-        public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy) => VSConstants.E_NOTIMPL;
 
-        public int OnAfterMergeSolution(object pUnkReserved)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterMergeSolution(object pUnkReserved) => VSConstants.E_NOTIMPL;
 
         public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
         {
@@ -207,10 +167,7 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int OnAfterOpeningChildren(IVsHierarchy pHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterOpeningChildren(IVsHierarchy pHierarchy) => VSConstants.E_NOTIMPL;
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
@@ -226,20 +183,11 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int OnBeforeCloseSolution(object pUnkReserved)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnBeforeCloseSolution(object pUnkReserved) => VSConstants.E_NOTIMPL;
 
-        public int OnBeforeClosingChildren(IVsHierarchy pHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnBeforeClosingChildren(IVsHierarchy pHierarchy) => VSConstants.E_NOTIMPL;
 
-        public int OnBeforeOpeningChildren(IVsHierarchy pHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnBeforeOpeningChildren(IVsHierarchy pHierarchy) => VSConstants.E_NOTIMPL;
 
         public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
@@ -255,30 +203,15 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel) => VSConstants.E_NOTIMPL;
 
-        public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel) => VSConstants.E_NOTIMPL;
 
-        public int OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel) => VSConstants.E_NOTIMPL;
 
-        public int OnAfterAsynchOpenProject(IVsHierarchy pHierarchy, int fAdded)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterAsynchOpenProject(IVsHierarchy pHierarchy, int fAdded) => VSConstants.E_NOTIMPL;
 
-        public int OnAfterChangeProjectParent(IVsHierarchy pHierarchy)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnAfterChangeProjectParent(IVsHierarchy pHierarchy) => VSConstants.E_NOTIMPL;
 
         public int OnAfterRenameProject(IVsHierarchy pHierarchy)
         {
@@ -294,9 +227,6 @@ namespace Microsoft.VisualStudioTools
             return VSConstants.S_OK;
         }
 
-        public int OnQueryChangeProjectParent(IVsHierarchy pHierarchy, IVsHierarchy pNewParentHier, ref int pfCancel)
-        {
-            return VSConstants.E_NOTIMPL;
-        }
+        public int OnQueryChangeProjectParent(IVsHierarchy pHierarchy, IVsHierarchy pNewParentHier, ref int pfCancel) => VSConstants.E_NOTIMPL;
     }
 }
