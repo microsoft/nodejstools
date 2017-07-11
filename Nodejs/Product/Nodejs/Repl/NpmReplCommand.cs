@@ -54,7 +54,7 @@ namespace Microsoft.NodejsTools.Repl
             var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
             var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
 
-            var projectNameToDirectoryDictionary = new Dictionary<string, (string name, IVsHierarchy hierarchy)>(StringComparer.OrdinalIgnoreCase);
+            var projectNameToDirectoryDictionary = new Dictionary<string, Tuple<string, IVsHierarchy>>(StringComparer.OrdinalIgnoreCase);
             foreach (var project in loadedProjects)
             {
                 var hierarchy = (IVsHierarchy)project;
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Repl
                         var projectHomeDirectory = projectHome.Value as string;
                         if (!string.IsNullOrEmpty(projectHomeDirectory))
                         {
-                            projectNameToDirectoryDictionary.Add(projectName, (projectHomeDirectory, hierarchy));
+                            projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectHomeDirectory, hierarchy));
                             continue;
                         }
                     }
@@ -107,11 +107,11 @@ namespace Microsoft.NodejsTools.Repl
                 var projectDirectory = string.IsNullOrEmpty(dteProject.FullName) ? null : Path.GetDirectoryName(dteProject.FullName);
                 if (!string.IsNullOrEmpty(projectDirectory))
                 {
-                    projectNameToDirectoryDictionary.Add(projectName, (projectDirectory, hierarchy));
+                    projectNameToDirectoryDictionary.Add(projectName, Tuple.Create(projectDirectory, hierarchy));
                 }
             }
 
-            (string Path, IVsHierarchy Hierarchy) projectInfo;
+            Tuple<string, IVsHierarchy> projectInfo;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
             {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
@@ -122,10 +122,10 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             NodejsProjectNode nodejsProject = null;
-            projectPath = projectInfo.Path;
+            projectPath = projectInfo.Item1;
             if (projectInfo.Item2 != null)
             {
-                nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
+                nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
             }
 
             var isGlobalCommand = false;

@@ -42,5 +42,3 @@ namespace Microsoft.NodejsTools.ProjectWizard
         }
     }
 }
-
-

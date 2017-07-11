@@ -353,5 +353,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-
-

@@ -23,5 +23,3 @@ namespace Microsoft.NodejsTools.Jade
         };
     }
 }
-
-
