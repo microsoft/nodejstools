@@ -359,4 +359,3 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         #endregion
     }
 }
-

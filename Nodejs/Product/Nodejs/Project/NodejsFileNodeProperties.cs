@@ -108,4 +108,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

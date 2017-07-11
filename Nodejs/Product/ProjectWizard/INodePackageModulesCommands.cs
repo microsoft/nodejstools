@@ -15,4 +15,3 @@ namespace Microsoft.NodejsTools.ProjectWizard
         Task InstallMissingModulesAsync();
     }
 }
-

@@ -32,4 +32,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         public NodePropertyType Type { get; private set; }
     }
 }
-

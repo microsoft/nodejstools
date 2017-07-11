@@ -140,4 +140,3 @@ namespace Microsoft.VisualStudioTools
         }
     }
 }
-

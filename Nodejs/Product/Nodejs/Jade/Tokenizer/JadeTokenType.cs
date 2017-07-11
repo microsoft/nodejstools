@@ -26,4 +26,3 @@ namespace Microsoft.NodejsTools.Jade
         Entity
     }
 }
-

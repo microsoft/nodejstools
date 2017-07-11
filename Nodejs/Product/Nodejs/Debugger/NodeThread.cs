@@ -58,4 +58,3 @@ namespace Microsoft.NodejsTools.Debugger
         internal int Id => this._identity;
     }
 }
-

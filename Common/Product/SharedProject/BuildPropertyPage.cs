@@ -10,4 +10,3 @@ namespace Microsoft.VisualStudioTools.Project
         OutputPath
     }
 }
-

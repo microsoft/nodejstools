@@ -73,4 +73,3 @@ namespace Microsoft.VisualStudioTools.Project
 #endif //!FEATURE_PAL
     }
 }
-

@@ -117,4 +117,3 @@ namespace Microsoft.VisualStudioTools.Project
         public const int ReferenceContainerNode = 300;
     }
 }
-

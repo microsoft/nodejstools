@@ -23,4 +23,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         public const string Prototype = "__proto__";
     }
 }
-

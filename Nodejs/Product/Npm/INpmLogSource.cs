@@ -13,4 +13,3 @@ namespace Microsoft.NodejsTools.Npm
         event EventHandler<NpmCommandCompletedEventArgs> CommandCompleted;
     }
 }
-

@@ -69,4 +69,3 @@ namespace Microsoft.VisualStudioTools.Project
         void RunGenerator(string document);
     }
 }
-

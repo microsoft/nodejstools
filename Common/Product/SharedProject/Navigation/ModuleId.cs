@@ -47,4 +47,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         }
     }
 }
-

@@ -30,10 +30,9 @@ namespace Microsoft.NodejsTools.Repl
                 if (_tags[i].Item1.Snapshot != _textView.TextSnapshot)
                 {
                     // update to the latest snapshot
-                    _tags[i] = new Tuple<SnapshotPoint, ZoomableInlineAdornment>(
+                    _tags[i] = Tuple.Create(
                         _tags[i].Item1.TranslateTo(_textView.TextSnapshot, PointTrackingMode.Negative),
-                        _tags[i].Item2
-                    );
+                        _tags[i].Item2);
                 }
 
                 var span = new SnapshotSpan(_textView.TextSnapshot, _tags[i].Item1, 0);
@@ -64,7 +63,7 @@ namespace Microsoft.NodejsTools.Repl
                 return;
             }
             var targetLine = targetLoc.GetContainingLine();
-            _tags.Add(new Tuple<SnapshotPoint, ZoomableInlineAdornment>(targetLoc, uiElement));
+            _tags.Add(Tuple.Create(targetLoc, uiElement));
             var handler = TagsChanged;
             if (handler != null)
             {
@@ -74,17 +73,10 @@ namespace Microsoft.NodejsTools.Repl
             }
         }
 
-        public IList<Tuple<SnapshotPoint, ZoomableInlineAdornment>> Adornments
-        {
-            get { return _tags; }
-        }
+        public IList<Tuple<SnapshotPoint, ZoomableInlineAdornment>> Adornments => _tags;
 
-        public void RemoveAll()
-        {
-            _tags.Clear();
-        }
+        public void RemoveAll() => _tags.Clear();
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
     }
 }
-

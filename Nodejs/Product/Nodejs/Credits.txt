@@ -407,4 +407,3 @@ END OF Respond.js NOTICES AND INFORMATION
 All of the code and documentation in SQLite has been dedicated to the public domain by the authors.
 =========================================
 END OF sqlite NOTICES AND INFORMATION
-

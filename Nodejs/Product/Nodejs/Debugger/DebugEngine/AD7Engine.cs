@@ -355,7 +355,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 // "Downloaded" script will have our IDebugDocument2
                 IDebugDocument2 debugDocument;
                 var debugDocumentPosition = Marshal.GetObjectForIUnknown(requestInfo[0].bpLocation.unionmember2) as IDebugDocumentPosition2;
-                if (debugDocumentPosition == null || VSConstants.S_OK != debugDocumentPosition.GetDocument(out debugDocument) || null == debugDocument as AD7Document)
+                if (debugDocumentPosition == null || VSConstants.S_OK != debugDocumentPosition.GetDocument(out debugDocument) || (debugDocument as AD7Document) == null)
                 {
                     // Not ours
                     return VSConstants.E_FAIL;
@@ -599,7 +599,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             AttachEvents(this._process);
 
-            var adProcessId = new AD_PROCESS_ID() 
+            var adProcessId = new AD_PROCESS_ID()
             {
                 ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM,
                 dwProcessId = (uint)_process.Id
@@ -1436,4 +1436,3 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         }
     }
 }
-

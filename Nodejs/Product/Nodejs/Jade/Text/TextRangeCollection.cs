@@ -949,4 +949,3 @@ namespace Microsoft.NodejsTools.Jade
         #endregion
     }
 }
-

@@ -170,4 +170,3 @@ namespace Microsoft.NodejsTools.Repl
         PropertyCollection Properties { get; }
     }
 }
-

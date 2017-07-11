@@ -20,4 +20,3 @@ namespace Microsoft.VisualStudioTools
         public abstract void CloseClipboard();
     }
 }
-

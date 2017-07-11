@@ -16,4 +16,3 @@ namespace Microsoft.VisualStudioTools.Project
         private PublishFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
-

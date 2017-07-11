@@ -16,4 +16,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         }
     }
 }
-

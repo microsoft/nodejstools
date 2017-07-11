@@ -19,4 +19,3 @@ namespace Microsoft.NodejsTools.Jade
         void ShiftStartingFrom(int start, int offset);
     }
 }
-

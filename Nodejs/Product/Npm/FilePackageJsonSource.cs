@@ -61,4 +61,3 @@ namespace Microsoft.NodejsTools.Npm
         public dynamic Package => this.source?.Package;
     }
 }
-

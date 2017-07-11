@@ -302,7 +302,7 @@ namespace Microsoft.NodejsTools
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null)
         {
             var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell)
+            if (uiShell == null)
             {
                 using (var ofd = new FolderBrowserDialog())
                 {
@@ -370,4 +370,3 @@ namespace Microsoft.NodejsTools
         }
     }
 }
-

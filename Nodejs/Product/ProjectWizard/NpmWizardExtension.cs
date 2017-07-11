@@ -46,4 +46,3 @@ namespace Microsoft.NodejsTools.ProjectWizard
         #endregion
     }
 }
-

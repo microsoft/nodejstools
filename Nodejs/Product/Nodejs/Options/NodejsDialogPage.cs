@@ -149,4 +149,3 @@ namespace Microsoft.NodejsTools.Options
         }
     }
 }
-

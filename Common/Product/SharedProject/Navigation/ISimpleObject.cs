@@ -34,4 +34,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         IVsSimpleObjectList2 FilterView(uint ListType);
     }
 }
-

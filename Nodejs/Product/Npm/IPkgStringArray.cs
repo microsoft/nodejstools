@@ -10,4 +10,3 @@ namespace Microsoft.NodejsTools.Npm
         string this[int index] { get; }
     }
 }
-

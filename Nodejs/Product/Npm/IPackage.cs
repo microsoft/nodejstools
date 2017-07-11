@@ -29,4 +29,3 @@ namespace Microsoft.NodejsTools.Npm
         PackageFlags Flags { get; }
     }
 }
-

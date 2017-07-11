@@ -20,4 +20,3 @@ namespace Microsoft.VisualStudioTools.Wpf
         }
     }
 }
-

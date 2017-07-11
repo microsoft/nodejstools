@@ -9,4 +9,3 @@ namespace Microsoft.NodejsTools.Jade
         IClassificationType GetClassificationType(T t);
     }
 }
-

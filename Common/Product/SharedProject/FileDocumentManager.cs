@@ -278,4 +278,3 @@ namespace Microsoft.VisualStudioTools.Project
         private new FileNode Node => (FileNode)base.Node;
     }
 }
-

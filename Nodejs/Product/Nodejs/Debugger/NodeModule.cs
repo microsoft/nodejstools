@@ -48,4 +48,3 @@ namespace Microsoft.NodejsTools.Debugger
         public object Document { get; set; }
     }
 }
-
