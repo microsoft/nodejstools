@@ -58,9 +58,8 @@ namespace Microsoft.NodejsTools.Repl
             foreach (var project in loadedProjects)
             {
                 var hierarchy = (IVsHierarchy)project;
-                object extObject;
 
-                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
+                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out var extObject);
                 if (!ErrorHandler.Succeeded(projectResult))
                 {
                     continue;
@@ -112,20 +111,18 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             Tuple<string, IVsHierarchy> projectInfo;
+            NodejsProjectNode nodejsProject = null;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
             {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
             }
-            else
+            else if (projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo))
             {
-                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
-            }
-
-            NodejsProjectNode nodejsProject = null;
-            projectPath = projectInfo.Item1;
-            if (projectInfo.Item2 != null)
-            {
-                nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
+                projectPath = projectInfo.Item1;
+                if (projectInfo.Item2 != null)
+                {
+                    nodejsProject = projectInfo.Item2.GetProject().GetNodejsProject();
+                }
             }
 
             var isGlobalCommand = false;
