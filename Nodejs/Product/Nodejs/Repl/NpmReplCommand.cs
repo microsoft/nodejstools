@@ -111,12 +111,17 @@ namespace Microsoft.NodejsTools.Repl
             }
 
             Tuple<string, IVsHierarchy> projectInfo;
-            NodejsProjectNode nodejsProject = null;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
             {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
             }
-            else if (projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo))
+            else
+            {
+                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
+            }
+
+            NodejsProjectNode nodejsProject = null;
+            if (projectInfo != null)
             {
                 projectPath = projectInfo.Item1;
                 if (projectInfo.Item2 != null)
@@ -138,7 +143,7 @@ namespace Microsoft.NodejsTools.Repl
 
             if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath))
             {
-                window.WriteError("Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] <npm arguments> For example: .npm [MyApp] list");
+                window.WriteError(Resources.NpmSpecifyValidProject);
                 return ExecutionResult.Failure;
             }
 
@@ -183,9 +188,12 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Success;
         }
 
-        public string Description => "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>";
+        public string Description => Resources.NpmExecuteCommand;
+
         public string Command => "npm";
+
         public object ButtonContent => null;
+        
         // TODO: This is duplicated from Npm project
         // We should consider using InternalsVisibleTo to avoid code duplication
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
@@ -271,7 +279,8 @@ namespace Microsoft.NodejsTools.Repl
                 this._window = window;
                 this.HasErrors = false;
             }
-            public bool HasErrors { get; set; }
+
+            public bool HasErrors { get; private set; }
 
             public override void WriteLine(string decodedString)
             {

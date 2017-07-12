@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -143,7 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
-      <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).lcl</TranslationFile>
+      <TranslationFile>$(BuildRoot)\loc\lcl\{lang}\$(AssemblyName).dll.lcl</TranslationFile>
       <LciCommentFile>$(BuildRoot)\loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
       <SettingsFile>$(LSBuildRoot)\MCP_excludeBaml.lss</SettingsFile>
       <InProject>false</InProject>
