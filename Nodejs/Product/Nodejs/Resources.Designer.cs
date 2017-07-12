@@ -19,10 +19,10 @@ namespace Microsoft.NodejsTools {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.NodejsTools.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Azure remote debugging.
         /// </summary>
-        public static string AzureRemoteDebugWaitCaption {
+        internal static string AzureRemoteDebugWaitCaption {
             get {
                 return ResourceManager.GetString("AzureRemoteDebugWaitCaption", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Attaching to Azure Website at {0}.
         /// </summary>
-        public static string AzureRemoteDebugWaitMessage {
+        internal static string AzureRemoteDebugWaitMessage {
             get {
                 return ResourceManager.GetString("AzureRemoteDebugWaitMessage", resourceCulture);
             }
@@ -83,7 +83,7 @@ namespace Microsoft.NodejsTools {
         ///
         ///Error retrieving websocket debug proxy information from web.config..
         /// </summary>
-        public static string AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage {
+        internal static string AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage {
             get {
                 return ResourceManager.GetString("AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage", resourceCulture);
             }
@@ -92,7 +92,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Failed to attach to Azure Website: {0}.
         /// </summary>
-        public static string AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage {
+        internal static string AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage {
             get {
                 return ResourceManager.GetString("AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage", resourceCulture);
             }
@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could not clear Node.js cache directory. Try manually deleting the directory: {0}.
         /// </summary>
-        public static string CacheDirectoryClearFailedCaption {
+        internal static string CacheDirectoryClearFailedCaption {
             get {
                 return ResourceManager.GetString("CacheDirectoryClearFailedCaption", resourceCulture);
             }
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could Not Clear Node.js Cache Directory.
         /// </summary>
-        public static string CacheDirectoryClearFailedTitle {
+        internal static string CacheDirectoryClearFailedTitle {
             get {
                 return ResourceManager.GetString("CacheDirectoryClearFailedTitle", resourceCulture);
             }
@@ -119,7 +119,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Loading published package list....
         /// </summary>
-        public static string CatalogLoadingDefault {
+        internal static string CatalogLoadingDefault {
             get {
                 return ResourceManager.GetString("CatalogLoadingDefault", resourceCulture);
             }
@@ -128,7 +128,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Status.
         /// </summary>
-        public static string CategoryStatus {
+        internal static string CategoryStatus {
             get {
                 return ResourceManager.GetString("CategoryStatus", resourceCulture);
             }
@@ -137,7 +137,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
-        public static string CategoryVersion {
+        internal static string CategoryVersion {
             get {
                 return ResourceManager.GetString("CategoryVersion", resourceCulture);
             }
@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting &apos;Set as Node.js Startup File&apos; or by modifying your configuration in project properties.
         /// </summary>
-        public static string DebugCouldNotResolveStartupFileErrorMessage {
+        internal static string DebugCouldNotResolveStartupFileErrorMessage {
             get {
                 return ResourceManager.GetString("DebugCouldNotResolveStartupFileErrorMessage", resourceCulture);
             }
@@ -155,7 +155,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Debugger connection was closed..
         /// </summary>
-        public static string DebuggerConnectionClosed {
+        internal static string DebuggerConnectionClosed {
             get {
                 return ResourceManager.GetString("DebuggerConnectionClosed", resourceCulture);
             }
@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Failed to update file contents..
         /// </summary>
-        public static string DebuggerModuleUpdateFailed {
+        internal static string DebuggerModuleUpdateFailed {
             get {
                 return ResourceManager.GetString("DebuggerModuleUpdateFailed", resourceCulture);
             }
@@ -173,7 +173,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the port used to communicate with the debugger.
         /// </summary>
-        public static string DebuggerPort {
+        internal static string DebuggerPort {
             get {
                 return ResourceManager.GetString("DebuggerPort", resourceCulture);
             }
@@ -182,7 +182,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Interpreter &quot;{0}&quot; does not exist..
         /// </summary>
-        public static string DebugInterpreterDoesNotExistErrorMessage {
+        internal static string DebugInterpreterDoesNotExistErrorMessage {
             get {
                 return ResourceManager.GetString("DebugInterpreterDoesNotExistErrorMessage", resourceCulture);
             }
@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to This TypeScript project has &apos;Combine Javascript output into file&apos; option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?.
         /// </summary>
-        public static string DebugTypeScriptCombineNotSupportedWarningMessage {
+        internal static string DebugTypeScriptCombineNotSupportedWarningMessage {
             get {
                 return ResourceManager.GetString("DebugTypeScriptCombineNotSupportedWarningMessage", resourceCulture);
             }
@@ -200,7 +200,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Working directory &quot;{0}&quot; does not exist..
         /// </summary>
-        public static string DebugWorkingDirectoryDoesNotExistErrorMessage {
+        internal static string DebugWorkingDirectoryDoesNotExistErrorMessage {
             get {
                 return ResourceManager.GetString("DebugWorkingDirectoryDoesNotExistErrorMessage", resourceCulture);
             }
@@ -209,7 +209,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to bundled.
         /// </summary>
-        public static string DependencyNodeLabelBundled {
+        internal static string DependencyNodeLabelBundled {
             get {
                 return ResourceManager.GetString("DependencyNodeLabelBundled", resourceCulture);
             }
@@ -218,7 +218,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to missing.
         /// </summary>
-        public static string DependencyNodeLabelMissing {
+        internal static string DependencyNodeLabelMissing {
             get {
                 return ResourceManager.GetString("DependencyNodeLabelMissing", resourceCulture);
             }
@@ -227,7 +227,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to not listed in {0}.
         /// </summary>
-        public static string DependencyNodeLabelNotListed {
+        internal static string DependencyNodeLabelNotListed {
             get {
                 return ResourceManager.GetString("DependencyNodeLabelNotListed", resourceCulture);
             }
@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools {
         ///   Looks up a localized string similar to Path to module does not exist:
         ///{0}.
         /// </summary>
-        public static string DependencyNodeModuleDoesNotExist {
+        internal static string DependencyNodeModuleDoesNotExist {
             get {
                 return ResourceManager.GetString("DependencyNodeModuleDoesNotExist", resourceCulture);
             }
@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools {
         ///NAME2=value2
         ///....
         /// </summary>
-        public static string EnvironmentVariables {
+        internal static string EnvironmentVariables {
             get {
                 return ResourceManager.GetString("EnvironmentVariables", resourceCulture);
             }
@@ -259,7 +259,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Launch url &apos;{0}&apos; is not valid .
         /// </summary>
-        public static string ErrorInvalidLaunchUrl {
+        internal static string ErrorInvalidLaunchUrl {
             get {
                 return ResourceManager.GetString("ErrorInvalidLaunchUrl", resourceCulture);
             }
@@ -268,7 +268,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files..
         /// </summary>
-        public static string ImportingProjectAccessErrorStatusText {
+        internal static string ImportingProjectAccessErrorStatusText {
             get {
                 return ResourceManager.GetString("ImportingProjectAccessErrorStatusText", resourceCulture);
             }
@@ -277,7 +277,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to An error occurred and your project was not created..
         /// </summary>
-        public static string ImportingProjectErrorStatusText {
+        internal static string ImportingProjectErrorStatusText {
             get {
                 return ResourceManager.GetString("ImportingProjectErrorStatusText", resourceCulture);
             }
@@ -286,7 +286,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Importing project....
         /// </summary>
-        public static string ImportingProjectStatusText {
+        internal static string ImportingProjectStatusText {
             get {
                 return ResourceManager.GetString("ImportingProjectStatusText", resourceCulture);
             }
@@ -295,7 +295,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to An unexpected error {0} occurred while creating your project..
         /// </summary>
-        public static string ImportingProjectUnexpectedErrorMessage {
+        internal static string ImportingProjectUnexpectedErrorMessage {
             get {
                 return ResourceManager.GetString("ImportingProjectUnexpectedErrorMessage", resourceCulture);
             }
@@ -304,7 +304,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Do nothing (recommended).
         /// </summary>
-        public static string IncludeNodeModulesCancelTitle {
+        internal static string IncludeNodeModulesCancelTitle {
             get {
                 return ResourceManager.GetString("IncludeNodeModulesCancelTitle", resourceCulture);
             }
@@ -313,7 +313,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Including &apos;node_modules&apos; in your project is generally unnecessary, and may reduce Visual Studio&apos;s performance. You can continue to use and deploy packages from &apos;node_modules&apos; without including it in your project..
         /// </summary>
-        public static string IncludeNodeModulesContent {
+        internal static string IncludeNodeModulesContent {
             get {
                 return ResourceManager.GetString("IncludeNodeModulesContent", resourceCulture);
             }
@@ -322,7 +322,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to This may be a long-running operation, during which Visual Studio will be unusable..
         /// </summary>
-        public static string IncludeNodeModulesIncludeDescription {
+        internal static string IncludeNodeModulesIncludeDescription {
             get {
                 return ResourceManager.GetString("IncludeNodeModulesIncludeDescription", resourceCulture);
             }
@@ -331,7 +331,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Include &apos;node_modules&apos; folder in project.
         /// </summary>
-        public static string IncludeNodeModulesIncludeTitle {
+        internal static string IncludeNodeModulesIncludeTitle {
             get {
                 return ResourceManager.GetString("IncludeNodeModulesIncludeTitle", resourceCulture);
             }
@@ -340,7 +340,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to &lt;a href=&quot;http://go.microsoft.com/fwlink/?LinkID=518083&quot;&gt;More Information&lt;/a&gt;.
         /// </summary>
-        public static string IncludeNodeModulesInformation {
+        internal static string IncludeNodeModulesInformation {
             get {
                 return ResourceManager.GetString("IncludeNodeModulesInformation", resourceCulture);
             }
@@ -349,7 +349,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Failed to start interactive process: {0}{1}{2}.
         /// </summary>
-        public static string InteractiveWindowFailedToStartProcessErrorMessage {
+        internal static string InteractiveWindowFailedToStartProcessErrorMessage {
             get {
                 return ResourceManager.GetString("InteractiveWindowFailedToStartProcessErrorMessage", resourceCulture);
             }
@@ -358,7 +358,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Current interactive window is disconnected - please reset the process..
         /// </summary>
-        public static string InteractiveWindowNoProcessErrorMessage {
+        internal static string InteractiveWindowNoProcessErrorMessage {
             get {
                 return ResourceManager.GetString("InteractiveWindowNoProcessErrorMessage", resourceCulture);
             }
@@ -367,7 +367,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to The process has exited.
         /// </summary>
-        public static string InteractiveWindowProcessExitedMessage {
+        internal static string InteractiveWindowProcessExitedMessage {
             get {
                 return ResourceManager.GetString("InteractiveWindowProcessExitedMessage", resourceCulture);
             }
@@ -376,7 +376,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js Interactive Window.
         /// </summary>
-        public static string InteractiveWindowTitle {
+        internal static string InteractiveWindowTitle {
             get {
                 return ResourceManager.GetString("InteractiveWindowTitle", resourceCulture);
             }
@@ -385,7 +385,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Invalid port number - the port should contain only digits..
         /// </summary>
-        public static string InvalidPortNumber {
+        internal static string InvalidPortNumber {
             get {
                 return ResourceManager.GetString("InvalidPortNumber", resourceCulture);
             }
@@ -394,7 +394,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well..
         /// </summary>
-        public static string LaunchUrlToolTip {
+        internal static string LaunchUrlToolTip {
             get {
                 return ResourceManager.GetString("LaunchUrlToolTip", resourceCulture);
             }
@@ -403,7 +403,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Not applicable for sub-packages..
         /// </summary>
-        public static string LinkStatusNotApplicableSubPackages {
+        internal static string LinkStatusNotApplicableSubPackages {
             get {
                 return ResourceManager.GetString("LinkStatusNotApplicableSubPackages", resourceCulture);
             }
@@ -412,7 +412,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Unknown.
         /// </summary>
-        public static string LinkStatusUnknown {
+        internal static string LinkStatusUnknown {
             get {
                 return ResourceManager.GetString("LinkStatusUnknown", resourceCulture);
             }
@@ -421,7 +421,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Copy Full Path.
         /// </summary>
-        public static string LongPathClickToCopy {
+        internal static string LongPathClickToCopy {
             get {
                 return ResourceManager.GetString("LongPathClickToCopy", resourceCulture);
             }
@@ -430,7 +430,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Do nothing and &amp;never warn me again.
         /// </summary>
-        public static string LongPathDoNothingAndDoNotWarnAgain {
+        internal static string LongPathDoNothingAndDoNotWarnAgain {
             get {
                 return ResourceManager.GetString("LongPathDoNothingAndDoNotWarnAgain", resourceCulture);
             }
@@ -439,7 +439,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to You can re-enable the check in Tools → Options → Node.js Tools → General..
         /// </summary>
-        public static string LongPathDoNothingAndDoNotWarnAgainDetail {
+        internal static string LongPathDoNothingAndDoNotWarnAgainDetail {
             get {
                 return ResourceManager.GetString("LongPathDoNothingAndDoNotWarnAgainDetail", resourceCulture);
             }
@@ -448,7 +448,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Do nothing, but &amp;warn me next time it happens.
         /// </summary>
-        public static string LongPathDoNothingButWarnNextTime {
+        internal static string LongPathDoNothingButWarnNextTime {
             get {
                 return ResourceManager.GetString("LongPathDoNothingButWarnNextTime", resourceCulture);
             }
@@ -457,7 +457,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to &lt;a href=&quot;#help&quot;&gt;Get more information&lt;/a&gt;.
         /// </summary>
-        public static string LongPathFooter {
+        internal static string LongPathFooter {
             get {
                 return ResourceManager.GetString("LongPathFooter", resourceCulture);
             }
@@ -466,7 +466,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Hide &amp;paths exceeding the limit.
         /// </summary>
-        public static string LongPathHidePathsExceedingTheLimit {
+        internal static string LongPathHidePathsExceedingTheLimit {
             get {
                 return ResourceManager.GetString("LongPathHidePathsExceedingTheLimit", resourceCulture);
             }
@@ -475,7 +475,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Run &apos;npm &amp;dedupe&apos; on the project.
         /// </summary>
-        public static string LongPathNpmDedupe {
+        internal static string LongPathNpmDedupe {
             get {
                 return ResourceManager.GetString("LongPathNpmDedupe", resourceCulture);
             }
@@ -484,7 +484,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue..
         /// </summary>
-        public static string LongPathNpmDedupeDetail {
+        internal static string LongPathNpmDedupeDetail {
             get {
                 return ResourceManager.GetString("LongPathNpmDedupeDetail", resourceCulture);
             }
@@ -493,7 +493,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Unfortunately, running &apos;npm dedupe&apos; did not resolve the issue. Please consult the &lt;a href=&quot;#help&quot;&gt;documentation&lt;/a&gt; for other potential workarounds..
         /// </summary>
-        public static string LongPathNpmDedupeDidNotHelp {
+        internal static string LongPathNpmDedupeDidNotHelp {
             get {
                 return ResourceManager.GetString("LongPathNpmDedupeDidNotHelp", resourceCulture);
             }
@@ -502,7 +502,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Show &amp;paths exceeding the limit.
         /// </summary>
-        public static string LongPathShowPathsExceedingTheLimit {
+        internal static string LongPathShowPathsExceedingTheLimit {
             get {
                 return ResourceManager.GetString("LongPathShowPathsExceedingTheLimit", resourceCulture);
             }
@@ -511,7 +511,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Your project folder contains one or more paths that exceed the &lt;a href=&quot;#msdn&quot;&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href=&quot;#uservoice&quot;&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features..
         /// </summary>
-        public static string LongPathWarningText {
+        internal static string LongPathWarningText {
             get {
                 return ResourceManager.GetString("LongPathWarningText", resourceCulture);
             }
@@ -520,7 +520,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Path Too Long Warning.
         /// </summary>
-        public static string LongPathWarningTitle {
+        internal static string LongPathWarningTitle {
             get {
                 return ResourceManager.GetString("LongPathWarningTitle", resourceCulture);
             }
@@ -529,7 +529,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Arguments to Node.exe.
         /// </summary>
-        public static string NodeExeArguments {
+        internal static string NodeExeArguments {
             get {
                 return ResourceManager.GetString("NodeExeArguments", resourceCulture);
             }
@@ -538,7 +538,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the options provided to node.exe, such as -e or -i..
         /// </summary>
-        public static string NodeExeArgumentsDescription {
+        internal static string NodeExeArgumentsDescription {
             get {
                 return ResourceManager.GetString("NodeExeArgumentsDescription", resourceCulture);
             }
@@ -547,7 +547,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the options provided to node.exe, such as -e or -i..
         /// </summary>
-        public static string NodeExeArgumentsToolTip {
+        internal static string NodeExeArgumentsToolTip {
             get {
                 return ResourceManager.GetString("NodeExeArgumentsToolTip", resourceCulture);
             }
@@ -556,7 +556,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Your project is currently configured to look for Node.exe at &quot;{0}&quot; but the file does not exist..
         /// </summary>
-        public static string NodeExeDoesntExist {
+        internal static string NodeExeDoesntExist {
             get {
                 return ResourceManager.GetString("NodeExeDoesntExist", resourceCulture);
             }
@@ -565,7 +565,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.exe path.
         /// </summary>
-        public static string NodeExePath {
+        internal static string NodeExePath {
             get {
                 return ResourceManager.GetString("NodeExePath", resourceCulture);
             }
@@ -574,7 +574,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the path to the node.exe executable..
         /// </summary>
-        public static string NodeExePathDescription {
+        internal static string NodeExePathDescription {
             get {
                 return ResourceManager.GetString("NodeExePathDescription", resourceCulture);
             }
@@ -583,7 +583,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to The specified Node.js interpreter does not exist..
         /// </summary>
-        public static string NodeExePathNotFound {
+        internal static string NodeExePathNotFound {
             get {
                 return ResourceManager.GetString("NodeExePathNotFound", resourceCulture);
             }
@@ -592,7 +592,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the path to the node.exe executable..
         /// </summary>
-        public static string NodeExePathToolTip {
+        internal static string NodeExePathToolTip {
             get {
                 return ResourceManager.GetString("NodeExePathToolTip", resourceCulture);
             }
@@ -601,7 +601,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project&apos;s properties page..
         /// </summary>
-        public static string NodejsNotInstalled {
+        internal static string NodejsNotInstalled {
             get {
                 return ResourceManager.GetString("NodejsNotInstalled", resourceCulture);
             }
@@ -610,7 +610,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js has not been detected on your computer.
         /// </summary>
-        public static string NodejsNotInstalledShort {
+        internal static string NodejsNotInstalledShort {
             get {
                 return ResourceManager.GetString("NodejsNotInstalledShort", resourceCulture);
             }
@@ -619,7 +619,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to This version of Node.js ({0}) is not supported. Please upgrade to Node.js v0.10.20 or later..
         /// </summary>
-        public static string NodejsNotSupported {
+        internal static string NodejsNotSupported {
             get {
                 return ResourceManager.GetString("NodejsNotSupported", resourceCulture);
             }
@@ -628,7 +628,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js Port.
         /// </summary>
-        public static string NodejsPort {
+        internal static string NodejsPort {
             get {
                 return ResourceManager.GetString("NodejsPort", resourceCulture);
             }
@@ -637,7 +637,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the port number used for process.env.port, if unspecified a random port is generated..
         /// </summary>
-        public static string NodejsPortDescription {
+        internal static string NodejsPortDescription {
             get {
                 return ResourceManager.GetString("NodejsPortDescription", resourceCulture);
             }
@@ -646,7 +646,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the port number used for process.env.port, if unspecified a random port is generated..
         /// </summary>
-        public static string NodejsPortToolTip {
+        internal static string NodejsPortToolTip {
             get {
                 return ResourceManager.GetString("NodejsPortToolTip", resourceCulture);
             }
@@ -655,7 +655,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js Tools for Visual Studio.
         /// </summary>
-        public static string NodejsToolsForVisualStudio {
+        internal static string NodejsToolsForVisualStudio {
             get {
                 return ResourceManager.GetString("NodejsToolsForVisualStudio", resourceCulture);
             }
@@ -664,7 +664,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Unable to parse {0} from your project.  Please fix any errors and try again..
         /// </summary>
-        public static string NodeModulesCouldNotParsePackageJsonErrorMessageText {
+        internal static string NodeModulesCouldNotParsePackageJsonErrorMessageText {
             get {
                 return ResourceManager.GetString("NodeModulesCouldNotParsePackageJsonErrorMessageText", resourceCulture);
             }
@@ -673,7 +673,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to (This package has no keywords.).
         /// </summary>
-        public static string NoKeywordsInPackage {
+        internal static string NoKeywordsInPackage {
             get {
                 return ResourceManager.GetString("NoKeywordsInPackage", resourceCulture);
             }
@@ -682,7 +682,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} cancelled.
         /// </summary>
-        public static string NpmCancelled {
+        internal static string NpmCancelled {
             get {
                 return ResourceManager.GetString("NpmCancelled", resourceCulture);
             }
@@ -691,7 +691,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} cancelled with errors - see Output window for details.
         /// </summary>
-        public static string NpmCancelledWithErrors {
+        internal static string NpmCancelledWithErrors {
             get {
                 return ResourceManager.GetString("NpmCancelledWithErrors", resourceCulture);
             }
@@ -700,16 +700,25 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
         /// </summary>
-        public static string NpmCompletedWithErrors {
+        internal static string NpmCompletedWithErrors {
             get {
                 return ResourceManager.GetString("NpmCompletedWithErrors", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] &lt;npm arguments&gt;.
+        /// </summary>
+        internal static string NpmExecuteCommand {
+            get {
+                return ResourceManager.GetString("NpmExecuteCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Package Installations.
         /// </summary>
-        public static string NpmNodePackageInstallation {
+        internal static string NpmNodePackageInstallation {
             get {
                 return ResourceManager.GetString("NpmNodePackageInstallation", resourceCulture);
             }
@@ -718,7 +727,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether the node manages local or global npm package installations..
         /// </summary>
-        public static string NpmNodePackageInstallationDescription {
+        internal static string NpmNodePackageInstallationDescription {
             get {
                 return ResourceManager.GetString("NpmNodePackageInstallationDescription", resourceCulture);
             }
@@ -727,7 +736,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Path.
         /// </summary>
-        public static string NpmNodePath {
+        internal static string NpmNodePath {
             get {
                 return ResourceManager.GetString("NpmNodePath", resourceCulture);
             }
@@ -736,7 +745,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Base path in which npm packages are installed..
         /// </summary>
-        public static string NpmNodePathDescription {
+        internal static string NpmNodePathDescription {
             get {
                 return ResourceManager.GetString("NpmNodePathDescription", resourceCulture);
             }
@@ -745,7 +754,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to npm Not Installed.
         /// </summary>
-        public static string NpmNotInstalledMessageCaption {
+        internal static string NpmNotInstalledMessageCaption {
             get {
                 return ResourceManager.GetString("NpmNotInstalledMessageCaption", resourceCulture);
             }
@@ -758,7 +767,7 @@ namespace Microsoft.NodejsTools {
         ///
         ///{0}.
         /// </summary>
-        public static string NpmNotInstalledMessageText {
+        internal static string NpmNotInstalledMessageText {
             get {
                 return ResourceManager.GetString("NpmNotInstalledMessageText", resourceCulture);
             }
@@ -767,7 +776,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Npm.
         /// </summary>
-        public static string NpmOutputPaneTitle {
+        internal static string NpmOutputPaneTitle {
             get {
                 return ResourceManager.GetString("NpmOutputPaneTitle", resourceCulture);
             }
@@ -776,7 +785,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Author.
         /// </summary>
-        public static string NpmPackageAuthor {
+        internal static string NpmPackageAuthor {
             get {
                 return ResourceManager.GetString("NpmPackageAuthor", resourceCulture);
             }
@@ -785,7 +794,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Primary or original author of package; there may also be additional contributors..
         /// </summary>
-        public static string NpmPackageAuthorDescription {
+        internal static string NpmPackageAuthorDescription {
             get {
                 return ResourceManager.GetString("NpmPackageAuthorDescription", resourceCulture);
             }
@@ -794,7 +803,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Description.
         /// </summary>
-        public static string NpmPackageDescription {
+        internal static string NpmPackageDescription {
             get {
                 return ResourceManager.GetString("NpmPackageDescription", resourceCulture);
             }
@@ -803,7 +812,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Package description..
         /// </summary>
-        public static string NpmPackageDescriptionDescription {
+        internal static string NpmPackageDescriptionDescription {
             get {
                 return ResourceManager.GetString("NpmPackageDescriptionDescription", resourceCulture);
             }
@@ -812,7 +821,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to (enter arguments above).
         /// </summary>
-        public static string NpmPackageInstallHelpMessage {
+        internal static string NpmPackageInstallHelpMessage {
             get {
                 return ResourceManager.GetString("NpmPackageInstallHelpMessage", resourceCulture);
             }
@@ -821,7 +830,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Bundled Dependency.
         /// </summary>
-        public static string NpmPackageIsBundledDependency {
+        internal static string NpmPackageIsBundledDependency {
             get {
                 return ResourceManager.GetString("NpmPackageIsBundledDependency", resourceCulture);
             }
@@ -830,7 +839,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not the package is a bundled dependency..
         /// </summary>
-        public static string NpmPackageIsBundledDependencyDescription {
+        internal static string NpmPackageIsBundledDependencyDescription {
             get {
                 return ResourceManager.GetString("NpmPackageIsBundledDependencyDescription", resourceCulture);
             }
@@ -839,7 +848,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Dev Dependency.
         /// </summary>
-        public static string NpmPackageIsDevDependency {
+        internal static string NpmPackageIsDevDependency {
             get {
                 return ResourceManager.GetString("NpmPackageIsDevDependency", resourceCulture);
             }
@@ -848,7 +857,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not the package is a development dependency..
         /// </summary>
-        public static string NpmPackageIsDevDependencyDescription {
+        internal static string NpmPackageIsDevDependencyDescription {
             get {
                 return ResourceManager.GetString("NpmPackageIsDevDependencyDescription", resourceCulture);
             }
@@ -857,7 +866,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Listed As Dependency.
         /// </summary>
-        public static string NpmPackageIsListedInParentPackageJson {
+        internal static string NpmPackageIsListedInParentPackageJson {
             get {
                 return ResourceManager.GetString("NpmPackageIsListedInParentPackageJson", resourceCulture);
             }
@@ -866,7 +875,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not the package is listed as a package.json dependency..
         /// </summary>
-        public static string NpmPackageIsListedInParentPackageJsonDescription {
+        internal static string NpmPackageIsListedInParentPackageJsonDescription {
             get {
                 return ResourceManager.GetString("NpmPackageIsListedInParentPackageJsonDescription", resourceCulture);
             }
@@ -875,7 +884,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Missing.
         /// </summary>
-        public static string NpmPackageIsMissing {
+        internal static string NpmPackageIsMissing {
             get {
                 return ResourceManager.GetString("NpmPackageIsMissing", resourceCulture);
             }
@@ -884,7 +893,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not the package is a missing dependency..
         /// </summary>
-        public static string NpmPackageIsMissingDescription {
+        internal static string NpmPackageIsMissingDescription {
             get {
                 return ResourceManager.GetString("NpmPackageIsMissingDescription", resourceCulture);
             }
@@ -893,7 +902,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Optional Dependency.
         /// </summary>
-        public static string NpmPackageIsOptionalDependency {
+        internal static string NpmPackageIsOptionalDependency {
             get {
                 return ResourceManager.GetString("NpmPackageIsOptionalDependency", resourceCulture);
             }
@@ -902,7 +911,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not the package is an optional dependency..
         /// </summary>
-        public static string NpmPackageIsOptionalDependencyDescription {
+        internal static string NpmPackageIsOptionalDependencyDescription {
             get {
                 return ResourceManager.GetString("NpmPackageIsOptionalDependencyDescription", resourceCulture);
             }
@@ -911,7 +920,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Keywords.
         /// </summary>
-        public static string NpmPackageKeywords {
+        internal static string NpmPackageKeywords {
             get {
                 return ResourceManager.GetString("NpmPackageKeywords", resourceCulture);
             }
@@ -920,7 +929,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Package keywords..
         /// </summary>
-        public static string NpmPackageKeywordsDescription {
+        internal static string NpmPackageKeywordsDescription {
             get {
                 return ResourceManager.GetString("NpmPackageKeywordsDescription", resourceCulture);
             }
@@ -929,7 +938,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Link Status.
         /// </summary>
-        public static string NpmPackageLinkStatus {
+        internal static string NpmPackageLinkStatus {
             get {
                 return ResourceManager.GetString("NpmPackageLinkStatus", resourceCulture);
             }
@@ -938,7 +947,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether a package has been linked from globally installed packages..
         /// </summary>
-        public static string NpmPackageLinkStatusDescription {
+        internal static string NpmPackageLinkStatusDescription {
             get {
                 return ResourceManager.GetString("NpmPackageLinkStatusDescription", resourceCulture);
             }
@@ -947,7 +956,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Package Name.
         /// </summary>
-        public static string NpmPackageName {
+        internal static string NpmPackageName {
             get {
                 return ResourceManager.GetString("NpmPackageName", resourceCulture);
             }
@@ -956,7 +965,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Name of package, as specified in its package.json..
         /// </summary>
-        public static string NpmPackageNameDescription {
+        internal static string NpmPackageNameDescription {
             get {
                 return ResourceManager.GetString("NpmPackageNameDescription", resourceCulture);
             }
@@ -965,7 +974,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Newer Version Available.
         /// </summary>
-        public static string NpmPackageNewVersionAvailable {
+        internal static string NpmPackageNewVersionAvailable {
             get {
                 return ResourceManager.GetString("NpmPackageNewVersionAvailable", resourceCulture);
             }
@@ -974,7 +983,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether or not a newer version of the package is available..
         /// </summary>
-        public static string NpmPackageNewVersionAvailableDescription {
+        internal static string NpmPackageNewVersionAvailableDescription {
             get {
                 return ResourceManager.GetString("NpmPackageNewVersionAvailableDescription", resourceCulture);
             }
@@ -983,7 +992,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Path.
         /// </summary>
-        public static string NpmPackagePath {
+        internal static string NpmPackagePath {
             get {
                 return ResourceManager.GetString("NpmPackagePath", resourceCulture);
             }
@@ -992,7 +1001,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Location of package on disk..
         /// </summary>
-        public static string NpmPackagePathDescription {
+        internal static string NpmPackagePathDescription {
             get {
                 return ResourceManager.GetString("NpmPackagePathDescription", resourceCulture);
             }
@@ -1001,7 +1010,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Requested Version.
         /// </summary>
-        public static string NpmPackageRequestedVersionRange {
+        internal static string NpmPackageRequestedVersionRange {
             get {
                 return ResourceManager.GetString("NpmPackageRequestedVersionRange", resourceCulture);
             }
@@ -1010,7 +1019,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Version of package requested in package.json belonging to parent package or project..
         /// </summary>
-        public static string NpmPackageRequestedVersionRangeDescription {
+        internal static string NpmPackageRequestedVersionRangeDescription {
             get {
                 return ResourceManager.GetString("NpmPackageRequestedVersionRangeDescription", resourceCulture);
             }
@@ -1019,7 +1028,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Package Type.
         /// </summary>
-        public static string NpmPackageType {
+        internal static string NpmPackageType {
             get {
                 return ResourceManager.GetString("NpmPackageType", resourceCulture);
             }
@@ -1028,7 +1037,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Indicates whether package is global, or locally installed in your project, and whether or not it is a sub-package..
         /// </summary>
-        public static string NpmPackageTypeDescription {
+        internal static string NpmPackageTypeDescription {
             get {
                 return ResourceManager.GetString("NpmPackageTypeDescription", resourceCulture);
             }
@@ -1037,7 +1046,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
-        public static string NpmPackageVersion {
+        internal static string NpmPackageVersion {
             get {
                 return ResourceManager.GetString("NpmPackageVersion", resourceCulture);
             }
@@ -1046,7 +1055,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Installed version of package..
         /// </summary>
-        public static string NpmPackageVersionDescription {
+        internal static string NpmPackageVersionDescription {
             get {
                 return ResourceManager.GetString("NpmPackageVersionDescription", resourceCulture);
             }
@@ -1055,16 +1064,25 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} completed with errors.
         /// </summary>
-        public static string NpmReplCommandCompletedWithErrors {
+        internal static string NpmReplCommandCompletedWithErrors {
             get {
                 return ResourceManager.GetString("NpmReplCommandCompletedWithErrors", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] &lt;npm arguments&gt; For example: .npm [MyApp] list..
+        /// </summary>
+        internal static string NpmSpecifyValidProject {
+            get {
+                return ResourceManager.GetString("NpmSpecifyValidProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executing: {0}.
         /// </summary>
-        public static string NpmStatusExecuting {
+        internal static string NpmStatusExecuting {
             get {
                 return ResourceManager.GetString("NpmStatusExecuting", resourceCulture);
             }
@@ -1073,7 +1091,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Errors Encountered ({1}) - Executing: {0}.
         /// </summary>
-        public static string NpmStatusExecutingErrors {
+        internal static string NpmStatusExecutingErrors {
             get {
                 return ResourceManager.GetString("NpmStatusExecutingErrors", resourceCulture);
             }
@@ -1082,7 +1100,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Executing: {0} ({1} command(s) queued).
         /// </summary>
-        public static string NpmStatusExecutingQueued {
+        internal static string NpmStatusExecutingQueued {
             get {
                 return ResourceManager.GetString("NpmStatusExecutingQueued", resourceCulture);
             }
@@ -1091,7 +1109,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Errors Encountered ({2}) - Executing: {0} ({1} command(s) queued).
         /// </summary>
-        public static string NpmStatusExecutingQueuedErrors {
+        internal static string NpmStatusExecutingQueuedErrors {
             get {
                 return ResourceManager.GetString("NpmStatusExecutingQueuedErrors", resourceCulture);
             }
@@ -1100,7 +1118,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Ready.
         /// </summary>
-        public static string NpmStatusReady {
+        internal static string NpmStatusReady {
             get {
                 return ResourceManager.GetString("NpmStatusReady", resourceCulture);
             }
@@ -1109,7 +1127,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Ready - Command(s) completed with errors ({0}).
         /// </summary>
-        public static string NpmStatusReadyWithErrors {
+        internal static string NpmStatusReadyWithErrors {
             get {
                 return ResourceManager.GetString("NpmStatusReadyWithErrors", resourceCulture);
             }
@@ -1118,7 +1136,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} successfully completed.
         /// </summary>
-        public static string NpmSuccessfullyCompleted {
+        internal static string NpmSuccessfullyCompleted {
             get {
                 return ResourceManager.GetString("NpmSuccessfullyCompleted", resourceCulture);
             }
@@ -1127,7 +1145,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Today at {0:t}.
         /// </summary>
-        public static string PackageCatalogRefresh0Days {
+        internal static string PackageCatalogRefresh0Days {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh0Days", resourceCulture);
             }
@@ -1136,7 +1154,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Yesterday at {0:t}.
         /// </summary>
-        public static string PackageCatalogRefresh1Day {
+        internal static string PackageCatalogRefresh1Day {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh1Day", resourceCulture);
             }
@@ -1145,7 +1163,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to More than 1 month ago.
         /// </summary>
-        public static string PackageCatalogRefresh1Month {
+        internal static string PackageCatalogRefresh1Month {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh1Month", resourceCulture);
             }
@@ -1154,7 +1172,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to More than 1 week ago.
         /// </summary>
-        public static string PackageCatalogRefresh1Week {
+        internal static string PackageCatalogRefresh1Week {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh1Week", resourceCulture);
             }
@@ -1163,7 +1181,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to {0} days ago.
         /// </summary>
-        public static string PackageCatalogRefresh2To7Days {
+        internal static string PackageCatalogRefresh2To7Days {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh2To7Days", resourceCulture);
             }
@@ -1172,7 +1190,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to More than 2 weeks ago.
         /// </summary>
-        public static string PackageCatalogRefresh2Weeks {
+        internal static string PackageCatalogRefresh2Weeks {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh2Weeks", resourceCulture);
             }
@@ -1181,7 +1199,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to More than 3 months ago.
         /// </summary>
-        public static string PackageCatalogRefresh3Months {
+        internal static string PackageCatalogRefresh3Months {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh3Months", resourceCulture);
             }
@@ -1190,7 +1208,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to More than 3 weeks ago.
         /// </summary>
-        public static string PackageCatalogRefresh3Weeks {
+        internal static string PackageCatalogRefresh3Weeks {
             get {
                 return ResourceManager.GetString("PackageCatalogRefresh3Weeks", resourceCulture);
             }
@@ -1199,7 +1217,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Refresh failed - see output below for details.
         /// </summary>
-        public static string PackageCatalogRefreshFailed {
+        internal static string PackageCatalogRefreshFailed {
             get {
                 return ResourceManager.GetString("PackageCatalogRefreshFailed", resourceCulture);
             }
@@ -1208,7 +1226,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Currently refreshing.
         /// </summary>
-        public static string PackageCatalogRefreshing {
+        internal static string PackageCatalogRefreshing {
             get {
                 return ResourceManager.GetString("PackageCatalogRefreshing", resourceCulture);
             }
@@ -1217,16 +1235,34 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Local.
         /// </summary>
-        public static string PackageInstallationLocal {
+        internal static string PackageInstallationLocal {
             get {
                 return ResourceManager.GetString("PackageInstallationLocal", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package.json not checked out.
+        /// </summary>
+        internal static string PackageJsonNotCheckedOutCaption {
+            get {
+                return ResourceManager.GetString("PackageJsonNotCheckedOutCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to check out &apos;package.json&apos;. Please ensure the file is checked out, before adding or removing NPM packages..
+        /// </summary>
+        internal static string PackageJsonNotCheckedOutMessage {
+            get {
+                return ResourceManager.GetString("PackageJsonNotCheckedOutMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Local.
         /// </summary>
-        public static string PackageTypeLocal {
+        internal static string PackageTypeLocal {
             get {
                 return ResourceManager.GetString("PackageTypeLocal", resourceCulture);
             }
@@ -1235,7 +1271,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Local sub-package.
         /// </summary>
-        public static string PackageTypeLocalSubpackage {
+        internal static string PackageTypeLocalSubpackage {
             get {
                 return ResourceManager.GetString("PackageTypeLocalSubpackage", resourceCulture);
             }
@@ -1244,7 +1280,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Browse for working directory.
         /// </summary>
-        public static string PropertiesBrowseDirectoryAccessibleName {
+        internal static string PropertiesBrowseDirectoryAccessibleName {
             get {
                 return ResourceManager.GetString("PropertiesBrowseDirectoryAccessibleName", resourceCulture);
             }
@@ -1253,7 +1289,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Browse for node.exe.
         /// </summary>
-        public static string PropertiesBrowsePathAccessibleName {
+        internal static string PropertiesBrowsePathAccessibleName {
             get {
                 return ResourceManager.GetString("PropertiesBrowsePathAccessibleName", resourceCulture);
             }
@@ -1262,7 +1298,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Local Package Properties.
         /// </summary>
-        public static string PropertiesClassLocalPackage {
+        internal static string PropertiesClassLocalPackage {
             get {
                 return ResourceManager.GetString("PropertiesClassLocalPackage", resourceCulture);
             }
@@ -1271,7 +1307,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Local Sub-Package Properties.
         /// </summary>
-        public static string PropertiesClassLocalSubPackage {
+        internal static string PropertiesClassLocalSubPackage {
             get {
                 return ResourceManager.GetString("PropertiesClassLocalSubPackage", resourceCulture);
             }
@@ -1280,7 +1316,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to npm Packages Properties.
         /// </summary>
-        public static string PropertiesClassNpm {
+        internal static string PropertiesClassNpm {
             get {
                 return ResourceManager.GetString("PropertiesClassNpm", resourceCulture);
             }
@@ -1289,7 +1325,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to &amp;Debugger port:.
         /// </summary>
-        public static string PropertiesDebuggerPort {
+        internal static string PropertiesDebuggerPort {
             get {
                 return ResourceManager.GetString("PropertiesDebuggerPort", resourceCulture);
             }
@@ -1298,7 +1334,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Environment &amp;Variables:.
         /// </summary>
-        public static string PropertiesEnvVars {
+        internal static string PropertiesEnvVars {
             get {
                 return ResourceManager.GetString("PropertiesEnvVars", resourceCulture);
             }
@@ -1307,7 +1343,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Launch &amp;URL:.
         /// </summary>
-        public static string PropertiesLaunchUrl {
+        internal static string PropertiesLaunchUrl {
             get {
                 return ResourceManager.GetString("PropertiesLaunchUrl", resourceCulture);
             }
@@ -1316,7 +1352,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to N&amp;ode.exe options:.
         /// </summary>
-        public static string PropertiesNodeExeOptions {
+        internal static string PropertiesNodeExeOptions {
             get {
                 return ResourceManager.GetString("PropertiesNodeExeOptions", resourceCulture);
             }
@@ -1325,7 +1361,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.exe &amp;path:.
         /// </summary>
-        public static string PropertiesNodeExePath {
+        internal static string PropertiesNodeExePath {
             get {
                 return ResourceManager.GetString("PropertiesNodeExePath", resourceCulture);
             }
@@ -1334,7 +1370,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.&amp;js port:.
         /// </summary>
-        public static string PropertiesNodePort {
+        internal static string PropertiesNodePort {
             get {
                 return ResourceManager.GetString("PropertiesNodePort", resourceCulture);
             }
@@ -1343,7 +1379,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to &amp;Script (startup file):.
         /// </summary>
-        public static string PropertiesScript {
+        internal static string PropertiesScript {
             get {
                 return ResourceManager.GetString("PropertiesScript", resourceCulture);
             }
@@ -1352,7 +1388,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Script ar&amp;guments:.
         /// </summary>
-        public static string PropertiesScriptArgs {
+        internal static string PropertiesScriptArgs {
             get {
                 return ResourceManager.GetString("PropertiesScriptArgs", resourceCulture);
             }
@@ -1361,7 +1397,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to St&amp;art web browser on launch.
         /// </summary>
-        public static string PropertiesStartBrowser {
+        internal static string PropertiesStartBrowser {
             get {
                 return ResourceManager.GetString("PropertiesStartBrowser", resourceCulture);
             }
@@ -1370,7 +1406,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Working director&amp;y:.
         /// </summary>
-        public static string PropertiesWorkingDir {
+        internal static string PropertiesWorkingDir {
             get {
                 return ResourceManager.GetString("PropertiesWorkingDir", resourceCulture);
             }
@@ -1379,7 +1415,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host..
         /// </summary>
-        public static string RemoteDebugCheckProxyAndPortErrorMessage {
+        internal static string RemoteDebugCheckProxyAndPortErrorMessage {
             get {
                 return ResourceManager.GetString("RemoteDebugCheckProxyAndPortErrorMessage", resourceCulture);
             }
@@ -1390,7 +1426,7 @@ namespace Microsoft.NodejsTools {
         ///
         ///.
         /// </summary>
-        public static string RemoteDebugCouldNotAttachErrorMessage {
+        internal static string RemoteDebugCouldNotAttachErrorMessage {
             get {
                 return ResourceManager.GetString("RemoteDebugCouldNotAttachErrorMessage", resourceCulture);
             }
@@ -1399,7 +1435,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Make sure that the Azure web site is deployed in the Debug configuration, and web sockets are enabled for it in the Azure management portal..
         /// </summary>
-        public static string RemoteDebugEnableWebSocketsErrorMessage {
+        internal static string RemoteDebugEnableWebSocketsErrorMessage {
             get {
                 return ResourceManager.GetString("RemoteDebugEnableWebSocketsErrorMessage", resourceCulture);
             }
@@ -1408,7 +1444,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Remote Debug Proxy &quot;{0}&quot; does not exist..
         /// </summary>
-        public static string RemoteDebugProxyFileDoesNotExist {
+        internal static string RemoteDebugProxyFileDoesNotExist {
             get {
                 return ResourceManager.GetString("RemoteDebugProxyFileDoesNotExist", resourceCulture);
             }
@@ -1417,7 +1453,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could not find RemoteDebugProxyFolder.
         /// </summary>
-        public static string RemoteDebugProxyFolderDoesNotExist {
+        internal static string RemoteDebugProxyFolderDoesNotExist {
             get {
                 return ResourceManager.GetString("RemoteDebugProxyFolderDoesNotExist", resourceCulture);
             }
@@ -1426,7 +1462,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above..
         /// </summary>
-        public static string RemoteDebugUnsupportedPlatformErrorMessage {
+        internal static string RemoteDebugUnsupportedPlatformErrorMessage {
             get {
                 return ResourceManager.GetString("RemoteDebugUnsupportedPlatformErrorMessage", resourceCulture);
             }
@@ -1435,7 +1471,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
         /// </summary>
-        public static string ReplInitializationMessage {
+        internal static string ReplInitializationMessage {
             get {
                 return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
             }
@@ -1444,7 +1480,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Please run &apos;.npm init -y&apos; to create a new package.json file..
         /// </summary>
-        public static string ReplWindowNpmInitNoYesFlagWarning {
+        internal static string ReplWindowNpmInitNoYesFlagWarning {
             get {
                 return ResourceManager.GetString("ReplWindowNpmInitNoYesFlagWarning", resourceCulture);
             }
@@ -1453,7 +1489,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to None.
         /// </summary>
-        public static string RequestedVersionRangeNone {
+        internal static string RequestedVersionRangeNone {
             get {
                 return ResourceManager.GetString("RequestedVersionRangeNone", resourceCulture);
             }
@@ -1462,7 +1498,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the arguments passed to the script on launch..
         /// </summary>
-        public static string ScriptArgumentsToolTip {
+        internal static string ScriptArgumentsToolTip {
             get {
                 return ResourceManager.GetString("ScriptArgumentsToolTip", resourceCulture);
             }
@@ -1471,7 +1507,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the script run on launch..
         /// </summary>
-        public static string ScriptFileTooltip {
+        internal static string ScriptFileTooltip {
             get {
                 return ResourceManager.GetString("ScriptFileTooltip", resourceCulture);
             }
@@ -1480,7 +1516,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to When checked a web browser is opened on launch.
         /// </summary>
-        public static string StartBrowserToolTip {
+        internal static string StartBrowserToolTip {
             get {
                 return ResourceManager.GetString("StartBrowserToolTip", resourceCulture);
             }
@@ -1489,7 +1525,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js code analysis is up to date, analyzed {0:N0} function(s) in {1}.
         /// </summary>
-        public static string StatusAnalysisUpToDate {
+        internal static string StatusAnalysisUpToDate {
             get {
                 return ResourceManager.GetString("StatusAnalysisUpToDate", resourceCulture);
             }
@@ -1498,7 +1534,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Node.js IntelliSense typings folder is up to date.
         /// </summary>
-        public static string StatusTypingsLoaded {
+        internal static string StatusTypingsLoaded {
             get {
                 return ResourceManager.GetString("StatusTypingsLoaded", resourceCulture);
             }
@@ -1507,7 +1543,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Loading Node.js IntelliSense typings for npm packages....
         /// </summary>
-        public static string StatusTypingsLoading {
+        internal static string StatusTypingsLoading {
             get {
                 return ResourceManager.GetString("StatusTypingsLoading", resourceCulture);
             }
@@ -1516,7 +1552,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Test Framework.
         /// </summary>
-        public static string TestFramework {
+        internal static string TestFramework {
             get {
                 return ResourceManager.GetString("TestFramework", resourceCulture);
             }
@@ -1525,25 +1561,25 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the test framework this file applies to..
         /// </summary>
-        public static string TestFrameworkDescription {
+        internal static string TestFrameworkDescription {
             get {
                 return ResourceManager.GetString("TestFrameworkDescription", resourceCulture);
             }
         }
-#if !DEV15
+        
         /// <summary>
         ///   Looks up a localized string similar to Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed.
         /// </summary>
-        public static string TypeScriptMinVersionNotInstalled {
+        internal static string TypeScriptMinVersionNotInstalled {
             get {
                 return ResourceManager.GetString("TypeScriptMinVersionNotInstalled", resourceCulture);
             }
         }
-#endif
+        
         /// <summary>
         ///   Looks up a localized string similar to Node.js IntelliSense added a .
         /// </summary>
-        public static string TypingsInfoBarSpan1 {
+        internal static string TypingsInfoBarSpan1 {
             get {
                 return ResourceManager.GetString("TypingsInfoBarSpan1", resourceCulture);
             }
@@ -1552,7 +1588,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to typings folder.
         /// </summary>
-        public static string TypingsInfoBarSpan2 {
+        internal static string TypingsInfoBarSpan2 {
             get {
                 return ResourceManager.GetString("TypingsInfoBarSpan2", resourceCulture);
             }
@@ -1561,7 +1597,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to  to your project.
         /// </summary>
-        public static string TypingsInfoBarSpan3 {
+        internal static string TypingsInfoBarSpan3 {
             get {
                 return ResourceManager.GetString("TypingsInfoBarSpan3", resourceCulture);
             }
@@ -1570,7 +1606,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Customize....
         /// </summary>
-        public static string TypingsOpenOptionsText {
+        internal static string TypingsOpenOptionsText {
             get {
                 return ResourceManager.GetString("TypingsOpenOptionsText", resourceCulture);
             }
@@ -1579,7 +1615,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could not start Typings tool used for IntelliSense.
         /// </summary>
-        public static string TypingsToolCouldNotStart {
+        internal static string TypingsToolCouldNotStart {
             get {
                 return ResourceManager.GetString("TypingsToolCouldNotStart", resourceCulture);
             }
@@ -1588,7 +1624,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed.
         /// </summary>
-        public static string TypingsToolInstallFailed {
+        internal static string TypingsToolInstallFailed {
             get {
                 return ResourceManager.GetString("TypingsToolInstallFailed", resourceCulture);
             }
@@ -1597,7 +1633,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Could not find Typings package manager tool used for IntelliSense.
         /// </summary>
-        public static string TypingsToolNotInstalledError {
+        internal static string TypingsToolNotInstalledError {
             get {
                 return ResourceManager.GetString("TypingsToolNotInstalledError", resourceCulture);
             }
@@ -1606,7 +1642,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Successfully installed typing files for IntelliSense..
         /// </summary>
-        public static string TypingsToolTypingsInstallCompleted {
+        internal static string TypingsToolTypingsInstallCompleted {
             get {
                 return ResourceManager.GetString("TypingsToolTypingsInstallCompleted", resourceCulture);
             }
@@ -1615,7 +1651,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to An error occurred installing typings used for IntelliSense..
         /// </summary>
-        public static string TypingsToolTypingsInstallErrorOccurred {
+        internal static string TypingsToolTypingsInstallErrorOccurred {
             get {
                 return ResourceManager.GetString("TypingsToolTypingsInstallErrorOccurred", resourceCulture);
             }
@@ -1624,7 +1660,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Replaced &lt;EnvironmentVariables&gt; property with &lt;Environment&gt;. This project will no longer work with NTVS 1.0 beta 2 or below..
         /// </summary>
-        public static string UpgradedEnvironmentVariables {
+        internal static string UpgradedEnvironmentVariables {
             get {
                 return ResourceManager.GetString("UpgradedEnvironmentVariables", resourceCulture);
             }
@@ -1633,7 +1669,7 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to The specified working directory is invalid or missing..
         /// </summary>
-        public static string WorkingDirInvalidOrMissing {
+        internal static string WorkingDirInvalidOrMissing {
             get {
                 return ResourceManager.GetString("WorkingDirInvalidOrMissing", resourceCulture);
             }
@@ -1642,27 +1678,9 @@ namespace Microsoft.NodejsTools {
         /// <summary>
         ///   Looks up a localized string similar to Specifies the working directory where the node.exe process is launched..
         /// </summary>
-        public static string WorkingDirToolTip {
+        internal static string WorkingDirToolTip {
             get {
                 return ResourceManager.GetString("WorkingDirToolTip", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Package.json not checked out.
-        /// </summary>
-        public static string PackageJsonNotCheckedOutCaption {
-            get {
-                return ResourceManager.GetString("PackageJsonNotCheckedOutCaption", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to checkout 'package.json'. Please ..
-        /// </summary>
-        public static string PackageJsonNotCheckedOutMessage {
-            get {
-                return ResourceManager.GetString("PackageJsonNotCheckedOutMessage", resourceCulture);
             }
         }
     }

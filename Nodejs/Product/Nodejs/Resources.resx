@@ -662,4 +662,10 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="PackageJsonNotCheckedOutMessage" xml:space="preserve">
     <value>Failed to check out 'package.json'. Please ensure the file is checked out, before adding or removing NPM packages.</value>
   </data>
+  <data name="NpmSpecifyValidProject" xml:space="preserve">
+    <value>Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] &lt;npm arguments&gt; For example: .npm [MyApp] list.</value>
+  </data>
+  <data name="NpmExecuteCommand" xml:space="preserve">
+    <value>Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] &lt;npm arguments&gt;</value>
+  </data>
 </root>
