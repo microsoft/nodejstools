@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Microsoft.NodejsTools.TestFrameworks
 {
@@ -10,52 +11,56 @@ namespace Microsoft.NodejsTools.TestFrameworks
     {
         public const string ExportRunnerFramework = "ExportRunner";
         private const string TestFrameworksDirectory = "TestFrameworks";
+        private const string TestAdapterDirectory = "TestAdapter";
 
-        private readonly Dictionary<string, string> _frameworkDirectories;
+        private readonly Dictionary<string, string> frameworkDirectories;
 
         public TestFrameworkDirectories()
         {
-            this._frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var directory in Directory.GetDirectories(GetBaseTestframeworkFolder()))
+            this.frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            var testFrameworkRoot = GetTestframeworkFolderRoot();
+            if(!Directory.Exists(testFrameworkRoot))
+            {
+                throw new InvalidOperationException("Unable to find test framework folder");
+            }
+
+            foreach (var directory in Directory.GetDirectories(testFrameworkRoot))
             {
                 var name = Path.GetFileName(directory);
-                this._frameworkDirectories.Add(name, directory);
+                this.frameworkDirectories.Add(name, directory);
             }
-            string defaultFx;
-            this._frameworkDirectories.TryGetValue(ExportRunnerFramework, out defaultFx);
-            if (defaultFx == null)
+
+            if (!this.frameworkDirectories.TryGetValue(ExportRunnerFramework, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
             {
                 throw new InvalidOperationException("Missing generic test framework");
             }
         }
 
-        public List<string> GetFrameworkNames()
-        {
-            return new List<string>(this._frameworkDirectories.Keys);
-        }
+        public List<string> GetFrameworkNames() => this.frameworkDirectories.Keys.ToList();
 
-        public List<string> GetFrameworkDirectories()
-        {
-            return new List<string>(this._frameworkDirectories.Values);
-        }
+        public List<string> GetFrameworkDirectories() => this.frameworkDirectories.Values.ToList();
 
-        private static string GetBaseTestframeworkFolder()
+        private static string GetTestframeworkFolderRoot()
         {
-            var installFolder = GetExecutingAssemblyPath();
-            var baseDirectory = Path.Combine(installFolder, TestFrameworksDirectory);
+            // This class is used in 2 different assemblies, installed in 2 locations:
+            //
+            // "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll"
+            // and
+            // "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\Extensions\Microsoft\NodeJsTools\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll"
+            //
+            // However in both cases, we should just go up a folder to the nodejstools root, and then into the TestAdapter folder.
+
+            var currentAssembly = typeof(TestFrameworkDirectories).Assembly;
+            var currentAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
+            var nodejsRootFolder = Path.GetDirectoryName(currentAssemblyFolder);
+
+            var baseDirectory = Path.Combine(nodejsRootFolder, TestAdapterDirectory, TestFrameworksDirectory);
 #if DEBUG
             // To allow easier debugging of the test adapter, try to use the local directory as a fallback.
             baseDirectory = Directory.Exists(baseDirectory) ? baseDirectory : Path.Combine(Directory.GetCurrentDirectory(), TestFrameworksDirectory);
 #endif
             return baseDirectory;
-        }
-
-        private static string GetExecutingAssemblyPath()
-        {
-            var codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-            var uri = new UriBuilder(codeBase);
-            var path = Uri.UnescapeDataString(uri.Path);
-            return Path.GetDirectoryName(path);
         }
     }
 }
