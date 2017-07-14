@@ -66,10 +66,10 @@ namespace Microsoft.NodejsTools
     internal sealed partial class NodejsPackage : CommonPackage
     {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
-        private IContentType _contentType;
+        private IContentType contentType;
         internal static NodejsPackage Instance;
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
-        private NodejsToolsLogger _logger;
+
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
         // after the initialization
         private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
@@ -136,8 +136,6 @@ namespace Microsoft.NodejsTools
 
             MakeDebuggerContextAvailable();
 
-            InitializeLogging();
-
             InitializeTelemetry();
 
             // The variable is inherited by child processes backing Test Explorer, and is used in
@@ -177,11 +175,6 @@ namespace Microsoft.NodejsTools
             this._subscribedCommandEvents.Add(targetEvent);
         }
 
-        private void InitializeLogging()
-        {
-            this._logger = new NodejsToolsLogger(this.ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
-        }
-
         private void InitializeTelemetry()
         {
             // Fetch the session synchronously on the UI thread; if this doesn't happen before we try using this on 
@@ -191,8 +184,6 @@ namespace Microsoft.NodejsTools
 
         public new IComponentModel ComponentModel => this.GetComponentModel();
 
-        internal NodejsToolsLogger Logger => this._logger;
-
         /// <summary>
         /// Makes the debugger context available - this enables our debugger when we're installed into
         /// a SKU which doesn't support every installed debugger.
@@ -201,8 +192,8 @@ namespace Microsoft.NodejsTools
         {
             var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
             var debugEngineGuid = AD7Engine.DebugEngineGuid;
-            uint contextCookie;
-            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie)))
+
+            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out var contextCookie)))
             {
                 ErrorHandler.ThrowOnFailure(monitorSelection.SetCmdUIContext(contextCookie, 1));
             }
@@ -262,11 +253,11 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                if (this._contentType == null)
+                if (this.contentType == null)
                 {
-                    this._contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
+                    this.contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
-                return this._contentType;
+                return this.contentType;
             }
         }
 
