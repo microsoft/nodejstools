@@ -21,37 +21,23 @@
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-      <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/...  -->
-      <Group guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup" priority="0x0500">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
-      </Group>
-
       <!-- Group on normal project items -->
       <Group guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_PROJECT"/>
       </Group>
 
-      <!-- Our group of menu items which is displayed on Tools/NodeJS Tools/Remote Debugging Proxy/...  -->
-      <Group guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup" priority="0x0500">
-        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu"/>
-      </Group>
-
-      <Group guid="guidNodeToolsCmdSet" id="NtvsHelpGroup" priority="0x0500">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenu"/>
-      </Group>
-
       <Group guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJWIN_SCOPE" priority="0x0500">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
-      
+
       <Group guid="guidNodeToolsNpmCmdSet" id="NpmGroup" priority="0x0600">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
-      
+
       <Group guid="guidNodeToolsNpmCmdSet" id="NpmExploreGroup" priority="0x0700">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
-      
+
       <Group guid="guidSHLMainMenu" id="IDG_VS_MNUDES_PROPERTIES" priority="0x0800">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmMenu"/>
       </Group>
@@ -62,21 +48,6 @@
     </Groups>
 
     <Menus>
-      <Menu guid="guidNodeToolsCmdSet" id="ToolsMenu" priority="0x8009" type="Menu">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2"/>
-        <Strings>
-          <ButtonText>Node.&amp;js Tools</ButtonText>
-          <CommandName>Node.&amp;js Tools</CommandName>
-        </Strings>
-      </Menu>
-
-      <Menu guid="guidNodeToolsCmdSet" id="RemoteDebugProxyMenu" priority="0x0500" type="Menu">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
-        <Strings>
-          <ButtonText>&amp;Remote Debugging Proxy</ButtonText>
-          <CommandName>&amp;Remote Debugging Proxy</CommandName>
-        </Strings>
-      </Menu>
       <Menu guid="guidNodeToolsNpmCmdSet" id="NpmMenu" priority="0x0600" type="Context">
         <Strings>
           <ButtonText>&amp;Npm</ButtonText>
@@ -94,7 +65,7 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-        
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidAddNewFileCommand" priority="0x0550" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="AddNewFileGroup"/>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -103,7 +74,7 @@
           <ButtonText>New File...</ButtonText>
         </Strings>
       </Button>
-      
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidSetAsNodejsStartupFile" priority="0x0300" type="Button">
         <Parent guid="guidNodeToolsCmdSet" id="CodeFileGroup"/>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -126,8 +97,8 @@
       </Button>
 
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenCommandPromptHere" priority="0x0600" type="Button">
-        <Icon guid="guidCommandPromptImage" id="1" />
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_FOLDER_EXPLORE"/>
+        <Icon guid="guidCommandPromptImage" id="1" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -155,7 +126,7 @@
           <ButtonText>Node.js Interactive Window</ButtonText>
         </Strings>
       </Button>
-      
+
       <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
         <Icon guid="guidReplImage" id="1"/>
@@ -164,38 +135,6 @@
         <Strings>
           <CommandName>Open Node.js Interactive Window</CommandName>
           <ButtonText>Open Node.js Interactive Window</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugProxyFolder" priority="0x0500" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup"/>
-        <Strings>
-          <CommandName>Open Containing Folder</CommandName>
-          <ButtonText>&amp;Open Containing Folder</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenRemoteDebugDocumentation" priority="0x0510" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="RemoteDebugProxyGroup"/>
-        <Strings>
-          <CommandName>Open Documentation</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidDocumentation" priority="0x004" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup"/>
-        <Strings>
-          <ButtonText>&amp;Documentation...</ButtonText>
-          <CommandName>Documentation...</CommandName>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidSendFeedback" priority="0x006" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="NtvsHelpGroup"/>
-        <Strings>
-          <ButtonText>&amp;Report Issue or Send Feedback...</ButtonText>
-          <CommandName>Report Issue or Send Feedback...</CommandName>
         </Strings>
       </Button>
 
@@ -259,27 +198,6 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmOpenModuleHomepage" priority="0x8370" type="Button">
-        <Parent guid="guidNodeToolsNpmCmdSet" id="NpmExploreGroup" />
-        <CommandFlag>DefaultInvisible</CommandFlag>
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <CommandName>cmdidNpmOpenModuleHomepage</CommandName>
-          <ButtonText>Open &amp;Documentation</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
-        <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
-        <CommandFlag>DefaultInvisible</CommandFlag>
-        <Strings>
-          <ButtonText>Import Existing &amp;Project...</ButtonText>
-          <MenuText>Import Existing &amp;Project...</MenuText>
-          <ToolTipText>Import Existing Project...</ToolTipText>
-          <CommandName>Import Existing Project...</CommandName>
-        </Strings>
-      </Button>
-
       <Button guid="guidNodeToolsCmdSet" id="cmdidAzureExplorerAttachNodejsDebugger" priority="0x0110" type="Button">
         <Parent guid="guidAzureExplorerCmdId" id="groupAzureDiagnostics"/>
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -325,9 +243,6 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x102">
-      <Parent guid="guidNodeToolsCmdSet" id="ToolsMenuItemsGroup"/>
-    </CommandPlacement>
   </CommandPlacements>
 
   <KeyBindings>
@@ -343,14 +258,11 @@
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
       <IDSymbol name="cmdidReplWindow" value="0x200" />
       <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
-      <IDSymbol name="cmdidOpenRemoteDebugProxyFolder" value="0x0202" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
-      <IDSymbol name="cmdidOpenRemoteDebugDocumentation" value="0x0206" />
+
       <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
-      <IDSymbol name="cmdidSendFeedback" value="0x0215" />
-      <IDSymbol name="cmdidDocumentation" value="0x0216" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
       <IDSymbol name="cmdidAddExistingFolder" value="0x10001" />
@@ -358,16 +270,10 @@
       <IDSymbol name="cmdidCopyFullPath" value="0x10003" />
 
       <!-- Groups -->
-      <IDSymbol name="ToolsMenuItemsGroup" value="0x1010" />
-      <IDSymbol name="RemoteDebugProxyGroup" value="0x1011" />
       <IDSymbol name="CodeFileGroup" value="0x1012" />
       <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
       <IDSymbol name="AddNewFileGroup" value="0x1016"/>
       <IDSymbol name="NtvsHelpGroup" value="0x1017" />
-
-      <!-- Menus -->
-      <IDSymbol name="ToolsMenu" value ="0x2001" />
-      <IDSymbol name="RemoteDebugProxyMenu" value ="0x2002" />
     </GuidSymbol>
 
     <GuidSymbol name="guidNodeToolsNpmCmdSet" value="{9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA}">
@@ -384,7 +290,7 @@
 
       <IDSymbol name="NpmMenu" value="0x3000"/>
     </GuidSymbol>
-      
+
     <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
     <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
 
