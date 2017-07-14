@@ -273,7 +273,6 @@
       <IDSymbol name="CodeFileGroup" value="0x1012" />
       <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
       <IDSymbol name="AddNewFileGroup" value="0x1016"/>
-      <IDSymbol name="NtvsHelpGroup" value="0x1017" />
     </GuidSymbol>
 
     <GuidSymbol name="guidNodeToolsNpmCmdSet" value="{9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA}">
