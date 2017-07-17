@@ -19,7 +19,6 @@ function hook_outputs() {
     process.stderr.write = append_stderr;
 }
 
-
 hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile) {
@@ -107,6 +106,6 @@ var run_tests = function (testCases, callback) {
         type: 'suite end',
         result: result
     });
-	process.exit();
+    process.exit();
 };
 module.exports.run_tests = run_tests;

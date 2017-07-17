@@ -13,27 +13,22 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             {
                 throw new ArgumentException("Invalid fully qualified test name");
             }
-            ModulePath = parts[0];
-            TestName = parts[1];
-            TestFramework = parts[2];
+            this.ModulePath = parts[0];
+            this.TestName = parts[1];
+            this.TestFramework = parts[2];
         }
 
         public NodejsTestInfo(string modulePath, string testName, string testFramework, int line, int column)
         {
-            ModulePath = modulePath;
-            TestName = testName;
-            TestFramework = testFramework;
-            SourceLine = line;
-            SourceColumn = column;
+            this.ModulePath = modulePath;
+            this.TestName = testName;
+            this.TestFramework = testFramework;
+            this.SourceLine = line;
+            this.SourceColumn = column;
         }
 
-        public string FullyQualifiedName
-        {
-            get
-            {
-                return ModulePath + "::" + TestName + "::" + TestFramework;
-            }
-        }
+        public string FullyQualifiedName => $"{this.ModulePath}::{this.TestName}::{this.TestFramework}";
+
         public string ModulePath { get; }
 
         public string TestName { get; }

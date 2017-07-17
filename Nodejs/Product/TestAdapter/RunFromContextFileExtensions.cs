@@ -11,13 +11,9 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         #region IRunFromContextFileExtensions Members
 
-        public IEnumerable<string> FileTypes
-        {
-            get
-            {
-                return new[] { NodejsConstants.JavaScriptExtension };
-            }
-        }
+        private static readonly string[] fileTypes = new[] { NodejsConstants.JavaScriptExtension };
+
+        public IEnumerable<string> FileTypes => fileTypes;
 
         #endregion
     }

@@ -57,9 +57,9 @@ function run_tests(testInfo, callback) {
         return;
     }
 
-    var harness = tape.getHarness({objectMode: true});
+    var harness = tape.getHarness({ objectMode: true });
     var capture = false; // Only capture between 'test' and 'end' events to avoid skipped test events.
-    harness.createStream({ objectMode: true }).on('data', function (evt){
+    harness.createStream({ objectMode: true }).on('data', function (evt) {
         switch (evt.type) {
             case 'test':
                 capture = true;
@@ -105,8 +105,8 @@ function run_tests(testInfo, callback) {
     loadTestCases(testInfo[0].testFile);
 
     // Skip those not selected to run. The rest will start running on the next tick.
-    harness['_tests'].forEach(function(test){
-        if( !testInfo.some( function(ti){ return ti.testName == test.name; }) ) {
+    harness['_tests'].forEach(function (test) {
+        if (!testInfo.some(function (ti) { return ti.testName == test.name; })) {
             test._skip = true;
         }
     });

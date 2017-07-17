@@ -14,16 +14,16 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     internal class TestFramework
     {
-        private readonly string _vsixScriptFolder;
-        private readonly string _findTestsScriptFile;
-        private readonly string _runTestsScriptFile;
+        private readonly string vsixScriptFolder;
+        private readonly string findTestsScriptFile;
+        private readonly string runTestsScriptFile;
 
         public TestFramework(string vsixScriptFolder)
         {
-            _vsixScriptFolder = vsixScriptFolder;
-            Name = Path.GetFileNameWithoutExtension(vsixScriptFolder);
-            _findTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "find_tests.js");
-            _runTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "run_tests.js");
+            this.vsixScriptFolder = vsixScriptFolder;
+            this.Name = Path.GetFileNameWithoutExtension(vsixScriptFolder);
+            this.findTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "find_tests.js");
+            this.runTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "run_tests.js");
         }
 
         public string Name { get; }
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, Name, line, column);
+                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column);
                     testCases.Add(test);
                 }
             }
@@ -101,8 +101,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             workingDirectory = workingDirectory.TrimEnd('\\');
             projectRootDir = projectRootDir.TrimEnd('\\');
             return new[] {
-                WrapWithQuotes(_runTestsScriptFile),
-                Name,
+                WrapWithQuotes(this.runTestsScriptFile),
+                this.Name,
                 WrapTestNameWithQuotes(testName),
                 WrapWithQuotes(testFile),
                 WrapWithQuotes(workingDirectory),
@@ -132,17 +132,19 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory)
         {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            var arguments = WrapWithQuotes(_findTestsScriptFile)
-                + " " + Name +
+            var arguments = WrapWithQuotes(this.findTestsScriptFile)
+                + " " + this.Name +
                 " " + WrapWithQuotes(testFile) +
                 " " + WrapWithQuotes(discoverResultFile) +
                 " " + WrapWithQuotes(workingDirectory);
 
-            var processStartInfo = new ProcessStartInfo(nodeExePath, arguments);
-            processStartInfo.CreateNoWindow = true;
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.RedirectStandardError = true;
-            processStartInfo.RedirectStandardOutput = true;
+            var processStartInfo = new ProcessStartInfo(nodeExePath, arguments)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
             var stdout = string.Empty;
             try

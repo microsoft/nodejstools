@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using MSBuild = Microsoft.Build.Evaluation;
-using System.Diagnostics;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -76,8 +75,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                             {
                                 continue;
                             }
-                            List<TestFileEntry> fileList;
-                            if (!testItems.TryGetValue(value, out fileList))
+
+                            if (!testItems.TryGetValue(value, out var fileList))
                             {
                                 fileList = new List<TestFileEntry>();
                                 testItems.Add(value, fileList);
