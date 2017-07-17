@@ -245,11 +245,7 @@
     <Compile Include="Debugger\LocalFileNameMapper.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Debugger\ScriptTree.cs" />
-    <Compile Include="Logging\InMemoryLogger.cs" />
-    <Compile Include="Logging\INodejsToolsLogger.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
-    <Compile Include="Logging\NodejsToolsLogEvent.cs" />
-    <Compile Include="Logging\NodejsToolsLogger.cs" />
     <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="NpmUI\NpmInstallWindowResources.Designer.cs">
