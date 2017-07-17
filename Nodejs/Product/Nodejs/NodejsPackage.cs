@@ -6,14 +6,12 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Jade;
-using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.ProjectWizard;
@@ -72,7 +70,7 @@ namespace Microsoft.NodejsTools
 
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
         // after the initialization
-        private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
+        private readonly List<EnvDTE.CommandEvents> subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
         /// <summary>
         /// Default constructor of the package.
@@ -125,6 +123,7 @@ namespace Microsoft.NodejsTools
                 new SendFeedbackCommand(),
                 new ShowDocumentationCommand()
             };
+
             try
             {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
@@ -132,11 +131,9 @@ namespace Microsoft.NodejsTools
             catch (NotSupportedException)
             {
             }
+
             RegisterCommands(commands, Guids.NodejsCmdSet);
-
             MakeDebuggerContextAvailable();
-
-            InitializeTelemetry();
 
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
@@ -172,14 +169,7 @@ namespace Microsoft.NodejsTools
             {
                 targetEvent.AfterExecute += afterExecute;
             }
-            this._subscribedCommandEvents.Add(targetEvent);
-        }
-
-        private void InitializeTelemetry()
-        {
-            // Fetch the session synchronously on the UI thread; if this doesn't happen before we try using this on 
-            // the background thread then the VS process will deadlock.
-            TelemetryHelper.Initialize();
+            this.subscribedCommandEvents.Add(targetEvent);
         }
 
         public new IComponentModel ComponentModel => this.GetComponentModel();
@@ -348,16 +338,6 @@ namespace Microsoft.NodejsTools
                     Marshal.FreeCoTaskMem(pDirName);
                 }
             }
-        }
-
-        internal static void NavigateTo(string filename, int line, int col)
-        {
-            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
-        }
-
-        internal static void NavigateTo(string filename, int pos)
-        {
-            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
         }
     }
 }

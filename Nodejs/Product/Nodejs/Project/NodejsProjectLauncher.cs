@@ -52,15 +52,10 @@ namespace Microsoft.NodejsTools.Project
         #region IProjectLauncher Members
         public int LaunchProject(bool debug)
         {
-            return Start(ResolveStartupFile(), debug);
+            return LaunchFile(ResolveStartupFile(), debug);
         }
 
         public int LaunchFile(string file, bool debug)
-        {
-            return Start(file, debug);
-        }
-
-        private int Start(string file, bool debug)
         {
             var nodePath = GetNodePath();
 
