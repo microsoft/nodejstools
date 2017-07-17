@@ -14,7 +14,10 @@ namespace Microsoft.NodejsTools.TypeScript
     {
         internal static bool IsTypeScriptFile(string filename)
         {
-            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension);
+            var extension = Path.GetExtension(filename);
+
+            return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptExtension)
+                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptJsxExtension);
         }
 
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)

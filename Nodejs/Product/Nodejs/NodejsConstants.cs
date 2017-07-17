@@ -9,6 +9,7 @@ namespace Microsoft.NodejsTools
     {
         internal const string JavaScriptExtension = ".js";
         internal const string TypeScriptExtension = ".ts";
+        internal const string TypeScriptJsxExtension = ".tsx";
         internal const string TypeScriptDeclarationExtension = ".d.ts";
         internal const string MapExtension = ".map";
         internal const string NodejsProjectExtension = ".njsproj";
