@@ -135,6 +135,51 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Guids.cs" />
+    <Compile Include="ReplMouseProcessor.cs" />
+    <Compile Include="Repl\InlineReplAdornmentManager.cs" />
+    <Compile Include="Repl\IReplCommand2.cs" />
+    <Compile Include="Repl\Margin\GlyphPrompts.cs" />
+    <Compile Include="Repl\Margin\PromptMarginVisualManager.cs" />
+    <Compile Include="Repl\Margin\PromptMargin.cs" />
+    <Compile Include="Repl\OutputBuffer.cs" />
+    <Compile Include="Repl\OutputColors.cs" />
+    <Compile Include="Repl\ReplOutputClassificationFormatDefinitions.cs" />
+    <Compile Include="Repl\ReplOutputClassifier.cs" />
+    <Compile Include="Repl\ReplOutputClassifierProvider.cs" />
+    <Compile Include="Repl\ReplOutputContentType.cs" />
+    <Compile Include="Repl\CustomTrackingSpan.cs" />
+    <Compile Include="Repl\IContentTypeMetadata.cs" />
+    <Compile Include="Repl\IReplWindowCreationListener.cs" />
+    <Compile Include="Repl\ReplInput.cs" />
+    <Compile Include="Repl\Commands\CancelExecutionCommand.cs" />
+    <Compile Include="Repl\Commands\ClearScreenReplCommand.cs" />
+    <Compile Include="Repl\Commands\EchoReplCommand.cs" />
+    <Compile Include="Repl\Commands\ResetReplCommand.cs" />
+    <Compile Include="Repl\Commands\WaitReplCommand.cs" />
+    <Compile Include="Repl\ReplAggregateClassifier.cs" />
+    <Compile Include="Repl\ReplAggregateClassifierProvider.cs" />
+    <Compile Include="Repl\ReplConstants.cs" />
+    <Compile Include="Repl\ExecutionResult.cs" />
+    <Compile Include="Repl\History.cs" />
+    <Compile Include="Repl\IMultipleScopeEvaluator.cs" />
+    <Compile Include="Repl\InlineReplAdornment.cs" />
+    <Compile Include="Repl\IReplCommand.cs" />
+    <Compile Include="Repl\IReplEvaluator.cs" />
+    <Compile Include="Repl\IReplEvaluatorProvider.cs" />
+    <Compile Include="Repl\IReplWindow.cs" />
+    <Compile Include="Repl\IReplWindowProvider.cs" />
+    <Compile Include="Repl\ReplContentType.cs" />
+    <Compile Include="Repl\ReplOptions.cs" />
+    <Compile Include="Repl\ReplRoleAttribute.cs" />
+    <Compile Include="Repl\ReplWindow.cs" />
+    <Compile Include="Repl\ReplWindowExtensions.cs" />
+    <Compile Include="Repl\ReplWindowProvider.cs" />
+    <Compile Include="Repl\ResizingAdorner.cs" />
+    <Compile Include="Repl\ZoomableInlineAdornment.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ReplWindowPackage.cs" />
+    <Compile Include="PkgCmdID.cs" />
     <VSCTCompile Include="InteractiveWindow.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
@@ -182,7 +227,6 @@
     <CreateVsixContainer>False</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
-  <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="..\ProjectAfter.targets" />
