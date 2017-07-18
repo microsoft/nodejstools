@@ -2,22 +2,18 @@
 
 namespace Microsoft.NodejsTools
 {
-    internal class PkgCmdId
+    internal static class PkgCmdId
     {
         public const int cmdidReplWindow = 0x200;
         public const int cmdidOpenReplWindow = 0x201;
-        public const int cmdidOpenRemoteDebugProxyFolder = 0x202;
         public const int cmdidSetAsNodejsStartupFile = 0x203;
 
         public const int cmdidImportWizard = 0x205;
-        public const int cmdidOpenRemoteDebugDocumentation = 0x206;
-
+ 
         public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
 
         public const int cmdidDiagnostics = 0x208;
         public const int cmdidAddFileCommand = 0x211;
-        public const int cmdidSendFeedback = 0x215;
-        public const int cmdidShowDocumentation = 0x216;
 
         public const int cmdidNpmManageModules = 0x300;
         public const int cmdidNpmInstallModules = 0x301;

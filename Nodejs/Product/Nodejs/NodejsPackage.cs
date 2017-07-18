@@ -117,11 +117,7 @@ namespace Microsoft.NodejsTools
             // Add our command handlers for menu (commands must exist in the .vsct file)
             var commands = new List<Command> {
                 new OpenReplWindowCommand(),
-                new OpenRemoteDebugProxyFolderCommand(),
-                new OpenRemoteDebugDocumentationCommand(),
                 new ImportWizardCommand(),
-                new SendFeedbackCommand(),
-                new ShowDocumentationCommand()
             };
 
             try
