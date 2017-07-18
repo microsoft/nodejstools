@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testCaseFile = pathToFile;
             var project = GetTestProjectFromFile(pathToFile);
-            if (null == project)
+            if (project == null)
             {
                 //The file is not included in the project.  
                 //Don't look for tests in it.
@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     return false;
                 }
             }
-            else if (!NodejsConstants.JavaScriptExtension.Equals(Path.GetExtension(pathToFile), StringComparison.OrdinalIgnoreCase))
+            else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(pathToFile), NodejsConstants.JavaScriptExtension))
             {
                 return false;
             }
@@ -620,6 +620,18 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="project">The project which the event is being raised for</param>
         private bool OnTestContainersChanged(IVsProject project)
         {
+            // https://pytools.codeplex.com/workitem/1271 
+            // When test explorer kicks off a run it kicks off a test discovery 
+            // phase, which kicks off a build, which results in us saving files. 
+            // If we raise the files changed event then test explorer immediately turns 
+            // around and queries us for the changed files.  Then it continues 
+            // along with the test discovery phase it was already initiating, and  
+            // discovers that no changes have occured - because it already updated 
+            // to the latest changes when we informed it our containers had changed.   
+            // Therefore if we are both building and detecting changes then we  
+            // don't want to raise the event, instead it'll query us in a little  
+            // bit and get the most recent changes. 
+
             if (project != null &&
                 project.TryGetProjectPath(out var projectPath) &&
                 this.knownProjects.TryGetValue(projectPath, out var projectInfo) &&

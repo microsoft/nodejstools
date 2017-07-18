@@ -198,7 +198,8 @@ namespace Microsoft.NodejsTools.Project
         {
             var ext = Path.GetExtension(strFileName);
 
-            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension);
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension) ||
+                StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptJsxExtension);
         }
 
         internal override string GetItemType(string filename)
@@ -209,7 +210,7 @@ namespace Microsoft.NodejsTools.Project
                 Path.Combine(this.ProjectHome, filename);
 
             var node = this.FindNodeByFullPath(absFileName) as NodejsFileNode;
-            if (node != null && node.ItemNode.ItemTypeName != null)
+            if (node?.ItemNode?.ItemTypeName != null)
             {
                 return node.ItemNode.ItemTypeName;
             }
@@ -271,7 +272,14 @@ namespace Microsoft.NodejsTools.Project
             return false;
         }
 
-        public override string[] CodeFileExtensions => new[] { NodejsConstants.JavaScriptExtension };
+        private static readonly string[] codeFileExtensions = new[] {
+            NodejsConstants.JavaScriptExtension,
+            NodejsConstants.JavaScriptJsxExtension,
+            NodejsConstants.TypeScriptExtension,
+            NodejsConstants.TypeScriptJsxExtension
+        };
+
+        public override string[] CodeFileExtensions => codeFileExtensions;
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element)
         {
@@ -359,7 +367,8 @@ namespace Microsoft.NodejsTools.Project
         public override bool IsCodeFile(string fileName)
         {
             var ext = Path.GetExtension(fileName);
-            return StringComparer.OrdinalIgnoreCase.Equals(NodejsConstants.JavaScriptExtension) ||
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension) ||
+                StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptJsxExtension) ||
                 TypeScriptHelpers.IsTypeScriptFile(fileName);
         }
 
