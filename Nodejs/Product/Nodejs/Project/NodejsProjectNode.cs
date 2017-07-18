@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.ProjectWizard;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
@@ -188,7 +189,7 @@ namespace Microsoft.NodejsTools.Project
 
         private static bool IsProjectTypeScriptSourceFile(string path)
         {
-            return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptExtension)
+            return TypeScriptHelpers.IsTypeScriptFile(path)
                 && !StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension)
                 && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
         }
@@ -197,7 +198,8 @@ namespace Microsoft.NodejsTools.Project
         {
             var ext = Path.GetExtension(strFileName);
 
-            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension);
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension) ||
+                StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptJsxExtension);
         }
 
         internal override string GetItemType(string filename)
@@ -208,13 +210,12 @@ namespace Microsoft.NodejsTools.Project
                 Path.Combine(this.ProjectHome, filename);
 
             var node = this.FindNodeByFullPath(absFileName) as NodejsFileNode;
-            if (node != null && node.ItemNode.ItemTypeName != null)
+            if (node?.ItemNode?.ItemTypeName != null)
             {
                 return node.ItemNode.ItemTypeName;
             }
 
-            // TODO: make sure this also works for .tsx
-            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension))
+            if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
@@ -271,7 +272,14 @@ namespace Microsoft.NodejsTools.Project
             return false;
         }
 
-        public override string[] CodeFileExtensions => new[] { NodejsConstants.JavaScriptExtension };
+        private static readonly string[] codeFileExtensions = new[] {
+            NodejsConstants.JavaScriptExtension,
+            NodejsConstants.JavaScriptJsxExtension,
+            NodejsConstants.TypeScriptExtension,
+            NodejsConstants.TypeScriptJsxExtension
+        };
+
+        public override string[] CodeFileExtensions => codeFileExtensions;
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element)
         {
@@ -281,13 +289,11 @@ namespace Microsoft.NodejsTools.Project
         public override CommonFileNode CreateCodeFileNode(ProjectElement item)
         {
             var fileName = item.Url;
-            if (!string.IsNullOrWhiteSpace(fileName)
-                && Path.GetExtension(fileName).Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(fileName) && TypeScriptHelpers.IsTypeScriptFile(fileName))
             {
                 return new NodejsTypeScriptFileNode(this, item);
             }
-            var res = new NodejsFileNode(this, item);
-            return res;
+            return new NodejsFileNode(this, item);
         }
 
         public override string GetProjectName()
@@ -361,8 +367,9 @@ namespace Microsoft.NodejsTools.Project
         public override bool IsCodeFile(string fileName)
         {
             var ext = Path.GetExtension(fileName);
-            return ext.Equals(NodejsConstants.JavaScriptExtension, StringComparison.OrdinalIgnoreCase) ||
-                   ext.Equals(NodejsConstants.TypeScriptExtension, StringComparison.OrdinalIgnoreCase);
+            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension) ||
+                StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptJsxExtension) ||
+                TypeScriptHelpers.IsTypeScriptFile(fileName);
         }
 
         protected override void Reload()

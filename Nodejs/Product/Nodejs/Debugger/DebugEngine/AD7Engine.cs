@@ -13,6 +13,7 @@ using Microsoft.NodejsTools.Debugger.Communication;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -1370,7 +1371,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             }
 
             // For .ts files, we need to build the project to regenerate .js code.
-            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(module.FileName), NodejsConstants.TypeScriptExtension))
+            if (TypeScriptHelpers.IsTypeScriptFile(module.FileName))
             {
                 if (document.ProjectItem.ContainingProject.GetNodeProject().Build(null, null) != MSBuildResult.Successful)
                 {
@@ -1395,7 +1396,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         internal static void MapLanguageInfo(string filename, out string pbstrLanguage, out Guid pguidLanguage)
         {
-            if (StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filename), NodejsConstants.TypeScriptExtension))
+            if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
                 pbstrLanguage = NodejsConstants.TypeScript;
                 pguidLanguage = Guids.TypeScriptDebugLanguage;
