@@ -35,4 +35,3 @@ namespace Microsoft.NodejsTools.Project.NewFileMenuGroup
         }
     }
 }
-

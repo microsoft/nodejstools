@@ -30,11 +30,20 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.writer = onWriteLine;
         }
 
-        public override void WriteErrorLine(string line) => this.writer(line);
+        public override void WriteErrorLine(string line)
+        {
+            this.writer(line);
+        }
 
-        public override void WriteLine(string line) => this.writer(line);
+        public override void WriteLine(string line)
+        {
+            this.writer(line);
+        }
 
-        public override bool CloseStandardInput() => false;
+        public override bool CloseStandardInput()
+        {
+            return false;
+        }
     }
 
     public class TestExecutor
@@ -46,7 +55,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private readonly ManualResetEvent cancelRequested = new ManualResetEvent(false);
 
-        private static readonly char[] NeedToBeQuoted = new[] { ' ', '"' };
+        private static readonly char[] needToBeQuoted = new[] { ' ', '"' };
         private ProcessOutput nodeProcess;
         private object syncObject = new object();
         private List<TestCase> currentTests;
@@ -75,9 +84,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         case "test start":
                             {
-                                this.currentResult = new TestResult(tests.First())
+                                this.currentResult = new TestResult(tests.First());
                                 {
-                                    StartTime = DateTimeOffset.Now
+                                this.currentResult.StartTime = DateTimeOffset.Now;
                                 };
 
                                 this.frameworkHandle.RecordStart(tests.First());
@@ -395,7 +404,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             string[] standardOutputLines = resultObject.stdout.Split('\n');
             string[] standardErrorLines = resultObject.stderr.Split('\n');
 
-            if (resultObject.pending.HasValue && (bool)resultObject.pending)
+            if (resultObject.pending != null && (bool)resultObject.pending)
             {
                 result.Outcome = TestOutcome.Skipped;
             }
@@ -433,10 +442,6 @@ internal class TestReceiver : ITestCaseDiscoverySink
 {
     public List<TestCase> Tests { get; } = new List<TestCase>();
 
-    public TestReceiver()
-    {
-    }
-
     public void SendTestCase(TestCase discoveredTest)
     {
         this.Tests.Add(discoveredTest);
@@ -447,6 +452,9 @@ internal class NodejsProjectSettings
 {
     public NodejsProjectSettings()
     {
+        this.NodeExePath = string.Empty;
+        this.SearchPath = string.Empty;
+        this.WorkingDir = string.Empty;
     }
 
     public string NodeExePath { get; set; } = string.Empty;
@@ -457,10 +465,6 @@ internal class NodejsProjectSettings
 
 internal class ResultObject
 {
-    public ResultObject()
-    {
-    }
-
     public string title { get; set; } = string.Empty;
     public bool passed { get; set; } = false;
     public bool? pending { get; set; } = false;
@@ -479,6 +483,11 @@ internal class TestCaseObject
 {
     public TestCaseObject()
     {
+        this.framework = string.Empty;
+        this.testName = string.Empty;
+        this.testFile = string.Empty;
+        this.workingFolder = string.Empty;
+        this.projectFolder = string.Empty;
     }
 
     public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder)
@@ -489,10 +498,10 @@ internal class TestCaseObject
         this.workingFolder = workingFolder;
         this.projectFolder = projectFolder;
     }
-
-    public string framework { get; set; } = string.Empty;
-    public string testName { get; set; } = string.Empty;
-    public string testFile { get; set; } = string.Empty;
-    public string workingFolder { get; set; } = string.Empty;
-    public string projectFolder { get; set; } = string.Empty;
+    public string framework { get; set; }
+    public string testName { get; set; }
+    public string testFile { get; set; }
+    public string workingFolder { get; set; }
+    public string projectFolder { get; set; }
 }
+

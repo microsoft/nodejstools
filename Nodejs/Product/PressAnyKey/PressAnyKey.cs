@@ -66,4 +66,3 @@ namespace Microsoft.NodejsTools.PressAnyKey
         }
     }
 }
-

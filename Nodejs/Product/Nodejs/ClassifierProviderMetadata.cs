@@ -13,4 +13,3 @@ namespace Microsoft.NodejsTools
         IEnumerable<string> ContentTypes { get; }
     }
 }
-

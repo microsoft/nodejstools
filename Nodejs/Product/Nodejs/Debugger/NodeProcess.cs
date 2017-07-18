@@ -195,4 +195,3 @@ namespace Microsoft.NodejsTools.Debugger
         }
     }
 }
-

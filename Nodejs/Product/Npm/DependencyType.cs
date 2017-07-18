@@ -9,4 +9,3 @@ namespace Microsoft.NodejsTools.Npm
         Optional,
     }
 }
-

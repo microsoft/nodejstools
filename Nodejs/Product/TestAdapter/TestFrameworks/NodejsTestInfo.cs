@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
 
             this.ModulePath = modulePath;
-            this.ModuleName = parts[0];
+            this.ModulePath = parts[0];
             this.TestName = parts[1];
             this.TestFramework = parts[2];
         }

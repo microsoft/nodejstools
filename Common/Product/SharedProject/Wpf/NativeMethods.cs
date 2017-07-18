@@ -25,4 +25,3 @@ namespace Microsoft.VisualStudioTools.Wpf
         public static extern bool DestroyIcon(IntPtr hIcon);
     }
 }
-

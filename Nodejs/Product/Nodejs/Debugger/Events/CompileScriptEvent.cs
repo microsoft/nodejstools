@@ -21,4 +21,3 @@ namespace Microsoft.NodejsTools.Debugger.Events
         public bool Running { get; private set; }
     }
 }
-

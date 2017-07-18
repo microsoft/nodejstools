@@ -47,5 +47,3 @@ namespace Microsoft.VisualStudioTools.Project
         internal static extern uint RegisterClipboardFormat(string format);
     }
 }
-
-

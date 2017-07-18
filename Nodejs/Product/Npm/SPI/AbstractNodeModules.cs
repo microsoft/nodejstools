@@ -72,4 +72,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public abstract int GetDepth(string filepath);
     }
 }
-

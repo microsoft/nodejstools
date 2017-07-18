@@ -21,4 +21,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public string VersionRangeText => this.IsVersionRange ? this.versionRangeUrlText : null;
     }
 }
-

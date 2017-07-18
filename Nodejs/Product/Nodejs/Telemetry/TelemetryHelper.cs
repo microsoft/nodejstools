@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Telemetry;
 using static Microsoft.NodejsTools.Telemetry.TelemetryEvents;
 using static Microsoft.NodejsTools.Telemetry.TelemetryProperties;
@@ -12,12 +11,6 @@ namespace Microsoft.NodejsTools.Telemetry
     /// </summary>
     internal static class TelemetryHelper
     {
-        public static void Initialize()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            var defaultSession = TelemetryService.DefaultSession;
-        }
-
         public static void LogProjectImported()
         {
             TelemetryService.DefaultSession.PostUserTask(ProjectImported, TelemetryResult.Success);

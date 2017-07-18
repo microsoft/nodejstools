@@ -744,4 +744,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

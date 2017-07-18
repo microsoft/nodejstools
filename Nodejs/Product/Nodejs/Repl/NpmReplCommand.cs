@@ -58,9 +58,8 @@ namespace Microsoft.NodejsTools.Repl
             foreach (var project in loadedProjects)
             {
                 var hierarchy = (IVsHierarchy)project;
-                object extObject;
 
-                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject);
+                var projectResult = hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out var extObject);
                 if (!ErrorHandler.Succeeded(projectResult))
                 {
                     continue;
@@ -144,7 +143,7 @@ namespace Microsoft.NodejsTools.Repl
 
             if (!isGlobalCommand && !Directory.Exists(projectDirectoryPath))
             {
-                window.WriteError("Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] <npm arguments> For example: .npm [MyApp] list");
+                window.WriteError(Resources.NpmSpecifyValidProject);
                 return ExecutionResult.Failure;
             }
 
@@ -189,9 +188,12 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Success;
         }
 
-        public string Description => "Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] <npm arguments>";
+        public string Description => Resources.NpmExecuteCommand;
+
         public string Command => "npm";
+
         public object ButtonContent => null;
+        
         // TODO: This is duplicated from Npm project
         // We should consider using InternalsVisibleTo to avoid code duplication
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
@@ -277,7 +279,8 @@ namespace Microsoft.NodejsTools.Repl
                 this._window = window;
                 this.HasErrors = false;
             }
-            public bool HasErrors { get; set; }
+
+            public bool HasErrors { get; private set; }
 
             public override void WriteLine(string decodedString)
             {
@@ -313,4 +316,3 @@ namespace Microsoft.NodejsTools.Repl
         }
     }
 }
-

@@ -58,4 +58,3 @@ namespace Microsoft.NodejsTools.Jade
         public virtual string DisplayText => _outlineDisplayText;
     }
 }
-

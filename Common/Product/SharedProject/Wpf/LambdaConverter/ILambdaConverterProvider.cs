@@ -7,4 +7,3 @@ namespace Microsoft.VisualStudioTools.Wpf
         LambdaConverter GetConverterForLambda(string lambda);
     }
 }
-

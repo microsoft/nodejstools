@@ -16,4 +16,3 @@ namespace Microsoft.NodejsTools.Jade
         T TokenType { get; }
     }
 }
-

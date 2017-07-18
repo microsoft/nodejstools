@@ -52,17 +52,10 @@ namespace Microsoft.NodejsTools.Project
         #region IProjectLauncher Members
         public int LaunchProject(bool debug)
         {
-            NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.Launch, debug ? 1 : 0);
-            return Start(ResolveStartupFile(), debug);
+            return LaunchFile(ResolveStartupFile(), debug);
         }
 
         public int LaunchFile(string file, bool debug)
-        {
-            NodejsPackage.Instance.Logger.LogEvent(Logging.NodejsToolsLogEvent.Launch, debug ? 1 : 0);
-            return Start(file, debug);
-        }
-
-        private int Start(string file, bool debug)
         {
             var nodePath = GetNodePath();
 
@@ -767,4 +760,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

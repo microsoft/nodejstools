@@ -98,4 +98,3 @@ namespace Microsoft.NodejsTools.Debugger
         }
     }
 }
-

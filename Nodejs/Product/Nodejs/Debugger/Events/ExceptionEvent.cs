@@ -115,4 +115,3 @@ namespace Microsoft.NodejsTools.Debugger.Events
         }
     }
 }
-

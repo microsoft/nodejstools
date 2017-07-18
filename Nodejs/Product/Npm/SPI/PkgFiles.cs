@@ -10,4 +10,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
             : base(package, "files") { }
     }
 }
-

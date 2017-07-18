@@ -17,4 +17,3 @@ namespace Microsoft.NodejsTools.Npm
         Installed = 0x1000,
     }
 }
-

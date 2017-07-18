@@ -58,4 +58,3 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         NodePropertyType Type { get; }
     }
 }
-

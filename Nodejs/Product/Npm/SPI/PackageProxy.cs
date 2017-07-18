@@ -47,4 +47,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public PackageFlags Flags { get; internal set; }
     }
 }
-

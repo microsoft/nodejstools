@@ -333,4 +333,3 @@ namespace Microsoft.NodejsTools.Project
         }
     }
 }
-

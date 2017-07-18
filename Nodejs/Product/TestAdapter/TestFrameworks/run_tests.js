@@ -23,7 +23,7 @@ rl.on('line', (line) => {
         console.log("NTVS_ERROR:Failed to load TestFramework (" + testCases[0].framework + "), " + exception);
         process.exit(1);
     }
-    
+
     function postResult(result) {
         // unhook stdout and stderr
         process.stdout.write = old_stdout;

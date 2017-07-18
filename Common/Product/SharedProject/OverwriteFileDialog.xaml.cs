@@ -51,4 +51,3 @@ namespace Microsoft.VisualStudioTools
         public bool AllItems => this._allItems.IsChecked.Value;
     }
 }
-

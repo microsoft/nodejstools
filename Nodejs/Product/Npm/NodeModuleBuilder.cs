@@ -159,4 +159,3 @@ namespace Microsoft.NodejsTools.Npm
         }
     }
 }
-

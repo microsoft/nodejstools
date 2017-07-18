@@ -77,4 +77,3 @@ namespace Microsoft.VisualStudioTools.Wpf
         }
     }
 }
-

@@ -77,4 +77,3 @@ namespace Microsoft.NodejsTools.Repl
         void AbortCommand();
     }
 }
-

@@ -291,4 +291,3 @@ namespace Microsoft.NodejsTools.Project
         #endregion
     }
 }
-

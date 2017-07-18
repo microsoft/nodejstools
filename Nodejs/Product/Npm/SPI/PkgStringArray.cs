@@ -80,4 +80,3 @@ namespace Microsoft.NodejsTools.Npm.SPI
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
-

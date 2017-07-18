@@ -86,4 +86,3 @@ namespace Microsoft.NodejsTools.ProjectWizard
         }
     }
 }
-

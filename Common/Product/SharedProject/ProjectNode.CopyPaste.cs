@@ -2225,4 +2225,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

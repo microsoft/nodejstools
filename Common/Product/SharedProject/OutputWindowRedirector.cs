@@ -120,4 +120,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

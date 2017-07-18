@@ -8,4 +8,3 @@ namespace Microsoft.NodejsTools.Npm
         DependencyUrlType Type { get; }
     }
 }
-

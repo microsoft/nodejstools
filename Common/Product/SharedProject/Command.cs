@@ -48,4 +48,3 @@ namespace Microsoft.VisualStudioTools
         public virtual EventHandler BeforeQueryStatus => null;
     }
 }
-

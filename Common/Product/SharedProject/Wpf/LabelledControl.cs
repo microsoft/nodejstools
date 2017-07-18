@@ -38,4 +38,3 @@ namespace Microsoft.VisualStudioTools.Wpf
         public static readonly DependencyProperty HasHelpTextProperty = HasHelpTextPropertyKey.DependencyProperty;
     }
 }
-

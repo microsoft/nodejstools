@@ -23,4 +23,3 @@ namespace Microsoft.NodejsTools.Jade
         public override bool IsString => this.TokenType == JadeTokenType.String;
     }
 }
-

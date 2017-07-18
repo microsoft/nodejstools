@@ -6,14 +6,12 @@ using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Jade;
-using Microsoft.NodejsTools.Logging;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.ProjectWizard;
@@ -66,13 +64,13 @@ namespace Microsoft.NodejsTools
     internal sealed partial class NodejsPackage : CommonPackage
     {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
-        private IContentType _contentType;
+        private IContentType contentType;
         internal static NodejsPackage Instance;
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
-        private NodejsToolsLogger _logger;
+
         // Hold references for the subscribed events. Otherwise the callbacks will be garbage collected
         // after the initialization
-        private List<EnvDTE.CommandEvents> _subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
+        private readonly List<EnvDTE.CommandEvents> subscribedCommandEvents = new List<EnvDTE.CommandEvents>();
 
         /// <summary>
         /// Default constructor of the package.
@@ -119,12 +117,9 @@ namespace Microsoft.NodejsTools
             // Add our command handlers for menu (commands must exist in the .vsct file)
             var commands = new List<Command> {
                 new OpenReplWindowCommand(),
-                new OpenRemoteDebugProxyFolderCommand(),
-                new OpenRemoteDebugDocumentationCommand(),
                 new ImportWizardCommand(),
-                new SendFeedbackCommand(),
-                new ShowDocumentationCommand()
             };
+
             try
             {
                 commands.Add(new AzureExplorerAttachDebuggerCommand());
@@ -132,13 +127,9 @@ namespace Microsoft.NodejsTools
             catch (NotSupportedException)
             {
             }
+
             RegisterCommands(commands, Guids.NodejsCmdSet);
-
             MakeDebuggerContextAvailable();
-
-            InitializeLogging();
-
-            InitializeTelemetry();
 
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
@@ -174,24 +165,10 @@ namespace Microsoft.NodejsTools
             {
                 targetEvent.AfterExecute += afterExecute;
             }
-            this._subscribedCommandEvents.Add(targetEvent);
-        }
-
-        private void InitializeLogging()
-        {
-            this._logger = new NodejsToolsLogger(this.ComponentModel.GetExtensions<INodejsToolsLogger>().ToArray());
-        }
-
-        private void InitializeTelemetry()
-        {
-            // Fetch the session synchronously on the UI thread; if this doesn't happen before we try using this on 
-            // the background thread then the VS process will deadlock.
-            TelemetryHelper.Initialize();
+            this.subscribedCommandEvents.Add(targetEvent);
         }
 
         public new IComponentModel ComponentModel => this.GetComponentModel();
-
-        internal NodejsToolsLogger Logger => this._logger;
 
         /// <summary>
         /// Makes the debugger context available - this enables our debugger when we're installed into
@@ -201,8 +178,8 @@ namespace Microsoft.NodejsTools
         {
             var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
             var debugEngineGuid = AD7Engine.DebugEngineGuid;
-            uint contextCookie;
-            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out contextCookie)))
+
+            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out var contextCookie)))
             {
                 ErrorHandler.ThrowOnFailure(monitorSelection.SetCmdUIContext(contextCookie, 1));
             }
@@ -262,11 +239,11 @@ namespace Microsoft.NodejsTools
         {
             get
             {
-                if (this._contentType == null)
+                if (this.contentType == null)
                 {
-                    this._contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
+                    this.contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
                 }
-                return this._contentType;
+                return this.contentType;
             }
         }
 
@@ -302,7 +279,7 @@ namespace Microsoft.NodejsTools
         public string BrowseForDirectory(IntPtr owner, string initialDirectory = null)
         {
             var uiShell = GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (null == uiShell)
+            if (uiShell == null)
             {
                 using (var ofd = new FolderBrowserDialog())
                 {
@@ -358,16 +335,5 @@ namespace Microsoft.NodejsTools
                 }
             }
         }
-
-        internal static void NavigateTo(string filename, int line, int col)
-        {
-            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, line, col);
-        }
-
-        internal static void NavigateTo(string filename, int pos)
-        {
-            VsUtilities.NavigateTo(Instance, filename, Guid.Empty, pos);
-        }
     }
 }
-

@@ -14,4 +14,3 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         protected DebuggerCommandException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
-

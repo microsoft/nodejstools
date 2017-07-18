@@ -39,4 +39,3 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         }
     }
 }
-

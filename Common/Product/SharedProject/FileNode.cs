@@ -999,4 +999,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

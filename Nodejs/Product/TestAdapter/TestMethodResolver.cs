@@ -15,8 +15,8 @@ namespace Microsoft.NodejsTools.TestAdapter
     [Export(typeof(ITestMethodResolver))]
     internal class TestMethodResolver : ITestMethodResolver
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly TestContainerDiscoverer _discoverer;
+        private readonly IServiceProvider serviceProvider;
+        private readonly TestContainerDiscoverer discoverer;
 
         #region ITestMethodResolver Members
 
@@ -24,19 +24,16 @@ namespace Microsoft.NodejsTools.TestAdapter
         public TestMethodResolver([Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider,
             [Import]TestContainerDiscoverer discoverer)
         {
-            _serviceProvider = serviceProvider;
-            _discoverer = discoverer;
+            this.serviceProvider = serviceProvider;
+            this.discoverer = discoverer;
         }
 
-        public Uri ExecutorUri
-        {
-            get { return TestExecutor.ExecutorUri; }
-        }
+        public Uri ExecutorUri=> TestExecutor.ExecutorUri;
 
         public string GetCurrentTest(string filePath, int line, int lineCharOffset)
         {
             var project = PathToProject(filePath);
-            if (project != null && _discoverer.IsProjectKnown(project))
+            if (project != null && this.discoverer.IsProjectKnown(project))
             {
                 var buildEngine = new MSBuild.ProjectCollection();
                 string projectPath;
@@ -55,20 +52,19 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private IVsProject PathToProject(string filePath)
         {
-            var rdt = (IVsRunningDocumentTable)_serviceProvider.GetService(typeof(SVsRunningDocumentTable));
+            var rdt = (IVsRunningDocumentTable)this.serviceProvider.GetService(typeof(SVsRunningDocumentTable));
             IVsHierarchy hierarchy;
-            uint itemId;
+
             var docData = IntPtr.Zero;
-            uint cookie;
             try
             {
                 var hr = rdt.FindAndLockDocument(
                     (uint)_VSRDTFLAGS.RDT_NoLock,
                     filePath,
                     out hierarchy,
-                    out itemId,
+                    out var _,
                     out docData,
-                    out cookie);
+                    out var _);
                 ErrorHandler.ThrowOnFailure(hr);
             }
             finally

@@ -8,7 +8,9 @@ namespace Microsoft.NodejsTools
     internal static class NodejsConstants
     {
         internal const string JavaScriptExtension = ".js";
+        internal const string JavaScriptJsxExtension = ".jsx";
         internal const string TypeScriptExtension = ".ts";
+        internal const string TypeScriptJsxExtension = ".tsx";
         internal const string TypeScriptDeclarationExtension = ".d.ts";
         internal const string MapExtension = ".map";
         internal const string NodejsProjectExtension = ".njsproj";

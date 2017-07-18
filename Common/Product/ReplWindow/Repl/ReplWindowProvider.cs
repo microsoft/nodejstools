@@ -46,7 +46,7 @@ namespace Microsoft.NodejsTools.Repl
                 {
                     string[] roles = evaluator.GetType().GetCustomAttributes(typeof(ReplRoleAttribute), true).Select(r => ((ReplRoleAttribute)r).Name).ToArray();
                     window = CreateReplWindowInternal(evaluator, contentType, roles, curId, title, languageServiceGuid, replId);
-                    if ((null == window) || (null == window.Frame))
+                    if (window?.Frame == null)
                     {
                         throw new NotSupportedException(Resources.CanNotCreateWindow);
                     }

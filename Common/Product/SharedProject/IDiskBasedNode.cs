@@ -15,4 +15,3 @@ namespace Microsoft.VisualStudioTools.Project
         void RenameForDeferredSave(string basePath, string baseNewPath);
     }
 }
-

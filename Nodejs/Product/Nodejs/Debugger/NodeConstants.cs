@@ -8,4 +8,3 @@ namespace Microsoft.NodejsTools.Debugger
         public const string ScriptWrapEnd = "\n});";
     }
 }
-

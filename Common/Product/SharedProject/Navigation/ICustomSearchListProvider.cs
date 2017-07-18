@@ -9,4 +9,3 @@ namespace Microsoft.VisualStudioTools.Navigation
         IVsSimpleObjectList2 GetSearchList();
     }
 }
-

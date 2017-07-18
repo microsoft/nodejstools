@@ -8,7 +8,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     internal class FrameworkDiscover
     {
-        private readonly Dictionary<String, TestFramework> _frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<String, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
+
         public FrameworkDiscover()
         {
             var directoryLoader = new TestFrameworkDirectories();
@@ -17,14 +18,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             foreach (var directory in testFrameworkDirectories)
             {
                 var fx = new TestFramework(directory);
-                _frameworks.Add(fx.Name, fx);
+                this.frameworks.Add(fx.Name, fx);
             }
         }
 
         public TestFramework Get(string frameworkName)
         {
-            TestFramework testFX = null;
-            _frameworks.TryGetValue(frameworkName, out testFX);
+            this.frameworks.TryGetValue(frameworkName, out var testFX);
             return testFX;
         }
     }

@@ -74,4 +74,3 @@ namespace Microsoft.NodejsTools.Jade
         public virtual bool IsKeyword => false;
     }
 }
-

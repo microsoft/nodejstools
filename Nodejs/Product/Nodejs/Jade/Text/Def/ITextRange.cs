@@ -49,4 +49,3 @@ namespace Microsoft.NodejsTools.Jade
         void Expand(int startOffset, int endOffset);
     }
 }
-

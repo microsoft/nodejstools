@@ -10,4 +10,3 @@ namespace Microsoft.NodejsTools.Debugger.Events
         bool Running { get; }
     }
 }
-

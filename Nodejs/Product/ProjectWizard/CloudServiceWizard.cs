@@ -209,4 +209,3 @@ namespace Microsoft.NodejsTools.ProjectWizard
         }
     }
 }
-

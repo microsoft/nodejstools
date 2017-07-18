@@ -138,4 +138,3 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
         }
     }
 }
-

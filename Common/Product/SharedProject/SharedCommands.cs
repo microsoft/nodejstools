@@ -15,4 +15,3 @@ namespace Microsoft.VisualStudioTools
         CopyFullPath = 0x10003
     }
 }
-

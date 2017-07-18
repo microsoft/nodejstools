@@ -110,4 +110,3 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 }
-

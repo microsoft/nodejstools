@@ -240,4 +240,3 @@ namespace Microsoft.VisualStudioTools.Project
         #endregion
     }
 }
-
