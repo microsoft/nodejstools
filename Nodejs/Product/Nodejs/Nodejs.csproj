@@ -227,11 +227,7 @@
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
-    <Compile Include="Commands\SendFeedbackCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
-    <Compile Include="Commands\OpenRemoteDebugDocumentationCommand.cs" />
-    <Compile Include="Commands\OpenRemoteDebugProxyFolderCommand.cs" />
-    <Compile Include="Commands\ShowDocumentationCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
     <Compile Include="ImportWizardResources.Designer.cs">
@@ -541,6 +537,7 @@
     </EmbeddedResource>
     <VSCTCompile Include="NodejsTools.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
     </VSCTCompile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
