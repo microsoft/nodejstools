@@ -220,6 +220,24 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs">
+      <Link>SharedProject\CommonConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
+      <Link>SharedProject\CommonUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
+      <Link>SharedProject\ExceptionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
+      <Link>SharedProject\ProcessOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\SolutionEventsListener.cs">
+      <Link>SharedProject\SolutionEventsListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\TaskDialog.cs">
+      <Link>SharedProject\TaskDialog.cs</Link>
+    </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>Project\TypeScriptHelpers.cs</Link>
     </Compile>
@@ -530,6 +548,13 @@
     <Compile Include="Telemetry\TelemetryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\..\Common\Product\SharedProject\ProjectResources.resx">
+      <Link>SharedProject\ProjectResources.resx</Link>
+      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
+    </EmbeddedResource>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProjectResources.cs">
+      <Link>SharedProject\ProjectResources.cs</Link>
+    </Compile>
     <EmbeddedResource Include="ImportWizardResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
@@ -1010,8 +1035,6 @@
     <Compile Include="SharedProject\AllFilesProjectElement.cs" />
     <Compile Include="SharedProject\HierarchyNodeFlags.cs" />
     <Compile Include="SharedProject\OutputWindowRedirector.cs" />
-    <Compile Include="SharedProject\ProcessOutput.cs" />
-    <Compile Include="SharedProject\TaskDialog.cs" />
     <Compile Include="SharedProject\OverwriteFileDialog.xaml.cs">
       <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
     </Compile>
@@ -1020,9 +1043,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="SharedProject\Navigation\IScopeNode.cs" />
-    <Compile Include="SharedProject\CommonConstants.cs" />
     <Compile Include="SharedProject\CommonPackage.cs" />
-    <Compile Include="SharedProject\CommonUtils.cs" />
     <Compile Include="SharedProject\DebugTimer.cs" />
     <Compile Include="SharedProject\DeveloperActivityAttribute.cs" />
     <Compile Include="SharedProject\DialogWindowVersioningWorkaround.cs" />
@@ -1126,7 +1147,6 @@
     <Compile Include="SharedProject\ProjectNode.Events.cs" />
     <Compile Include="SharedProject\ProjectPackage.cs" />
     <Compile Include="SharedProject\ProjectReferenceNode.cs" />
-    <Compile Include="SharedProject\ProjectResources.cs" />
     <Compile Include="SharedProject\PropertiesEditorLauncher.cs" />
     <Compile Include="SharedProject\PublishFailedException.cs" />
     <Compile Include="SharedProject\PublishFile.cs" />
@@ -1175,8 +1195,6 @@
     <Compile Include="SharedProject\ProvideDebugPortPickerAttribute.cs" />
     <Compile Include="SharedProject\ProvideTextEditorAutomationAttribute.cs" />
     <Compile Include="SharedProject\VsExtensions.cs" />
-    <Compile Include="SharedProject\SolutionEventsListener.cs" />
-    <Compile Include="SharedProject\ExceptionExtensions.cs" />
     <Compile Include="SharedProject\TaskExtensions.cs" />
     <Compile Include="SharedProject\VsTaskExtensions.cs" />
     <Compile Include="SharedProject\Wpf\Commands.cs" />
@@ -1194,11 +1212,6 @@
     <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaConverter.cs" />
     <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaExtension.cs" />
     <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaProperties.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SharedProject\ProjectResources.resx">
-      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SharedProject\WebPiComponentPickerControl.resx">
