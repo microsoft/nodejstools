@@ -52,12 +52,9 @@
     <Reference Include="System.Web.ApplicationServices" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(BuildRoot)\Common\Product\WebRole\WebSocketProxyBase.cs">
-      <Link>WebSocketProxyBase.cs</Link>
-      <Visible>true</Visible>
-    </Compile>
     <Compile Include="WebSocketProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebSocketProxyBase.cs" />
     <Content Include="Global.asax" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

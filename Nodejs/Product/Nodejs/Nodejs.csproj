@@ -1006,6 +1006,207 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\debug.d.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SharedProject\Navigation\SourceLocation.cs" />
+    <Compile Include="SharedProject\AllFilesProjectElement.cs" />
+    <Compile Include="SharedProject\HierarchyNodeFlags.cs" />
+    <Compile Include="SharedProject\OutputWindowRedirector.cs" />
+    <Compile Include="SharedProject\ProcessOutput.cs" />
+    <Compile Include="SharedProject\TaskDialog.cs" />
+    <Compile Include="SharedProject\OverwriteFileDialog.xaml.cs">
+      <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
+    </Compile>
+    <Page Include="SharedProject\OverwriteFileDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="SharedProject\Navigation\IScopeNode.cs" />
+    <Compile Include="SharedProject\CommonConstants.cs" />
+    <Compile Include="SharedProject\CommonPackage.cs" />
+    <Compile Include="SharedProject\CommonUtils.cs" />
+    <Compile Include="SharedProject\DebugTimer.cs" />
+    <Compile Include="SharedProject\DeveloperActivityAttribute.cs" />
+    <Compile Include="SharedProject\DialogWindowVersioningWorkaround.cs" />
+    <Compile Include="SharedProject\Navigation\CommonLibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\ProjectLibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\HierarchyListener.cs" />
+    <Compile Include="SharedProject\Navigation\ICustomSearchListProvider.cs" />
+    <Compile Include="SharedProject\Navigation\ILibraryManager.cs" />
+    <Compile Include="SharedProject\Navigation\ISimpleObject.cs" />
+    <Compile Include="SharedProject\Navigation\Library.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryManager.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryTask.cs" />
+    <Compile Include="SharedProject\Navigation\ModuleId.cs" />
+    <Compile Include="SharedProject\Navigation\SimpleObject.cs" />
+    <Compile Include="SharedProject\Navigation\SimpleObjectList.cs" />
+    <Compile Include="SharedProject\Navigation\TextLineEventListener.cs" />
+    <Compile Include="SharedProject\AssemblyReferenceNode.cs" />
+    <Compile Include="SharedProject\Attributes.cs" />
+    <Compile Include="SharedProject\Automation\AutomationScope.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectConfigurationProperties.cs" />
+    <Compile Include="SharedProject\Automation\OAFileItem.cs" />
+    <Compile Include="SharedProject\Automation\OAFolderItem.cs" />
+    <Compile Include="SharedProject\Automation\OANavigableProjectItems.cs" />
+    <Compile Include="SharedProject\Automation\OANullProperty.cs" />
+    <Compile Include="SharedProject\Automation\OAProject.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectItem.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectItems.cs" />
+    <Compile Include="SharedProject\Automation\OAProperties.cs" />
+    <Compile Include="SharedProject\Automation\OAProperty.cs" />
+    <Compile Include="SharedProject\Automation\OAReferenceFolderItem.cs" />
+    <Compile Include="SharedProject\Automation\OAReferenceItem.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAAssemblyReference.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAProjectReference.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAReferenceBase.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAReferences.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAVSProject.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAVSProjectItem.cs" />
+    <Compile Include="SharedProject\BuildDependency.cs" />
+    <Compile Include="SharedProject\BuildPropertyPage.cs" />
+    <Compile Include="SharedProject\CommonConfigProvider.cs" />
+    <Compile Include="SharedProject\CommonEditorFactory.cs" />
+    <Compile Include="SharedProject\CommonFileNode.cs" />
+    <Compile Include="SharedProject\CommonFolderNode.cs" />
+    <Compile Include="SharedProject\CommonNonCodeFileNode.cs" />
+    <Compile Include="SharedProject\CommonProjectConfig.cs" />
+    <Compile Include="SharedProject\CommonProjectNode.cs" />
+    <Compile Include="SharedProject\CommonProjectNodeProperties.cs" />
+    <Compile Include="SharedProject\CommonProjectPackage.cs" />
+    <Compile Include="SharedProject\CommonPropertyPage.cs" />
+    <Compile Include="SharedProject\CommonReferenceContainerNode.cs" />
+    <Compile Include="SharedProject\ConfigProvider.cs" />
+    <Compile Include="SharedProject\FileWatcher.cs" />
+    <Compile Include="SharedProject\FlavoredProjectFactoryBase.cs" />
+    <Compile Include="SharedProject\DataObject.cs" />
+    <Compile Include="SharedProject\DependentFileNode.cs" />
+    <Compile Include="SharedProject\DesignPropertyDescriptor.cs" />
+    <Compile Include="SharedProject\DirtyChangedEventArgs.cs" />
+    <Compile Include="SharedProject\DocumentManager.cs" />
+    <Compile Include="SharedProject\EnumBSTR.cs" />
+    <Compile Include="SharedProject\EnumDependencies.cs" />
+    <Compile Include="SharedProject\ExtensibilityEventsDispatcher.cs" />
+    <Compile Include="SharedProject\FileChangeManager.cs" />
+    <Compile Include="SharedProject\FileDocumentManager.cs" />
+    <Compile Include="SharedProject\FileNode.cs" />
+    <Compile Include="SharedProject\FolderNode.cs" />
+    <Compile Include="SharedProject\HierarchyNode.cs" />
+    <Compile Include="SharedProject\HierarchyIdMap.cs" />
+    <Compile Include="SharedProject\IDEBuildLogger.cs" />
+    <Compile Include="SharedProject\IdleManager.cs" />
+    <Compile Include="SharedProject\ClipboardServiceBase.cs" />
+    <Compile Include="SharedProject\ClipboardService.cs" />
+    <Compile Include="SharedProject\ImageHandler.cs" />
+    <Compile Include="SharedProject\Interfaces.cs" />
+    <Compile Include="SharedProject\IProjectLauncher.cs" />
+    <Compile Include="SharedProject\IProjectLaunchProperties.cs" />
+    <Compile Include="SharedProject\IProjectPublisher.cs" />
+    <Compile Include="SharedProject\IPublishFile.cs" />
+    <Compile Include="SharedProject\IPublishProject.cs" />
+    <Compile Include="SharedProject\LocalizableProperties.cs" />
+    <Compile Include="SharedProject\Misc\ConnectionPointContainer.cs" />
+    <Compile Include="SharedProject\Misc\ExternDll.cs" />
+    <Compile Include="SharedProject\Misc\NativeMethods.cs" />
+    <Compile Include="SharedProject\Misc\UnsafeNativeMethods.cs" />
+    <Compile Include="SharedProject\MsBuildProjectElement.cs" />
+    <Compile Include="SharedProject\NodeProperties.cs" />
+    <Compile Include="SharedProject\ObservableCollectionExtensions.cs" />
+    <Compile Include="SharedProject\OleServiceProvider.cs" />
+    <Compile Include="SharedProject\Output.cs" />
+    <Compile Include="SharedProject\OutputGroup.cs" />
+    <Compile Include="SharedProject\ProjectConfig.cs" />
+    <Compile Include="SharedProject\ProjectDesignerDocumentManager.cs" />
+    <Compile Include="SharedProject\ProjectDocumentsListener.cs" />
+    <Compile Include="SharedProject\ProjectDocumentsListenerForStartupFileUpdates.cs" />
+    <Compile Include="SharedProject\ProjectElement.cs" />
+    <Compile Include="SharedProject\ProjectFactory.cs" />
+    <Compile Include="SharedProject\ProjectFileConstants.cs" />
+    <Compile Include="SharedProject\ProjectNode.CopyPaste.cs" />
+    <Compile Include="SharedProject\ProjectNode.IOleCommandTarget.cs" />
+    <Compile Include="SharedProject\ProjectNode.cs" />
+    <Compile Include="SharedProject\ProjectNode.Events.cs" />
+    <Compile Include="SharedProject\ProjectPackage.cs" />
+    <Compile Include="SharedProject\ProjectReferenceNode.cs" />
+    <Compile Include="SharedProject\ProjectResources.cs" />
+    <Compile Include="SharedProject\PropertiesEditorLauncher.cs" />
+    <Compile Include="SharedProject\PublishFailedException.cs" />
+    <Compile Include="SharedProject\PublishFile.cs" />
+    <Compile Include="SharedProject\PublishProject.cs" />
+    <Compile Include="SharedProject\PublishProjectOptions.cs" />
+    <Compile Include="SharedProject\ReferenceContainerNode.cs" />
+    <Compile Include="SharedProject\ReferenceNode.cs" />
+    <Compile Include="SharedProject\SolutionListener.cs" />
+    <Compile Include="SharedProject\SolutionListenerForBuildDependencyUpdate.cs" />
+    <Compile Include="SharedProject\SolutionListenerForProjectOpen.cs" />
+    <Compile Include="SharedProject\StructuresEnums.cs" />
+    <Compile Include="SharedProject\SuspendFileChanges.cs" />
+    <Compile Include="SharedProject\TaskProgressBar.xaml.cs">
+      <DependentUpon>TaskProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SharedProject\IDiskBasedNode.cs" />
+    <Compile Include="SharedProject\Command.cs" />
+    <Compile Include="SharedProject\SharedCommands.cs" />
+    <Page Include="SharedProject\TaskProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="SharedProject\TrackDocumentsHelper.cs" />
+    <Compile Include="SharedProject\UIThread.cs" />
+    <Compile Include="SharedProject\UIThreadBase.cs" />
+    <Compile Include="SharedProject\UIThreadSynchronizer.cs" />
+    <Compile Include="SharedProject\UpdateSolutionEventsListener.cs" />
+    <Compile Include="SharedProject\Utilities.cs" />
+    <Compile Include="SharedProject\VirtualProjectElement.cs" />
+    <Compile Include="SharedProject\VsCommands.cs" />
+    <Compile Include="SharedProject\VSShellUtilities.cs" />
+    <Compile Include="SharedProject\WaitDialog.cs" />
+    <Compile Include="SharedProject\WebPiComponentPickerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SharedProject\WebPiComponentPickerControl.Designer.cs">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SharedProject\ProvideDebugEngineAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugExceptionAttribute.cs" />
+    <Compile Include="SharedProject\WebSocketStream.cs" />
+    <Compile Include="SharedProject\ProvideCodeExpansionsAttribute.cs" />
+    <Compile Include="SharedProject\ProvideCodeExpansionPathAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugLanguageAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugPortSupplierAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugPortPickerAttribute.cs" />
+    <Compile Include="SharedProject\ProvideTextEditorAutomationAttribute.cs" />
+    <Compile Include="SharedProject\VsExtensions.cs" />
+    <Compile Include="SharedProject\SolutionEventsListener.cs" />
+    <Compile Include="SharedProject\ExceptionExtensions.cs" />
+    <Compile Include="SharedProject\TaskExtensions.cs" />
+    <Compile Include="SharedProject\VsTaskExtensions.cs" />
+    <Compile Include="SharedProject\Wpf\Commands.cs" />
+    <Compile Include="SharedProject\Wpf\ConfigurationControl.cs" />
+    <Compile Include="SharedProject\Wpf\LabelledButton.cs" />
+    <Compile Include="SharedProject\Wpf\LabelledControl.cs" />
+    <Compile Include="SharedProject\Wpf\Controls.cs" />
+    <Compile Include="SharedProject\Wpf\NativeMethods.cs" />
+    <Compile Include="SharedProject\Wpf\Dialogs.cs" />
+    <Page Include="SharedProject\Wpf\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="SharedProject\Wpf\LambdaConverter\ILambdaConverterProvider.cs" />
+    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaConverter.cs" />
+    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaExtension.cs" />
+    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaProperties.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SharedProject\ProjectResources.resx">
+      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SharedProject\WebPiComponentPickerControl.resx">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
       <TranslationFile>$(BuildRoot)loc\lcl\{Lang}\$(AssemblyName).dll.lcl</TranslationFile>
       <LciCommentFile>$(BuildRoot)loc\lci\$(AssemblyName).dll.lci</LciCommentFile>
@@ -1035,7 +1236,6 @@
     <CreateVsixContainer>false</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
-  <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="..\ProjectAfter.targets" />
