@@ -1,13 +1,8 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.ComponentModel;
-using System.Windows;
 using System.Windows.Markup;
 using System.Xaml;
-using System.Windows.Data;
-using System.Globalization;
-using Microsoft.VisualStudioTools.Wpf;
 
 namespace Microsoft.VisualStudioTools.Wpf
 {
