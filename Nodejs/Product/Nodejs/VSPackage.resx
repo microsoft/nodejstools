@@ -301,10 +301,10 @@
     <value>Azure Cloud Service</value>
   </data>
   <data name="3066" xml:space="preserve">
-    <value>Basic Node.js Express 4 Application.</value>
+    <value>Azure Cloud Service</value>
   </data>
   <data name="3067" xml:space="preserve">
-    <value>Azure Cloud Service</value>
+    <value>Basic Node.js Express 4 Application.</value>
   </data>
   <data name="3068" xml:space="preserve">
     <value>A basic Node.js Express 4 application.</value>
@@ -379,7 +379,7 @@
     <value>Blank Node.js Web Application</value>
   </data>
   <data name="3092" xml:space="preserve">
-    <value>An empty Node.js application.</value>
+    <value>An empty Node.js Web application.</value>
   </data>
   <data name="3093" xml:space="preserve">
     <value>Express Web Role</value>
