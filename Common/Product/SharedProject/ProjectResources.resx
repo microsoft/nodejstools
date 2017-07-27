@@ -633,7 +633,7 @@ Run Visual Studio with the /Log option and check ActivityLog.xml for more detail
     <value>Unable to add '{0}'. A file with that name already exists.</value>
   </data>
   <data name="CannotAddFolderAsDescendantOfSelf" xml:space="preserve">
-    <value>Cannot add folder '{0}' as a child or decedent of self.</value>
+    <value>Cannot add folder '{0}' as a child or descendant of self.</value>
   </data>
   <data name="CannotMoveFolderExists" xml:space="preserve">
     <value>Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.</value>
