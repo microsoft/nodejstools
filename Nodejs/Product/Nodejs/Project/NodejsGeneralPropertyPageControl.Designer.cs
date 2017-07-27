@@ -222,6 +222,7 @@
             this._nodeExeArguments.Name = "_nodeExeArguments";
             this._nodeExeArguments.Size = new System.Drawing.Size(620, 20);
             this._nodeExeArguments.TabIndex = 4;
+            this._nodeExeArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _scriptFile
             // 
@@ -231,6 +232,7 @@
             this._scriptFile.Name = "_scriptFile";
             this._scriptFile.Size = new System.Drawing.Size(620, 20);
             this._scriptFile.TabIndex = 6;
+            this._scriptFile.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _browseDirectory
             // 
@@ -251,6 +253,7 @@
             this._scriptArguments.Name = "_scriptArguments";
             this._scriptArguments.Size = new System.Drawing.Size(620, 20);
             this._scriptArguments.TabIndex = 9;
+            this._scriptArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _workingDir
             // 
@@ -270,6 +273,7 @@
             this._launchUrl.Name = "_launchUrl";
             this._launchUrl.Size = new System.Drawing.Size(620, 20);
             this._launchUrl.TabIndex = 13;
+            this._launchUrl.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _nodejsPort
             // 
@@ -285,6 +289,7 @@
             this._debuggerPort.Name = "_debuggerPort";
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
             this._debuggerPort.TabIndex = 17;
+            this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
             // _envVars
             // 
@@ -296,6 +301,7 @@
             this._envVars.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this._envVars.Size = new System.Drawing.Size(620, 84);
             this._envVars.TabIndex = 19;
+            this._envVars.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _startBrowser
             // 
@@ -307,6 +313,7 @@
             this._startBrowser.TabIndex = 20;
             this._startBrowser.Text = "_startBrowser";
             this._startBrowser.UseVisualStyleBackColor = true;
+            this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExeErrorProvider
             // 
