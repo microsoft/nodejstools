@@ -617,7 +617,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Attaching to Azure Website at {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Anfügen an Azure Website unter {0}]]></Val>
+            <Val><![CDATA[Anfügen an die Azure-Website unter {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2448,10 +2448,13 @@
       </Item>
       <Item ItemId=";CannotAddFolderAsDescendantOfSelf" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Cannot add folder '{0}' as a child or decedent of self.]]></Val>
+          <Val><![CDATA[Cannot add folder '{0}' as a child or descendant of self.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ordner "{0}" kann als untergeordnetes Element oder Nachfolgerelement nicht verschoben werden.]]></Val>
+            <Val><![CDATA[Der Ordner "{0}" kann nicht als untergeordnetes Element oder Nachfolgerelement hinzugefügt werden.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Cannot add folder '{0}' as a child or decedent of self.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -4803,19 +4806,25 @@
       </Item>
       <Item ItemId=";3066" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
+          <Val><![CDATA[Azure Cloud Service]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js Express 4-Basisanwendung.]]></Val>
+            <Val><![CDATA[Azure-Clouddienst]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";3067" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Azure Cloud Service]]></Val>
+          <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Azure-Clouddienst]]></Val>
+            <Val><![CDATA[Node.js Express 4-Basisanwendung.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Azure Cloud Service]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5037,10 +5046,13 @@
       </Item>
       <Item ItemId=";3092" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[An empty Node.js application.]]></Val>
+          <Val><![CDATA[An empty Node.js Web application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Eine leere Node.js-Anwendung.]]></Val>
+            <Val><![CDATA[Eine leere Node.js-Webanwendung.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[An empty Node.js application.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5179,7 +5191,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3]]></Val>
+        <Val><![CDATA[1.4.10727.3]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5206,7 +5218,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3 commit:78ad38f4a71b0327b97ae283494986e4e5f06e1d]]></Val>
+        <Val><![CDATA[1.4.10727.3 commit:dc914d64ca2eec4704ae1a8fadd7a610df14b849]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

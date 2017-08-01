@@ -1872,10 +1872,13 @@
       </Item>
       <Item ItemId=";CannotAddFolderAsDescendantOfSelf" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Cannot add folder '{0}' as a child or decedent of self.]]></Val>
+          <Val><![CDATA[Cannot add folder '{0}' as a child or descendant of self.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA['{0}' 폴더를 자체의 자식 또는 하위 항목으로 추가할 수 없습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Cannot add folder '{0}' as a child or decedent of self.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -3292,7 +3295,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3]]></Val>
+        <Val><![CDATA[1.4.10727.3]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3319,7 +3322,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3 commit:78ad38f4a71b0327b97ae283494986e4e5f06e1d]]></Val>
+        <Val><![CDATA[1.4.10727.3 commit:dc914d64ca2eec4704ae1a8fadd7a610df14b849]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
