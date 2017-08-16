@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.CodeDom.Compiler;
@@ -6511,15 +6511,24 @@ If the files in the existing folder have the same names as files in the folder y
             // we always start at the current node and go it's children down, so 
             //  if you want to scan the whole tree, better call 
             // the root
-            name = EnsureRootedPath(name);
-            itemId = 0;
-            var child = FindNodeByFullPath(name);
-            if (child != null)
+            try
             {
-                itemId = child.HierarchyId;
-                return VSConstants.S_OK;
+                name = EnsureRootedPath(name);
+                var child = FindNodeByFullPath(name);
+                if (child != null)
+                {
+                    itemId = child.HierarchyId;
+                    return VSConstants.S_OK;
+                }
+            }
+            catch (ArgumentException)
+            {
+                // This is expected when the path contains 
+                // invalid characters. This can happen with 
+                // 'core' node files like console, debug, etc.
             }
 
+            itemId = 0;
             return VSConstants.E_FAIL;
         }
 
