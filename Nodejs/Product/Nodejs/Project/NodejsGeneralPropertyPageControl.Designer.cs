@@ -90,21 +90,21 @@
             // _scriptArgsLabel
             // 
             this._scriptArgsLabel.AutoSize = true;
-            this._scriptArgsLabel.Location = new System.Drawing.Point(3, 87);
+            this._scriptArgsLabel.Location = new System.Drawing.Point(3, 84);
             this._scriptArgsLabel.Margin = new System.Windows.Forms.Padding(3);
             this._scriptArgsLabel.Name = "_scriptArgsLabel";
             this._scriptArgsLabel.Size = new System.Drawing.Size(85, 13);
-            this._scriptArgsLabel.TabIndex = 8;
+            this._scriptArgsLabel.TabIndex = 7;
             this._scriptArgsLabel.Text = "_scriptArgsLabel";
             // 
             // _workingDirLabel
             // 
             this._workingDirLabel.AutoSize = true;
-            this._workingDirLabel.Location = new System.Drawing.Point(3, 113);
+            this._workingDirLabel.Location = new System.Drawing.Point(3, 110);
             this._workingDirLabel.Margin = new System.Windows.Forms.Padding(3);
             this._workingDirLabel.Name = "_workingDirLabel";
             this._workingDirLabel.Size = new System.Drawing.Size(89, 13);
-            this._workingDirLabel.TabIndex = 10;
+            this._workingDirLabel.TabIndex = 9;
             this._workingDirLabel.Text = "_workingDirLabel";
             // 
             // _launchUrlLabel
@@ -160,11 +160,11 @@
             this.tableLayoutPanel1.Controls.Add(this._nodeExeArguments, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this._scriptLabel, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this._scriptFile, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this._browseDirectory, 2, 2);
             this.tableLayoutPanel1.Controls.Add(this._scriptArgsLabel, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this._scriptArguments, 1, 3);
             this.tableLayoutPanel1.Controls.Add(this._workingDirLabel, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this._workingDir, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this._browseDirectory, 2, 4);
             this.tableLayoutPanel1.Controls.Add(this._launchUrlLabel, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this._launchUrl, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this._nodePortLabel, 0, 6);
@@ -237,10 +237,10 @@
             // _browseDirectory
             // 
             this._browseDirectory.AutoSize = true;
-            this._browseDirectory.Location = new System.Drawing.Point(738, 58);
+            this._browseDirectory.Location = new System.Drawing.Point(738, 110);
             this._browseDirectory.Name = "_browseDirectory";
             this._browseDirectory.Size = new System.Drawing.Size(26, 23);
-            this._browseDirectory.TabIndex = 7;
+            this._browseDirectory.TabIndex = 11;
             this._browseDirectory.Text = "...";
             this._browseDirectory.UseVisualStyleBackColor = true;
             this._browseDirectory.Click += new System.EventHandler(this.BrowseDirectoryClick);
@@ -249,20 +249,20 @@
             // 
             this._scriptArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._scriptArguments.Location = new System.Drawing.Point(112, 87);
+            this._scriptArguments.Location = new System.Drawing.Point(112, 84);
             this._scriptArguments.Name = "_scriptArguments";
             this._scriptArguments.Size = new System.Drawing.Size(620, 20);
-            this._scriptArguments.TabIndex = 9;
+            this._scriptArguments.TabIndex = 8;
             this._scriptArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _workingDir
             // 
             this._workingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._workingDir.Location = new System.Drawing.Point(112, 113);
+            this._workingDir.Location = new System.Drawing.Point(112, 110);
             this._workingDir.Name = "_workingDir";
             this._workingDir.Size = new System.Drawing.Size(620, 20);
-            this._workingDir.TabIndex = 11;
+            this._workingDir.TabIndex = 10;
             this._workingDir.TextChanged += new System.EventHandler(this.WorkingDirChanged);
             // 
             // _launchUrl
