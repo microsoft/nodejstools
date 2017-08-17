@@ -85,6 +85,7 @@ var run_tests = function (testCases, callback) {
             result.title = test.testName;
             testCase[test.testName]();
             result.passed = true;
+            result.stdOut += "Test passed.\n";
         } catch (err) {
             result.passed = false;
             console.error(err.name);
