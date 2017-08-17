@@ -84,7 +84,8 @@ var run_tests = function (testCases, callback) {
             var testCase = require(test.testFile);
             result.title = test.testName;
             testCase[test.testName]();
-            result.passed = true;
+			result.passed = true;
+			result.stdOut += "Test passed.";
         } catch (err) {
             result.passed = false;
             console.error(err.name);
