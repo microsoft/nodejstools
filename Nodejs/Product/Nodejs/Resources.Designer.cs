@@ -608,6 +608,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from &apos;https://nodejs.org&apos;, or specify the location of your Node.exe in the &apos;{0}&apos;..
+        /// </summary>
+        internal static string NodejsNotInstalledAnyCode {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledAnyCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js has not been detected on your computer.
         /// </summary>
         internal static string NodejsNotInstalledShort {
