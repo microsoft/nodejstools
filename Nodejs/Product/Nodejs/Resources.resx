@@ -669,7 +669,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] &lt;npm arguments&gt;</value>
   </data>
   <data name="NodejsNotInstalledAnyCode" xml:space="preserve">
-    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}'.</value>
+    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.</value>
     <comment>Template contains a filename, like launch.json</comment>
   </data>
 </root>

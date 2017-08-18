@@ -608,7 +608,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from &apos;https://nodejs.org&apos;, or specify the location of your Node.exe in the &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from &apos;https://nodejs.org&apos;, or specify the location of your Node.exe in the &apos;{0}&apos; file..
         /// </summary>
         internal static string NodejsNotInstalledAnyCode {
             get {
