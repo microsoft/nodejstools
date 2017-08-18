@@ -1,15 +1,18 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.Setup.Configuration;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.Extensions.VS.Debug;
+using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Debugger
@@ -46,9 +49,35 @@ namespace Microsoft.NodejsTools.Debugger
     ""configuration"": ""#/definitions/nodejsFile""
 }";
 
+        [Import]
+        public SVsServiceProvider ServiceProvider { get; set; }
+
+        [Import]
+        public IVsFolderWorkspaceService WorkspaceService { get; set; }
+
         public void SetupDebugTargetInfo(ref VsDebugTargetInfo vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext)
         {
             var nodeExe = debugLaunchContext.LaunchConfiguration.GetValue(NodeExeKey, defaultValue: Nodejs.GetPathToNodeExecutableFromEnvironment());
+
+            if (string.IsNullOrEmpty(nodeExe))
+            {
+                var workspace = this.WorkspaceService.CurrentWorkspace;
+                workspace.JTF.Run(async () =>
+                {
+                    await workspace.JTF.SwitchToMainThreadAsync();
+
+                    VsShellUtilities.ShowMessageBox(this.ServiceProvider,
+                        string.Format(Resources.NodejsNotInstalledAnyCode, LaunchConfigurationConstants.LaunchJsonFileName),
+                        Resources.NodejsNotInstalledShort,
+                        OLEMSGICON.OLEMSGICON_CRITICAL,
+                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                });
+
+                // This isn't pretty but the only way to not get an additional
+                // dialog box, after the one we show.
+                throw new TaskCanceledException();
+            }
 
             var nodeVersion = Nodejs.GetNodeVersion(nodeExe);
             if (nodeVersion >= new Version(8, 0) || NodejsProjectLauncher.CheckDebugProtocolOption())
