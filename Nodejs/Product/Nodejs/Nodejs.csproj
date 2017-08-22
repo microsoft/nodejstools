@@ -628,18 +628,6 @@
     <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.xml" />
-    <Content Include="TypingsAcquisitionTool\index.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="TypingsAcquisitionTool\package.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="TypingsAcquisitionTool\bin\install_typings">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
