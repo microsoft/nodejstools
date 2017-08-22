@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -129,46 +129,6 @@ namespace Microsoft.NodejsTools.Project
         public override Guid SharedCommandGuid => Guids.NodejsCmdSet;
 
         internal override string IssueTrackerUrl => NodejsConstants.IssueTrackerUrl;
-        protected override void FinishProjectCreation(string sourceFolder, string destFolder)
-        {
-            foreach (var item in this.BuildProject.Items)
-            {
-                if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude))
-                {
-                    // Create the 'typings' folder
-                    var typingsFolder = Path.Combine(this.ProjectHome, "Scripts", "typings");
-                    if (!Directory.Exists(typingsFolder))
-                    {
-                        Directory.CreateDirectory(typingsFolder);
-                    }
-
-                    // Deploy node.d.ts
-                    var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
-                    if (!Directory.Exists(Path.Combine(nodeTypingsFolder)))
-                    {
-                        Directory.CreateDirectory(nodeTypingsFolder);
-                    }
-
-                    var nodeFolder = ((OAProject)this.GetAutomationObject()).ProjectItems
-                        .AddFolder("Scripts").ProjectItems
-                        .AddFolder("typings").ProjectItems
-                        .AddFolder("node");
-
-                    nodeFolder.ProjectItems.AddFromFileCopy(
-                        Path.Combine(
-                            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                            "Scripts",
-                            "typings",
-                            "node",
-                            "node.d.ts"
-                        )
-                    );
-                    break;
-                }
-            }
-
-            base.FinishProjectCreation(sourceFolder, destFolder);
-        }
 
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName)
         {
