@@ -38,6 +38,7 @@ x64/
 *.vspscc
 *.vssscc
 .builds
+GeneratedHelpAboutVersion.cs
 #Include the telemetry pdb
 !Nodejs/Common/Telemetry/*.*
 

@@ -258,6 +258,11 @@
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
+    <Compile Include="GeneratedHelpAboutVersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GeneratedHelpAboutVersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="ImportWizardResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -707,6 +712,10 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
+    <Content Include="GeneratedHelpAboutVersion.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GeneratedHelpAboutVersion.cs</LastGenOutput>
+    </Content>
     <Content Include="License.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1189,6 +1198,12 @@
       <InProject>false</InProject>
     </FilesToSign>
   </ItemGroup>
+  <ItemGroup>
+    <T4ParameterValues Include="BuildVersion">
+      <Value>$(VSIXBuildVersion)</Value>
+      <Visible>false</Visible>
+    </T4ParameterValues>
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -1203,8 +1218,13 @@
     <CreateVsixContainer>false</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
+  <PropertyGroup>
+    <TransformOnBuild>true</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+  </PropertyGroup>
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets" />
   <Import Project="..\ProjectAfter.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
