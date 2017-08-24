@@ -585,16 +585,13 @@ namespace Microsoft.NodejsTools.Project
                 this._isCheckingForLongPaths = true;
 
                 var longPaths = await Task.Factory.StartNew(() =>
-                    GetLongSubPaths(this.ProjectHome)
-                    .Concat(GetLongSubPaths(this._intermediateOutputPath))
-                    .Any());
-                if (!longPaths)
-                {
-                    return;
-                }
+                    GetLongSubPaths(this.ProjectHome).Any() || GetLongSubPaths(this._intermediateOutputPath).Any());
 
-                Utilities.ShowMessageBox(
-                  this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                if (longPaths)
+                {
+                    Utilities.ShowMessageBox(
+                      this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                }
             }
             finally
             {
