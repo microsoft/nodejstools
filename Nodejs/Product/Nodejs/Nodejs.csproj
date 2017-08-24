@@ -245,9 +245,6 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\SolutionEventsListener.cs">
       <Link>SharedProject\SolutionEventsListener.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\TaskDialog.cs">
-      <Link>SharedProject\TaskDialog.cs</Link>
-    </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>Project\TypeScriptHelpers.cs</Link>
     </Compile>

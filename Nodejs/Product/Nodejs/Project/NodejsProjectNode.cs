@@ -2,12 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +19,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
-using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 
 namespace Microsoft.NodejsTools.Project
@@ -76,7 +73,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private static string[] _excludedAvailableItems = new[] {
+        private readonly static string[] _excludedAvailableItems = new[] {
             "ApplicationDefinition",
             "Page",
             "Resource",
@@ -586,72 +583,14 @@ namespace Microsoft.NodejsTools.Project
             try
             {
                 this._isCheckingForLongPaths = true;
-                TaskDialogButton dedupeButton, ignoreButton, disableButton;
-                var taskDialog = new TaskDialog(NodejsPackage.Instance)
-                {
-                    AllowCancellation = true,
-                    EnableHyperlinks = true,
-                    Title = Resources.LongPathWarningTitle,
-                    MainIcon = TaskDialogIcon.Warning,
-                    Content = Resources.LongPathWarningText,
-                    CollapsedControlText = Resources.LongPathShowPathsExceedingTheLimit,
-                    ExpandedControlText = Resources.LongPathHidePathsExceedingTheLimit,
-                    Buttons = {
-                        (dedupeButton = new TaskDialogButton(Resources.LongPathNpmDedupe, Resources.LongPathNpmDedupeDetail)),
-                        (ignoreButton = new TaskDialogButton(Resources.LongPathDoNothingButWarnNextTime)),
-                        (disableButton = new TaskDialogButton(Resources.LongPathDoNothingAndDoNotWarnAgain, Resources.LongPathDoNothingAndDoNotWarnAgainDetail))
-                    },
-                    FooterIcon = TaskDialogIcon.Information,
-                    Footer = Resources.LongPathFooter
-                };
-
-                taskDialog.HyperlinkClicked += (sender, e) =>
-                {
-                    switch (e.Url)
-                    {
-                        case "#msdn":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=454508");
-                            break;
-                        case "#uservoice":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkID=456509");
-                            break;
-                        case "#help":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=456511");
-                            break;
-                        default:
-                            System.Windows.Clipboard.SetText(e.Url);
-                            break;
-                    }
-                };
-
-                recheck:
 
                 var longPaths = await Task.Factory.StartNew(() =>
-                    GetLongSubPaths(this.ProjectHome)
-                    .Concat(GetLongSubPaths(this._intermediateOutputPath))
-                    .Select(lpi => string.Format(CultureInfo.InvariantCulture, "\u2022 {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, Resources.LongPathClickToCopy))
-                    .ToArray());
-                if (longPaths.Length == 0)
-                {
-                    return;
-                }
-                taskDialog.ExpandedInformation = string.Join("\r\n", longPaths);
+                    GetLongSubPaths(this.ProjectHome).Any() || GetLongSubPaths(this._intermediateOutputPath).Any());
 
-                var button = taskDialog.ShowModal();
-                if (button == dedupeButton)
+                if (longPaths)
                 {
-                    var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
-                    await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(SR.ProductName);
-
-                    taskDialog.Content += "\r\n\r\n" + Resources.LongPathNpmDedupeDidNotHelp;
-                    taskDialog.Buttons.Remove(dedupeButton);
-                    goto recheck;
-                }
-                else if (button == disableButton)
-                {
-                    var page = NodejsPackage.Instance.GeneralOptionsPage;
-                    page.CheckForLongPaths = false;
-                    page.SaveSettingsToStorage();
+                    Utilities.ShowMessageBox(
+                      this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 }
             }
             finally

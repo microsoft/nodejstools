@@ -63,9 +63,6 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
       <Link>ExceptionExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\TaskDialog.cs">
-      <Link>TaskDialog.cs</Link>
-    </Compile>
     <Compile Include="..\Nodejs\Guids.cs">
       <Link>Guids.cs</Link>
     </Compile>
