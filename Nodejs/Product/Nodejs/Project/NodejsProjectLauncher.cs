@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -407,13 +407,18 @@ namespace Microsoft.NodejsTools.Project
             var webBrowserUrl = GetFullUrl();
             var envVars = GetEnvironmentVariables(webBrowserUrl);
 
+            var runtimeArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments));
+            var scriptArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments));
+
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
                 new JProperty("name", "Debug Node.js program from Visual Studio"),
                 new JProperty("type", "node2"),
                 new JProperty("request", "launch"),
                 new JProperty("program", file),
+                new JProperty("args", scriptArguments),
                 new JProperty("runtimeExecutable", nodePath),
+                new JProperty("runtimeArgs", runtimeArguments),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("env", JObject.FromObject(envVars)),
@@ -436,30 +441,31 @@ namespace Microsoft.NodejsTools.Project
 
             var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
 
-            var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
+            var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
             debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
 
             // Launch browser 
-            if (startBrowser)
+            if (startBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
             {
-                Uri uri = null;
-                if (!String.IsNullOrWhiteSpace(webBrowserUrl))
-                {
-                    uri = new Uri(webBrowserUrl);
-                }
-
-                if (uri != null)
-                {
-                    OnPortOpenedHandler.CreateHandler(
-                        uri.Port,
-                        shortCircuitPredicate: () => false,
-                        action: () =>
-                        {
-                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                        }
-                    );
-                }
+                var uri = new Uri(webBrowserUrl);
+                OnPortOpenedHandler.CreateHandler(
+                    uri.Port,
+                    shortCircuitPredicate: () => false,
+                    action: () =>
+                    {
+                        VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                    }
+                );
             }
+        }
+
+        private static string[] ConvertArguments(string argumentString)
+        {
+            if (argumentString != null)
+            {
+                return argumentString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return Array.Empty<string>();
         }
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
