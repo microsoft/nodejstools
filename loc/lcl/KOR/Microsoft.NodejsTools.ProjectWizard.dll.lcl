@@ -658,6 +658,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NodejsNotInstalledAnyCode" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[컴퓨터에서 Node.js 런타임을 찾을 수 없습니다. 'https://nodejs.org'에서 현재 Node.js 릴리스를 다운로드하여 설치하거나 '{0}' 파일에서 Node.exe 위치를 지정하세요.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NodejsNotInstalledShort" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js has not been detected on your computer]]></Val>
@@ -3295,7 +3304,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10727.3]]></Val>
+        <Val><![CDATA[1.4.10823.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3322,7 +3331,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10727.3 commit:dc914d64ca2eec4704ae1a8fadd7a610df14b849]]></Val>
+        <Val><![CDATA[1.4.10823.1 commit:e435c08a2cc5d668ccb6e5112dc94176ffcd0cf5]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
