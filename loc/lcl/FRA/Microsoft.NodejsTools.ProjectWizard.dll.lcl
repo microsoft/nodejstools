@@ -658,6 +658,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NodejsNotInstalledAnyCode" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Runtime Node.js introuvable sur votre ordinateur. Téléchargez et installez la version de Node.js actuelle à partir de 'https://nodejs.org', ou spécifiez l'emplacement de votre fichier Node.exe dans le fichier '{0}'.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NodejsNotInstalledShort" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js has not been detected on your computer]]></Val>
@@ -3295,7 +3304,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10727.3]]></Val>
+        <Val><![CDATA[1.4.10818.3]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3322,7 +3331,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10727.3 commit:dc914d64ca2eec4704ae1a8fadd7a610df14b849]]></Val>
+        <Val><![CDATA[1.4.10818.3 commit:1dc62ccc34a0e4f574ad3df8d39aed1b04860a56]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
