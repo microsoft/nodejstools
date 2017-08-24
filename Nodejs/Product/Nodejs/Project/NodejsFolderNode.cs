@@ -35,16 +35,11 @@ namespace Microsoft.NodejsTools.Project
             var nodeModulesPath = Path.Combine(this._project.FullPathToChildren, "node_modules");
             if (CommonUtils.IsSameDirectory(nodeModulesPath, this.ItemNode.Url))
             {
-                ShouldIncludeNodeModulesFolderInProject();
+                Utilities.ShowMessageBox(
+                    this._project.Site, Resources.IncludeNodeModulesContent, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 return VSConstants.S_OK;
             }
             return base.IncludeInProject(includeChildren);
-        }
-
-        private void ShouldIncludeNodeModulesFolderInProject()
-        {
-            Utilities.ShowMessageBox(
-                this._project.Site, Resources.IncludeNodeModulesContent, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
     }
 }

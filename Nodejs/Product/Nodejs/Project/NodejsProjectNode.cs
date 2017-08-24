@@ -73,7 +73,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private static string[] _excludedAvailableItems = new[] {
+        private readonly static string[] _excludedAvailableItems = new[] {
             "ApplicationDefinition",
             "Page",
             "Resource",
@@ -584,18 +584,17 @@ namespace Microsoft.NodejsTools.Project
             {
                 this._isCheckingForLongPaths = true;
 
-                Utilities.ShowMessageBox(
-                  this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-
                 var longPaths = await Task.Factory.StartNew(() =>
                     GetLongSubPaths(this.ProjectHome)
                     .Concat(GetLongSubPaths(this._intermediateOutputPath))
-                    .Select(lpi => string.Format(CultureInfo.InvariantCulture, "\u2022 {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, Resources.LongPathClickToCopy))
-                    .ToArray());
-                if (longPaths.Length == 0)
+                    .Any());
+                if (!longPaths)
                 {
                     return;
                 }
+
+                Utilities.ShowMessageBox(
+                  this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }
             finally
             {
