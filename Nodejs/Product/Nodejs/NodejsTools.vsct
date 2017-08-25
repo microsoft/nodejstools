@@ -210,6 +210,7 @@
         </Strings>
       </Button>
 
+      <!-- This button is invoked by code in the Import Wizard. So it's invisible, but still very much needed. -->
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>

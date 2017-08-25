@@ -34,15 +34,14 @@ namespace Microsoft.NodejsTools.ProjectWizard
                 var hr = EnsurePackageLoaded(serviceProvider);
                 if (ErrorHandler.Failed(hr))
                 {
-                    MessageBox.Show(string.Format(ProjectWizardResources.ImportWizardCouldNotStartFailedToLoadPackage, hr), "Visual Studio");
+                    MessageBox.Show(string.Format(ProjectWizardResources.ImportWizardCouldNotStartFailedToLoadPackage, hr), SR.ProductName);
                     throw new WizardBackoutException();
                 }
                 var uiShell = (IVsUIShell)serviceProvider.GetService(typeof(SVsUIShell));
 
-                var projName = replacementsDictionary["$projectname$"];
-                replacementsDictionary.TryGetValue("$specifiedsolutionname$", out var solnName);
                 string directory;
-                if (string.IsNullOrWhiteSpace(solnName))
+                var projName = replacementsDictionary["$projectname$"];
+                if (!replacementsDictionary.TryGetValue("$specifiedsolutionname$", out var solnName) || string.IsNullOrWhiteSpace(solnName))
                 {
                     // Create directory is unchecked, destinationdirectory is the
                     // directory name the user entered plus the project name, we want
@@ -64,7 +63,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
                 hr = uiShell.PostExecCommand(ref guid, (uint)PkgCmdId.cmdidImportWizard, 0, ref inObj);
                 if (ErrorHandler.Failed(hr))
                 {
-                    MessageBox.Show(string.Format(ProjectWizardResources.ImportWizardCouldNotStartUnexpectedError, hr), "Visual Studio");
+                    MessageBox.Show(string.Format(ProjectWizardResources.ImportWizardCouldNotStartUnexpectedError, hr), SR.ProductName);
                 }
             }
 
