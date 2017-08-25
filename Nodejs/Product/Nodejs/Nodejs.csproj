@@ -676,6 +676,36 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSAzureApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSAzureApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSConsole.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSConsole.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSWeb.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSWeb.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSWorker.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSWorker.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\NodeJSApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\NodeJSApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\NodeTSApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\NodeTSApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSAzureApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSAzureApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSConsole.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSConsole.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSWeb.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSWeb.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSWorker.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSWorker.ico</Link>
+    </Resource>
     <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

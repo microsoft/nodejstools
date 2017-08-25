@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.ProjectWizard {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ProjectWizardResources {
@@ -137,11 +137,20 @@ namespace Microsoft.NodejsTools.ProjectWizard {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to start wizard: no automation object available..
+        ///   Looks up a localized string similar to Unable to start wizard: failed to load Node Tools support Package (0x{0:X08}).
         /// </summary>
-        internal static string ImportWizzardCouldNotStartNotAutomationObjectErrorMessage {
+        internal static string ImportWizardCouldNotStartFailedToLoadPackage {
             get {
-                return ResourceManager.GetString("ImportWizzardCouldNotStartNotAutomationObjectErrorMessage", resourceCulture);
+                return ResourceManager.GetString("ImportWizardCouldNotStartFailedToLoadPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to start wizard: Unexpected error 0x{0:X08}.
+        /// </summary>
+        internal static string ImportWizardCouldNotStartUnexpectedError {
+            get {
+                return ResourceManager.GetString("ImportWizardCouldNotStartUnexpectedError", resourceCulture);
             }
         }
     }

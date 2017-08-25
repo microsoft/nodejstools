@@ -209,6 +209,17 @@
           <CommandName>Attach Node.js Debugger</CommandName>
         </Strings>
       </Button>
+
+      <!-- This button is invoked by code in the Import Wizard. So it's invisible, but still very much needed. -->
+      <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Import Existing &amp;Project...</ButtonText>
+          <MenuText>Import Existing &amp;Project...</MenuText>
+          <ToolTipText>Import Existing Project...</ToolTipText>
+          <CommandName>Import Existing Project...</CommandName>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->

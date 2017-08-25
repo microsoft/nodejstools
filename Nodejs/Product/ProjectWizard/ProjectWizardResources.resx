@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ErrorNoDte" xml:space="preserve">
-    <value>Unable to start wizard: no automation object available.</value>
-  </data>
   <data name="AzureToolsInstallInstructions" xml:space="preserve">
     <value>These tools are a free download for your version of Visual Studio that allow you to write, deploy and debug applications for Microsoft Azure in a range of programming languages.</value>
   </data>
@@ -145,7 +142,13 @@ Some manual steps will be required to configure your project.</value>
     <value>&amp;Download and install now
 You will need to restart Visual Studio after installation.</value>
   </data>
-  <data name="ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" xml:space="preserve">
+  <data name="ImportWizardCouldNotStartFailedToLoadPackage" xml:space="preserve">
+    <value>Unable to start wizard: failed to load Node Tools support Package (0x{0:X08})</value>
+  </data>
+  <data name="ImportWizardCouldNotStartUnexpectedError" xml:space="preserve">
+    <value>Unable to start wizard: Unexpected error 0x{0:X08}</value>
+  </data>
+  <data name="ErrorNoDte" xml:space="preserve">
     <value>Unable to start wizard: no automation object available.</value>
   </data>
 </root>
