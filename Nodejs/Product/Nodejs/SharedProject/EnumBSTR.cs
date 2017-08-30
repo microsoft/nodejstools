@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace Microsoft.VisualStudioTools.Project

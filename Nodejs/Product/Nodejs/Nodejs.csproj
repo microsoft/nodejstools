@@ -710,12 +710,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Debugger\RemoteDebug\RemoteDebug.js">
-      <Link>RemoteDebug\RemoteDebug.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>RemoteDebug</VSIXSubPath>
-    </Content>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
@@ -1122,7 +1116,6 @@
     <Compile Include="SharedProject\MsBuildProjectElement.cs" />
     <Compile Include="SharedProject\NodeProperties.cs" />
     <Compile Include="SharedProject\ObservableCollectionExtensions.cs" />
-    <Compile Include="SharedProject\OleServiceProvider.cs" />
     <Compile Include="SharedProject\Output.cs" />
     <Compile Include="SharedProject\OutputGroup.cs" />
     <Compile Include="SharedProject\ProjectConfig.cs" />

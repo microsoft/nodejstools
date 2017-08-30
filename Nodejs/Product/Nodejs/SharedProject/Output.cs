@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using Microsoft.Build.Execution;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;

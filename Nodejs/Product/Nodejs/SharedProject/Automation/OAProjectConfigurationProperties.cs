@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudioTools.Project;
 using VSLangProj;
 
 namespace Microsoft.VisualStudioTools.Project.Automation

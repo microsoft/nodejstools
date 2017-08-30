@@ -4,14 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Microsoft.NodejsTools.Project;
-using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TemplateWizard;
-using Microsoft.VisualStudioTools;
 using ProjectItem = EnvDTE.ProjectItem;
 
 namespace Microsoft.NodejsTools.ProjectWizard

@@ -4,7 +4,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project

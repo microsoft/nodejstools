@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Telemetry;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 
 namespace Microsoft.NodejsTools.Repl

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -120,7 +120,6 @@ namespace Microsoft.NodejsTools.Npm
 
         [JsonProperty]
         public ulong Patch { get; private set; }
-
 
         //  N.B. Both PreReleaseVersion and BuildMetadata are series of dot separated identifiers, but since we don't really particularly
         //  care about them at the moment, can defer comparisons to semver, and won't need to do anything beyond
