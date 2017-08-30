@@ -1,40 +1,33 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    internal class TestFilesUpdateWatcher : IDisposable
+    internal class TestFilesUpdateWatcher : IVsFileChangeEvents
     {
-        private readonly IDictionary<string, FileSystemWatcher> _fileWatchers;
+        private readonly IDictionary<string, uint> watchedFiles = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
-        public TestFilesUpdateWatcher()
+        private readonly IVsFileChangeEx fileWatcher;
+
+        public TestFilesUpdateWatcher(IServiceProvider serviceProvider)
         {
-            _fileWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
+            this.fileWatcher = (IVsFileChangeEx)serviceProvider.GetService<SVsFileChangeEx>();
         }
 
         public bool AddWatch(string path)
         {
             ValidateArg.NotNull(path, "path");
-
-            if (!string.IsNullOrEmpty(path))
+            if (!this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseFileChange(path, (uint)_VSFILECHANGEFLAGS.VSFILECHG_Add, this, out uint cookie)))
             {
-                var directoryName = Path.GetDirectoryName(path);
-                var filter = Path.GetFileName(path);
-
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(directoryName))
-                {
-                    var watcher = new FileSystemWatcher(directoryName, filter);
-                    _fileWatchers[path] = watcher;
-
-                    watcher.Changed += OnChanged;
-                    watcher.EnableRaisingEvents = true;
-                    return true;
-                }
+                this.watchedFiles.Add(path, cookie);
+                return true;
             }
             return false;
         }
@@ -43,84 +36,47 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(path, "path");
 
-            if (!string.IsNullOrEmpty(path))
+            if (!this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
             {
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(path))
-                {
-                    var watcher = new FileSystemWatcher(path);
-                    _fileWatchers[path] = watcher;
+                this.watchedFiles.Add(path, cookie);
+                return true;
+            }
+            return false;
+        }
 
-                    watcher.IncludeSubdirectories = true;
-                    watcher.Changed += OnChanged;
-                    watcher.Renamed += OnRenamed;
-                    watcher.EnableRaisingEvents = true;
-                    return true;
+        public bool RemoveWatch(string path)
+        {
+            ValidateArg.NotNull(path, "path");
+
+            if (this.watchedFiles.TryGetValue(path, out uint cookie))
+            {
+                this.watchedFiles.Remove(path);
+                if (Path.HasExtension(path))
+                {
+                    return ErrorHandler.Succeeded(this.fileWatcher.UnadviseFileChange(cookie));
+                }
+                else
+                {
+                    return ErrorHandler.Succeeded(this.fileWatcher.UnadviseDirChange(cookie));
                 }
             }
             return false;
         }
 
-        public void RemoveWatch(string path)
+        int IVsFileChangeEvents.FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            ValidateArg.NotNull(path, "path");
-
-            if (!string.IsNullOrEmpty(path))
+            for (var i = 0; i < cChanges; i++)
             {
-                FileSystemWatcher watcher;
-
-                if (_fileWatchers.TryGetValue(path, out watcher))
-                {
-                    watcher.EnableRaisingEvents = false;
-
-                    _fileWatchers.Remove(path);
-
-                    watcher.Changed -= OnChanged;
-                    watcher.Dispose();
-                }
+                FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], TestFileChangedReason.Changed));
             }
+
+            return VSConstants.S_OK;
         }
 
-        private void OnChanged(object sender, FileSystemEventArgs e)
+        int IVsFileChangeEvents.DirectoryChanged(string pszDirectory)
         {
-            var evt = FileChangedEvent;
-            if (evt != null)
-            {
-                evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Changed));
-            }
-        }
-
-        private void OnRenamed(object sender, RenamedEventArgs e)
-        {
-            var evt = FileChangedEvent;
-            if (evt != null)
-            {
-                evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Renamed));
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && _fileWatchers != null)
-            {
-                foreach (var watcher in _fileWatchers.Values)
-                {
-                    if (watcher != null)
-                    {
-                        watcher.Changed -= OnChanged;
-                        watcher.Dispose();
-                    }
-                }
-
-                _fileWatchers.Clear();
-            }
+            FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, pszDirectory, TestFileChangedReason.Changed));
+            return VSConstants.S_OK;
         }
     }
 }

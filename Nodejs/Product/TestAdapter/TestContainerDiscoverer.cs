@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         private TestContainerDiscoverer([Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, [Import(typeof(IOperationState))]IOperationState operationState)
             : this(serviceProvider,
                    new SolutionEventsListener(serviceProvider),
-                   new TestFilesUpdateWatcher(),
+                   new TestFilesUpdateWatcher(serviceProvider),
                    new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
                    operationState)
         {
@@ -289,7 +289,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 this.isDisposed = true;
                 this.testFilesAddRemoveListener.Dispose();
-                this.testFilesUpdateWatcher.Dispose();
                 this.solutionListener.Dispose();
             }
         }
