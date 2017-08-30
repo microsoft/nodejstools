@@ -161,9 +161,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return null;
             }
 
-            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out var o)))
+            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out var result)))
             {
-                return o;
+                return result;
             }
             return null;
         }
@@ -387,14 +387,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                 {
                     continue;
                 }
+
                 var solution = (IVsSolution)this.serviceProvider.GetService(typeof(SVsSolution));
                 ErrorHandler.ThrowOnFailure(
-                    solution.SaveSolutionElement(
-                        0,
-                        (IVsHierarchy)project,
-                        0
-                    )
-                );
+                    solution.SaveSolutionElement((uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_SaveIfDirty, (IVsHierarchy)project, /* save entire project */ 0));
             }
         }
 
@@ -469,7 +465,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         }
                         else
                         {
-                            this.testFilesUpdateWatcher.AddWatch(p);
+                            this.testFilesUpdateWatcher.AddFileWatch(p);
                         }
                     }
                 }
@@ -506,13 +502,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         if (string.IsNullOrEmpty(root) || !CommonUtils.IsSubpathOf(root, p))
                         {
-                            this.testFilesUpdateWatcher.RemoveWatch(p);
+                            this.testFilesUpdateWatcher.RemoveFileWatch(p);
                         }
                         this.fileRootMap.Remove(p);
                     }
                     if (!string.IsNullOrEmpty(root))
                     {
-                        this.testFilesUpdateWatcher.RemoveWatch(root);
+                        this.testFilesUpdateWatcher.RemoveFolderWatch(root);
                     }
                 }
             }
@@ -549,7 +545,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             }
                             else
                             {
-                                this.testFilesUpdateWatcher.AddWatch(e.File);
+                                this.testFilesUpdateWatcher.AddFileWatch(e.File);
                             }
 
                             OnTestContainersChanged(e.Project);
@@ -563,12 +559,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                             this.fileRootMap.Remove(e.File);
                             if (!this.fileRootMap.Values.Contains(root))
                             {
-                                this.testFilesUpdateWatcher.RemoveWatch(root);
+                                this.testFilesUpdateWatcher.RemoveFolderWatch(root);
                             }
                         }
                         else
                         {
-                            this.testFilesUpdateWatcher.RemoveWatch(e.File);
+                            this.testFilesUpdateWatcher.RemoveFileWatch(e.File);
                         }
 
                         // https://pytools.codeplex.com/workitem/1546
