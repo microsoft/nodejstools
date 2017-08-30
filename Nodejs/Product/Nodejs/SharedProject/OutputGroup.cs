@@ -3,11 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using MSBuildExecution = Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudioTools.Project
 {

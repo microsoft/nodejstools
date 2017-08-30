@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
