@@ -85,11 +85,20 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" ItemType="0" PsrId="211" Leaf="true">
+      <Item ItemId=";ImportWizardCouldNotStartFailedToLoadPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Unable to start wizard: no automation object available.]]></Val>
+          <Val><![CDATA[Unable to start wizard: failed to load Node Tools support Package (0x{0:X08})]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Не удается запустить мастер: нет доступных объектов автоматизации.]]></Val>
+            <Val><![CDATA[Не удалось запустить мастер: не удалось загрузить пакет поддержки Инструментов Node (0x{0:X08})]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ImportWizardCouldNotStartUnexpectedError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to start wizard: Unexpected error 0x{0:X08}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Не удалось запустить мастер: непредвиденная ошибка 0x{0:X08}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3307,7 +3316,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10824.1]]></Val>
+        <Val><![CDATA[1.4.10830.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3334,7 +3343,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10824.1 commit:b618825b08a028a48c7c234147a627a356567c49]]></Val>
+        <Val><![CDATA[1.4.10830.2 commit:563ca5727367851e672f8378092e37a62bc05f17]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
