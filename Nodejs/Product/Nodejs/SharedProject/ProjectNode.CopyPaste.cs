@@ -1448,7 +1448,6 @@ namespace Microsoft.VisualStudioTools.Project
                         return;
                     }
 
-
                     if (this.DropEffect == DropEffect.Move && Utilities.IsSameComObject(this.Project, this.SourceHierarchy))
                     {
                         // we are doing a move, we need to remove the old item, and add the new.
