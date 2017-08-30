@@ -85,11 +85,20 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";ImportWizzardCouldNotStartNotAutomationObjectErrorMessage" ItemType="0" PsrId="211" Leaf="true">
+      <Item ItemId=";ImportWizardCouldNotStartFailedToLoadPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Unable to start wizard: no automation object available.]]></Val>
+          <Val><![CDATA[Unable to start wizard: failed to load Node Tools support Package (0x{0:X08})]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nie można uruchomić kreatora: brak dostępnych obiektów automatyzacji.]]></Val>
+            <Val><![CDATA[Nie można uruchomić kreatora: nie można załadować pakietu dla pomocy technicznej narzędzi Node Tools (0x{0:X08})]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ImportWizardCouldNotStartUnexpectedError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to start wizard: Unexpected error 0x{0:X08}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można uruchomić kreatora: nieoczekiwany błąd 0x{0:X08}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3304,7 +3313,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10818.3]]></Val>
+        <Val><![CDATA[1.4.10826.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3331,7 +3340,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10818.3 commit:1dc62ccc34a0e4f574ad3df8d39aed1b04860a56]]></Val>
+        <Val><![CDATA[1.4.10826.1 commit:3ab177bb3380959add5d47a50357fc6ed521c5f8]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
