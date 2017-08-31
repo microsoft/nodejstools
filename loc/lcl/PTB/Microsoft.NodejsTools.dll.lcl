@@ -4918,8 +4918,8 @@
       <Item ItemId=";3067" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Basic Node.js Express 4 Application]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Aplicativo Node.js Express 4 Básico.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Aplicativo Node.js Express 4 Básico]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
@@ -5290,7 +5290,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10830.2]]></Val>
+        <Val><![CDATA[1.4.10831.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5317,7 +5317,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10830.2 commit:563ca5727367851e672f8378092e37a62bc05f17]]></Val>
+        <Val><![CDATA[1.4.10831.1 commit:a8407bfe1d016b6f4dfaf72e8d84b1846f19dcbb]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
