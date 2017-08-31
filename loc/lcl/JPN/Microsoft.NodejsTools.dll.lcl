@@ -4095,6 +4095,9 @@
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},517" ItemType=";Tooltip" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Import Existing Project...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[既存のプロジェクトをインポート...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -5287,7 +5290,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10830.2]]></Val>
+        <Val><![CDATA[1.4.10830.5]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5314,7 +5317,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10830.2 commit:563ca5727367851e672f8378092e37a62bc05f17]]></Val>
+        <Val><![CDATA[1.4.10830.5 commit:d590a38520123f52763718a24d0c69ea281ce5bb]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
