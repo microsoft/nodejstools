@@ -289,6 +289,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 this.isDisposed = true;
                 this.testFilesAddRemoveListener.Dispose();
+                this.testFilesUpdateWatcher.Dispose();
                 this.solutionListener.Dispose();
             }
         }
@@ -460,7 +461,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, p))
                         {
-                            this.testFilesUpdateWatcher.AddDirectoryWatch(root);
+                            this.testFilesUpdateWatcher.AddFolderWatch(root);
                             this.fileRootMap[p] = root;
                         }
                         else
@@ -540,7 +541,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                             if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
                             {
-                                this.testFilesUpdateWatcher.AddDirectoryWatch(root);
+                                this.testFilesUpdateWatcher.AddFolderWatch(root);
                                 this.fileRootMap[e.File] = root;
                             }
                             else

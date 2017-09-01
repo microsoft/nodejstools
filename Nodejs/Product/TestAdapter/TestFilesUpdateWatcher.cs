@@ -9,25 +9,32 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    internal class TestFilesUpdateWatcher : IVsFileChangeEvents
+    internal class TestFilesUpdateWatcher : IVsFileChangeEvents, IDisposable
     {
         private readonly IDictionary<string, uint> watchedFiles = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
+        private readonly IDictionary<string, uint> watchedFolders = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
+
+        private bool disposed;
+
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
-        private readonly IVsFileChangeEx fileWatcher;
+        private /*readonly*/ IVsFileChangeEx fileWatcher; // writeable for dispose
 
         public TestFilesUpdateWatcher(IServiceProvider serviceProvider)
         {
+            ValidateArg.NotNull(serviceProvider, nameof(serviceProvider));
+
             this.fileWatcher = serviceProvider.GetService<IVsFileChangeEx>(typeof(SVsFileChangeEx));
         }
 
         public bool AddFileWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
             const uint mask = (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Add | _VSFILECHANGEFLAGS.VSFILECHG_Del | _VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time);
 
-            if (!this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseFileChange(path, mask, this, out uint cookie)))
+            if (!string.IsNullOrEmpty(path) && !this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseFileChange(path, mask, this, out uint cookie)))
             {
                 this.watchedFiles.Add(path, cookie);
                 return true;
@@ -35,13 +42,14 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             return false;
         }
 
-        public bool AddDirectoryWatch(string path)
+        public bool AddFolderWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (!this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
+            if (!string.IsNullOrEmpty(path) && !this.watchedFolders.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
             {
-                this.watchedFiles.Add(path, cookie);
+                this.watchedFolders.Add(path, cookie);
                 return true;
             }
             return false;
@@ -49,9 +57,10 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         public bool RemoveFileWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (this.watchedFiles.TryGetValue(path, out uint cookie))
+            if (!string.IsNullOrEmpty(path) && this.watchedFiles.TryGetValue(path, out uint cookie))
             {
                 this.watchedFiles.Remove(path);
                 return ErrorHandler.Succeeded(this.fileWatcher.UnadviseFileChange(cookie));
@@ -61,11 +70,12 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         public bool RemoveFolderWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (this.watchedFiles.TryGetValue(path, out uint cookie))
+            if (!string.IsNullOrEmpty(path) && this.watchedFolders.TryGetValue(path, out uint cookie))
             {
-                this.watchedFiles.Remove(path);
+                this.watchedFolders.Remove(path);
                 return ErrorHandler.Succeeded(this.fileWatcher.UnadviseDirChange(cookie));
             }
             return false;
@@ -73,11 +83,14 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         int IVsFileChangeEvents.FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            for (var i = 0; i < cChanges; i++)
+            if (this.FileChangedEvent != null)
             {
-                FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                var evt = FileChangedEvent;
+                for (var i = 0; i < cChanges; i++)
+                {
+                    evt.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                }
             }
-
             return VSConstants.S_OK;
         }
 
@@ -102,8 +115,33 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 return TestFileChangedReason.Removed;
             }
 
-            Debug.Fail($"Unexpected value for the file changed event \'{flag}\'");
+            Debug.Fail($"Unexpected value for the file changed event: \'{flag}\'");
             return TestFileChangedReason.Changed;
+        }
+
+        private void CheckDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(nameof(TestFilesUpdateWatcher));
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!this.disposed)
+            {
+                this.disposed = true;
+                foreach (var cookie in this.watchedFiles.Values)
+                {
+                    this.fileWatcher.UnadviseFileChange(cookie);
+                }
+                foreach (var cookie in this.watchedFolders.Values)
+                {
+                    this.fileWatcher.UnadviseDirChange(cookie);
+                }
+                this.fileWatcher = null;
+            }
         }
     }
 }
