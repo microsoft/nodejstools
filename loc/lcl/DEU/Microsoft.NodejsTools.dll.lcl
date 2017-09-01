@@ -4917,12 +4917,12 @@
       </Item>
       <Item ItemId=";3067" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
+          <Val><![CDATA[Basic Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js Express 4-Basisanwendung.]]></Val>
+            <Val><![CDATA[Node.js Express 4-Basisanwendung]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Azure Cloud Service]]></Val>
+            <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -5290,7 +5290,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10826.1]]></Val>
+        <Val><![CDATA[1.4.10831.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5317,7 +5317,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10826.1 commit:3ab177bb3380959add5d47a50357fc6ed521c5f8]]></Val>
+        <Val><![CDATA[1.4.10831.2 commit:3484de9ee5000eccb5069a4216fbc36fd9617cb1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
