@@ -140,6 +140,8 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 {
                     this.fileWatcher.UnadviseDirChange(cookie);
                 }
+                this.watchedFiles.Clear();
+                this.watchedFolders.Clear();
                 this.fileWatcher = null;
             }
         }
