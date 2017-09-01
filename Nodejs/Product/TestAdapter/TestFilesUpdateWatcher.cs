@@ -1,125 +1,148 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    internal class TestFilesUpdateWatcher : IDisposable
+    internal class TestFilesUpdateWatcher : IVsFileChangeEvents, IDisposable
     {
-        private readonly IDictionary<string, FileSystemWatcher> _fileWatchers;
+        private readonly IDictionary<string, uint> watchedFiles = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
+        private readonly IDictionary<string, uint> watchedFolders = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
+
+        private bool disposed;
+
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
-        public TestFilesUpdateWatcher()
+        private /*readonly*/ IVsFileChangeEx fileWatcher; // writeable for dispose
+
+        public TestFilesUpdateWatcher(IServiceProvider serviceProvider)
         {
-            _fileWatchers = new Dictionary<string, FileSystemWatcher>(StringComparer.OrdinalIgnoreCase);
+            ValidateArg.NotNull(serviceProvider, nameof(serviceProvider));
+
+            this.fileWatcher = serviceProvider.GetService<IVsFileChangeEx>(typeof(SVsFileChangeEx));
         }
 
-        public bool AddWatch(string path)
+        public bool AddFileWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (!string.IsNullOrEmpty(path))
+            const uint mask = (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Add | _VSFILECHANGEFLAGS.VSFILECHG_Del | _VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time);
+
+            if (!string.IsNullOrEmpty(path) && !this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseFileChange(path, mask, this, out uint cookie)))
             {
-                var directoryName = Path.GetDirectoryName(path);
-                var filter = Path.GetFileName(path);
-
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(directoryName))
-                {
-                    var watcher = new FileSystemWatcher(directoryName, filter);
-                    _fileWatchers[path] = watcher;
-
-                    watcher.Changed += OnChanged;
-                    watcher.EnableRaisingEvents = true;
-                    return true;
-                }
+                this.watchedFiles.Add(path, cookie);
+                return true;
             }
             return false;
         }
 
-        public bool AddDirectoryWatch(string path)
+        public bool AddFolderWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path) && !this.watchedFolders.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
             {
-                if (!_fileWatchers.ContainsKey(path) && Directory.Exists(path))
-                {
-                    var watcher = new FileSystemWatcher(path);
-                    _fileWatchers[path] = watcher;
-
-                    watcher.IncludeSubdirectories = true;
-                    watcher.Changed += OnChanged;
-                    watcher.Renamed += OnRenamed;
-                    watcher.EnableRaisingEvents = true;
-                    return true;
-                }
+                this.watchedFolders.Add(path, cookie);
+                return true;
             }
             return false;
         }
 
-        public void RemoveWatch(string path)
+        public bool RemoveFileWatch(string path)
         {
-            ValidateArg.NotNull(path, "path");
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
 
-            if (!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path) && this.watchedFiles.TryGetValue(path, out uint cookie))
             {
-                FileSystemWatcher watcher;
+                this.watchedFiles.Remove(path);
+                return ErrorHandler.Succeeded(this.fileWatcher.UnadviseFileChange(cookie));
+            }
+            return false;
+        }
 
-                if (_fileWatchers.TryGetValue(path, out watcher))
+        public bool RemoveFolderWatch(string path)
+        {
+            ValidateArg.NotNull(path, nameof(path));
+            this.CheckDisposed();
+
+            if (!string.IsNullOrEmpty(path) && this.watchedFolders.TryGetValue(path, out uint cookie))
+            {
+                this.watchedFolders.Remove(path);
+                return ErrorHandler.Succeeded(this.fileWatcher.UnadviseDirChange(cookie));
+            }
+            return false;
+        }
+
+        int IVsFileChangeEvents.FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
+        {
+            if (this.FileChangedEvent != null)
+            {
+                var evt = FileChangedEvent;
+                for (var i = 0; i < cChanges; i++)
                 {
-                    watcher.EnableRaisingEvents = false;
-
-                    _fileWatchers.Remove(path);
-
-                    watcher.Changed -= OnChanged;
-                    watcher.Dispose();
+                    evt.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
                 }
             }
+            return VSConstants.S_OK;
         }
 
-        private void OnChanged(object sender, FileSystemEventArgs e)
+        int IVsFileChangeEvents.DirectoryChanged(string pszDirectory)
         {
-            var evt = FileChangedEvent;
-            if (evt != null)
+            FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, pszDirectory, TestFileChangedReason.Changed));
+            return VSConstants.S_OK;
+        }
+
+        private static TestFileChangedReason ConvertVSFILECHANGEFLAGS(uint flag)
+        {
+            if ((flag & (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Attr)) != 0)
             {
-                evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Changed));
+                return TestFileChangedReason.Changed;
             }
+            if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Add) != 0)
+            {
+                return TestFileChangedReason.Added;
+            }
+            if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Del) != 0)
+            {
+                return TestFileChangedReason.Removed;
+            }
+
+            Debug.Fail($"Unexpected value for the file changed event: \'{flag}\'");
+            return TestFileChangedReason.Changed;
         }
 
-        private void OnRenamed(object sender, RenamedEventArgs e)
+        private void CheckDisposed()
         {
-            var evt = FileChangedEvent;
-            if (evt != null)
+            if (this.disposed)
             {
-                evt(sender, new TestFileChangedEventArgs(null, e.FullPath, TestFileChangedReason.Renamed));
+                throw new ObjectDisposedException(nameof(TestFilesUpdateWatcher));
             }
         }
 
         public void Dispose()
         {
-            Dispose(true);
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && _fileWatchers != null)
+            if (!this.disposed)
             {
-                foreach (var watcher in _fileWatchers.Values)
+                this.disposed = true;
+                foreach (var cookie in this.watchedFiles.Values)
                 {
-                    if (watcher != null)
-                    {
-                        watcher.Changed -= OnChanged;
-                        watcher.Dispose();
-                    }
+                    this.fileWatcher.UnadviseFileChange(cookie);
                 }
-
-                _fileWatchers.Clear();
+                foreach (var cookie in this.watchedFolders.Values)
+                {
+                    this.fileWatcher.UnadviseDirChange(cookie);
+                }
+                this.watchedFiles.Clear();
+                this.watchedFolders.Clear();
+                this.fileWatcher = null;
             }
         }
     }

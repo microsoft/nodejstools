@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         private TestContainerDiscoverer([Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, [Import(typeof(IOperationState))]IOperationState operationState)
             : this(serviceProvider,
                    new SolutionEventsListener(serviceProvider),
-                   new TestFilesUpdateWatcher(),
+                   new TestFilesUpdateWatcher(serviceProvider),
                    new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
                    operationState)
         {
@@ -161,9 +161,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return null;
             }
 
-            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out var o)))
+            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out var result)))
             {
-                return o;
+                return result;
             }
             return null;
         }
@@ -388,14 +388,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                 {
                     continue;
                 }
+
                 var solution = (IVsSolution)this.serviceProvider.GetService(typeof(SVsSolution));
                 ErrorHandler.ThrowOnFailure(
-                    solution.SaveSolutionElement(
-                        0,
-                        (IVsHierarchy)project,
-                        0
-                    )
-                );
+                    solution.SaveSolutionElement((uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_SaveIfDirty, (IVsHierarchy)project, /* save entire project */ 0));
             }
         }
 
@@ -465,12 +461,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, p))
                         {
-                            this.testFilesUpdateWatcher.AddDirectoryWatch(root);
+                            this.testFilesUpdateWatcher.AddFolderWatch(root);
                             this.fileRootMap[p] = root;
                         }
                         else
                         {
-                            this.testFilesUpdateWatcher.AddWatch(p);
+                            this.testFilesUpdateWatcher.AddFileWatch(p);
                         }
                     }
                 }
@@ -507,13 +503,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         if (string.IsNullOrEmpty(root) || !CommonUtils.IsSubpathOf(root, p))
                         {
-                            this.testFilesUpdateWatcher.RemoveWatch(p);
+                            this.testFilesUpdateWatcher.RemoveFileWatch(p);
                         }
                         this.fileRootMap.Remove(p);
                     }
                     if (!string.IsNullOrEmpty(root))
                     {
-                        this.testFilesUpdateWatcher.RemoveWatch(root);
+                        this.testFilesUpdateWatcher.RemoveFolderWatch(root);
                     }
                 }
             }
@@ -545,12 +541,12 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                             if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
                             {
-                                this.testFilesUpdateWatcher.AddDirectoryWatch(root);
+                                this.testFilesUpdateWatcher.AddFolderWatch(root);
                                 this.fileRootMap[e.File] = root;
                             }
                             else
                             {
-                                this.testFilesUpdateWatcher.AddWatch(e.File);
+                                this.testFilesUpdateWatcher.AddFileWatch(e.File);
                             }
 
                             OnTestContainersChanged(e.Project);
@@ -564,12 +560,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                             this.fileRootMap.Remove(e.File);
                             if (!this.fileRootMap.Values.Contains(root))
                             {
-                                this.testFilesUpdateWatcher.RemoveWatch(root);
+                                this.testFilesUpdateWatcher.RemoveFolderWatch(root);
                             }
                         }
                         else
                         {
-                            this.testFilesUpdateWatcher.RemoveWatch(e.File);
+                            this.testFilesUpdateWatcher.RemoveFileWatch(e.File);
                         }
 
                         // https://pytools.codeplex.com/workitem/1546
