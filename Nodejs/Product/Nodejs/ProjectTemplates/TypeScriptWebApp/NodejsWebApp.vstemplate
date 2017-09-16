@@ -22,10 +22,12 @@
       <ProjectItem>tsconfig.json</ProjectItem>
       <Folder Name="node_modules">
         <Folder Name="@types">
-          <ProjectItem TargetFileName="package.json">node.package.json</ProjectItem>
-          <ProjectItem TargetFileName="LICENSE">node.LICENSE</ProjectItem>
-          <ProjectItem TargetFileName="index.d.ts">node.index.d.ts</ProjectItem>
-          <ProjectItem TargetFileName="README.md">node.README.md</ProjectItem>
+          <Folder Name="node">
+            <ProjectItem TargetFileName="package.json">node.package.json</ProjectItem>
+            <ProjectItem TargetFileName="LICENSE">node.LICENSE</ProjectItem>
+            <ProjectItem TargetFileName="index.d.ts">node.index.d.ts</ProjectItem>
+            <ProjectItem TargetFileName="README.md">node.README.md</ProjectItem>
+          </Folder>
         </Folder>
       </Folder>
     </Project>
