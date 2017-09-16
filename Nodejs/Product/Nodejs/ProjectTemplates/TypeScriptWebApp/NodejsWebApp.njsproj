@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
-    <Content Include="tsconfig.json">
+    <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
