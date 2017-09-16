@@ -1,0 +1,31 @@
+{
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Microsoft TypeScript",
+      "url": "http://typescriptlang.org"
+    },
+    {
+      "name": "DefinitelyTyped",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped"
+    },
+    {
+      "name": "Wilco Bakker",
+      "url": "https://github.com/WilcoBakker"
+    }
+  ],
+  "dependencies": {},
+  "deprecated": false,
+  "description": "TypeScript definitions for Node.js",
+  "license": "MIT",
+  "main": "",
+  "name": "@types/node",
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"
+  },
+  "scripts": {},
+  "typeScriptVersion": "2.0",
+  "typesPublisherContentHash": "e6510e23bed5fe0154bf8df6b3a7b2e215c915249603eda22a0c0e59f3ff551c",
+  "version": "6.0.88"
+}
