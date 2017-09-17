@@ -16,7 +16,7 @@
   <TemplateContent>
     <Project File="NodejsConsoleApp.njsproj" ReplaceParameters="true">
       <Folder Name="node_modules">
-        <Folder Name="@types">
+        <Folder Name="%40types">
           <Folder Name="node">
             <ProjectItem TargetFileName="package.json">node.package.json</ProjectItem>
             <ProjectItem TargetFileName="LICENSE">node.LICENSE</ProjectItem>
