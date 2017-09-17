@@ -944,58 +944,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\tsconfig.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\error.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\tsconfig.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
