@@ -886,7 +886,6 @@
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.njsproj" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.vstemplate" />
-
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
