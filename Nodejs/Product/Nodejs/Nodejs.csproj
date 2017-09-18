@@ -729,10 +729,6 @@
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\node.README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
@@ -742,10 +738,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\node.README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
@@ -758,10 +750,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\node.README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
@@ -782,10 +770,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\node.README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
@@ -804,10 +788,6 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.index.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.LICENSE" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\node.README.md" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />

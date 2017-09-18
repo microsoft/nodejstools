@@ -16,16 +16,6 @@
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptWebApp.njsproj" ReplaceParameters="true">
-      <Folder Name="node_modules">
-        <Folder Name="%40types">
-          <Folder Name="node">
-            <ProjectItem TargetFileName="package.json">node.package.json</ProjectItem>
-            <ProjectItem TargetFileName="LICENSE">node.LICENSE</ProjectItem>
-            <ProjectItem TargetFileName="index.d.ts">node.index.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="README.md">node.README.md</ProjectItem>
-          </Folder>
-        </Folder>
-      </Folder>
       <ProjectItem>tsconfig.json</ProjectItem>
       <ProjectItem OpenInEditor="true">server.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
