@@ -1277,7 +1277,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="CalculateZipFiles">
     <ItemGroup>
       <ZipProject Include="@(TypeScriptProject)">
         <Language>TypeScript</Language>
