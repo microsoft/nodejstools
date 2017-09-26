@@ -1,12 +1,16 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Npm
 {
-    public class PackageComparer : IComparer<IPackage>
+    public sealed class PackageComparer : IComparer<IPackage>
     {
+        public static readonly PackageComparer Instance = new PackageComparer();
+
+        private PackageComparer() { }
+
         public int Compare(IPackage x, IPackage y)
         {
             if (x == y)
@@ -26,8 +30,12 @@ namespace Microsoft.NodejsTools.Npm
         }
     }
 
-    public class PackageEqualityComparer : EqualityComparer<IPackage>
+    public sealed class PackageEqualityComparer : EqualityComparer<IPackage>
     {
+        public static readonly PackageEqualityComparer Instance = new PackageEqualityComparer();
+
+        private PackageEqualityComparer() { }
+
         public override bool Equals(IPackage p1, IPackage p2)
         {
             return p1.Name == p2.Name

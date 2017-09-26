@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Project
                     continue;
                 }
 
-                if (modules != null && modules.Contains(dep.Package, new PackageEqualityComparer()))
+                if (modules != null && modules.Contains(dep.Package, PackageEqualityComparer.Instance))
                 {
                     recycle[dep.Package.Name] = dep;
                 }
