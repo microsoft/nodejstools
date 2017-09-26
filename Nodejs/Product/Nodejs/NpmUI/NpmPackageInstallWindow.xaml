@@ -149,6 +149,12 @@
                                            Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
 
                                 <TextBlock Grid.Column="1"
+                                           x:Name="LocalInstallMissingMessage"
+                                           Visibility="Collapsed"
+                                           FontWeight="Bold"
+                                           Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
+                                
+                                <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
                                            FontWeight="Bold"

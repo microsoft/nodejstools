@@ -186,4 +186,7 @@
   <data name="WindowTitle" xml:space="preserve">
     <value>Install New npm Packages</value>
   </data>
+  <data name="MissingLocallyMessage" xml:space="preserve">
+    <value>Package missing</value>
+  </data>
 </root>
