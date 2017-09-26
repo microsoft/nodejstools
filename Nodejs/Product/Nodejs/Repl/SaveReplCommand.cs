@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -25,12 +25,12 @@ namespace Microsoft.NodejsTools.Repl
         {
             if (string.IsNullOrWhiteSpace(arguments))
             {
-                window.WriteError("save requires a filename");
+                window.WriteError(Resources.ReplSaveNoFileName);
                 return ExecutionResult.Failed;
             }
             else if (arguments.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
-                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Invalid filename: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveInvalidFileName, arguments));
                 return ExecutionResult.Failed;
             }
 
@@ -63,17 +63,19 @@ namespace Microsoft.NodejsTools.Repl
             try
             {
                 File.WriteAllText(arguments, text.ToString());
-                window.WriteLine(string.Format(CultureInfo.CurrentCulture, "Session saved to: {0}", arguments));
+                window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveSucces, arguments));
             }
             catch
             {
-                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Failed to save: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveFailed, arguments));
             }
             return ExecutionResult.Succeeded;
         }
 
-        public string Description => "Save the current REPL session to a file";
+        public string Description => Resources.ReplSaveDescription;
+
         public string Command => "save";
+
         private static bool IsJavaScriptBuffer(ITextBuffer buffer)
         {
             return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);

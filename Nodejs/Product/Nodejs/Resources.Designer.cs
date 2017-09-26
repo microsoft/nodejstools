@@ -1478,11 +1478,65 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resets the context object to an empty object and clears any multi-line expression..
+        /// </summary>
+        internal static string ReplClearDescription {
+            get {
+                return ResourceManager.GetString("ReplClearDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
         /// </summary>
         internal static string ReplInitializationMessage {
             get {
                 return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
+        /// </summary>
+        internal static string ReplSaveDescription {
+            get {
+                return ResourceManager.GetString("ReplSaveDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveFailed {
+            get {
+                return ResourceManager.GetString("ReplSaveFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid filename: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveInvalidFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveInvalidFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save requires a filename..
+        /// </summary>
+        internal static string ReplSaveNoFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveNoFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session saved to: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveSucces {
+            get {
+                return ResourceManager.GetString("ReplSaveSucces", resourceCulture);
             }
         }
         

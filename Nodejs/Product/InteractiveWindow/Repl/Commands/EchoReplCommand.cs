@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Repl
             if (string.IsNullOrWhiteSpace(arguments))
             {
                 var curValue = (bool)window.GetOptionValue(ReplOptions.ShowOutput);
-                window.WriteLine("ECHO is " + (curValue ? "ON" : "OFF"));
+                window.WriteLine(string.Format(Resources.echoState, curValue ? "\'ON\'" : "\'OFF\'"));
                 return ExecutionResult.Succeeded;
             }
 
@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string Description
         {
-            get { return "Suppress or unsuppress output to the buffer"; }
+            get { return Resources.echoDescription; }
         }
 
         public string Command

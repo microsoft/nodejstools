@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Reflection;
@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string Description
         {
-            get { return "Clears the contents of the REPL editor window"; }
+            get { return Resources.clearDescription; }
         }
 
         public string Command

@@ -109,7 +109,7 @@
     <value>text/microsoft-resx</value>
   </resheader>
   <resheader name="version">
-    <value>0.5</value>
+    <value>2.0</value>
   </resheader>
   <resheader name="reader">
     <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -117,7 +117,29 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="cancelDescription" xml:space="preserve">
+    <value>Stops execution of the current command.</value>
+  </data>
   <data name="CanNotCreateWindow" xml:space="preserve">
-    <value>Cannot create Interactive window</value>
+    <value>Cannot create Interactive window.</value>
+  </data>
+  <data name="clearDescription" xml:space="preserve">
+    <value>Clears the contents of the REPL editor window.</value>
+  </data>
+  <data name="echoDescription" xml:space="preserve">
+    <value>Suppress or unsuppress output to the buffer.</value>
+  </data>
+  <data name="helpDescription" xml:space="preserve">
+    <value>Show a list of REPL commands.</value>
+  </data>
+  <data name="resetDescription" xml:space="preserve">
+    <value>Reset to an empty execution engine, but keep REPL history.</value>
+  </data>
+  <data name="waitDescription" xml:space="preserve">
+    <value>Wait for at least the specified number of milliseconds.</value>
+  </data>
+  <data name="echoState" xml:space="preserve">
+    <value>ECHO is {0}</value>
+    <comment>ECHO is on\off</comment>
   </data>
 </root>
