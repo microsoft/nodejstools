@@ -401,6 +401,51 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Jade Class Literal.
+        /// </summary>
+        internal static string JadeClassLiteral {
+            get {
+                return ResourceManager.GetString("JadeClassLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Filter.
+        /// </summary>
+        internal static string JadeFilter {
+            get {
+                return ResourceManager.GetString("JadeFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Id Literal.
+        /// </summary>
+        internal static string JadeIdLiteral {
+            get {
+                return ResourceManager.GetString("JadeIdLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Keyword.
+        /// </summary>
+        internal static string JadeKeyword {
+            get {
+                return ResourceManager.GetString("JadeKeyword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Variable.
+        /// </summary>
+        internal static string JadeVariable {
+            get {
+                return ResourceManager.GetString("JadeVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well..
         /// </summary>
         internal static string LaunchUrlToolTip {
