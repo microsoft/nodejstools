@@ -79,6 +79,159 @@ namespace Microsoft.NodejsTools.Repl {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Black.
+        /// </summary>
+        internal static string ClassificationBlack {
+            get {
+                return ResourceManager.GetString("ClassificationBlack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Blue.
+        /// </summary>
+        internal static string ClassificationBlue {
+            get {
+                return ResourceManager.GetString("ClassificationBlue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Cyan.
+        /// </summary>
+        internal static string ClassificationCyan {
+            get {
+                return ResourceManager.GetString("ClassificationCyan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Blue.
+        /// </summary>
+        internal static string ClassificationDarkBlue {
+            get {
+                return ResourceManager.GetString("ClassificationDarkBlue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Cyan.
+        /// </summary>
+        internal static string ClassificationDarkCyan {
+            get {
+                return ResourceManager.GetString("ClassificationDarkCyan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Gray.
+        /// </summary>
+        internal static string ClassificationDarkGray {
+            get {
+                return ResourceManager.GetString("ClassificationDarkGray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Green.
+        /// </summary>
+        internal static string ClassificationDarkGreen {
+            get {
+                return ResourceManager.GetString("ClassificationDarkGreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Magenta.
+        /// </summary>
+        internal static string ClassificationDarkMagenta {
+            get {
+                return ResourceManager.GetString("ClassificationDarkMagenta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Red.
+        /// </summary>
+        internal static string ClassificationDarkRed {
+            get {
+                return ResourceManager.GetString("ClassificationDarkRed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Yellow.
+        /// </summary>
+        internal static string ClassificationDarkYellow {
+            get {
+                return ResourceManager.GetString("ClassificationDarkYellow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Error.
+        /// </summary>
+        internal static string ClassificationError {
+            get {
+                return ResourceManager.GetString("ClassificationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Gray.
+        /// </summary>
+        internal static string ClassificationGray {
+            get {
+                return ResourceManager.GetString("ClassificationGray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Green.
+        /// </summary>
+        internal static string ClassificationGreen {
+            get {
+                return ResourceManager.GetString("ClassificationGreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Magenta.
+        /// </summary>
+        internal static string ClassificationMagenta {
+            get {
+                return ResourceManager.GetString("ClassificationMagenta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Red.
+        /// </summary>
+        internal static string ClassificationRed {
+            get {
+                return ResourceManager.GetString("ClassificationRed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - White.
+        /// </summary>
+        internal static string ClassificationWhite {
+            get {
+                return ResourceManager.GetString("ClassificationWhite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Yellow.
+        /// </summary>
+        internal static string ClassificationYellow {
+            get {
+                return ResourceManager.GetString("ClassificationYellow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
         /// </summary>
         internal static string clearDescription {
