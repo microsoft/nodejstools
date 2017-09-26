@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ namespace Microsoft.NodejsTools.NpmUI
     {
         private readonly SemverVersion? version;
         private readonly SemverVersion? localVersion;
+        private readonly bool? localInstallMissing;
 
         protected PackageCatalogEntryViewModel(
             string name,
@@ -21,7 +22,8 @@ namespace Microsoft.NodejsTools.NpmUI
             string description,
             IEnumerable<string> homepages,
             string keywords,
-            SemverVersion? localVersion
+            SemverVersion? localVersion,
+            bool? localInstallMissing
         )
         {
             this.Name = name;
@@ -32,6 +34,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this.Homepages = homepages ?? Enumerable.Empty<string>();
             this.Keywords = keywords;
             this.localVersion = localVersion;
+            this.localInstallMissing = localInstallMissing;
         }
 
         public virtual string Name { get; }
@@ -51,8 +54,12 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public string Keywords { get; }
 
-        public bool IsInstalledLocally => this.localVersion.HasValue;
-        public bool IsLocalInstallOutOfDate => this.localVersion.HasValue && this.localVersion < this.version;
+        public bool IsInstalledLocally => !this.IsLocalInstallMissing && this.localVersion.HasValue;
+        public bool IsLocalInstallOutOfDate => !this.IsLocalInstallMissing && this.localVersion.HasValue && this.localVersion < this.version;
+
+        // Local install is missing if we expect a local install, but it's not there. 
+        // This means that if a package is not in the package.json, we don't report it missing.
+        public bool IsLocalInstallMissing => this.localInstallMissing.HasValue && this.localInstallMissing.Value;
         public string LocalVersion => this.localVersion?.ToString() ?? string.Empty;
 
         public override string ToString()
@@ -74,7 +81,8 @@ namespace Microsoft.NodejsTools.NpmUI
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
                     : Resources.NoKeywordsInPackage,
-                localInstall != null ? (SemverVersion?)localInstall.Version : null
+                localInstall != null ? (SemverVersion?)localInstall.Version : null,
+                localInstall?.IsMissing
             )
         {
             if (string.IsNullOrEmpty(this.Name))
