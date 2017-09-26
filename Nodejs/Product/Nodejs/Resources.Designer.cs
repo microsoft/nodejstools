@@ -153,6 +153,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the &apos;Tools\Node.js Tool\Remote Debug Proxy&apos; menu. Specify the target hostname and debugger port in the &apos;Qualifier&apos; textbox, e.g. &apos;targethost: {0}&apos;. This transport is not secure, and should not be used on a network that might have hostile traffic..
+        /// </summary>
+        internal static string DebuggerAttachToDescription {
+            get {
+                return ResourceManager.GetString("DebuggerAttachToDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debugger connection was closed..
         /// </summary>
         internal static string DebuggerConnectionClosed {

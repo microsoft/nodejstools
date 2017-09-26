@@ -690,4 +690,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="ReplSaveSucces" xml:space="preserve">
     <value>Session saved to: '{0}'.</value>
   </data>
+  <data name="DebuggerAttachToDescription" xml:space="preserve">
+    <value>Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.</value>
+  </data>
 </root>
