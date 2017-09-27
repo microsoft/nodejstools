@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Succeeded;
         }
 
-        public string Description => "Resets the context object to an empty object and clears any multi-line expression.";
+        public string Description => Resources.ReplClearDescription;
         public string Command => "clear";
         public object ButtonContent => null;
 

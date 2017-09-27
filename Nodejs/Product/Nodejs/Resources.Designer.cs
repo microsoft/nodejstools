@@ -153,6 +153,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the &apos;Tools\Node.js Tool\Remote Debug Proxy&apos; menu. Specify the target hostname and debugger port in the &apos;Qualifier&apos; textbox, e.g. &apos;targethost: {0}&apos;. This transport is not secure, and should not be used on a network that might have hostile traffic..
+        /// </summary>
+        internal static string DebuggerAttachToDescription {
+            get {
+                return ResourceManager.GetString("DebuggerAttachToDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Debugger connection was closed..
         /// </summary>
         internal static string DebuggerConnectionClosed {
@@ -388,6 +397,51 @@ namespace Microsoft.NodejsTools {
         internal static string InvalidPortNumber {
             get {
                 return ResourceManager.GetString("InvalidPortNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Class Literal.
+        /// </summary>
+        internal static string JadeClassLiteral {
+            get {
+                return ResourceManager.GetString("JadeClassLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Filter.
+        /// </summary>
+        internal static string JadeFilter {
+            get {
+                return ResourceManager.GetString("JadeFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Id Literal.
+        /// </summary>
+        internal static string JadeIdLiteral {
+            get {
+                return ResourceManager.GetString("JadeIdLiteral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Keyword.
+        /// </summary>
+        internal static string JadeKeyword {
+            get {
+                return ResourceManager.GetString("JadeKeyword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Jade Variable.
+        /// </summary>
+        internal static string JadeVariable {
+            get {
+                return ResourceManager.GetString("JadeVariable", resourceCulture);
             }
         }
         
@@ -1478,11 +1532,65 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resets the context object to an empty object and clears any multi-line expression..
+        /// </summary>
+        internal static string ReplClearDescription {
+            get {
+                return ResourceManager.GetString("ReplClearDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
         /// </summary>
         internal static string ReplInitializationMessage {
             get {
                 return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
+        /// </summary>
+        internal static string ReplSaveDescription {
+            get {
+                return ResourceManager.GetString("ReplSaveDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveFailed {
+            get {
+                return ResourceManager.GetString("ReplSaveFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid filename: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveInvalidFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveInvalidFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save requires a filename..
+        /// </summary>
+        internal static string ReplSaveNoFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveNoFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session saved to: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveSucces {
+            get {
+                return ResourceManager.GetString("ReplSaveSucces", resourceCulture);
             }
         }
         

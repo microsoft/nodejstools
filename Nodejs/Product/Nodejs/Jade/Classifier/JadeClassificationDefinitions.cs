@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.ComponentModel.Composition;
 using System.Windows.Media;
@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Jade
             internal KeywordClassificationFormat()
             {
                 this.ForegroundColor = Colors.OrangeRed;
-                this.DisplayName = "Jade Keyword";
+                this.DisplayName = Resources.JadeKeyword;
             }
         }
         #endregion
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Jade
             internal FilterClassificationFormat()
             {
                 this.ForegroundColor = Colors.DarkRed;
-                this.DisplayName = "Jade Filter";
+                this.DisplayName = Resources.JadeFilter ;
             }
         }
         #endregion
@@ -80,7 +80,7 @@ namespace Microsoft.NodejsTools.Jade
             internal ClassLiteralClassificationFormat()
             {
                 this.ForegroundColor = new Color() { R = 255, G = 128, B = 0 };
-                this.DisplayName = "Jade Class Literal";
+                this.DisplayName = Resources.JadeClassLiteral;
             }
         }
 
@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.Jade
             internal IdLiteralClassificationFormat()
             {
                 this.ForegroundColor = Colors.Maroon;
-                this.DisplayName = "Jade Id Literal";
+                this.DisplayName = Resources.JadeIdLiteral;
             }
         }
 
@@ -131,7 +131,7 @@ namespace Microsoft.NodejsTools.Jade
             internal VariableClassificationFormat()
             {
                 this.ForegroundColor = Colors.Blue;
-                this.DisplayName = "Jade Variable";
+                this.DisplayName = Resources.JadeVariable;
             }
         }
         #endregion

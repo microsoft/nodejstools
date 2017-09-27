@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -2786,7 +2786,7 @@ namespace Microsoft.NodejsTools.Repl
             }
             catch (Exception e)
             {
-                WriteError(string.Format("Command '{0}' failed: {1}", command, e.Message));
+                WriteError(string.Format(Resources.ReplCommandFailed, command, e.Message));
                 return ExecutionResult.Failed;
             }
         }
@@ -2797,7 +2797,7 @@ namespace Microsoft.NodejsTools.Repl
             cmdnames.Sort((x, y) => StringComparer.CurrentCulture.Compare(x.Command, y.Command));
 
             const string helpFmt = "  {0,-24}  {1}";
-            WriteLine(string.Format(helpFmt, _commandPrefix + "help", "Show a list of REPL commands"));
+            WriteLine(string.Format(helpFmt, _commandPrefix + "help", Resources.HelpDescription));
 
             foreach (var cmd in cmdnames)
             {

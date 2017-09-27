@@ -672,4 +672,40 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.</value>
     <comment>Template contains a filename, like launch.json</comment>
   </data>
+  <data name="ReplClearDescription" xml:space="preserve">
+    <value>Resets the context object to an empty object and clears any multi-line expression.</value>
+  </data>
+  <data name="ReplSaveDescription" xml:space="preserve">
+    <value>Clears the contents of the REPL editor window.</value>
+  </data>
+  <data name="ReplSaveFailed" xml:space="preserve">
+    <value>Failed to save: '{0}'.</value>
+  </data>
+  <data name="ReplSaveInvalidFileName" xml:space="preserve">
+    <value>Invalid filename: '{0}'.</value>
+  </data>
+  <data name="ReplSaveNoFileName" xml:space="preserve">
+    <value>Save requires a filename.</value>
+  </data>
+  <data name="ReplSaveSucces" xml:space="preserve">
+    <value>Session saved to: '{0}'.</value>
+  </data>
+  <data name="DebuggerAttachToDescription" xml:space="preserve">
+    <value>Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.</value>
+  </data>
+  <data name="JadeClassLiteral" xml:space="preserve">
+    <value>Jade Class Literal</value>
+  </data>
+  <data name="JadeFilter" xml:space="preserve">
+    <value>Jade Filter</value>
+  </data>
+  <data name="JadeIdLiteral" xml:space="preserve">
+    <value>Jade Id Literal</value>
+  </data>
+  <data name="JadeKeyword" xml:space="preserve">
+    <value>Jade Keyword</value>
+  </data>
+  <data name="JadeVariable" xml:space="preserve">
+    <value>Jade Variable</value>
+  </data>
 </root>
