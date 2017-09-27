@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,11 +13,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
     internal class RootPackage : IRootPackage
     {
         public RootPackage(
-             string fullPathToRootDirectory,
-             bool showMissingDevOptionalSubPackages,
-             Dictionary<string, ModuleInfo> allModules = null,
-             int depth = 0,
-             int maxDepth = 1)
+            string fullPathToRootDirectory,
+            bool showMissingDevOptionalSubPackages,
+            Dictionary<string, ModuleInfo> allModules = null,
+            int depth = 0,
+            int maxDepth = 1)
         {
             this.Path = fullPathToRootDirectory;
             var packageJsonFile = System.IO.Path.Combine(fullPathToRootDirectory, "package.json");
@@ -57,10 +58,13 @@ The following error was reported:
             {
                 // this is the root package so the full folder name after node_nodules is the name
                 // of the package
-                var index = this.Path.IndexOf(NodejsConstants.NodeModulesFolder, StringComparison.OrdinalIgnoreCase);
-                var name = this.Path.Substring(index + NodejsConstants.NodeModulesFolder.Length);
+                var index = this.Path.IndexOf(NodejsConstants.NodeModulesFolderWithSeparators, StringComparison.OrdinalIgnoreCase);
 
-                this.Name = name.TrimStart('\\', '/');
+                Debug.Assert(index > -1, "Failed to find the node_modules folder.");
+
+                var name = this.Path.Substring(index + NodejsConstants.NodeModulesFolderWithSeparators.Length);
+
+                this.Name = name;
             }
         }
 

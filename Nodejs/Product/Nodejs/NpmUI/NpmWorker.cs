@@ -106,135 +106,86 @@ namespace Microsoft.NodejsTools.NpmUI
 
             TelemetryHelper.LogSearchNpm();
 
-            string relativeUri;
             if (filterText.Length == 1)
             {
-                // Special case since the search API won't retur results for 
-                // single chararcter queries.
-                relativeUri = $"/{WebUtility.UrlEncode(filterText)}/latest";
-
-                using (var response = await SearchNpmRegistry(relativeUri))
-                {
-                    /* We expect the following response
-                      {
-                        "name": "express",
-                        "scope": "unscoped",
-                        "version": "4.15.2",
-                        "description": "Fast, unopinionated, minimalist web framework",
-                        "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
-                        "date": "2017-03-06T13:42:44.853Z",
-                        "links": {
-                          "npm": "https://www.npmjs.com/package/express",
-                          "homepage": "http://expressjs.com/",
-                          "repository": "https://github.com/expressjs/express",
-                          "bugs": "https://github.com/expressjs/express/issues"
-                        },
-                        "author": {
-                          "name": "TJ Holowaychuk",
-                          "email": "tj@vision-media.ca"
-                        },
-                        "publisher": {
-                          "username": "dougwilson",
-                          "email": "doug@somethingdoug.com"
-                        },
-                        "maintainers": [
-                          {
-                            "username": "dougwilson",
-                            "email": "doug@somethingdoug.com"
-                          }
-                        ]
-                      }*/
-                    var reader = new StreamReader(response.GetResponseStream());
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        while (jsonReader.Read())
-                        {
-                            switch (jsonReader.TokenType)
-                            {
-                                case JsonToken.StartObject:
-                                    var token = JToken.ReadFrom(jsonReader);
-                                    var package = ReadPackage(token, new NodeModuleBuilder());
-                                    if (package != null)
-                                    {
-                                        return new[] { package };
-                                    }
-                                    break;
-                                default:
-                                    throw new InvalidOperationException("Unexpected json token.");
-                            }
-                        }
-                    }
-                }
+                return await QueryNpmForSingleCharAsync(filterText);
             }
             else
             {
-                relativeUri = $"/-/v1/search?text={WebUtility.UrlEncode(filterText)}";
+                return await QueryNpmAsync(filterText);
+            }
+        }
 
-                using (var response = await SearchNpmRegistry(relativeUri))
-                {
-                    /* We expect the following response:
-                     {
-                          "objects": [
-                            {
-                              "package": {
-                                "name": "express",
-                                "scope": "unscoped",
-                                "version": "4.15.2",
-                                "description": "Fast, unopinionated, minimalist web framework",
-                                "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
-                                "date": "2017-03-06T13:42:44.853Z",
-                                "links": {
-                                  "npm": "https://www.npmjs.com/package/express",
-                                  "homepage": "http://expressjs.com/",
-                                  "repository": "https://github.com/expressjs/express",
-                                  "bugs": "https://github.com/expressjs/express/issues"
-                                },
-                                "author": {
-                                  "name": "TJ Holowaychuk",
-                                  "email": "tj@vision-media.ca"
-                                },
-                                "publisher": {
-                                  "username": "dougwilson",
-                                  "email": "doug@somethingdoug.com"
-                                },
-                                "maintainers": [
-                                  {
-                                    "username": "dougwilson",
-                                    "email": "doug@somethingdoug.com"
-                                  }
-                                ]
-                              },
-                              "score": {
-                                "final": 0.9549640105248649,
-                                "detail": {
-                                  "quality": 0.9427473299991661,
-                                  "popularity": 0.9496544159654299,
-                                  "maintenance": 0.9707450455348992
-                                }
-                              },
-                              "searchScore": 100000.95
-                            }
-                          ],
-                          "total": 10991,
-                          "time": "Tue May 09 2017 22:41:07 GMT+0000 (UTC)"
-                        }
-                    */
+        private async Task<IEnumerable<IPackage>> QueryNpmAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length > 1, $"Use {nameof(QueryNpmForSingleCharAsync)} for single character queries.");
 
-                    var reader = new StreamReader(response.GetResponseStream());
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        while (jsonReader.Read())
+            var relativeUri = $"/-/v1/search?text={WebUtility.UrlEncode(filterText)}";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
+            {
+                /* We expect the following response:
+                 {
+                      "objects": [
                         {
-                            switch (jsonReader.TokenType)
-                            {
-                                case JsonToken.StartObject:
-                                case JsonToken.PropertyName:
-                                    continue;
-                                case JsonToken.StartArray:
-                                    return ReadPackagesFromArray(jsonReader);
-                                default:
-                                    throw new InvalidOperationException("Unexpected json token.");
+                          "package": {
+                            "name": "express",
+                            "scope": "unscoped",
+                            "version": "4.15.2",
+                            "description": "Fast, unopinionated, minimalist web framework",
+                            "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
+                            "date": "2017-03-06T13:42:44.853Z",
+                            "links": {
+                              "npm": "https://www.npmjs.com/package/express",
+                              "homepage": "http://expressjs.com/",
+                              "repository": "https://github.com/expressjs/express",
+                              "bugs": "https://github.com/expressjs/express/issues"
+                            },
+                            "author": {
+                              "name": "TJ Holowaychuk",
+                              "email": "tj@vision-media.ca"
+                            },
+                            "publisher": {
+                              "username": "dougwilson",
+                              "email": "doug@somethingdoug.com"
+                            },
+                            "maintainers": [
+                              {
+                                "username": "dougwilson",
+                                "email": "doug@somethingdoug.com"
+                              }
+                            ]
+                          },
+                          "score": {
+                            "final": 0.9549640105248649,
+                            "detail": {
+                              "quality": 0.9427473299991661,
+                              "popularity": 0.9496544159654299,
+                              "maintenance": 0.9707450455348992
                             }
+                          },
+                          "searchScore": 100000.95
+                        }
+                      ],
+                      "total": 10991,
+                      "time": "Tue May 09 2017 22:41:07 GMT+0000 (UTC)"
+                    }
+                */
+
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    while (jsonReader.Read())
+                    {
+                        switch (jsonReader.TokenType)
+                        {
+                            case JsonToken.StartObject:
+                            case JsonToken.PropertyName:
+                                continue;
+                            case JsonToken.StartArray:
+                                return ReadPackagesFromArray(jsonReader);
+                            default:
+                                throw new InvalidOperationException("Unexpected json token.");
                         }
                     }
                 }
@@ -244,7 +195,69 @@ namespace Microsoft.NodejsTools.NpmUI
             throw new InvalidOperationException("Unexpected json token.");
         }
 
-        private static Task<WebResponse> SearchNpmRegistry(string relativeUri)
+        private async Task<IEnumerable<IPackage>> QueryNpmForSingleCharAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length == 1, $"Use {nameof(QueryNpmAsync)} for general queries when the search query has more than 1 character.");
+
+            // Special case since the search API won't return results for 
+            // single chararacter queries.
+            var relativeUri = $"/{WebUtility.UrlEncode(filterText)}/latest";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
+            {
+                /* We expect the following response
+                  {
+                    "name": "express",
+                    "scope": "unscoped",
+                    "version": "4.15.2",
+                    "description": "Fast, unopinionated, minimalist web framework",
+                    "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
+                    "date": "2017-03-06T13:42:44.853Z",
+                    "links": {
+                      "npm": "https://www.npmjs.com/package/express",
+                      "homepage": "http://expressjs.com/",
+                      "repository": "https://github.com/expressjs/express",
+                      "bugs": "https://github.com/expressjs/express/issues"
+                    },
+                    "author": {
+                      "name": "TJ Holowaychuk",
+                      "email": "tj@vision-media.ca"
+                    },
+                    "publisher": {
+                      "username": "dougwilson",
+                      "email": "doug@somethingdoug.com"
+                    },
+                    "maintainers": [
+                      {
+                        "username": "dougwilson",
+                        "email": "doug@somethingdoug.com"
+                      }
+                    ]
+                  }*/
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    while (jsonReader.Read())
+                    {
+                        if (jsonReader.TokenType == JsonToken.StartObject)
+                        {
+                            var token = JToken.ReadFrom(jsonReader);
+                            var package = ReadPackage(token, new NodeModuleBuilder());
+                            if (package != null)
+                            {
+                                return new[] { package };
+                            }
+                        }
+
+                        throw new InvalidOperationException($"Unexpected json token. '{jsonReader.TokenType}'");
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private static Task<WebResponse> QueryNpmRegistryAsync(string relativeUri)
         {
             var searchUri = new Uri(defaultRegistryUri, relativeUri);
 
