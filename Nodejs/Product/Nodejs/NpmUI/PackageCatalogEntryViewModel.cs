@@ -55,11 +55,11 @@ namespace Microsoft.NodejsTools.NpmUI
         public string Keywords { get; }
 
         public bool IsInstalledLocally => !this.IsLocalInstallMissing && this.localVersion.HasValue;
-        public bool IsLocalInstallOutOfDate => !this.IsLocalInstallMissing && this.localVersion.HasValue && this.localVersion < this.version;
+        public bool IsLocalInstallOutOfDate => this.IsInstalledLocally && this.localVersion < this.version;
 
         // Local install is missing if we expect a local install, but it's not there. 
         // This means that if a package is not in the package.json, we don't report it missing.
-        public bool IsLocalInstallMissing => this.localInstallMissing.HasValue && this.localInstallMissing.Value;
+        public bool IsLocalInstallMissing => this.localInstallMissing == true;
         public string LocalVersion => this.localVersion?.ToString() ?? string.Empty;
 
         public override string ToString()
@@ -81,7 +81,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 (package.Keywords != null && package.Keywords.Any())
                     ? string.Join(", ", package.Keywords)
                     : Resources.NoKeywordsInPackage,
-                localInstall != null ? (SemverVersion?)localInstall.Version : null,
+                localInstall?.Version,
                 localInstall?.IsMissing
             )
         {
