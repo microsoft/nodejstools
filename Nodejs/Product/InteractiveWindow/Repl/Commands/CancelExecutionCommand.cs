@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string Description
         {
-            get { return Resources.cancelDescription; }
+            get { return Resources.CancelDescription; }
         }
 
         public string Command

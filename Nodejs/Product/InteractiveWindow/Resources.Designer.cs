@@ -63,9 +63,9 @@ namespace Microsoft.NodejsTools.Repl {
         /// <summary>
         ///   Looks up a localized string similar to Stops execution of the current command..
         /// </summary>
-        internal static string cancelDescription {
+        internal static string CancelDescription {
             get {
-                return ResourceManager.GetString("cancelDescription", resourceCulture);
+                return ResourceManager.GetString("CancelDescription", resourceCulture);
             }
         }
         
@@ -234,54 +234,63 @@ namespace Microsoft.NodejsTools.Repl {
         /// <summary>
         ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
         /// </summary>
-        internal static string clearDescription {
+        internal static string ClearDescription {
             get {
-                return ResourceManager.GetString("clearDescription", resourceCulture);
+                return ResourceManager.GetString("ClearDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Suppress or unsuppress output to the buffer..
         /// </summary>
-        internal static string echoDescription {
+        internal static string EchoDescription {
             get {
-                return ResourceManager.GetString("echoDescription", resourceCulture);
+                return ResourceManager.GetString("EchoDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to ECHO is {0}.
         /// </summary>
-        internal static string echoState {
+        internal static string EchoState {
             get {
-                return ResourceManager.GetString("echoState", resourceCulture);
+                return ResourceManager.GetString("EchoState", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Show a list of REPL commands..
         /// </summary>
-        internal static string helpDescription {
+        internal static string HelpDescription {
             get {
-                return ResourceManager.GetString("helpDescription", resourceCulture);
+                return ResourceManager.GetString("HelpDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command &apos;{0}&apos; failed: &apos;{1}&apos;.
+        /// </summary>
+        internal static string ReplCommandFailed {
+            get {
+                return ResourceManager.GetString("ReplCommandFailed", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Reset to an empty execution engine, but keep REPL history..
         /// </summary>
-        internal static string resetDescription {
+        internal static string ResetDescription {
             get {
-                return ResourceManager.GetString("resetDescription", resourceCulture);
+                return ResourceManager.GetString("ResetDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Wait for at least the specified number of milliseconds..
         /// </summary>
-        internal static string waitDescription {
+        internal static string WaitDescription {
             get {
-                return ResourceManager.GetString("waitDescription", resourceCulture);
+                return ResourceManager.GetString("WaitDescription", resourceCulture);
             }
         }
     }

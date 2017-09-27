@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string Description
         {
-            get { return Resources.waitDescription; }
+            get { return Resources.WaitDescription; }
         }
 
         public string Command

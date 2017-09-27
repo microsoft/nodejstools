@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Repl
             if (string.IsNullOrWhiteSpace(arguments))
             {
                 var curValue = (bool)window.GetOptionValue(ReplOptions.ShowOutput);
-                window.WriteLine(string.Format(Resources.echoState, curValue ? "\'ON\'" : "\'OFF\'"));
+                window.WriteLine(string.Format(Resources.EchoState, curValue ? "\'ON\'" : "\'OFF\'"));
                 return ExecutionResult.Succeeded;
             }
 
@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string Description
         {
-            get { return Resources.echoDescription; }
+            get { return Resources.EchoDescription; }
         }
 
         public string Command
