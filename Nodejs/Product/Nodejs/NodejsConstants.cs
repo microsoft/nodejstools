@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -25,6 +25,7 @@ namespace Microsoft.NodejsTools
         internal const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
 
         internal const string NodeModulesFolder = "node_modules";
+        internal const string NodeModulesFolderWithSeparators = "\\" + NodeModulesFolder + "\\";
         internal const string NodeModulesStagingFolder = "node_modules\\.staging\\";
         internal const string BowerComponentsFolder = "bower_components";
 

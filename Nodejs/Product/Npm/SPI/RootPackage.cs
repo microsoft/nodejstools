@@ -1,6 +1,8 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -47,6 +49,23 @@ The following error was reported:
             {
                 // otherwise we fail to create it completely...
             }
+
+            if (this.PackageJson != null)
+            {
+                this.Name = this.PackageJson.Name;
+            }
+            else
+            {
+                // this is the root package so the full folder name after node_nodules is the name
+                // of the package
+                var index = this.Path.IndexOf(NodejsConstants.NodeModulesFolderWithSeparators, StringComparison.OrdinalIgnoreCase);
+
+                Debug.Assert(index > -1, "Failed to find the node_modules folder.");
+
+                var name = this.Path.Substring(index + NodejsConstants.NodeModulesFolderWithSeparators.Length);
+
+                this.Name = name;
+            }
         }
 
         public IPackageJson PackageJson { get; }
@@ -55,13 +74,13 @@ The following error was reported:
 
         public string Path { get; }
 
+        public string Name { get; }
+
         public IEnumerable<string> Homepages => this.PackageJson?.Homepages ?? Enumerable.Empty<string>();
 
         public bool HasPackageJson => this.PackageJson != null;
 
-        public string Name => this.PackageJson?.Name ?? new DirectoryInfo(this.Path).Name;
-
-        public SemverVersion Version => this.PackageJson?.Version ?? new SemverVersion();
+        public SemverVersion Version => this.PackageJson?.Version ?? SemverVersion.UnknownVersion;
 
         public IPerson Author => this.PackageJson?.Author;
 
