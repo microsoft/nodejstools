@@ -396,7 +396,7 @@ namespace Microsoft.NodejsTools.Project
                     default:
                         if (propPage != null)
                         {
-                            this.PropertyPage.IsDirty = true;
+                            propPage.IsDirty = true;
                         }
                         break;
                 }

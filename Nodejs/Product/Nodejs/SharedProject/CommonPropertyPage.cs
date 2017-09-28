@@ -1,41 +1,28 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Build.Construction;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Editors.PropertyPages;
 
 namespace Microsoft.VisualStudioTools.Project
 {
     /// <summary>
     /// Base class for property pages based on a WinForm control.
     /// </summary>
-    public abstract class CommonPropertyPage : IPropertyPage
+    public abstract class CommonPropertyPage : PropPageBase
     {
-        private IPropertyPageSite site;
         private CommonProjectNode _project;
-        private bool dirty;
 
-        public abstract Control Control
-        {
-            get;
-        }
+        protected override Size DefaultSize { get; set; } = new Size(800, 600);
 
-        public virtual Size DefaultSize { get; } = new Size(800, 600);
-
-        public abstract void Apply();
         public abstract void LoadSettings();
 
-        public abstract string Name
-        {
-            get;
-        }
+        public abstract Control Control { get; }
 
         internal virtual CommonProjectNode Project
         {
@@ -237,106 +224,7 @@ namespace Microsoft.VisualStudioTools.Project
             newGroup.AddProperty(propertyName, propertyValue);
         }
 
-        public bool Loading { get; set; }
-
-        public bool IsDirty
-        {
-            get
-            {
-                return this.dirty;
-            }
-            set
-            {
-                if (this.dirty != value && !this.Loading)
-                {
-                    this.dirty = value;
-                    if (this.site != null)
-                    {
-                        this.site.OnStatusChange((uint)(this.dirty ? PropPageStatus.Dirty : PropPageStatus.Clean));
-                    }
-                }
-            }
-        }
-
-        void IPropertyPage.Activate(IntPtr hWndParent, RECT[] pRect, int bModal)
-        {
-            this.Control.Visible = false;
-
-            // suspend to reduce flashing
-            this.Control.SuspendLayout();
-
-            try
-            {
-                var parent = Control.FromHandle(hWndParent);
-                this.Control.Parent = parent;
-
-                // move to final location
-                ((IPropertyPage)this).Move(pRect);
-            }
-            finally
-            {
-                this.Control.ResumeLayout();
-                this.Control.Visible = true;
-                this.Control.Focus();
-            }
-        }
-
-        int IPropertyPage.Apply()
-        {
-            try
-            {
-                Apply();
-                return VSConstants.S_OK;
-            }
-            catch (Exception e)
-            {
-                return Marshal.GetHRForException(e);
-            }
-        }
-
-        void IPropertyPage.Deactivate()
-        {
-            this.Project = null;
-            this.Control.Dispose();
-        }
-
-        void IPropertyPage.GetPageInfo(PROPPAGEINFO[] pPageInfo)
-        {
-            Utilities.ArgumentNotNull("pPageInfo", pPageInfo);
-
-            var info = new PROPPAGEINFO();
-
-            info.cb = (uint)Marshal.SizeOf(typeof(PROPPAGEINFO));
-            info.dwHelpContext = 0;
-            info.pszDocString = null;
-            info.pszHelpFile = null;
-            info.pszTitle = this.Name;
-            info.SIZE.cx = this.DefaultSize.Width;
-            info.SIZE.cy = this.DefaultSize.Height;
-            pPageInfo[0] = info;
-        }
-
-        void IPropertyPage.Help(string pszHelpDir)
-        {
-            // not implemented
-        }
-
-        int IPropertyPage.IsPageDirty()
-        {
-            return (this.IsDirty ? (int)VSConstants.S_OK : (int)VSConstants.S_FALSE);
-        }
-
-        void IPropertyPage.Move(RECT[] pRect)
-        {
-            Utilities.ArgumentNotNull("pRect", pRect);
-
-            var r = pRect[0];
-
-            this.Control.Location = new Point(r.left, r.top);
-            this.Control.Size = new Size(r.right - r.left, r.bottom - r.top);
-        }
-
-        void IPropertyPage.SetObjects(uint count, object[] punk)
+        protected override void SetObjects(uint count, object[] punk)
         {
             if (punk == null)
             {
@@ -380,49 +268,6 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 LoadSettings();
             }
-        }
-
-        void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite)
-        {
-            this.site = pPageSite;
-        }
-
-        void IPropertyPage.Show(uint nCmdShow)
-        {
-            const int SW_HIDE = 0;
-
-            if (nCmdShow != SW_HIDE)
-            {
-                this.Control.Visible = true;
-                this.Control.Show();
-            }
-            else
-            {
-                this.Control.Visible = false;
-                this.Control.Hide();
-            }
-        }
-
-        int IPropertyPage.TranslateAccelerator(MSG[] pMsg)
-        {
-            Utilities.ArgumentNotNull("pMsg", pMsg);
-
-            var msg = pMsg[0];
-
-            var message = Message.Create(msg.hwnd, (int)msg.message, msg.wParam, msg.lParam);
-
-            var target = Control.FromChildHandle(message.HWnd);
-            if (target != null && target.PreProcessMessage(ref message))
-            {
-                // handled the message
-                pMsg[0].message = (uint)message.Msg;
-                pMsg[0].wParam = message.WParam;
-                pMsg[0].lParam = message.LParam;
-
-                return VSConstants.S_OK;
-            }
-
-            return VSConstants.S_FALSE;
         }
     }
 }
