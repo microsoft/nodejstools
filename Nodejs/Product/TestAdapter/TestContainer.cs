@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestWindow.Extensibility.Model;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    internal class TestContainer : ITestContainer
+    internal class TestContainer : ITestContainer, IComparable<ITestContainer>
     {
         private readonly DateTime timeStamp;
 
@@ -22,7 +22,8 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         private TestContainer(TestContainer copy)
             : this(copy.Discoverer, copy.Source, copy.timeStamp, copy.TargetPlatform)
-        { }
+        {
+        }
 
         public int CompareTo(ITestContainer other)
         {
@@ -32,13 +33,13 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 return -1;
             }
 
-            var result = StringComparer.OrdinalIgnoreCase.Compare(Source, container.Source);
+            var result = StringComparer.OrdinalIgnoreCase.Compare(this.Source, container.Source);
             if (result != 0)
             {
                 return result;
             }
 
-            return timeStamp.CompareTo(container.timeStamp);
+            return this.timeStamp.CompareTo(container.timeStamp);
         }
 
         public IEnumerable<Guid> DebugEngines
@@ -77,7 +78,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         public override string ToString()
         {
-            return Source + ":" + Discoverer.ExecutorUri.ToString();
+            return this.Source + ":" + this.Discoverer.ExecutorUri.ToString();
         }
     }
 }

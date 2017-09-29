@@ -62,16 +62,16 @@ namespace Microsoft.VisualStudioTools.Project
 
     internal sealed class TeeRedirector : Redirector, IDisposable
     {
-        private readonly Redirector[] _redirectors;
+        private readonly Redirector[] redirectors;
 
         public TeeRedirector(params Redirector[] redirectors)
         {
-            this._redirectors = redirectors;
+            this.redirectors = redirectors;
         }
 
         public void Dispose()
         {
-            foreach (var redir in this._redirectors.OfType<IDisposable>())
+            foreach (var redir in this.redirectors.OfType<IDisposable>())
             {
                 redir.Dispose();
             }
@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void WriteLine(string line)
         {
-            foreach (var redir in this._redirectors)
+            foreach (var redir in this.redirectors)
             {
                 redir.WriteLine(line);
             }
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void WriteErrorLine(string line)
         {
-            foreach (var redir in this._redirectors)
+            foreach (var redir in this.redirectors)
             {
                 redir.WriteErrorLine(line);
             }
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Show()
         {
-            foreach (var redir in this._redirectors)
+            foreach (var redir in this.redirectors)
             {
                 redir.Show();
             }
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void ShowAndActivate()
         {
-            foreach (var redir in this._redirectors)
+            foreach (var redir in this.redirectors)
             {
                 redir.ShowAndActivate();
             }
@@ -115,19 +115,19 @@ namespace Microsoft.VisualStudioTools.Project
     /// </summary>
     internal sealed class ProcessOutput : IDisposable
     {
-        private readonly Process _process;
-        private readonly string _arguments;
-        private readonly List<string> _output, _error;
-        private ManualResetEvent _waitHandleEvent;
-        private readonly Redirector _redirector;
-        private bool _isDisposed;
-        private readonly object _seenNullLock = new object();
-        private bool _seenNullInOutput, _seenNullInError;
-        private bool _haveRaisedExitedEvent;
-        private Task<int> _awaiter;
+        private readonly Process process;
+        private readonly string arguments;
+        private readonly List<string> output, error;
+        private ManualResetEvent waitHandleEvent;
+        private readonly Redirector redirector;
+        private bool isDisposed;
+        private readonly object seenNullLock = new object();
+        private bool seenNullInOutput, seenNullInError;
+        private bool haveRaisedExitedEvent;
+        private Task<int> awaiter;
 
         private static readonly char[] EolChars = new[] { '\r', '\n' };
-        private static readonly char[] _needToBeQuoted = new[] { ' ', '"' };
+        private static readonly char[] NeedToBeQuoted = new[] { ' ', '"' };
 
         /// <summary>
         /// Runs the provided executable file and allows the program to display
@@ -398,7 +398,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return "\"\"";
             }
-            if (arg.IndexOfAny(_needToBeQuoted) < 0)
+            if (arg.IndexOfAny(NeedToBeQuoted) < 0)
             {
                 return arg;
             }
@@ -442,38 +442,38 @@ namespace Microsoft.VisualStudioTools.Project
 
         private ProcessOutput(Process process, Redirector redirector)
         {
-            this._arguments = QuoteSingleArgument(process.StartInfo.FileName) + " " + process.StartInfo.Arguments;
-            this._redirector = redirector;
-            if (this._redirector == null)
+            this.arguments = QuoteSingleArgument(process.StartInfo.FileName) + " " + process.StartInfo.Arguments;
+            this.redirector = redirector;
+            if (this.redirector == null)
             {
-                this._output = new List<string>();
-                this._error = new List<string>();
+                this.output = new List<string>();
+                this.error = new List<string>();
             }
 
-            this._process = process;
-            if (this._process.StartInfo.RedirectStandardOutput)
+            this.process = process;
+            if (this.process.StartInfo.RedirectStandardOutput)
             {
-                this._process.OutputDataReceived += this.OnOutputDataReceived;
+                this.process.OutputDataReceived += this.OnOutputDataReceived;
             }
-            if (this._process.StartInfo.RedirectStandardError)
+            if (this.process.StartInfo.RedirectStandardError)
             {
-                this._process.ErrorDataReceived += this.OnErrorDataReceived;
+                this.process.ErrorDataReceived += this.OnErrorDataReceived;
             }
 
-            if (!this._process.StartInfo.RedirectStandardOutput && !this._process.StartInfo.RedirectStandardError)
+            if (!this.process.StartInfo.RedirectStandardOutput && !this.process.StartInfo.RedirectStandardError)
             {
                 // If we are receiving output events, we signal that the process
                 // has exited when one of them receives null. Otherwise, we have
                 // to listen for the Exited event.
                 // If we just listen for the Exited event, we may receive it
                 // before all the output has arrived.
-                this._process.Exited += this.OnExited;
+                this.process.Exited += this.OnExited;
             }
-            this._process.EnableRaisingEvents = true;
+            this.process.EnableRaisingEvents = true;
 
             try
             {
-                this._process.Start();
+                this.process.Start();
             }
             catch (Exception ex)
             {
@@ -481,39 +481,39 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     throw;
                 }
-                if (this._redirector != null)
+                if (this.redirector != null)
                 {
                     foreach (var line in SplitLines(ex.ToString()))
                     {
-                        this._redirector.WriteErrorLine(line);
+                        this.redirector.WriteErrorLine(line);
                     }
                 }
-                else if (this._error != null)
+                else if (this.error != null)
                 {
-                    this._error.AddRange(SplitLines(ex.ToString()));
+                    this.error.AddRange(SplitLines(ex.ToString()));
                 }
-                this._process = null;
+                this.process = null;
             }
 
-            if (this._process != null)
+            if (this.process != null)
             {
-                if (this._process.StartInfo.RedirectStandardOutput)
+                if (this.process.StartInfo.RedirectStandardOutput)
                 {
-                    this._process.BeginOutputReadLine();
+                    this.process.BeginOutputReadLine();
                 }
-                if (this._process.StartInfo.RedirectStandardError)
+                if (this.process.StartInfo.RedirectStandardError)
                 {
-                    this._process.BeginErrorReadLine();
+                    this.process.BeginErrorReadLine();
                 }
 
-                if (this._process.StartInfo.RedirectStandardInput)
+                if (this.process.StartInfo.RedirectStandardInput)
                 {
                     // Close standard input so that we don't get stuck trying to read input from the user.
-                    if (_redirector == null || (_redirector != null && _redirector.CloseStandardInput()))
+                    if (this.redirector == null || (this.redirector != null && this.redirector.CloseStandardInput()))
                     {
                         try
                         {
-                            this._process.StandardInput.Close();
+                            this.process.StandardInput.Close();
                         }
                         catch (InvalidOperationException)
                         {
@@ -526,7 +526,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (this._isDisposed)
+            if (this.isDisposed)
             {
                 return;
             }
@@ -534,27 +534,27 @@ namespace Microsoft.VisualStudioTools.Project
             if (e.Data == null)
             {
                 bool shouldExit;
-                lock (this._seenNullLock)
+                lock (this.seenNullLock)
                 {
-                    this._seenNullInOutput = true;
-                    shouldExit = this._seenNullInError || !this._process.StartInfo.RedirectStandardError;
+                    this.seenNullInOutput = true;
+                    shouldExit = this.seenNullInError || !this.process.StartInfo.RedirectStandardError;
                 }
                 if (shouldExit)
                 {
-                    OnExited(this._process, EventArgs.Empty);
+                    OnExited(this.process, EventArgs.Empty);
                 }
             }
             else if (!string.IsNullOrEmpty(e.Data))
             {
                 foreach (var line in SplitLines(e.Data))
                 {
-                    if (this._output != null)
+                    if (this.output != null)
                     {
-                        this._output.Add(line);
+                        this.output.Add(line);
                     }
-                    if (this._redirector != null)
+                    if (this.redirector != null)
                     {
-                        this._redirector.WriteLine(line);
+                        this.redirector.WriteLine(line);
                     }
                 }
             }
@@ -562,7 +562,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            if (this._isDisposed)
+            if (this.isDisposed)
             {
                 return;
             }
@@ -570,43 +570,43 @@ namespace Microsoft.VisualStudioTools.Project
             if (e.Data == null)
             {
                 bool shouldExit;
-                lock (this._seenNullLock)
+                lock (this.seenNullLock)
                 {
-                    this._seenNullInError = true;
-                    shouldExit = this._seenNullInOutput || !this._process.StartInfo.RedirectStandardOutput;
+                    this.seenNullInError = true;
+                    shouldExit = this.seenNullInOutput || !this.process.StartInfo.RedirectStandardOutput;
                 }
                 if (shouldExit)
                 {
-                    OnExited(this._process, EventArgs.Empty);
+                    OnExited(this.process, EventArgs.Empty);
                 }
             }
             else if (!string.IsNullOrEmpty(e.Data))
             {
                 foreach (var line in SplitLines(e.Data))
                 {
-                    if (this._error != null)
+                    if (this.error != null)
                     {
-                        this._error.Add(line);
+                        this.error.Add(line);
                     }
-                    if (this._redirector != null)
+                    if (this.redirector != null)
                     {
-                        this._redirector.WriteLine(line);
+                        this.redirector.WriteLine(line);
                     }
                 }
             }
         }
 
-        public int? ProcessId => this._process != null ? this._process.Id : (int?)null;
+        public int? ProcessId => this.process != null ? this.process.Id : (int?)null;
 
         /// <summary>
         /// The arguments that were originally passed, including the filename.
         /// </summary>
-        public string Arguments => this._arguments;
+        public string Arguments => this.arguments;
 
         /// <summary>
         /// True if the process started. False if an error occurred.
         /// </summary>
-        public bool IsStarted => this._process != null;
+        public bool IsStarted => this.process != null;
 
         /// <summary>
         /// The exit code or null if the process never started or has not
@@ -616,11 +616,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (this._process == null || !this._process.HasExited)
+                if (this.process == null || !this.process.HasExited)
                 {
                     return null;
                 }
-                return this._process.ExitCode;
+                return this.process.ExitCode;
             }
         }
 
@@ -631,11 +631,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (this._process != null && !this._process.HasExited)
+                if (this.process != null && !this.process.HasExited)
                 {
                     try
                     {
-                        return this._process.PriorityClass;
+                        return this.process.PriorityClass;
                     }
                     catch (Win32Exception)
                     {
@@ -650,11 +650,11 @@ namespace Microsoft.VisualStudioTools.Project
             }
             set
             {
-                if (this._process != null && !this._process.HasExited)
+                if (this.process != null && !this.process.HasExited)
                 {
                     try
                     {
-                        this._process.PriorityClass = value;
+                        this.process.PriorityClass = value;
                     }
                     catch (Win32Exception)
                     {
@@ -671,7 +671,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// The redirector that was originally passed.
         /// </summary>
-        public Redirector Redirector => this._redirector;
+        public Redirector Redirector => this.redirector;
         /// <summary>
         /// Writes a line to stdin. A redirector must have been provided that indicates not
         /// to close the StandardInput stream.
@@ -679,36 +679,36 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="line"></param>
         public void WriteInputLine(string line)
         {
-            if (IsStarted && _redirector != null && !_redirector.CloseStandardInput())
+            if (IsStarted && redirector != null && !redirector.CloseStandardInput())
             {
-                _process.StandardInput.WriteLine(line);
-                _process.StandardInput.Flush();
+                process.StandardInput.WriteLine(line);
+                process.StandardInput.Flush();
             }
         }
 
         private void FlushAndCloseOutput()
         {
-            if (this._process == null)
+            if (this.process == null)
             {
                 return;
             }
 
-            if (this._process.StartInfo.RedirectStandardOutput)
+            if (this.process.StartInfo.RedirectStandardOutput)
             {
                 try
                 {
-                    this._process.CancelOutputRead();
+                    this.process.CancelOutputRead();
                 }
                 catch (InvalidOperationException)
                 {
                     // Reader has already been cancelled
                 }
             }
-            if (this._process.StartInfo.RedirectStandardError)
+            if (this.process.StartInfo.RedirectStandardError)
             {
                 try
                 {
-                    this._process.CancelErrorRead();
+                    this.process.CancelErrorRead();
                 }
                 catch (InvalidOperationException)
                 {
@@ -716,11 +716,11 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            if (this._waitHandleEvent != null)
+            if (this.waitHandleEvent != null)
             {
                 try
                 {
-                    this._waitHandleEvent.Set();
+                    this.waitHandleEvent.Set();
                 }
                 catch (ObjectDisposedException)
                 {
@@ -732,13 +732,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// The lines of text sent to standard output. These do not include
         /// newline characters.
         /// </summary>
-        public IEnumerable<string> StandardOutputLines => this._output;
+        public IEnumerable<string> StandardOutputLines => this.output;
 
         /// <summary>
         /// The lines of text sent to standard error. These do not include
         /// newline characters.
         /// </summary>
-        public IEnumerable<string> StandardErrorLines => this._error;
+        public IEnumerable<string> StandardErrorLines => this.error;
 
         /// <summary>
         /// A handle that can be waited on. It triggers when the process exits.
@@ -747,26 +747,28 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (this._process == null)
+                if (this.process == null)
                 {
                     return null;
                 }
-                if (this._waitHandleEvent == null)
+                if (this.waitHandleEvent == null)
                 {
-                    this._waitHandleEvent = new ManualResetEvent(this._haveRaisedExitedEvent);
+                    this.waitHandleEvent = new ManualResetEvent(this.haveRaisedExitedEvent);
                 }
-                return this._waitHandleEvent;
+                return this.waitHandleEvent;
             }
         }
+
+        public bool IsDisposed { get => this.isDisposed; set => this.isDisposed = value; }
 
         /// <summary>
         /// Waits until the process exits.
         /// </summary>
         public void Wait()
         {
-            if (this._process != null)
+            if (this.process != null)
             {
-                this._process.WaitForExit();
+                this.process.WaitForExit();
                 // Should have already been called, in which case this is a no-op
                 OnExited(this, EventArgs.Empty);
             }
@@ -781,9 +783,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </returns>
         public bool Wait(TimeSpan timeout)
         {
-            if (this._process != null)
+            if (this.process != null)
             {
-                var exited = this._process.WaitForExit((int)timeout.TotalMilliseconds);
+                var exited = this.process.WaitForExit((int)timeout.TotalMilliseconds);
                 if (exited)
                 {
                     // Should have already been called, in which case this is a no-op
@@ -799,25 +801,25 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public TaskAwaiter<int> GetAwaiter()
         {
-            if (this._awaiter == null)
+            if (this.awaiter == null)
             {
-                if (this._process == null)
+                if (this.process == null)
                 {
                     var tcs = new TaskCompletionSource<int>();
                     tcs.SetCanceled();
-                    this._awaiter = tcs.Task;
+                    this.awaiter = tcs.Task;
                 }
-                else if (this._process.HasExited)
+                else if (this.process.HasExited)
                 {
                     // Should have already been called, in which case this is a no-op
                     OnExited(this, EventArgs.Empty);
                     var tcs = new TaskCompletionSource<int>();
-                    tcs.SetResult(this._process.ExitCode);
-                    this._awaiter = tcs.Task;
+                    tcs.SetResult(this.process.ExitCode);
+                    this.awaiter = tcs.Task;
                 }
                 else
                 {
-                    this._awaiter = Task.Run(() =>
+                    this.awaiter = Task.Run(() =>
                     {
                         try
                         {
@@ -827,12 +829,12 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             throw new OperationCanceledException();
                         }
-                        return this._process.ExitCode;
+                        return this.process.ExitCode;
                     });
                 }
             }
 
-            return this._awaiter.GetAwaiter();
+            return this.awaiter.GetAwaiter();
         }
 
         /// <summary>
@@ -840,9 +842,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Kill()
         {
-            if (this._process != null && !this._process.HasExited)
+            if (this.process != null && !this.process.HasExited)
             {
-                this._process.Kill();
+                this.process.Kill();
                 // Should have already been called, in which case this is a no-op
                 OnExited(this, EventArgs.Empty);
             }
@@ -855,11 +857,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void OnExited(object sender, EventArgs e)
         {
-            if (this._isDisposed || this._haveRaisedExitedEvent)
+            if (this.isDisposed || this.haveRaisedExitedEvent)
             {
                 return;
             }
-            this._haveRaisedExitedEvent = true;
+            this.haveRaisedExitedEvent = true;
             FlushAndCloseOutput();
             var evt = Exited;
             if (evt != null)
@@ -873,30 +875,30 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Dispose()
         {
-            if (!this._isDisposed)
+            if (!this.isDisposed)
             {
-                this._isDisposed = true;
-                if (this._process != null)
+                this.isDisposed = true;
+                if (this.process != null)
                 {
-                    if (this._process.StartInfo.RedirectStandardOutput)
+                    if (this.process.StartInfo.RedirectStandardOutput)
                     {
-                        this._process.OutputDataReceived -= this.OnOutputDataReceived;
+                        this.process.OutputDataReceived -= this.OnOutputDataReceived;
                     }
-                    if (this._process.StartInfo.RedirectStandardError)
+                    if (this.process.StartInfo.RedirectStandardError)
                     {
-                        this._process.ErrorDataReceived -= this.OnErrorDataReceived;
+                        this.process.ErrorDataReceived -= this.OnErrorDataReceived;
                     }
-                    this._process.Dispose();
+                    this.process.Dispose();
                 }
-                var disp = this._redirector as IDisposable;
+                var disp = this.redirector as IDisposable;
                 if (disp != null)
                 {
                     disp.Dispose();
                 }
-                if (this._waitHandleEvent != null)
+                if (this.waitHandleEvent != null)
                 {
-                    this._waitHandleEvent.Set();
-                    this._waitHandleEvent.Dispose();
+                    this.waitHandleEvent.Set();
+                    this.waitHandleEvent.Dispose();
                 }
             }
         }

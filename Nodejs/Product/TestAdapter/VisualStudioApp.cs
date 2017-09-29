@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -16,17 +16,17 @@ namespace Microsoft.VisualStudioTools
 {
     internal class VisualStudioApp : IDisposable
     {
-        private static readonly Dictionary<int, VisualStudioApp> _knownInstances = new Dictionary<int, VisualStudioApp>();
-        private readonly int _processId;
+        private static readonly Dictionary<int, VisualStudioApp> KnownInstances = new Dictionary<int, VisualStudioApp>();
+        private readonly int processId;
 
         public static VisualStudioApp FromProcessId(int processId)
         {
             VisualStudioApp inst;
-            lock (_knownInstances)
+            lock (KnownInstances)
             {
-                if (!_knownInstances.TryGetValue(processId, out inst))
+                if (!KnownInstances.TryGetValue(processId, out inst))
                 {
-                    _knownInstances[processId] = inst = new VisualStudioApp(processId);
+                    KnownInstances[processId] = inst = new VisualStudioApp(processId);
                 }
             }
             return inst;
@@ -40,8 +40,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
-            int processId;
-            if (!int.TryParse(pid, out processId))
+            if (!int.TryParse(pid, out var processId))
             {
                 return null;
             }
@@ -49,16 +48,16 @@ namespace Microsoft.VisualStudioTools
             return FromProcessId(processId);
         }
 
-        public VisualStudioApp(int processId)
+        private VisualStudioApp(int processId)
         {
-            _processId = processId;
+            this.processId = processId;
         }
 
         public void Dispose()
         {
-            lock (_knownInstances)
+            lock (KnownInstances)
             {
-                _knownInstances.Remove(_processId);
+                KnownInstances.Remove(this.processId);
             }
         }
 
@@ -70,10 +69,10 @@ namespace Microsoft.VisualStudioTools
 
         public DTE GetDTE()
         {
-            var dte = GetDTE(_processId);
+            var dte = GetDTE(this.processId);
             if (dte == null)
             {
-                throw new InvalidOperationException("Could not find VS DTE object for process " + _processId);
+                throw new InvalidOperationException("Could not find VS DTE object for process " + this.processId);
             }
             return dte;
         }
@@ -266,16 +265,14 @@ namespace Microsoft.VisualStudioTools
         // Start the filter.
         public static void Register()
         {
-            IOleMessageFilter newFilter = new MessageFilter();
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(newFilter, out oldFilter);
+            var newFilter = new MessageFilter();
+            CoRegisterMessageFilter(newFilter, out var oldFilter);
         }
 
         // Done with the filter, close it.
         public static void Revoke()
         {
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(null, out oldFilter);
+            CoRegisterMessageFilter(null, out var oldFilter);
         }
 
         private const int SERVERCALL_ISHANDLED = 0;
