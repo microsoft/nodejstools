@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -109,6 +109,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 }
             }
 
+            // per API we should throw if we can't find the property.
             throw new ArgumentException(SR.GetString(SR.InvalidParameter), "index");
         }
         /// <summary>

@@ -97,6 +97,8 @@ namespace Microsoft.NodejsTools.Project
             return VSConstants.S_OK;
         }
 
+        // todo: move usersettings to separate class, so we can use this from other places.
+
         internal static bool CheckUseNewChromeDebugProtocolOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");

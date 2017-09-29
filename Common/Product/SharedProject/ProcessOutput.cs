@@ -596,7 +596,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        public int? ProcessId => this.process != null ? this.process.Id : (int?)null;
+        public int? ProcessId => this.IsStarted ? this.process.Id : (int?)null;
 
         /// <summary>
         /// The arguments that were originally passed, including the filename.

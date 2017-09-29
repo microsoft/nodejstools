@@ -201,22 +201,6 @@ namespace Microsoft.VisualStudioTools
             return AttachToProcess(processOutput, process);
         }
 
-        public bool AttachToProcess(ProcessOutput processOutput, Guid[] engines)
-        {
-            var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
-            var processes = debugger3.LocalProcesses;
-            for (var i = 1; i < processes.Count; ++i)
-            {
-                var process = processes.Item(i);
-                if (process.ProcessID == processOutput.ProcessId)
-                {
-                    return AttachToProcess(processOutput, process, engines);
-                }
-            }
-
-            return false;
-        }
-
         public bool AttachToProcess(ProcessOutput processOutput, EnvDTE.Process process, Guid[] engines = null)
         {
             // Retry the attach itself 3 times before displaying a Retry/Cancel
