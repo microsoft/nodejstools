@@ -2351,12 +2351,6 @@
       </Bin>
       <Disp Edtr="External" LocTbl="false" />
     </Item>
-    <Item ItemId=";version.txt" ItemType="0" PsrId="211" Leaf="true">
-      <Bin BinId="3">
-        <Val><![CDATA[AAEAAAD/////AQAAAAAAAAAEAQAAAAxTeXN0ZW0uSW50MzIBAAAAB21fdmFsdWUACAMAAAALAAEAAAD/////AQAAAAAAAAAGAQAAAAt2ZXJzaW9uLnR4dAsAAQAAAP////8BAAAAAAAAAAQBAAAAH1N5c3RlbS5Vbml0eVNlcmlhbGl6YXRpb25Ib2xkZXIDAAAABERhdGEJVW5pdHlUeXBlDEFzc2VtYmx5TmFtZQEAAQgGAgAAAB9TeXN0ZW0uSU8uVW5tYW5hZ2VkTWVtb3J5U3RyZWFtBAAAAAYDAAAAS21zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OQsAAQAAAP////8BAAAAAAAAAA8BAAAANQAAAAJBc3NlbWJseUZpbGVWZXJzaW9uPTE1LjMtbWFzdGVyDQpBc3NlbWJseVZlcnNpb249MTUuMAsAAQAAAP////8BAAAAAAAAAAQBAAAADlN5c3RlbS5Cb29sZWFuAQAAAAdtX3ZhbHVlAAEACwABAAAA/////wEAAAAAAAAABAEAAAAOU3lzdGVtLkJvb2xlYW4BAAAAB21fdmFsdWUAAQAL]]></Val>
-      </Bin>
-      <Disp Edtr="External" LocTbl="false" />
-    </Item>
   </Item>
   <Item ItemId=";Microsoft.VisualStudio.Project.resources" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
@@ -5290,7 +5284,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10831.3]]></Val>
+        <Val><![CDATA[1.4.10925.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5317,7 +5311,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10831.3 commit:5592d1f0f6503271db5327feb3b8060457047b70]]></Val>
+        <Val><![CDATA[1.4.10925.2 commit:15df9c45501b3765c48ff566f450dee9c122de62]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

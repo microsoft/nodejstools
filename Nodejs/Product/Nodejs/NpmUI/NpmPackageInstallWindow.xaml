@@ -149,6 +149,13 @@
                                            Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
 
                                 <TextBlock Grid.Column="1"
+                                           x:Name="LocalInstallMissingMessage"
+                                           Visibility="Collapsed"
+                                           FontWeight="Bold"
+                                           Foreground="Red"
+                                           Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
+                                
+                                <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
                                            FontWeight="Bold"
@@ -170,6 +177,9 @@
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsInstalledLocally}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLocalInstallMissing}" Value="true">
+                                <Setter TargetName="LocalInstallMissingMessage" Property="Visibility" Value="Visible" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsLocalInstallOutOfDate}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Collapsed" />

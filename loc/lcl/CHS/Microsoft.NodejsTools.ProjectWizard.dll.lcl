@@ -3101,7 +3101,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The project could not be upgraded because it could not be checked out from source control.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[无法升级项目，因为无法将其从源控件中签出。]]></Val>
+            <Val><![CDATA[无法升级项目，因为无法将其从源代码管理中签出。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3313,7 +3313,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10826.1]]></Val>
+        <Val><![CDATA[1.4.10917.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3340,7 +3340,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10826.1 commit:3ab177bb3380959add5d47a50357fc6ed521c5f8]]></Val>
+        <Val><![CDATA[1.4.10917.2 commit:c39cdc71cd9e394aebdd7252df80c92eb2d44e21]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

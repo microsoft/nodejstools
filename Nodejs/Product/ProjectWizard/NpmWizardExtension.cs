@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualStudio.TemplateWizard;
 
 namespace Microsoft.NodejsTools.ProjectWizard
@@ -22,6 +23,14 @@ namespace Microsoft.NodejsTools.ProjectWizard
         {
             Debug.Assert(project != null && project.Object != null);
             Debug.Assert(project.Object is INodePackageModulesCommands);
+
+            // Create the "node_modules/@types" folder before opening any files (which creates the
+            // context for the project). This allows tsserver to start watching for type definitions
+            // before any are installed (which is needed as "npm install" runs async, so the modules
+            // usually aren't installed before the project context is loaded).
+            var fullname = project.FullName;
+            var projectFolder = Path.GetDirectoryName(fullname);
+            Directory.CreateDirectory(Path.Combine(projectFolder, @"node_modules\@types"));
 
             ((INodePackageModulesCommands)project.Object).InstallMissingModulesAsync();
         }

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Concurrent;
@@ -106,11 +106,23 @@ namespace Microsoft.NodejsTools.NpmUI
 
             TelemetryHelper.LogSearchNpm();
 
-            var relativeUri = string.Format("/-/v1/search?text=\"{0}\"", WebUtility.UrlEncode(filterText));
-            var searchUri = new Uri(defaultRegistryUri, relativeUri);
+            if (filterText.Length == 1)
+            {
+                return await QueryNpmForSingleCharAsync(filterText);
+            }
+            else
+            {
+                return await QueryNpmAsync(filterText);
+            }
+        }
 
-            var request = WebRequest.Create(searchUri);
-            using (var response = await request.GetResponseAsync())
+        private async Task<IEnumerable<IPackage>> QueryNpmAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length > 1, $"Use {nameof(QueryNpmForSingleCharAsync)} for single character queries.");
+
+            var relativeUri = $"/-/v1/search?text={WebUtility.UrlEncode(filterText)}";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
             {
                 /* We expect the following response:
                  {
@@ -160,7 +172,7 @@ namespace Microsoft.NodejsTools.NpmUI
                     }
                 */
 
-                var reader = new StreamReader(response.GetResponseStream());
+                using (var reader = new StreamReader(response.GetResponseStream()))
                 using (var jsonReader = new JsonTextReader(reader))
                 {
                     while (jsonReader.Read())
@@ -181,6 +193,76 @@ namespace Microsoft.NodejsTools.NpmUI
 
             // should never get here
             throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private async Task<IEnumerable<IPackage>> QueryNpmForSingleCharAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length == 1, $"Use {nameof(QueryNpmAsync)} for general queries when the search query has more than 1 character.");
+
+            // Special case since the search API won't return results for 
+            // single chararacter queries.
+            var relativeUri = $"/{WebUtility.UrlEncode(filterText)}/latest";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
+            {
+                /* We expect the following response
+                  {
+                    "name": "express",
+                    "scope": "unscoped",
+                    "version": "4.15.2",
+                    "description": "Fast, unopinionated, minimalist web framework",
+                    "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
+                    "date": "2017-03-06T13:42:44.853Z",
+                    "links": {
+                      "npm": "https://www.npmjs.com/package/express",
+                      "homepage": "http://expressjs.com/",
+                      "repository": "https://github.com/expressjs/express",
+                      "bugs": "https://github.com/expressjs/express/issues"
+                    },
+                    "author": {
+                      "name": "TJ Holowaychuk",
+                      "email": "tj@vision-media.ca"
+                    },
+                    "publisher": {
+                      "username": "dougwilson",
+                      "email": "doug@somethingdoug.com"
+                    },
+                    "maintainers": [
+                      {
+                        "username": "dougwilson",
+                        "email": "doug@somethingdoug.com"
+                      }
+                    ]
+                  }*/
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    while (jsonReader.Read())
+                    {
+                        if (jsonReader.TokenType == JsonToken.StartObject)
+                        {
+                            var token = JToken.ReadFrom(jsonReader);
+                            var package = ReadPackage(token, new NodeModuleBuilder());
+                            if (package != null)
+                            {
+                                return new[] { package };
+                            }
+                        }
+
+                        throw new InvalidOperationException($"Unexpected json token. '{jsonReader.TokenType}'");
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private static Task<WebResponse> QueryNpmRegistryAsync(string relativeUri)
+        {
+            var searchUri = new Uri(defaultRegistryUri, relativeUri);
+
+            var request = WebRequest.Create(searchUri);
+            return request.GetResponseAsync();
         }
 
         private IEnumerable<IPackage> ReadPackagesFromArray(JsonTextReader jsonReader)
