@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
             this.frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var testFrameworkRoot = GetTestframeworkFolderRoot();
-            if(!Directory.Exists(testFrameworkRoot))
+            if (!Directory.Exists(testFrameworkRoot))
             {
                 throw new InvalidOperationException("Unable to find test framework folder");
             }
@@ -52,6 +52,16 @@ namespace Microsoft.NodejsTools.TestFrameworks
             // However in both cases, we should just go up a folder to the nodejstools root, and then into the TestAdapter folder.
 
             var currentAssembly = typeof(TestFrameworkDirectories).Assembly;
+
+            if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase))
+            {
+                var testAdapterAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
+
+                return Path.Combine(testAdapterAssemblyFolder, TestFrameworksDirectory);
+            }
+
+            System.Diagnostics.Debugger.Launch();
+
             var currentAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
             var nodejsRootFolder = Path.GetDirectoryName(currentAssemblyFolder);
 

@@ -50,6 +50,9 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
+
+        private static readonly Version Node8Version = new Version(8, 0);
+
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
         private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}");
 
@@ -260,14 +263,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                         nodeArgs.Add(args[0]);
                     }
 
-                    testObjects.Add(new TestCaseObject(args[1], args[2], args[3], args[4], args[5]));
+                    testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
                 }
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
                     app.GetDTE().Debugger.DetachAll();
                     // Ensure that --debug-brk is the first argument
-                    nodeArgs.InsertRange(0, GetDebugArgs(out port));
+                    nodeArgs.InsertRange(0, GetDebugArgs(nodeVersion, out port));
                 }
 
                 this.nodeProcess = ProcessOutput.Run(
@@ -283,14 +286,25 @@ namespace Microsoft.NodejsTools.TestAdapter
                 {
                     try
                     {
-                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                        var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
+                        if (nodeVersion >= Node8Version)
                         {
-                            if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                            //System.Diagnostics.Debugger.Launch();
+
+                            frameworkHandle.SendMessage(TestMessageLevel.Informational, $"ProcessId {this.nodeProcess.ProcessId ?? -99}");
+
+                            app.AttachToProcessNode2DebugAdapter((int)this.nodeProcess.ProcessId, nodeArgs[1]);
+                        }
+                        else
+                        {
+                            //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                            //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                            var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                            while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
                             {
-                                break;
+                                if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                                {
+                                    break;
+                                }
                             }
                         }
 #if DEBUG
@@ -354,13 +368,20 @@ namespace Microsoft.NodejsTools.TestAdapter
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
-        private static IEnumerable<string> GetDebugArgs(out int port)
+        private static IEnumerable<string> GetDebugArgs(Version nodeVersion, out int port)
         {
             port = GetFreePort();
 
-            // TODO: Need to use --inspect-brk on Node.js 8 or later
+            if (nodeVersion >= Node8Version)
+            {
+                return new[]
+                {
+                    $"--inspect-brk={port}"
+                };
+            }
+
             return new[] {
-                "--debug-brk=" + port.ToString()
+                $"--debug-brk={port}"
             };
         }
 
@@ -394,10 +415,10 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)
         {
-            string[] standardOutputLines = resultObject.stdout.Split('\n');
-            string[] standardErrorLines = resultObject.stderr.Split('\n');
+            var standardOutputLines = resultObject.stdout.Split('\n');
+            var standardErrorLines = resultObject.stderr.Split('\n');
 
-            if (resultObject.pending != null && (bool)resultObject.pending)
+            if (resultObject.pending == true)
             {
                 result.Outcome = TestOutcome.Skipped;
             }

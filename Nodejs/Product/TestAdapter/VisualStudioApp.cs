@@ -9,7 +9,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools
@@ -170,6 +173,41 @@ namespace Microsoft.VisualStudioTools
             }
 
             return (DTE)runningObject;
+        }
+
+        private static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+
+        public bool AttachToProcessNode2DebugAdapter(int processId, string script)
+        {
+            var dte = (VisualStudio.OLE.Interop.IServiceProvider)GetDTE();
+
+            var serviceProvider = new ServiceProvider(dte);
+
+            var configuration = new JObject(
+                    new JProperty("name", "Debug Node.js program from Visual Studio"),
+                    new JProperty("type", "node2"),
+                    new JProperty("request", "attach"),
+                    new JProperty("trace", "all"),
+                    new JProperty("processId", processId));
+
+            var jsonConfiguration = configuration.ToString();
+
+            var debugTargets = new[] {
+                new VsDebugTargetInfo4() {
+                    dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
+                    guidLaunchDebugEngine = WebKitDebuggerV2Guid,
+                    bstrOptions = jsonConfiguration,
+                    dwProcessId = (uint)processId,
+                    bstrExe = script
+                }
+            };
+
+            var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
+
+            var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
+            debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+
+            return true;
         }
 
         public bool AttachToProcess(ProcessOutput processOutput, Guid portSupplier, string transportQualifierUri)
