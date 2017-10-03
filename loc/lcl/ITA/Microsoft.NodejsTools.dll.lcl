@@ -733,6 +733,9 @@
       <Item ItemId=";DebuggerAttachToDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Consente di collegarsi a processi Node.js in esecuzione in un sistema protetto da un proxy di debug remoto (RemoteDebug.js). La documentazione correlata è disponibile nel menu 'Strumenti\Node.js Tools\Proxy di debug remoto'. Specificare il nome host e la porta del debugger di destinazione nella casella di testo 'Qualificatore', ad esempio 'targethost: {0}'. Questo trasporto non è protetto e non deve essere usato in una rete con possibile traffico ostile.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -946,6 +949,9 @@
       <Item ItemId=";JadeClassLiteral" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Jade Class Literal]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Valore letterale classe Jade]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -961,6 +967,9 @@
       <Item ItemId=";JadeIdLiteral" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Jade Id Literal]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Valore letterale ID Jade]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2065,6 +2074,9 @@
       <Item ItemId=";ReplClearDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Resets the context object to an empty object and clears any multi-line expression.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Reimposta l'oggetto contesto in un oggetto vuoto e cancella eventuali espressioni su più righe.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2080,12 +2092,18 @@
       <Item ItemId=";ReplSaveDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Clears the contents of the REPL editor window.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Cancella il contenuto della finestra dell'editor REPL.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";ReplSaveFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Failed to save: '{0}'.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Non è stato possibile salvare: '{0}'.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2101,6 +2119,9 @@
       <Item ItemId=";ReplSaveNoFileName" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Save requires a filename.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Per il salvataggio è richiesto un nome file.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
