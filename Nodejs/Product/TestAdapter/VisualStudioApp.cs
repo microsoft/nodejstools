@@ -194,11 +194,11 @@ namespace Microsoft.VisualStudioTools
 
             var debugTargets = new[] {
                 new VsDebugTargetInfo4() {
-                    dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
+                    dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning,
                     guidLaunchDebugEngine = WebKitDebuggerV2Guid,
                     bstrOptions = jsonConfiguration,
                     dwProcessId = (uint)processId,
-                    bstrExe = script
+                    bstrExe = $"\01"
                 }
             };
 

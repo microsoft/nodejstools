@@ -284,14 +284,12 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
+                    System.Diagnostics.Debugger.Launch();
+
                     try
                     {
                         if (nodeVersion >= Node8Version)
                         {
-                            //System.Diagnostics.Debugger.Launch();
-
-                            frameworkHandle.SendMessage(TestMessageLevel.Informational, $"ProcessId {this.nodeProcess.ProcessId ?? -99}");
-
                             app.AttachToProcessNode2DebugAdapter((int)this.nodeProcess.ProcessId, nodeArgs[1]);
                         }
                         else
