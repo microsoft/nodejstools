@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.Project
             this._startBrowser.Text = Resources.PropertiesStartBrowser;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
-            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
         }
 
         private void AddToolTips()
