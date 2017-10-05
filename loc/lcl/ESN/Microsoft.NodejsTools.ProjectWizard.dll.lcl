@@ -229,6 +229,9 @@
       <Item ItemId=";DebuggerAttachToDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Permite asociar a Node.js procesos que se ejecutan detrás de un proxy de depuración remota (RemoteDebug.js). Puede encontrar documentación relacionada en el menú "Herramientas\Node.js Tool\Remote Debug Proxy". Especifique el puerto del depurador y el nombre del host de destino en el cuadro de texto "Calificador", por ejemplo: "targethost: {0}". Este transporte no es seguro y no se debe usar en una red que pueda tener tráfico hostil.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -3418,7 +3421,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11004.3]]></Val>
+        <Val><![CDATA[1.4.11004.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3445,7 +3448,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11004.3 commit:ae099409c0a17a5110e8df3cce7237a7896df77e]]></Val>
+        <Val><![CDATA[1.4.11004.4 commit:56a5bc8e9129654fa402dcdc9736e690a3716706]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
