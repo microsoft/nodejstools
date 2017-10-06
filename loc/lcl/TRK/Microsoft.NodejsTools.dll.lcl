@@ -626,7 +626,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Attaching to Azure Website at {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} konumundaki Azure Web Sitesine ekleniyor]]></Val>
+            <Val><![CDATA[{0} konumundaki Azure Web Sitesine iliştiriliyor]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -635,7 +635,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not attach to node.exe process on Azure Website at {0}.]D;]A;]D;]A;Error retrieving websocket debug proxy information from web.config.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} konumunda bulunan Azure Web Sitesinde node.exe işlemine ekleme başarısız oldu.]D;]A;]D;]A;Web.config'den websocket hata ayıklama proxy'si bilgileri alınamadı.]]></Val>
+            <Val><![CDATA[{0} konumunda bulunan Azure Web Sitesinde node.exe işlemine iliştirme başarısız oldu.]D;]A;]D;]A;Web.config'den websocket hata ayıklama proxy'si bilgileri alınamadı.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -644,7 +644,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Failed to attach to Azure Website: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Azure Web Sitesine ekleme başarısız oldu: {0}]]></Val>
+            <Val><![CDATA[Azure Web Sitesine iliştirme başarısız oldu: {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -734,7 +734,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Uzaktan hata ayıklama proxy'sinde (RemoteDebug.js) çalışan Node.js işlemlerine eklemeye izin verir. İlgili belgeler 'Araçlar\Node.js Aracı\Uzak Hata Ayıklama Proxy'si' menüsü altında bulunabilir. 'Niteleyici' metin kutusunda, hedef konak adını ve hata ayıklayıcısı bağlantı noktasını belirtin, ör. 'targethost: {0}'. Bu aktarım güvenli değildir ve saldırı trafiğine sahip olabilecek bir ağ üzerinde kullanılmamalıdır.]]></Val>
+            <Val><![CDATA[Uzaktan hata ayıklama proxy'sinde (RemoteDebug.js) çalışan Node.js işlemlerine iliştirmeye izin verir. İlgili belgeler 'Araçlar\Node.js Aracı\Uzak Hata Ayıklama Proxy'si' menüsü altında bulunabilir. 'Niteleyici' metin kutusunda, hedef konak adını ve hata ayıklayıcısı bağlantı noktasını belirtin, ör. 'targethost: {0}'. Bu aktarım güvenli değildir ve saldırı trafiğine sahip olabilecek bir ağ üzerinde kullanılmamalıdır.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2030,7 +2030,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not attach to Node.js process at {0}{1}]D;]A;]D;]A;]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Şu konumdaki Node.js işlemine ekleme başarısız oldu: {0}{1}]D;]A;]D;]A;]]></Val>
+            <Val><![CDATA[Şu konumdaki Node.js işlemine iliştirme başarısız oldu: {0}{1}]D;]A;]D;]A;]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4219,7 +4219,7 @@
           <Str Cat="Button" IgnoreHK="true">
             <Val><![CDATA[Attach Debugger (&Node.js)]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[Hata Ayıklayıcısı Ekle (&Node.js)]]></Val>
+              <Val><![CDATA[Hata Ayıklayıcısı İliştir (&Node.js)]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -4228,7 +4228,7 @@
           <Str Cat="Button">
             <Val><![CDATA[Attach Node.js Debugger]]></Val>
             <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Node.js Hata Ayıklayıcısı Ekle]]></Val>
+              <Val><![CDATA[Node.js Hata Ayıklayıcısı İliştir]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -4237,7 +4237,7 @@
           <Str Cat="Button">
             <Val><![CDATA[Attach the Node.js debugger to the remote Microsoft Azure site]]></Val>
             <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Node.js hata ayıklayıcısını uzak Microsoft Azure sitesine ekleyin]]></Val>
+              <Val><![CDATA[Node.js hata ayıklayıcısını uzak Microsoft Azure sitesine iliştirin]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
