@@ -5401,7 +5401,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11004.1]]></Val>
+        <Val><![CDATA[1.4.11005.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5428,7 +5428,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11004.1 commit:3a1ff452bef7451fc1ab509843d463cfd04f2a24]]></Val>
+        <Val><![CDATA[1.4.11005.1 commit:d00f493da9f4f6d1b12fd1dd1d1fb51c920846e0]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
