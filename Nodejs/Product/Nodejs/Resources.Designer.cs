@@ -1559,6 +1559,33 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve Nodejs.exe information..
+        /// </summary>
+        internal static string ReplNodeError {
+            get {
+                return ResourceManager.GetString("ReplNodeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using Node.js exe from: &apos;{0}&apos;.
+        /// </summary>
+        internal static string ReplNodeInfo {
+            get {
+                return ResourceManager.GetString("ReplNodeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Version: {0}.
+        /// </summary>
+        internal static string ReplNodeVersion {
+            get {
+                return ResourceManager.GetString("ReplNodeVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
         /// </summary>
         internal static string ReplSaveDescription {

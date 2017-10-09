@@ -711,4 +711,15 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="ReplInfoDescription" xml:space="preserve">
     <value>Show information about the current used Node.js executable.</value>
   </data>
+  <data name="ReplNodeError" xml:space="preserve">
+    <value>Failed to retrieve Nodejs.exe information.</value>
+  </data>
+  <data name="ReplNodeInfo" xml:space="preserve">
+    <value>Using Node.js exe from: '{0}'</value>
+    <comment>template is substituted with a path.</comment>
+  </data>
+  <data name="ReplNodeVersion" xml:space="preserve">
+    <value>Node.js Version: {0}</value>
+    <comment>template is substituted with version info</comment>
+  </data>
 </root>

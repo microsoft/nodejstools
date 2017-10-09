@@ -3,6 +3,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Repl
@@ -23,12 +24,12 @@ namespace Microsoft.NodejsTools.Repl
                     }
                     var nodeVersion = FileVersionInfo.GetVersionInfo(nodeExePath);
 
-                    window.WriteLine($"Using Node.js exe from: '{nodeExePath}'");
-                    window.WriteLine($"Node.js Version: {nodeVersion.ProductVersion}");
+                    window.WriteLine(string.Format(CultureInfo.CurrentUICulture, Resources.ReplNodeInfo, nodeExePath));
+                    window.WriteLine(string.Format(CultureInfo.CurrentUICulture, Resources.ReplNodeVersion, nodeVersion.ProductVersion));
                 }
                 catch(Exception e)
                 {
-                    window.WriteLine("Failed to retrieve Nodejs.exe information.");
+                    window.WriteLine(Resources.ReplNodeError);
                     window.WriteError(e);
                 }
             }
