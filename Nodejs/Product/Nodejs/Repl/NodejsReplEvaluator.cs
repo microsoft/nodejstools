@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -38,6 +38,8 @@ namespace Microsoft.NodejsTools.Repl
         {
             this._site = site;
         }
+
+        public string NodeExePath { get; private set; }
 
         #region IReplEvaluator Members
 
@@ -152,23 +154,21 @@ namespace Microsoft.NodejsTools.Repl
                 this._listener = null;
             }
 
-            var nodeExePath = GetNodeExePath();
-            if (string.IsNullOrWhiteSpace(nodeExePath))
+            this.NodeExePath = GetNodeExePath();
+            if (string.IsNullOrWhiteSpace(this.NodeExePath))
             {
                 this._window.WriteError(Resources.NodejsNotInstalled);
                 this._window.WriteError(Environment.NewLine);
                 return;
             }
-            else if (!File.Exists(nodeExePath))
+            else if (!File.Exists(this.NodeExePath))
             {
-                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
+                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
                 this._window.WriteError(Environment.NewLine);
                 return;
             }
 
-            Socket socket;
-            int port;
-            CreateConnection(out socket, out port);
+            CreateConnection(out var socket, out var port);
 
             var scriptPath = "\"" +
                     Path.Combine(
@@ -176,15 +176,15 @@ namespace Microsoft.NodejsTools.Repl
                         "visualstudio_nodejs_repl.js"
                     ) + "\"";
 
-            var psi = new ProcessStartInfo(nodeExePath, scriptPath + " " + port);
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
+            var psi = new ProcessStartInfo(this.NodeExePath, scriptPath + " " + port)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
-            string fileName, directory = null;
-
-            if (this._site.TryGetStartupFileAndDirectory(out fileName, out directory))
+            if (this._site.TryGetStartupFileAndDirectory(out var fileName, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
@@ -205,7 +205,7 @@ namespace Microsoft.NodejsTools.Repl
             this._listener = new ListenerThread(this, process, socket);
         }
 
-        private string GetNodeExePath()
+        public string GetNodeExePath()
         {
             var startupProject = this._site.GetStartupProject();
             string nodeExePath;

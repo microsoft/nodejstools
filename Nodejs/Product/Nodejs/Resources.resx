@@ -708,4 +708,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="JadeVariable" xml:space="preserve">
     <value>Jade Variable</value>
   </data>
+  <data name="ReplInfoDescription" xml:space="preserve">
+    <value>Show information about the current used Node.js executable.</value>
+  </data>
 </root>

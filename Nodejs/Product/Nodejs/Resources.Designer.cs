@@ -1541,6 +1541,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show information about the current used Node.js executable..
+        /// </summary>
+        internal static string ReplInfoDescription {
+            get {
+                return ResourceManager.GetString("ReplInfoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
         /// </summary>
         internal static string ReplInitializationMessage {
