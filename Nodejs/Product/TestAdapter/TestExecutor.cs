@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -195,7 +195,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
 
             var defaultSession = TelemetryService.DefaultSession;
-            defaultSession.PostEvent(userTask);
+            defaultSession?.PostEvent(userTask);
         }
 
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
