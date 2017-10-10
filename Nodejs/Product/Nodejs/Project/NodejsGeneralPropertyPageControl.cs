@@ -11,7 +11,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase
+    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";

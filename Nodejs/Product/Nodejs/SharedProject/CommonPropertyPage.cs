@@ -21,36 +21,24 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal virtual CommonProjectNode Project { get; set; }
 
-        protected override void SetObjects(uint count, object[] punk)
+        protected override void SetObjects(uint count, object[] objects)
         {
-            if (punk == null)
+            if (objects == null)
             {
                 return;
             }
 
             if (count > 0)
             {
-                if (punk[0] is ProjectConfig)
+                if (this.Project == null)
                 {
-                    if (this.Project == null)
+                    if (objects[0] is CommonProjectConfig projectConfig)
                     {
-                        this.Project = (CommonProjectNode)((CommonProjectConfig)punk.First()).ProjectMgr;
+                        this.Project = (CommonProjectNode)projectConfig.ProjectMgr;
                     }
-
-                    var configs = new List<CommonProjectConfig>();
-
-                    for (var i = 0; i < count; i++)
+                    else if (objects[0] is NodeProperties properties)
                     {
-                        var config = (CommonProjectConfig)punk[i];
-
-                        configs.Add(config);
-                    }
-                }
-                else if (punk[0] is NodeProperties)
-                {
-                    if (this.Project == null)
-                    {
-                        this.Project = (CommonProjectNode)(punk[0] as NodeProperties).HierarchyNode.ProjectMgr;
+                        this.Project = (CommonProjectNode)(properties).HierarchyNode.ProjectMgr;
                     }
                 }
             }
