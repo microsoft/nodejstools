@@ -6,11 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.Editors.PropertyPages;
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal partial class NodejsGeneralPropertyPageControl : UserControl
+    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -49,7 +50,7 @@ namespace Microsoft.NodejsTools.Project
             this._startBrowser.Text = Resources.PropertiesStartBrowser;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
-            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
         }
 
         private void AddToolTips()
@@ -65,6 +66,10 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
         }
+
+        protected override bool DisableOnBuild => false;
+
+        protected override bool DisableOnDebug => false;
 
         public string NodeExePath
         {
@@ -192,7 +197,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void Changed(object sender, EventArgs e)
         {
-            this._propPage.IsDirty = true;
+            this.IsDirty = true;
         }
 
         private void SetCueBanner()
