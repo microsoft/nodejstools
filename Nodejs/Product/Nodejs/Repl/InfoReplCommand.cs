@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Microsoft.NodejsTools.Repl
 {
     [Export(typeof(IReplCommand))]
-    internal class InfoReplCommand : IReplCommand
+    internal sealed class InfoReplCommand : IReplCommand
     {
         public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
         {
@@ -17,23 +17,24 @@ namespace Microsoft.NodejsTools.Repl
             {
                 try
                 {
-                    var nodeExePath = nodeEval.NodeExePath;
-                    if (string.IsNullOrEmpty(nodeExePath))
+                    if (!nodeEval.EnsureNodeInstalled())
                     {
-                        nodeExePath = nodeEval.GetNodeExePath();
+                        return ExecutionResult.Failed;
+
                     }
+                    var nodeExePath = nodeEval.NodeExePath;
                     var nodeVersion = FileVersionInfo.GetVersionInfo(nodeExePath);
 
                     window.WriteLine(string.Format(CultureInfo.CurrentUICulture, Resources.ReplNodeInfo, nodeExePath));
                     window.WriteLine(string.Format(CultureInfo.CurrentUICulture, Resources.ReplNodeVersion, nodeVersion.ProductVersion));
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     window.WriteLine(Resources.ReplNodeError);
                     window.WriteError(e);
+                    return ExecutionResult.Failed;
                 }
             }
-
             return ExecutionResult.Succeeded;
         }
 

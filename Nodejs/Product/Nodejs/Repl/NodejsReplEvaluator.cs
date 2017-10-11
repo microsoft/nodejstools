@@ -39,7 +39,19 @@ namespace Microsoft.NodejsTools.Repl
             this._site = site;
         }
 
-        public string NodeExePath { get; private set; }
+        private string nodeExePath;
+
+        public string NodeExePath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.nodeExePath))
+                {
+                    this.nodeExePath = this.GetNodeExePath();
+                }
+                return this.nodeExePath;
+            }
+        }
 
         #region IReplEvaluator Members
 
@@ -64,7 +76,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public Task<ExecutionResult> Reset()
         {
-            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
+            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(_ => true);
             for (var i = 0; i < buffersBeforeReset.Count - 1; i++)
             {
                 var buffer = buffersBeforeReset[i];
@@ -77,11 +89,6 @@ namespace Microsoft.NodejsTools.Repl
 
             Connect();
             return ExecutionResult.Succeeded;
-        }
-
-        private static bool TruePredicate(ITextBuffer buffer)
-        {
-            return true;
         }
 
         public bool CanExecuteText(string text)
@@ -145,6 +152,30 @@ namespace Microsoft.NodejsTools.Repl
             }
         }
 
+        /// <summary>
+        /// Checks if Node.js Exe is installed correctly.
+        /// Writes an error message if it's not.
+        /// </summary>
+        /// <returns></returns>
+        public bool EnsureNodeInstalled()
+        {
+            if (string.IsNullOrWhiteSpace(this.NodeExePath))
+            {
+                this._window.WriteError(Resources.NodejsNotInstalled);
+                this._window.WriteError(Environment.NewLine);
+                return false;
+            }
+
+            if (!File.Exists(this.NodeExePath))
+            {
+                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
+                this._window.WriteError(Environment.NewLine);
+                return false;
+            }
+
+            return true;
+        }
+
         private void Connect()
         {
             if (this._listener != null)
@@ -154,17 +185,8 @@ namespace Microsoft.NodejsTools.Repl
                 this._listener = null;
             }
 
-            this.NodeExePath = GetNodeExePath();
-            if (string.IsNullOrWhiteSpace(this.NodeExePath))
+            if(!this.EnsureNodeInstalled())
             {
-                this._window.WriteError(Resources.NodejsNotInstalled);
-                this._window.WriteError(Environment.NewLine);
-                return;
-            }
-            else if (!File.Exists(this.NodeExePath))
-            {
-                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
-                this._window.WriteError(Environment.NewLine);
                 return;
             }
 
@@ -205,7 +227,7 @@ namespace Microsoft.NodejsTools.Repl
             this._listener = new ListenerThread(this, process, socket);
         }
 
-        public string GetNodeExePath()
+        private string GetNodeExePath()
         {
             var startupProject = this._site.GetStartupProject();
             string nodeExePath;
