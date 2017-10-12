@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 Path.Combine(ideFolder, "PrivateAssemblies"),
                 Path.Combine(ideFolder, "PublicAssemblies"),
                 Path.Combine(installPath, "MSBuild","15.0","Bin"),
+                Path.Combine(ideFolder, "CommonExtensions","Microsoft","TestWindow"),
                 Path.Combine(ideFolder, "CommonExtensions","Microsoft","WebClient","Project System") };
 
             // This is what comes in for args.Name, but we really just want the dll file name:
