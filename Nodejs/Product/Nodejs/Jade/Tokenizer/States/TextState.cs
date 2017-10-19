@@ -12,7 +12,9 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream())
             {
                 if (this._cs.IsAtNewLine())
+                {
                     break;
+                }
 
                 if (this._cs.CurrentChar == '#' && this._cs.NextChar == '{')
                 {

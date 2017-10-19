@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudioTools
         {
             if (serviceProvider == null)
             {
-                throw new ArgumentNullException("serviceProvider");
+                throw new ArgumentNullException(nameof(serviceProvider));
             }
 
             this._solution = serviceProvider.GetService(typeof(SVsSolution)) as IVsSolution;
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools
         {
             if (service == null)
             {
-                throw new ArgumentNullException("service");
+                throw new ArgumentNullException(nameof(service));
             }
             this._solution = service;
             this._buildManager = buildManager;

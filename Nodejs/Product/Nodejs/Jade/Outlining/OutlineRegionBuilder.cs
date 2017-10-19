@@ -40,7 +40,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
-                var changeStart = Int32.MaxValue;
+                var changeStart = int.MaxValue;
                 var changeEnd = 0;
 
                 lock (this._regionsLock)
@@ -75,14 +75,18 @@ namespace Microsoft.NodejsTools.Jade
                         changeEnd = Math.Max(changeEnd, region.End);
                     }
 
-                    if (changeStart < Int32.MaxValue)
+                    if (changeStart < int.MaxValue)
+                    {
                         this.CurrentRegions.TextBufferVersion = this.TextBuffer.CurrentSnapshot.Version.VersionNumber;
+                    }
                 }
 
-                if (changeStart < Int32.MaxValue)
+                if (changeStart < int.MaxValue)
                 {
                     if (this.RegionsChanged != null)
+                    {
                         this.RegionsChanged(this, new OutlineRegionsChangedEventArgs(this.CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
+                    }
                 }
             }
         }

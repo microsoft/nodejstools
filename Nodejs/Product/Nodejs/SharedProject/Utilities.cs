@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -143,7 +143,9 @@ namespace Microsoft.VisualStudioTools.Project
             foreach (var guid in guidsStrings)
             {
                 if (!string.IsNullOrEmpty(guid))
+                {
                     guids.Add(new Guid(guid.Trim(curlyBraces)));
+                }
             }
 
             return guids.ToArray();
@@ -575,7 +577,10 @@ namespace Microsoft.VisualStudioTools.Project
             // A valid file name cannot be all "c" .
             var charFound = 0;
             for (charFound = 0; charFound < fileName.Length && fileName[charFound] == c; ++charFound)
+            {
                 ;
+            }
+
             if (charFound >= fileName.Length)
             {
                 return true;
@@ -657,7 +662,9 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // Make sure it doesn't already exist
             if (Directory.Exists(target))
-                throw new ArgumentException(SR.GetString(SR.FileOrFolderAlreadyExists, target));
+            {
+                throw new ArgumentException(SR.GetString(SR.FileOrFolderAlreadyExists, target), nameof(target));
+            }
 
             Directory.CreateDirectory(target);
             var directory = new DirectoryInfo(source);

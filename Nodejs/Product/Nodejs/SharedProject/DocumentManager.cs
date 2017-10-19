@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -301,7 +301,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (string.IsNullOrEmpty(caption))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "caption");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(caption));
             }
 
             var uiShell = site.GetService(typeof(SVsUIShell)) as IVsUIShell;
@@ -344,23 +344,26 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (string.IsNullOrEmpty(oldName))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "oldName");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(oldName));
             }
 
             if (string.IsNullOrEmpty(newName))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "newName");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(newName));
             }
 
             if (newItemId == VSConstants.VSITEMID_NIL)
             {
-                throw new ArgumentNullException("newItemId");
+                throw new ArgumentNullException(nameof(newItemId));
             }
 
             var pRDT = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
             if (pRDT == null)
+            {
                 return;
+            }
+
             ErrorHandler.ThrowOnFailure(pRDT.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, oldName, out var pIVsHierarchy, out var itemId, out var docData, out var uiVsDocCookie));
 
             if (docData != IntPtr.Zero && pIVsHierarchy != null)
@@ -377,9 +380,14 @@ namespace Microsoft.VisualStudioTools.Project
                     finally
                     {
                         if (pHier != IntPtr.Zero)
+                        {
                             Marshal.Release(pHier);
+                        }
+
                         if (pUnk != IntPtr.Zero)
+                        {
                             Marshal.Release(pUnk);
+                        }
                     }
                 }
                 finally

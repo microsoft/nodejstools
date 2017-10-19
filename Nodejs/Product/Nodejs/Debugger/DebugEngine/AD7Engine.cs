@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -166,7 +166,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             if (celtPrograms != 1)
             {
                 Debug.Fail("Node debugging only supports one program in a process");
-                throw new ArgumentException();
+                throw new ArgumentException("Node debugging only supports one program in a process", nameof(celtPrograms));
             }
 
             var processId = EngineUtils.GetProcessId(rgpPrograms[0]);

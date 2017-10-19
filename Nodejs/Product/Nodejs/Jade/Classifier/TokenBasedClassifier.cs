@@ -123,7 +123,9 @@ namespace Microsoft.NodejsTools.Jade
 
             this._lastValidPosition = Math.Min(this._lastValidPosition, start);
             if (this.Tokens.Count > 0)
+            {
                 this.Tokens.RemoveInRange(TextRange.FromBounds(this._lastValidPosition, this.Tokens[this.Tokens.Count - 1].End), true);
+            }
 
             // In line-based tokenizers like SaSS or Jade we need to start at the beginning 
             // of the line i.e. at 'anchor' position that is canculated depending on particular
@@ -156,7 +158,9 @@ namespace Microsoft.NodejsTools.Jade
             {
                 var ws = textSnapshot.GetText(span);
                 if (string.IsNullOrWhiteSpace(ws))
+                {
                     return classifications;
+                }
             }
 
             // Token collection at this point contains valid tokens at least to a point

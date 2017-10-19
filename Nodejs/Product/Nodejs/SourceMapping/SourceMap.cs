@@ -178,7 +178,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     }
 
                     intValue |= (uint)((mappedValue & ~VLQ_CONTINUATION_MASK) << shift);
-                    if (intValue > Int32.MaxValue)
+                    if (intValue > int.MaxValue)
                     {
                         throw new InvalidOperationException("invalid data in source map, value is outside of 32-bit range");
                     }

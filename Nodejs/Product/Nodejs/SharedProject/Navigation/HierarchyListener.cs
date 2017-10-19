@@ -243,17 +243,35 @@ namespace Microsoft.VisualStudioTools.Navigation
             private static uint GetItemId(object variantValue)
             {
                 if (variantValue == null)
+                {
                     return VSConstants.VSITEMID_NIL;
+                }
+
                 if (variantValue is int)
+                {
                     return (uint)(int)variantValue;
+                }
+
                 if (variantValue is uint)
+                {
                     return (uint)variantValue;
+                }
+
                 if (variantValue is short)
+                {
                     return (uint)(short)variantValue;
+                }
+
                 if (variantValue is ushort)
+                {
                     return (uint)(ushort)variantValue;
+                }
+
                 if (variantValue is long)
+                {
                     return (uint)(long)variantValue;
+                }
+
                 return VSConstants.VSITEMID_NIL;
             }
         }

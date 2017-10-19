@@ -22,7 +22,9 @@ namespace Microsoft.NodejsTools.Jade
             var clone = new OutlineRegionCollection(this.TextBufferVersion);
 
             foreach (var item in this)
+            {
                 clone.Add(item.Clone() as OutlineRegion);
+            }
 
             return clone;
         }

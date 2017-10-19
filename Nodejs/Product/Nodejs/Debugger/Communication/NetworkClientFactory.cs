@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             if (uri == null)
             {
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
             }
 
             if (uri.IsAbsoluteUri)
@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                     case "tcp":
                         if (uri.Port < 0)
                         {
-                            throw new ArgumentException("tcp:// URI must include port number", "uri");
+                            throw new ArgumentException("tcp:// URI must include port number", nameof(uri));
                         }
                         return new TcpNetworkClient(uri.Host, uri.Port);
                     case "ws":
@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                 }
             }
 
-            throw new ArgumentException("tcp://, ws:// or wss:// URI required", "uri");
+            throw new ArgumentException("tcp://, ws:// or wss:// URI required", nameof(uri));
         }
     }
 }

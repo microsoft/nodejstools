@@ -102,7 +102,10 @@ namespace Microsoft.VisualStudioTools.Project
                 var aggregateProjectFactory = (IVsCreateAggregateProject)this.Site.GetService(typeof(SVsCreateAggregateProject));
                 var hr = aggregateProjectFactory.CreateAggregateProject(guidsList, fileName, location, name, flags, ref projectGuid, out project);
                 if (hr == VSConstants.E_ABORT)
+                {
                     canceled = 1;
+                }
+
                 ErrorHandler.ThrowOnFailure(hr);
 
                 this.buildProject = null;
@@ -147,7 +150,9 @@ namespace Microsoft.VisualStudioTools.Project
             // Retrieve the list of GUIDs, if it is not specify, make it our GUID
             var guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
             if (string.IsNullOrEmpty(guids))
+            {
                 guids = this.GetType().GUID.ToString("B");
+            }
 
             return guids;
         }

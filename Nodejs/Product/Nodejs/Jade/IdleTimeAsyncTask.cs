@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -43,7 +43,9 @@ namespace Microsoft.NodejsTools.Jade
             Debug.Assert(taskAction != null);
 
             if (taskAction == null)
-                throw new ArgumentNullException("taskAction");
+            {
+                throw new ArgumentNullException(nameof(taskAction));
+            }
 
             this._taskAction = taskAction;
             this._callbackAction = callbackAction;
@@ -83,7 +85,9 @@ namespace Microsoft.NodejsTools.Jade
         public void DoTaskNow()
         {
             if (Interlocked.Read(ref this._closed) == 0)
+            {
                 DoTaskInternal();
+            }
         }
 
         /// <summary>
@@ -92,10 +96,14 @@ namespace Microsoft.NodejsTools.Jade
         public void DoTaskOnIdle()
         {
             if (this._taskAction == null)
+            {
                 throw new InvalidOperationException("Task action is null");
+            }
 
             if (Interlocked.Read(ref this._closed) == 0)
+            {
                 ConnectToIdle();
+            }
         }
 
         /// <summary>
@@ -105,12 +113,16 @@ namespace Microsoft.NodejsTools.Jade
         public void DoTaskOnIdle(int msDelay)
         {
             if (this._taskAction == null)
+            {
                 throw new InvalidOperationException("Task action is null");
+            }
 
             this._delay = msDelay;
 
             if (Interlocked.Read(ref this._closed) == 0)
+            {
                 ConnectToIdle();
+            }
         }
 
         /// <summary>
@@ -122,10 +134,14 @@ namespace Microsoft.NodejsTools.Jade
         public void DoTaskOnIdle(Func<object> taskAction, Action<object> callbackAction, Action<object> cancelAction, object tag = null)
         {
             if (this.TaskRunning)
+            {
                 throw new InvalidOperationException("Task is running");
+            }
 
             if (taskAction == null)
-                throw new ArgumentNullException("taskAction");
+            {
+                throw new ArgumentNullException(nameof(taskAction));
+            }
 
             this.Tag = tag;
 

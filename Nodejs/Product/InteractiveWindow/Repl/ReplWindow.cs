@@ -3297,7 +3297,7 @@ namespace Microsoft.NodejsTools.Repl
             List<SpanRangeEdit> spanEdits = new List<SpanRangeEdit>();
 
             // a span in the new snapshot that includes all line changes:
-            int newMinPosition = Int32.MaxValue;
+            int newMinPosition = int.MaxValue;
             int newMaxPosition = -1;
 
             // changes are sorted by position

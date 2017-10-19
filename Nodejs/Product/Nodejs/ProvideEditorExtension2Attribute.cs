@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -42,13 +42,21 @@ namespace Microsoft.NodejsTools
         {
             // figure out what type of object they passed in and get the GUID from it
             if (factoryType is string)
+            {
                 this._factory = new Guid((string)factoryType);
+            }
             else if (factoryType is Type)
+            {
                 this._factory = ((Type)factoryType).GUID;
+            }
             else if (factoryType is Guid)
+            {
                 this._factory = (Guid)factoryType;
+            }
             else
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "invalid factory type: {0}", factoryType));
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "invalid factory type: {0}", factoryType), nameof(factoryType));
+            }
 
             this._extension = extension;
             this._priority = priority;
@@ -170,9 +178,14 @@ namespace Microsoft.NodejsTools
                     editorKey.SetValue(null, this.DefaultName);
                 }
                 if (0 != this._editorNameResId)
+                {
                     editorKey.SetValue("DisplayName", "#" + this._editorNameResId.ToString(CultureInfo.InvariantCulture));
+                }
                 else if (0 != this._resId)
+                {
                     editorKey.SetValue("DisplayName", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                }
+
                 if (this._linkedEditorGuid != Guid.Empty)
                 {
                     editorKey.SetValue("LinkedEditorGuid", this._linkedEditorGuid.ToString("B"));
@@ -193,7 +206,7 @@ namespace Microsoft.NodejsTools
                     foreach (var extension in this._extensions)
                     {
                         var extensionAndPri = extension.Split(':');
-                        if (extensionAndPri.Length != 2 || !Int32.TryParse(extensionAndPri[1], out var pri))
+                        if (extensionAndPri.Length != 2 || !int.TryParse(extensionAndPri[1], out var pri))
                         {
                             throw new InvalidOperationException("Expected extension:priority");
                         }
@@ -210,7 +223,10 @@ namespace Microsoft.NodejsTools
                 using (var projectKey = context.CreateKey(prjRegKey))
                 {
                     if (0 != this._resId)
+                    {
                         projectKey.SetValue("", "#" + this._resId.ToString(CultureInfo.InvariantCulture));
+                    }
+
                     if (this._templateDir.Length != 0)
                     {
                         var url = new Uri(context.ComponentType.Assembly.CodeBase);
@@ -229,7 +245,9 @@ namespace Microsoft.NodejsTools
                 // The IVsEditorFactoryNotify interface is called by the project system, so it doesn't make sense to
                 // register it if there is no project associated to this editor.
                 if (this._project == Guid.Empty)
-                    throw new ArgumentException("project");
+                {
+                    throw new InvalidOperationException("No project associated.");
+                }
 
                 // Create the registry key
                 using (var edtFactoryNotifyKey = context.CreateKey(this.EditorFactoryNotifyKey))
@@ -251,7 +269,9 @@ namespace Microsoft.NodejsTools
             {
                 context.RemoveKey(ProjectRegKeyName(context));
                 if (this.EditorFactoryNotify)
+                {
                     context.RemoveKey(this.EditorFactoryNotifyKey);
+                }
             }
         }
     }

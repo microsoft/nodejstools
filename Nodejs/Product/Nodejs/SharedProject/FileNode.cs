@@ -389,9 +389,15 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(this.ProjectMgr != null, " The project manager is null for the filenode");
             HierarchyNode handlerNode = this;
             while (handlerNode != null && !(handlerNode is ProjectNode || handlerNode is FolderNode))
+            {
                 handlerNode = handlerNode.Parent;
+            }
+
             if (handlerNode == null)
+            {
                 handlerNode = this.ProjectMgr;
+            }
+
             return handlerNode;
         }
 
@@ -594,7 +600,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 case __VSHPROPID.VSHPROPID_ItemDocCookie:
                     if (this.DocCookie != 0)
+                    {
                         return (IntPtr)this.DocCookie; //cast to IntPtr as some callers expect VT_INT
+                    }
+
                     break;
             }
             return base.GetProperty(propId);
@@ -823,7 +832,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var pRDT = this.GetService(typeof(IVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (pRDT == null)
+            {
                 return false;
+            }
+
             var docData = IntPtr.Zero;
 
             SuspendFileChanges sfc = null;

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             if (this._container == null)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
 
             string stringIndex = index as string;
@@ -220,11 +220,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             IList<ReferenceNode> refs = this._container.EnumReferences();
             if (null == refs)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             if ((intIndex <= 0) || (intIndex > refs.Count))
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             // Let the implementation of IList<> throw in case of index not correct.
             return refs[intIndex - 1].Object as Reference;

@@ -38,9 +38,13 @@ namespace Microsoft.VisualStudioTools.Project
 
                 var hr = propertyPageFrame.ShowFrame(Guid.Empty);
                 if (ErrorHandler.Succeeded(hr))
+                {
                     return true;
+                }
                 else
+                {
                     ErrorHandler.ThrowOnFailure(propertyPageFrame.ReportError(hr));
+                }
             }
 
             return false;

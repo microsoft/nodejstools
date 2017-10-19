@@ -193,11 +193,17 @@ namespace Microsoft.NodejsTools.Repl
                     int middle = (low + high) / 2;
                     ITextViewLine middleLine = lines[middle];
                     if (span.Start < middleLine.Start)
+                    {
                         high = middle;
+                    }
                     else if (span.Start >= middleLine.EndIncludingLineBreak)
+                    {
                         low = middle + 1;
+                    }
                     else
+                    {
                         return middleLine;
+                    }
                 }
 
                 if (returnLastLine)
@@ -228,7 +234,9 @@ namespace Microsoft.NodejsTools.Repl
 
                 _deltaY = Canvas.GetTop(element);
                 if (double.IsNaN(_deltaY))
+                {
                     _deltaY = 0.0;
+                }
             }
 
             public SnapshotSpan? VisualSpan { get { return _visualSpan; } }

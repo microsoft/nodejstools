@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
                 {
-                    if (Int32.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out var port))
+                    if (int.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out var port))
                     {
                         return port;
                     }

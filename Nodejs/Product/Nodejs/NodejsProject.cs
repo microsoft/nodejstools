@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -168,7 +168,9 @@ namespace Microsoft.NodejsTools
 
             // Ensure we have a service provider as this is required for menu items to work
             if (this.serviceProvider == null)
+            {
                 this.serviceProvider = (System.IServiceProvider)this._package;
+            }
 
             // Now let the base implementation set the inner object
             base.SetInnerProject(innerIUnknown);
@@ -566,9 +568,13 @@ namespace Microsoft.NodejsTools
                         // Guids are separated by ';' so if we remove the last one also remove the last ';'
                         var index2 = index + s.Length + 1;
                         if (index2 >= propertyPagesList.Length)
+                        {
                             propertyPagesList = propertyPagesList.Substring(0, index).TrimEnd(';');
+                        }
                         else
+                        {
                             propertyPagesList = propertyPagesList.Substring(0, index) + propertyPagesList.Substring(index2);
+                        }
                     }
                 }
             }
@@ -829,7 +835,7 @@ namespace Microsoft.NodejsTools
             System.IServiceProvider site
         )
         {
-            Utilities.ArgumentNotNull("project", project);
+            Utilities.ArgumentNotNull(nameof(project), project);
 
             ErrorHandler.ThrowOnFailure(project.GetProperty(
                 (uint)VSConstants.VSITEMID.Root,
@@ -951,7 +957,7 @@ namespace Microsoft.NodejsTools
         {
             if (lines == null)
             {
-                throw new ArgumentException("lines");
+                throw new ArgumentException("No IVsTextLines specified", nameof(lines));
             }
 
             ErrorHandler.ThrowOnFailure(lines.GetLastLineIndex(out var lastLine, out var lastIndex));
@@ -1046,7 +1052,7 @@ namespace Microsoft.NodejsTools
             var isWorker = roleType == "Worker";
             if (isWeb == isWorker)
             {
-                throw new ArgumentException("Unknown role type: " + (roleType ?? "(null)"), "roleType");
+                throw new ArgumentException("Unknown role type: " + (roleType ?? "(null)"), nameof(roleType));
             }
 
             var nav = doc.CreateNavigator();

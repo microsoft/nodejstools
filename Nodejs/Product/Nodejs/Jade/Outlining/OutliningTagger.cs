@@ -24,7 +24,9 @@ namespace Microsoft.NodejsTools.Jade
         public IEnumerable<ITagSpan<IOutliningRegionTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
             if (spans.Count == 0 || this._currentRegions == null || this._currentRegions.Count == 0)
+            {
                 yield break;
+            }
 
             var snapshot = this._textBuffer.CurrentSnapshot;
             var entire = new SnapshotSpan(spans[0].Start, spans[spans.Count - 1].End).TranslateTo(snapshot, SpanTrackingMode.EdgeExclusive);

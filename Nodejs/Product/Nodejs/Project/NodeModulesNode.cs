@@ -681,21 +681,30 @@ namespace Microsoft.NodejsTools.Project
         private static IEnumerable<IPackage> GetDevPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
         }
 
         private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
         }
 
         private static IEnumerable<IPackage> GetRootPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package =>
                 package.IsDependency || !package.IsListedInParentPackageJson);
         }

@@ -2087,7 +2087,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 try
                 {
-                    options.WarningLevel = Int32.Parse(warningLevel, CultureInfo.InvariantCulture);
+                    options.WarningLevel = int.Parse(warningLevel, CultureInfo.InvariantCulture);
                 }
                 catch (ArgumentNullException e)
                 {
@@ -2227,14 +2227,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="strPath">Path of the folder, can be relative to project or absolute</param>
         public virtual HierarchyNode CreateFolderNodes(string path, bool createOnDisk = true)
         {
-            Utilities.ArgumentNotNull("path", path);
+            Utilities.ArgumentNotNull(nameof(path), path);
 
             if (Path.IsPathRooted(path))
             {
                 // Ensure we are using a path deeper than ProjectHome
                 if (!CommonUtils.IsSubpathOf(this.ProjectHome, path))
                 {
-                    throw new ArgumentException("The path is not within the project", "path");
+                    throw new ArgumentException("The path is not within the project", nameof(path));
                 }
 
                 path = CommonUtils.GetRelativeDirectoryPath(this.ProjectHome, path);
@@ -4279,7 +4279,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (string.IsNullOrEmpty(tempFileToBeSaved))
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileToBeSaved");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileToBeSaved));
             }
 
             var setProjectFileDirtyAfterSave = 0;
@@ -5060,14 +5060,14 @@ If the files in the existing folder have the same names as files in the folder y
             // Init output params
             frame = null;
 
-            var n = this.NodeFromItemId(itemId);
-            if (n == null)
+            var node = this.NodeFromItemId(itemId);
+            if (node == null)
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), nameof(itemId));
             }
 
             // Delegate to the document manager object that knows how to open the item
-            var documentManager = n.GetDocumentManager();
+            var documentManager = node.GetDocumentManager();
             if (documentManager != null)
             {
                 return documentManager.Open(ref logicalView, punkDocDataExisting, out frame, WindowFrameShowAction.DoNotShow);
@@ -5082,14 +5082,14 @@ If the files in the existing folder have the same names as files in the folder y
             // Init output params
             frame = null;
 
-            var n = this.NodeFromItemId(itemId);
-            if (n == null)
+            var node = this.NodeFromItemId(itemId);
+            if (node == null)
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), nameof(itemId));
             }
 
             // Delegate to the document manager object that knows how to open the item
-            var documentManager = n.GetDocumentManager();
+            var documentManager = node.GetDocumentManager();
             if (documentManager != null)
             {
                 return documentManager.OpenWithSpecific(editorFlags, ref editorType, physicalView, ref logicalView, docDataExisting, out frame, WindowFrameShowAction.DoNotShow);
@@ -5101,12 +5101,12 @@ If the files in the existing folder have the same names as files in the folder y
 
         public virtual int RemoveItem(uint reserved, uint itemId, out int result)
         {
-            var n = this.NodeFromItemId(itemId);
-            if (n == null)
+            var node = this.NodeFromItemId(itemId);
+            if (node == null)
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), nameof(itemId));
             }
-            n.Remove(true);
+            node.Remove(true);
             result = 1;
             return VSConstants.S_OK;
         }
@@ -5116,14 +5116,14 @@ If the files in the existing folder have the same names as files in the folder y
             // Init output params
             frame = null;
 
-            var n = this.NodeFromItemId(itemId);
-            if (n == null)
+            var node = this.NodeFromItemId(itemId);
+            if (node == null)
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), "itemId");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidItemId), nameof(itemId));
             }
 
             // Delegate to the document manager object that knows how to open the item
-            var documentManager = n.GetDocumentManager();
+            var documentManager = node.GetDocumentManager();
             if (documentManager != null)
             {
                 return documentManager.ReOpenWithSpecific(0, ref editorType, physicalView, ref logicalView, docDataExisting, out frame, WindowFrameShowAction.DoNotShow);
@@ -5298,17 +5298,17 @@ If the files in the existing folder have the same names as files in the folder y
         /// <summary>
         /// This method is called to determine which files should be placed under source control for a given VSITEMID within this hierarchy.
         /// </summary>
-        /// <param name="itemid">Identifier for the VSITEMID being queried.</param>
+        /// <param name="itemId">Identifier for the VSITEMID being queried.</param>
         /// <param name="stringsOut">Pointer to an array of CALPOLESTR strings containing the file names for this item.</param>
         /// <param name="flagsOut">Pointer to a CADWORD array of flags stored in DWORDs indicating that some of the files have special behaviors.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
-        public virtual int GetSccFiles(uint itemid, CALPOLESTR[] stringsOut, CADWORD[] flagsOut)
+        public virtual int GetSccFiles(uint itemId, CALPOLESTR[] stringsOut, CADWORD[] flagsOut)
         {
-            if (itemid == VSConstants.VSITEMID_SELECTION)
+            if (itemId == VSConstants.VSITEMID_SELECTION)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(itemId));
             }
-            else if (itemid == VSConstants.VSITEMID_ROOT)
+            else if (itemId == VSConstants.VSITEMID_ROOT)
             {
                 // Root node.  Return our project file path.
                 if (stringsOut != null && stringsOut.Length > 0)
@@ -5324,10 +5324,10 @@ If the files in the existing folder have the same names as files in the folder y
             }
 
             // otherwise delegate to either a file or a folder to get the SCC files
-            var n = this.NodeFromItemId(itemid);
+            var n = this.NodeFromItemId(itemId);
             if (n == null)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(itemId));
             }
 
             var files = new List<string>();
@@ -5367,30 +5367,30 @@ If the files in the existing folder have the same names as files in the folder y
         /// <summary>
         /// This method is called to discover special (hidden files) associated with a given VSITEMID within this hierarchy. 
         /// </summary>
-        /// <param name="itemid">Identifier for the VSITEMID being queried.</param>
+        /// <param name="itemId">Identifier for the VSITEMID being queried.</param>
         /// <param name="sccFile">One of the files associated with the node</param>
         /// <param name="stringsOut">Pointer to an array of CALPOLESTR strings containing the file names for this item.</param>
         /// <param name="flagsOut">Pointer to a CADWORD array of flags stored in DWORDs indicating that some of the files have special behaviors.</param>
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         /// <remarks>This method is called to discover any special or hidden files associated with an item in the project hierarchy. It is called when GetSccFiles returns with the SFF_HasSpecialFiles flag set for any of the files associated with the node.</remarks>
-        public virtual int GetSccSpecialFiles(uint itemid, string sccFile, CALPOLESTR[] stringsOut, CADWORD[] flagsOut)
+        public virtual int GetSccSpecialFiles(uint itemId, string sccFile, CALPOLESTR[] stringsOut, CADWORD[] flagsOut)
         {
-            if (itemid == VSConstants.VSITEMID_SELECTION)
+            if (itemId == VSConstants.VSITEMID_SELECTION)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(itemId));
             }
 
-            var n = this.NodeFromItemId(itemid);
-            if (n == null)
+            var node = this.NodeFromItemId(itemId);
+            if (node == null)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemid");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(itemId));
             }
 
             var files = new List<string>();
 
             var flags = new List<tagVsSccFilesFlags>();
 
-            n.GetSccSpecialFiles(sccFile, files, flags);
+            node.GetSccSpecialFiles(sccFile, files, flags);
 
             if (stringsOut != null && stringsOut.Length > 0)
             {
@@ -5426,13 +5426,13 @@ If the files in the existing folder have the same names as files in the folder y
             {
                 for (var i = 0; i < affectedNodes; i++)
                 {
-                    var n = this.NodeFromItemId(itemidAffectedNodes[i]);
-                    if (n == null)
+                    var node = this.NodeFromItemId(itemidAffectedNodes[i]);
+                    if (node == null)
                     {
-                        throw new ArgumentException(SR.GetString(SR.InvalidParameter), "itemidAffectedNodes");
+                        throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(itemidAffectedNodes));
                     }
 
-                    ReDrawNode(n, UIHierarchyElement.SccState);
+                    ReDrawNode(node, UIHierarchyElement.SccState);
                 }
             }
             return VSConstants.S_OK;
@@ -5654,18 +5654,18 @@ If the files in the existing folder have the same names as files in the folder y
         /// <summary>
         /// Get the property of an item
         /// </summary>
-        /// <param name="item">ItemID</param>
+        /// <param name="itemId">ItemID</param>
         /// <param name="attributeName">Name of the property</param>
         /// <param name="attributeValue">Value of the property (out parameter)</param>
         /// <returns>HRESULT</returns>
-        int IVsBuildPropertyStorage.GetItemAttribute(uint item, string attributeName, out string attributeValue)
+        int IVsBuildPropertyStorage.GetItemAttribute(uint itemId, string attributeName, out string attributeValue)
         {
             attributeValue = null;
 
-            var node = NodeFromItemId(item);
+            var node = NodeFromItemId(itemId);
             if (node == null)
             {
-                throw new ArgumentException("Invalid item id", "item");
+                throw new ArgumentException("Invalid item id", nameof(itemId));
             }
 
             if (node.ItemNode != null)
@@ -5726,17 +5726,17 @@ If the files in the existing folder have the same names as files in the folder y
         /// <summary>
         /// Set a property on an item
         /// </summary>
-        /// <param name="item">ItemID</param>
+        /// <param name="itemId">ItemID</param>
         /// <param name="attributeName">Name of the property</param>
         /// <param name="attributeValue">New value for the property</param>
         /// <returns>HRESULT</returns>
-        int IVsBuildPropertyStorage.SetItemAttribute(uint item, string attributeName, string attributeValue)
+        int IVsBuildPropertyStorage.SetItemAttribute(uint itemId, string attributeName, string attributeValue)
         {
-            var node = NodeFromItemId(item);
+            var node = NodeFromItemId(itemId);
 
             if (node == null)
             {
-                throw new ArgumentException("Invalid item id", "item");
+                throw new ArgumentException("Invalid item id", nameof(itemId));
             }
 
             node.ItemNode.SetMetadata(attributeName, attributeValue);

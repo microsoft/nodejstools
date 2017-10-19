@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         catch (FormatException)
                         {
                             // Not a valid guid
-                            throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), "viewKind");
+                            throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), nameof(viewKind));
                         }
                         var rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                         if (rdt == null)
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             catch (FormatException)
             {
                 // Not a valid guid
-                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), "viewKind");
+                throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), nameof(viewKind));
             }
 
             var isOpen = false;
@@ -229,8 +229,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-
-
                     isOpen = VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, logicalViewGuid, out var hier, out var itemid, out var windowFrame);
                 });
             }

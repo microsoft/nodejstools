@@ -1816,8 +1816,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            Utilities.ArgumentNotNull("files", files);
-            Utilities.ArgumentNotNull("flags", flags);
+            Utilities.ArgumentNotNull(nameof(files), files);
+            Utilities.ArgumentNotNull(nameof(flags), flags);
         }
 
         /// <summary>

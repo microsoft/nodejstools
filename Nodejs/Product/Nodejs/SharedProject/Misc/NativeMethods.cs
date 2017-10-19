@@ -514,10 +514,14 @@ namespace Microsoft.VisualStudioTools.Project
                 var pCmdText = (Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT)Marshal.PtrToStructure(pCmdTextInt, typeof(Microsoft.VisualStudio.OLE.Interop.OLECMDTEXT));
 
                 if ((pCmdText.cmdtextf & (int)OLECMDTEXTF.OLECMDTEXTF_NAME) != 0)
+                {
                     return OLECMDTEXTF.OLECMDTEXTF_NAME;
+                }
 
                 if ((pCmdText.cmdtextf & (int)OLECMDTEXTF.OLECMDTEXTF_STATUS) != 0)
+                {
                     return OLECMDTEXTF.OLECMDTEXTF_STATUS;
+                }
 
                 return OLECMDTEXTF.OLECMDTEXTF_NONE;
             }

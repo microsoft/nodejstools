@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Project
             this._project = project;
 
             var portNumber = this._project.GetProjectProperty(NodeProjectProperty.NodejsPort);
-            if (Int32.TryParse(portNumber, out var portNum))
+            if (int.TryParse(portNumber, out var portNum))
             {
                 this._testServerPort = portNum;
             }

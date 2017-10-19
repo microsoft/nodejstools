@@ -99,7 +99,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (isSupportedView)
+            {
                 return VSConstants.S_OK;
+            }
             else
             {
                 // E_NOTIMPL must be returned for any unrecognized rguidLogicalView values

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -156,7 +156,9 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var property = GetMsBuildProperty(propertyName, resetCache);
             if (property == null)
+            {
                 return null;
+            }
 
             return property.EvaluatedValue;
         }
@@ -466,18 +468,18 @@ namespace Microsoft.VisualStudioTools.Project
             // Are they only asking for the number of groups?
             if (celt == 0)
             {
-                if ((null == pcActual) || (0 == pcActual.Length))
+                if (pcActual == null || pcActual.Length == 0)
                 {
-                    throw new ArgumentNullException("pcActual");
+                    throw new ArgumentNullException(nameof(pcActual));
                 }
                 pcActual[0] = (uint)this.OutputGroups.Count;
                 return VSConstants.S_OK;
             }
 
             // Check that the array of output groups is not null
-            if ((null == rgpcfg) || (rgpcfg.Length == 0))
+            if (rgpcfg == null || rgpcfg.Length == 0)
             {
-                throw new ArgumentNullException("rgpcfg");
+                throw new ArgumentNullException(nameof(rgpcfg));
             }
 
             // Fill the array with our output groups
@@ -492,7 +494,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (pcActual != null && pcActual.Length > 0)
+            {
                 pcActual[0] = count;
+            }
 
             // If the number asked for does not match the number returned, return S_FALSE
             return (count == celt) ? VSConstants.S_OK : VSConstants.S_FALSE;
@@ -589,7 +593,9 @@ namespace Microsoft.VisualStudioTools.Project
             var current = GetCurrentConfig(resetCache);
 
             if (current == null)
+            {
                 throw new Exception("Failed to retrieve properties");
+            }
 
             // return property asked for
             return current.GetProperty(propertyName);
@@ -603,11 +609,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // We do not check whether the supportsProjectDesigner is set to true on the ProjectNode.
             // We rely that the caller knows what to call on us.
-            Utilities.ArgumentNotNull("pages", pages);
+            Utilities.ArgumentNotNull(nameof(pages), pages);
 
             if (pages.Length == 0)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "pages");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(pages));
             }
 
             // Retrive the list of guids from hierarchy properties.
@@ -879,7 +885,9 @@ namespace Microsoft.VisualStudioTools.Project
 
             // If not supported
             if (ppCfg == IntPtr.Zero)
+            {
                 return VSConstants.E_NOINTERFACE;
+            }
 
             return VSConstants.S_OK;
         }
@@ -919,27 +927,45 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int QueryStartBuild(uint options, int[] supported, int[] ready)
         {
             if (supported != null && supported.Length > 0)
+            {
                 supported[0] = 1;
+            }
+
             if (ready != null && ready.Length > 0)
+            {
                 ready[0] = (this.config.ProjectMgr.BuildInProgress) ? 0 : 1;
+            }
+
             return VSConstants.S_OK;
         }
 
         public virtual int QueryStartClean(uint options, int[] supported, int[] ready)
         {
             if (supported != null && supported.Length > 0)
+            {
                 supported[0] = 1;
+            }
+
             if (ready != null && ready.Length > 0)
+            {
                 ready[0] = (this.config.ProjectMgr.BuildInProgress) ? 0 : 1;
+            }
+
             return VSConstants.S_OK;
         }
 
         public virtual int QueryStartUpToDateCheck(uint options, int[] supported, int[] ready)
         {
             if (supported != null && supported.Length > 0)
+            {
                 supported[0] = 1;
+            }
+
             if (ready != null && ready.Length > 0)
+            {
                 ready[0] = (this.config.ProjectMgr.BuildInProgress) ? 0 : 1;
+            }
+
             return VSConstants.S_OK;
         }
 

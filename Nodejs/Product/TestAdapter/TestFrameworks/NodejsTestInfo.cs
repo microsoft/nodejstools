@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             var parts = fullyQualifiedName.Split(new[] { "::" }, StringSplitOptions.None);
             if (parts.Length != 3)
             {
-                throw new ArgumentException("Invalid fully qualified test name");
+                throw new ArgumentException("Invalid fully qualified test name", nameof(fullyQualifiedName));
             }
             this.ModulePath = parts[0];
             this.TestName = parts[1];

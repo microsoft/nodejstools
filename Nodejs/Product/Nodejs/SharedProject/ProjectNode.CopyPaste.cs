@@ -983,7 +983,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // Split the reference in its 3 parts
                 var index1 = Guid.Empty.ToString("B").Length;
                 if (index1 + 1 >= projectReference.Length)
-                    throw new ArgumentOutOfRangeException("folderToAdd");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(projectReference));
+                }
 
                 // Get the Guid
                 var guidString = projectReference.Substring(1, index1 - 2);
@@ -992,7 +994,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // Get the project path
                 var index2 = projectReference.IndexOf('|', index1 + 1);
                 if (index2 < 0 || index2 + 1 >= projectReference.Length)
-                    throw new ArgumentOutOfRangeException("folderToAdd");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(projectReference));
+                }
 
                 // Finally get the source path
                 folder = projectReference.Substring(index2 + 1);
@@ -1605,10 +1609,15 @@ namespace Microsoft.VisualStudioTools.Project
                 var result = new VSADDRESULT[1];
                 ErrorHandler.ThrowOnFailure(this.AddItem(parentNode.ID, VSADDITEMOPERATION.VSADDITEMOP_OPENFILE, name, 1, new string[] { targetPath }, IntPtr.Zero, result));
                 if (result[0] != VSADDRESULT.ADDRESULT_Success)
+                {
                     throw new Exception();
+                }
+
                 newNode = this.FindNodeByFullPath(targetPath);
                 if (newNode == null)
+                {
                     throw new Exception();
+                }
             }
             else if (Directory.Exists(targetPath))
             {
@@ -1768,11 +1777,15 @@ namespace Microsoft.VisualStudioTools.Project
                 // First see if this is a set of storage based items
                 var format = DragDropHelper.CreateFormatEtc((ushort)DragDropHelper.CF_VSSTGPROJECTITEMS);
                 if (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK)
+                {
                     return true;
+                }
                 // Try reference based items
                 format = DragDropHelper.CreateFormatEtc((ushort)DragDropHelper.CF_VSREFPROJECTITEMS);
                 if (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK)
+                {
                     return true;
+                }
                 // Try windows explorer files format
                 format = DragDropHelper.CreateFormatEtc((ushort)NativeMethods.CF_HDROP);
                 return (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK);
@@ -2069,11 +2082,15 @@ namespace Microsoft.VisualStudioTools.Project
 
             // CTRL
             if ((grfKeyState & NativeMethods.MK_CONTROL) != 0)
+            {
                 return DropEffect.Copy;
+            }
 
             // SHIFT
             if ((grfKeyState & NativeMethods.MK_SHIFT) != 0)
+            {
                 return DropEffect.Move;
+            }
 
             // no modifier
             if (this._dragging)
@@ -2183,7 +2200,9 @@ namespace Microsoft.VisualStudioTools.Project
             finally
             {
                 if (data != IntPtr.Zero)
+                {
                     UnsafeNativeMethods.GlobalUnLock(data);
+                }
             }
 
             return ptr;

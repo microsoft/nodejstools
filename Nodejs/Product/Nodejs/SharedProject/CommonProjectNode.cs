@@ -128,7 +128,10 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 if (this._vsProject == null)
+                {
                     this._vsProject = new OAVSProject(this);
+                }
+
                 return this._vsProject;
             }
         }
@@ -1841,7 +1844,9 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("propertyName", propertyName);
 
             if (this._userBuildProject == null)
+            {
                 return null;
+            }
 
             // If user project file exists during project load/reload userBuildProject is initiated 
             return this._userBuildProject.GetPropertyValue(propertyName);
@@ -1858,7 +1863,9 @@ namespace Microsoft.VisualStudioTools.Project
 
             //Validate input
             if (string.IsNullOrEmpty(mkDocument))
-                throw new ArgumentException("Was null or empty", "mkDocument");
+            {
+                throw new ArgumentException("Was null or empty", nameof(mkDocument));
+            }
 
             // Make sure that the document moniker passed to us is part of this project
             // We also don't care if it is not a dynamic language file node
@@ -1869,7 +1876,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
             var hierNode = NodeFromItemId(itemid);
             if (hierNode == null || ((hierNode as CommonFileNode) == null))
+            {
                 return VSConstants.E_NOTIMPL;
+            }
 
             switch (propid)
             {

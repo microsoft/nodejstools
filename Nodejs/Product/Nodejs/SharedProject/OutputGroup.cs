@@ -160,7 +160,10 @@ namespace Microsoft.VisualStudioTools.Project
 
             var hr = this.get_CanonicalName(out var description);
             if (ErrorHandler.Succeeded(hr))
+            {
                 pbstrDescription = this.Project.GetOutputGroupDescription(description);
+            }
+
             return hr;
         }
 
@@ -170,7 +173,10 @@ namespace Microsoft.VisualStudioTools.Project
 
             var hr = this.get_CanonicalName(out var displayName);
             if (ErrorHandler.Succeeded(hr))
+            {
                 pbstrDisplayName = this.Project.GetOutputGroupDisplayName(displayName);
+            }
+
             return hr;
         }
 
@@ -178,7 +184,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrCanonicalName = null;
             if (this._keyOutput == null)
+            {
                 Refresh();
+            }
+
             if (this._keyOutput == null)
             {
                 pbstrCanonicalName = string.Empty;
@@ -202,7 +211,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
             ppKeyOutput = this._keyOutput;
             if (ppKeyOutput == null)
+            {
                 return VSConstants.S_FALSE;
+            }
+
             return VSConstants.S_OK;
         }
 
@@ -225,7 +237,10 @@ namespace Microsoft.VisualStudioTools.Project
             if (celt == 0 || rgpcfg == null)
             {
                 if (pcActual != null && pcActual.Length > 0)
+                {
                     pcActual[0] = (uint)this._outputs.Count;
+                }
+
                 return VSConstants.S_OK;
             }
 
@@ -241,7 +256,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (pcActual != null && pcActual.Length > 0)
+            {
                 pcActual[0] = count;
+            }
 
             // If the number asked for does not match the number returned, return S_FALSE
             return (count == celt) ? VSConstants.S_OK : VSConstants.S_FALSE;

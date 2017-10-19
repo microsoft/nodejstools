@@ -44,7 +44,9 @@ namespace Microsoft.NodejsTools.Jade
         {
             // Figure out regions based on line indent
             if (snapshot.LineCount == 0)
+            {
                 return;
+            }
 
             var regionStack = new Stack<CodeBlock>();
             var lineLengths = new int[snapshot.LineCount];
@@ -66,9 +68,13 @@ namespace Microsoft.NodejsTools.Jade
                 var indent = GetLineIndent(line);
 
                 if (regionStack.Count > 0)
+                {
                     lastBlockIndent = regionStack.Peek().Indent;
+                }
                 else
+                {
                     lastBlockIndent = 0;
+                }
 
                 if (indent <= lastBlockIndent)
                 {
@@ -87,7 +93,9 @@ namespace Microsoft.NodejsTools.Jade
                         for (; j >= 0; j--)
                         {
                             if (lineLengths[j] > 0)
+                            {
                                 break;
+                            }
                         }
 
                         j++;
@@ -97,14 +105,18 @@ namespace Microsoft.NodejsTools.Jade
                             var prevLine = snapshot.GetLineFromLineNumber(j - 1);
 
                             if (prevCodeBlock.Start < prevLine.End)
+                            {
                                 newRegions.Add(OutlineRegion.FromBounds(snapshot.TextBuffer, prevCodeBlock.Start, prevLine.End));
+                            }
                         }
 
                         if (regionStack.Count > 0)
                         {
                             prevCodeBlock = regionStack.Peek();
                             if (prevCodeBlock.Indent < indent)
+                            {
                                 break;
+                            }
                         }
                     }
                 }
@@ -125,7 +137,9 @@ namespace Microsoft.NodejsTools.Jade
                     var indent = GetLineIndent(prevLine);
 
                     if (indent == codeBlock.Indent)
+                    {
                         regionStack.Pop();
+                    }
                 }
             }
 
@@ -147,7 +161,9 @@ namespace Microsoft.NodejsTools.Jade
             {
                 var ch = line.Snapshot.GetText(i, 1)[0];
                 if (!Char.IsWhiteSpace(ch))
+                {
                     return i - line.Start;
+                }
             }
 
             return 0;
