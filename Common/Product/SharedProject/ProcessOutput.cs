@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (string.IsNullOrEmpty(filename))
             {
-                throw new ArgumentException("Filename required", "filename");
+                throw new ArgumentException("Filename required", nameof(filename));
             }
             if (elevate)
             {

@@ -36,8 +36,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (project != null && this.discoverer.IsProjectKnown(project))
             {
                 var buildEngine = new MSBuild.ProjectCollection();
-                string projectPath;
-                if (project.TryGetProjectPath(out projectPath))
+                if (project.TryGetProjectPath(out var projectPath))
                 {
                     var proj = buildEngine.LoadProject(projectPath);
 

@@ -148,9 +148,14 @@ namespace Microsoft.VisualStudioTools.Parsing
         public static int Compare(SourceLocation left, SourceLocation right)
         {
             if (left < right)
+            {
                 return -1;
+            }
+
             if (left > right)
+            {
                 return 1;
+            }
 
             return 0;
         }
@@ -179,7 +184,9 @@ namespace Microsoft.VisualStudioTools.Parsing
         public override bool Equals(object obj)
         {
             if (!(obj is SourceLocation))
+            {
                 return false;
+            }
 
             var other = (SourceLocation)obj;
             return other._index == this._index && other._line == this._line && other._column == this._column;

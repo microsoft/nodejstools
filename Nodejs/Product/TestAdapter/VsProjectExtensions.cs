@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -16,13 +16,12 @@ namespace Microsoft.VisualStudioTools.TestAdapter
     {
         internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy)
         {
-            object project;
 
             ErrorHandler.ThrowOnFailure(
                 hierarchy.GetProperty(
                     VSConstants.VSITEMID_ROOT,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
-                    out project
+                    out var project
                 )
             );
 
@@ -37,8 +36,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             ValidateArg.NotNull(project, "project");
 
             var projectHierarchy = (IVsHierarchy)project;
-            object projectName;
-            ErrorHandler.ThrowOnFailure(projectHierarchy.GetProperty((uint)VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_Name, out projectName));
+            ErrorHandler.ThrowOnFailure(projectHierarchy.GetProperty((uint)VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_Name, out var projectName));
             return (string)projectName;
         }
 
@@ -125,11 +123,10 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             Debug.Assert(project != null);
             var hier = (IVsHierarchy)project;
-            object extObject;
             ErrorHandler.ThrowOnFailure(hier.GetProperty(
                 (uint)VSConstants.VSITEMID.Root,
                 (int)__VSHPROPID.VSHPROPID_ExtObject,
-                out extObject
+                out var extObject
             ));
             var proj = extObject as EnvDTE.Project;
             if (proj == null)
@@ -163,8 +160,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         /// </summary>
         public static IEnumerable<string> GetProjectItemPaths(this IVsProject project)
         {
-            string path;
-            ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path));
+            ErrorHandler.ThrowOnFailure(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out var path));
             if (string.IsNullOrEmpty(path))
             {
                 yield break;
@@ -187,7 +183,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             if (project == null)
             {
-                throw new ArgumentNullException("project");
+                throw new ArgumentNullException(nameof(project));
             }
 
             // Each item in VS OM is IVSHierarchy. 
@@ -268,8 +264,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 return null;
             }
 
-            object o;
-            if (ErrorHandler.Failed(vsHierarchy.GetProperty(itemId, propid, out o)))
+            if (ErrorHandler.Failed(vsHierarchy.GetProperty(itemId, propid, out var o)))
             {
                 return null;
             }

@@ -26,8 +26,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new InvalidOperationException("Unable to get output window service");
             }
 
-            IVsOutputWindowPane pane;
-            if (ErrorHandler.Failed(outputWindow.GetPane(id, out pane)) || pane == null)
+            if (ErrorHandler.Failed(outputWindow.GetPane(id, out var pane)) || pane == null)
             {
                 if (ErrorHandler.Failed(provider.GetUIThread().Invoke(() => outputWindow.CreatePane(id, title, 1, 0))))
                 {

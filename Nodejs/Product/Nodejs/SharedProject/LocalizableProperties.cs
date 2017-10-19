@@ -67,7 +67,9 @@ namespace Microsoft.VisualStudioTools.Project
             var props = TypeDescriptor.GetProperties(this, attributes, true);
 
             for (var i = 0; i < props.Count; i++)
+            {
                 newList.Add(CreateDesignPropertyDescriptor(props[i]));
+            }
 
             return new PropertyDescriptorCollection((PropertyDescriptor[])newList.ToArray(typeof(PropertyDescriptor)));
             ;

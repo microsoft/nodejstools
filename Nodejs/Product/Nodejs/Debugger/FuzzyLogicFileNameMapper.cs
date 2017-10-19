@@ -39,8 +39,7 @@ namespace Microsoft.NodejsTools.Debugger
             var matchedCount = 0;
             foreach (var component in pathComponents.Reverse())
             {
-                ScriptTree nextTree;
-                if (!curTree.Parents.TryGetValue(component, out nextTree))
+                if (!curTree.Parents.TryGetValue(component, out var nextTree))
                 {
                     // Can't walk up the local tree any further - this means that we're at the point at which local and remote
                     // filesystems begin to differ, yet we have more than one candidate.
@@ -82,8 +81,7 @@ namespace Microsoft.NodejsTools.Debugger
             var pathComponents = GetPathComponents(fileName);
             foreach (var component in pathComponents.Reverse())
             {
-                ScriptTree nextTree;
-                if (!curTree.Parents.TryGetValue(component, out nextTree))
+                if (!curTree.Parents.TryGetValue(component, out var nextTree))
                 {
                     curTree.Parents[component] = nextTree = new ScriptTree(component);
                 }

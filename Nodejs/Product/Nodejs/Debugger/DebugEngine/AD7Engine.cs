@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -166,7 +166,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             if (celtPrograms != 1)
             {
                 Debug.Fail("Node debugging only supports one program in a process");
-                throw new ArgumentException();
+                throw new ArgumentException("Node debugging only supports one program in a process", nameof(celtPrograms));
             }
 
             var processId = EngineUtils.GetProcessId(rgpPrograms[0]);
@@ -353,9 +353,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 // Check whether breakpoint request for our "downloaded" script
                 // "Downloaded" script will have our IDebugDocument2
-                IDebugDocument2 debugDocument;
                 var debugDocumentPosition = Marshal.GetObjectForIUnknown(requestInfo[0].bpLocation.unionmember2) as IDebugDocumentPosition2;
-                if (debugDocumentPosition == null || VSConstants.S_OK != debugDocumentPosition.GetDocument(out debugDocument) || (debugDocument as AD7Document) == null)
+                if (debugDocumentPosition == null || VSConstants.S_OK != debugDocumentPosition.GetDocument(out var debugDocument) || (debugDocument as AD7Document) == null)
                 {
                     // Not ours
                     return VSConstants.E_FAIL;
@@ -668,13 +667,11 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
             // which will complete the hookup with AD7
-            IDebugPort2 port;
-            EngineUtils.RequireOk(process.GetPort(out port));
+            EngineUtils.RequireOk(process.GetPort(out var port));
 
             var defaultPort = (IDebugDefaultPort2)port;
 
-            IDebugPortNotify2 portNotify;
-            EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
+            EngineUtils.RequireOk(defaultPort.GetPortNotify(out var portNotify));
 
             EngineUtils.RequireOk(portNotify.AddProgramNode(new AD7ProgramNode(this._process.Id)));
 
@@ -776,8 +773,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         {
             DebugWriteCommand("EnumCodeContexts");
 
-            string filename;
-            pDocPos.GetFileName(out filename);
+            pDocPos.GetFileName(out var filename);
             TEXT_POSITION[] beginning = new TEXT_POSITION[1], end = new TEXT_POSITION[1];
 
             pDocPos.GetRange(beginning, end);
@@ -1027,9 +1023,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 return;
             }
 
-            uint attributes;
             var riidEvent = new Guid(iidEvent);
-            var attributesResult = eventObject.GetAttributes(out attributes);
+            var attributesResult = eventObject.GetAttributes(out var attributes);
             if (attributesResult == VSConstants.RPC_E_DISCONNECTED)
             {
                 return;
@@ -1090,8 +1085,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 // The debug engine is loaded by VS separately from the main NTVS package, so we
                 // need to make sure that the package is also loaded before querying its options.
                 var packageGuid = new Guid(Guids.NodejsPackageString);
-                IVsPackage package;
-                shell.LoadPackage(ref packageGuid, out package);
+                shell.LoadPackage(ref packageGuid, out var package);
 
                 var nodejsPackage = package as NodejsPackage;
                 if (nodejsPackage != null)
@@ -1137,8 +1131,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnThreadExited(object sender, ThreadEventArgs e)
         {
             // TODO: Thread exit code
-            AD7Thread oldThread;
-            this._threads.TryGetValue(e.Thread, out oldThread);
+            this._threads.TryGetValue(e.Thread, out var oldThread);
             this._threads.Remove(e.Thread);
 
             this._threadExitedEvent.Set();
@@ -1180,8 +1173,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             var previewersEnum = doc3.DocumentPreviewersEnum;
 
             var rgPreviewers = new IVsDocumentPreviewer[1];
-            uint celtFetched;
-            while (ErrorHandler.Succeeded(previewersEnum.Next(1, rgPreviewers, out celtFetched)) && celtFetched == 1)
+            while (ErrorHandler.Succeeded(previewersEnum.Next(1, rgPreviewers, out var celtFetched)) && celtFetched == 1)
             {
                 if (rgPreviewers[0].IsDefault && !string.IsNullOrEmpty(rgPreviewers[0].Path))
                 {
@@ -1282,8 +1274,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnExceptionRaised(object sender, ExceptionRaisedEventArgs e)
         {
             // Exception events are sent when an exception occurs in the debuggee that the debugger was not expecting.
-            AD7Thread thread;
-            if (this._threads.TryGetValue(e.Thread, out thread))
+            if (this._threads.TryGetValue(e.Thread, out var thread))
             {
                 Send(
                     new AD7DebugExceptionEvent(e.Exception.TypeName, e.Exception.Description, e.IsUnhandled, this),
@@ -1340,8 +1331,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e)
         {
-            AD7Thread thread;
-            if (!this._threads.TryGetValue(e.Thread, out thread))
+            if (!this._threads.TryGetValue(e.Thread, out var thread))
             {
                 this._threads[e.Thread] = thread = new AD7Thread(this, e.Thread);
             }
@@ -1420,8 +1410,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 {
                     foreach (var itemid in project.EnumerateProjectItems())
                     {
-                        string moniker;
-                        if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out moniker)) && moniker != null)
+                        if (ErrorHandler.Succeeded(project.GetMkDocument(itemid, out var moniker)) && moniker != null)
                         {
                             yield return moniker;
                         }

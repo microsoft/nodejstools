@@ -21,14 +21,13 @@ namespace Microsoft.VisualStudioTools.Project
         public CommonConfigProvider(CommonProjectNode project)
             : base(project)
         {
-            bool appxPackage, windowsAppContainer;
             this._project = project;
             bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware), out this._isPlatformAware);
 
             if (!this._isPlatformAware)
             {
-                bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AppxPackage), out appxPackage);
-                bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.WindowsAppContainer), out windowsAppContainer);
+                bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.AppxPackage), out var appxPackage);
+                bool.TryParse(this.ProjectMgr.BuildProject.GetPropertyValue(ProjectFileConstants.WindowsAppContainer), out var windowsAppContainer);
                 this._isPlatformAware = appxPackage && windowsAppContainer;
             }
         }

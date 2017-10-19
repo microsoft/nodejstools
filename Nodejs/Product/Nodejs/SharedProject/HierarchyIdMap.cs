@@ -21,8 +21,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (reference != null)
                 {
-                    HierarchyNode item;
-                    if (reference.TryGetTarget(out item))
+                    if (reference.TryGetTarget(out var item))
                     {
                         Debug.Assert(node != item);
                     }
@@ -49,10 +48,9 @@ namespace Microsoft.VisualStudioTools.Project
         public void Remove(HierarchyNode node)
         {
             var i = (int)node.ID - 1;
-            HierarchyNode found;
             if (i < 0 ||
                 i >= this._ids.Count ||
-                (this._ids[i].TryGetTarget(out found) && !object.ReferenceEquals(node, found)))
+                (this._ids[i].TryGetTarget(out var found) && !object.ReferenceEquals(node, found)))
             {
                 throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
             }
@@ -72,8 +70,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (0 <= i && i < this._ids.Count)
                 {
                     var reference = this._ids[i];
-                    HierarchyNode node;
-                    if (reference != null && reference.TryGetTarget(out node))
+                    if (reference != null && reference.TryGetTarget(out var node))
                     {
                         return node;
                     }

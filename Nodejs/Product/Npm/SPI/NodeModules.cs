@@ -95,8 +95,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             depth++;
 
-            ModuleInfo moduleInfo;
-            this._allModules.TryGetValue(moduleDir, out moduleInfo);
+            this._allModules.TryGetValue(moduleDir, out var moduleInfo);
 
             if (moduleInfo != null)
             {
@@ -159,8 +158,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1, StringComparison.Ordinal);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
-            ModuleInfo value = null;
-            this._allModules.TryGetValue(directorySubString, out value);
+            this._allModules.TryGetValue(directorySubString, out var value);
 
             var depth = value != null ? value.Depth : 0;
             Debug.WriteLine("Module Depth: {0} [{1}]", filepath, depth);

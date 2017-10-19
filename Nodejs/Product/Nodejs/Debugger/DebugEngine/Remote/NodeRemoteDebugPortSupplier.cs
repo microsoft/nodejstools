@@ -26,8 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         {
             ppPort = null;
 
-            string name;
-            pRequest.GetPortName(out name);
+            pRequest.GetPortName(out var name);
 
             // Support old-style 'hostname:port' format, as well.
             if (!name.Contains("://"))

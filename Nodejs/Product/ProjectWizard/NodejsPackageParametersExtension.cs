@@ -72,9 +72,8 @@ namespace Microsoft.NodejsTools.ProjectWizard
 
             // Populate the package status
             uint count = 0;
-            uint sizeNeeded = 0;
             IVsSetupPackageInfo[] packages = null;
-            setupCompositionService.GetSetupPackagesInfo(count, packages, out sizeNeeded);
+            setupCompositionService.GetSetupPackagesInfo(count, packages, out var sizeNeeded);
 
             if (sizeNeeded > 0)
             {

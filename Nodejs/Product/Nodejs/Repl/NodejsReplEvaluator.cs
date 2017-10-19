@@ -189,7 +189,6 @@ namespace Microsoft.NodejsTools.Repl
             {
                 return;
             }
-
             CreateConnection(out var socket, out var port);
 
             var scriptPath = "\"" +
@@ -205,8 +204,7 @@ namespace Microsoft.NodejsTools.Repl
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-
-            if (this._site.TryGetStartupFileAndDirectory(out var fileName, out var directory))
+            if (this._site.TryGetStartupFileAndDirectory(out var _, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
@@ -424,8 +422,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 var cmd = this._serializer.Deserialize<Dictionary<string, object>>(response.Body);
 
-                object type;
-                if (cmd.TryGetValue("type", out type) && type is string)
+                if (cmd.TryGetValue("type", out var type) && type is string)
                 {
                     switch ((string)type)
                     {

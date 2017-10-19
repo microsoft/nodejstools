@@ -37,9 +37,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     return null;
                 }
-                object extObject;
                 if (Microsoft.VisualStudio.ErrorHandler.Succeeded(
-                        hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out extObject)))
+                        hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out var extObject)))
                 {
                     return extObject as EnvDTE.Project;
                 }

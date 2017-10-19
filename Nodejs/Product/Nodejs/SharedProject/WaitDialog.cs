@@ -28,7 +28,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         public void UpdateProgress(int currentSteps, int totalSteps)
         {
-            bool canceled;
             this._waitDialog.UpdateProgress(
                 null,
                 null,
@@ -36,7 +35,7 @@ namespace Microsoft.VisualStudioTools.Project
                 currentSteps,
                 totalSteps,
                 false,
-                out canceled
+                out var canceled
             );
         }
 
@@ -44,8 +43,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                bool canceled;
-                ErrorHandler.ThrowOnFailure(this._waitDialog.HasCanceled(out canceled));
+                ErrorHandler.ThrowOnFailure(this._waitDialog.HasCanceled(out var canceled));
                 return canceled;
             }
         }
@@ -56,8 +54,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (ErrorHandler.Succeeded(this._waitResult))
             {
-                var cancelled = 0;
-                this._waitDialog.EndWaitDialog(out cancelled);
+                this._waitDialog.EndWaitDialog(out var cancelled);
             }
         }
 

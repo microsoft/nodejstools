@@ -68,9 +68,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                int dirty;
 
-                ErrorHandler.ThrowOnFailure(this.project.IsDirty(out dirty));
+                ErrorHandler.ThrowOnFailure(this.project.IsDirty(out var dirty));
                 return dirty != 0;
             }
             set
@@ -137,12 +136,11 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     Utilities.CheckNotNull(solution);
 
                     // Ask solution for unique name of project
-                    string uniqueName;
 
                     ErrorHandler.ThrowOnFailure(
                         solution.GetUniqueNameOfProject(
                             this.project.GetOuterInterface<IVsHierarchy>(),
-                            out uniqueName
+                            out var uniqueName
                         )
                     );
                     return uniqueName;
@@ -181,9 +179,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                string filename;
-                uint format;
-                ErrorHandler.ThrowOnFailure(this.project.GetCurFile(out filename, out format));
+                ErrorHandler.ThrowOnFailure(this.project.GetCurFile(out var filename, out var format));
                 return filename;
             }
         }
@@ -214,11 +210,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
                                                                                                  Utilities.CheckNotNull(extensibility);
 
-                                                                                                 object configurationManagerAsObject;
                                                                                                  ErrorHandler.ThrowOnFailure(extensibility.GetConfigMgr(
                                                                                                      this.project.GetOuterInterface<IVsHierarchy>(),
                                                                                                      VSConstants.VSITEMID_ROOT,
-                                                                                                     out configurationManagerAsObject
+                                                                                                     out var configurationManagerAsObject
                                                                                                  ));
 
                                                                                                  Utilities.CheckNotNull(configurationManagerAsObject);
@@ -319,13 +314,8 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     // Get the cookie of the project file from the RTD.
                     var rdt = this.project.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                     Utilities.CheckNotNull(rdt);
-
-                    IVsHierarchy hier;
-                    uint itemid;
-                    IntPtr unkData;
-                    uint cookie;
-                    ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.project.Url, out hier,
-                                                                        out itemid, out unkData, out cookie));
+                    ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.project.Url, out var hier,
+                                                                        out var itemid, out var unkData, out var cookie));
                     if (IntPtr.Zero != unkData)
                     {
                         Marshal.Release(unkData);

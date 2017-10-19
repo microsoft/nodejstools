@@ -128,7 +128,10 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 if (this._vsProject == null)
+                {
                     this._vsProject = new OAVSProject(this);
+                }
+
                 return this._vsProject;
             }
         }
@@ -982,8 +985,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            FileSystemEventHandler handler;
-            if (this._fileChangedHandlers.TryGetValue(e.FullPath, out handler))
+            if (this._fileChangedHandlers.TryGetValue(e.FullPath, out var handler))
             {
                 handler(sender, e);
             }
@@ -1093,8 +1095,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child)
         {
-            FileSystemWatcher watcher;
-            if (this._symlinkWatchers.TryGetValue(child.Url, out watcher))
+            if (this._symlinkWatchers.TryGetValue(child.Url, out var watcher))
             {
                 this._symlinkWatchers.Remove(child.Url);
                 watcher.EnableRaisingEvents = false;
@@ -1496,8 +1497,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Typically these are references/environments, since files are
                 // added lazily through a mechanism that does not raise this
                 // event.
-                bool isBold;
-                if (this._needBolding.TryGetValue(e.Item.HierarchyIdentity.ItemID, out isBold))
+                if (this._needBolding.TryGetValue(e.Item.HierarchyIdentity.ItemID, out var isBold))
                 {
                     e.Item.IsBold = isBold;
                     this._needBolding.Remove(e.Item.HierarchyIdentity.ItemID);
@@ -1684,7 +1684,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// This method retrieves an instance of a service that 
         /// allows to start a project or a file with or without debugging.
         /// </summary>
-        public abstract IProjectLauncher/*!*/ GetLauncher();
+        public abstract IProjectLauncher GetLauncher();
 
         /// <summary>
         /// Returns resolved value of the current working directory property.
@@ -1844,7 +1844,9 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("propertyName", propertyName);
 
             if (this._userBuildProject == null)
+            {
                 return null;
+            }
 
             // If user project file exists during project load/reload userBuildProject is initiated 
             return this._userBuildProject.GetPropertyValue(propertyName);
@@ -1861,19 +1863,22 @@ namespace Microsoft.VisualStudioTools.Project
 
             //Validate input
             if (string.IsNullOrEmpty(mkDocument))
-                throw new ArgumentException("Was null or empty", "mkDocument");
+            {
+                throw new ArgumentException("Was null or empty", nameof(mkDocument));
+            }
 
             // Make sure that the document moniker passed to us is part of this project
             // We also don't care if it is not a dynamic language file node
-            uint itemid;
             int hr;
-            if (ErrorHandler.Failed(hr = ParseCanonicalName(mkDocument, out itemid)))
+            if (ErrorHandler.Failed(hr = ParseCanonicalName(mkDocument, out var itemid)))
             {
                 return hr;
             }
             var hierNode = NodeFromItemId(itemid);
             if (hierNode == null || ((hierNode as CommonFileNode) == null))
+            {
                 return VSConstants.E_NOTIMPL;
+            }
 
             switch (propid)
             {
@@ -1929,8 +1934,7 @@ namespace Microsoft.VisualStudioTools.Project
             var shell = this.Site.GetService(typeof(SVsUIShell)) as IVsUIShell;
             var vsSolution = (IVsSolution)this.GetService(typeof(SVsSolution));
 
-            int canContinue;
-            vsSolution.QueryRenameProject(this, this.FileName, pszProjectFilename, 0, out canContinue);
+            vsSolution.QueryRenameProject(this, this.FileName, pszProjectFilename, 0, out var canContinue);
             if (canContinue == 0)
             {
                 return VSConstants.OLE_E_PROMPTSAVECANCELLED;
@@ -1997,13 +2001,12 @@ namespace Microsoft.VisualStudioTools.Project
                     var docMgr = child.GetDocumentManager();
                     if (docMgr != null && docMgr.IsDirty)
                     {
-                        int cancelled;
                         child.ProjectMgr.SaveItem(
                             VSSAVEFLAGS.VSSAVE_Save,
                             null,
                             docMgr.DocCookie,
                             IntPtr.Zero,
-                            out cancelled
+                            out var cancelled
                         );
                     }
 

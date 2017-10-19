@@ -162,9 +162,8 @@ namespace Microsoft.VisualStudioTools.Project
             var referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
-            CannotAddReferenceErrorMessage referenceErrorMessageHandler = null;
 
-            if (!this.CanAddReference(out referenceErrorMessageHandler))
+            if (!this.CanAddReference(out var referenceErrorMessageHandler))
             {
                 if (referenceErrorMessageHandler != null)
                 {

@@ -40,8 +40,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
-            int processId;
-            if (!int.TryParse(pid, out processId))
+            if (!int.TryParse(pid, out var processId))
             {
                 return null;
             }
@@ -267,15 +266,13 @@ namespace Microsoft.VisualStudioTools
         public static void Register()
         {
             IOleMessageFilter newFilter = new MessageFilter();
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(newFilter, out oldFilter);
+            CoRegisterMessageFilter(newFilter, out var oldFilter);
         }
 
         // Done with the filter, close it.
         public static void Revoke()
         {
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(null, out oldFilter);
+            CoRegisterMessageFilter(null, out var oldFilter);
         }
 
         private const int SERVERCALL_ISHANDLED = 0;

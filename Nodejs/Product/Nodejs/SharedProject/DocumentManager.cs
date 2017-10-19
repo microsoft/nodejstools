@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -100,11 +100,8 @@ namespace Microsoft.VisualStudioTools.Project
                 var shell = this.Node.ProjectMgr.Site.GetService(typeof(IVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
                 var logicalView = Guid.Empty;
                 uint grfIDO = 0;
-                IVsUIHierarchy pHierOpen;
                 var itemIdOpen = new uint[1];
-                IVsWindowFrame windowFrame;
-                int fOpen;
-                ErrorHandler.ThrowOnFailure(shell.IsDocumentOpen(this.Node.ProjectMgr, this.Node.ID, this.Node.Url, ref logicalView, grfIDO, out pHierOpen, itemIdOpen, out windowFrame, out fOpen));
+                ErrorHandler.ThrowOnFailure(shell.IsDocumentOpen(this.Node.ProjectMgr, this.Node.ID, this.Node.Url, ref logicalView, grfIDO, out var pHierOpen, itemIdOpen, out var windowFrame, out var fOpen));
 
                 if (windowFrame != null)
                 {
@@ -127,9 +124,7 @@ namespace Microsoft.VisualStudioTools.Project
                 var persistDocData = this.DocData;
                 if (persistDocData != null)
                 {
-                    string name;
-                    int cancelled;
-                    ErrorHandler.ThrowOnFailure(persistDocData.SaveDocData(VSSAVEFLAGS.VSSAVE_SilentSave, out name, out cancelled));
+                    ErrorHandler.ThrowOnFailure(persistDocData.SaveDocData(VSSAVEFLAGS.VSSAVE_SilentSave, out var name, out var cancelled));
                 }
             }
         }
@@ -165,13 +160,10 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     return false;
                 }
-
-                IVsHierarchy hierarchy;
-                uint itemId;
                 docTable.GetDocumentHierarchyItem(
                     docTable.GetDocumentCookie(this.node.GetMkDocument()),
-                    out hierarchy,
-                    out itemId
+                    out var hierarchy,
+                    out var itemId
                 );
                 return Utilities.IsSameComObject(this.node.ProjectMgr, hierarchy);
             }
@@ -263,8 +255,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             Debug.Assert(this.node != null, "No node has been initialized for the document manager");
 
-            object pvar;
-            ErrorHandler.ThrowOnFailure(this.node.ProjectMgr.GetProperty(this.node.ID, (int)__VSHPROPID.VSHPROPID_Caption, out pvar));
+            ErrorHandler.ThrowOnFailure(this.node.ProjectMgr.GetProperty(this.node.ID, (int)__VSHPROPID.VSHPROPID_Caption, out var pvar));
 
             return (pvar as string);
         }
@@ -310,21 +301,18 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (string.IsNullOrEmpty(caption))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "caption");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(caption));
             }
 
             var uiShell = site.GetService(typeof(SVsUIShell)) as IVsUIShell;
 
             // We need to tell the windows to update their captions. 
-            IEnumWindowFrames windowFramesEnum;
-            ErrorHandler.ThrowOnFailure(uiShell.GetDocumentWindowEnum(out windowFramesEnum));
+            ErrorHandler.ThrowOnFailure(uiShell.GetDocumentWindowEnum(out var windowFramesEnum));
             var windowFrames = new IVsWindowFrame[1];
-            uint fetched;
-            while (windowFramesEnum.Next(1, windowFrames, out fetched) == VSConstants.S_OK && fetched == 1)
+            while (windowFramesEnum.Next(1, windowFrames, out var fetched) == VSConstants.S_OK && fetched == 1)
             {
                 var windowFrame = windowFrames[0];
-                object data;
-                ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out data));
+                ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out var data));
                 var ptr = Marshal.GetIUnknownForObject(data);
                 try
                 {
@@ -356,29 +344,27 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (string.IsNullOrEmpty(oldName))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "oldName");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(oldName));
             }
 
             if (string.IsNullOrEmpty(newName))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "newName");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(newName));
             }
 
             if (newItemId == VSConstants.VSITEMID_NIL)
             {
-                throw new ArgumentNullException("newItemId");
+                throw new ArgumentNullException(nameof(newItemId));
             }
 
             var pRDT = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
             if (pRDT == null)
+            {
                 return;
+            }
 
-            IVsHierarchy pIVsHierarchy;
-            uint itemId;
-            IntPtr docData;
-            uint uiVsDocCookie;
-            ErrorHandler.ThrowOnFailure(pRDT.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, oldName, out pIVsHierarchy, out itemId, out docData, out uiVsDocCookie));
+            ErrorHandler.ThrowOnFailure(pRDT.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, oldName, out var pIVsHierarchy, out var itemId, out var docData, out var uiVsDocCookie));
 
             if (docData != IntPtr.Zero && pIVsHierarchy != null)
             {
@@ -386,8 +372,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     var pUnk = Marshal.GetIUnknownForObject(pIVsHierarchy);
                     var iid = typeof(IVsHierarchy).GUID;
-                    IntPtr pHier;
-                    Marshal.QueryInterface(pUnk, ref iid, out pHier);
+                    Marshal.QueryInterface(pUnk, ref iid, out var pHier);
                     try
                     {
                         ErrorHandler.ThrowOnFailure(pRDT.RenameDocument(oldName, newName, pHier, newItemId));
@@ -395,9 +380,14 @@ namespace Microsoft.VisualStudioTools.Project
                     finally
                     {
                         if (pHier != IntPtr.Zero)
+                        {
                             Marshal.Release(pHier);
+                        }
+
                         if (pUnk != IntPtr.Zero)
+                        {
                             Marshal.Release(pUnk);
+                        }
                     }
                 }
                 finally

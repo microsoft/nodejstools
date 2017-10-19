@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -32,11 +32,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (null == source)
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
             if (this.connectionPoints.ContainsKey(typeof(SinkType).GUID))
             {
-                throw new ArgumentException("EventSource guid already added to the list of connection points", "source");
+                throw new ArgumentException("EventSource guid already added to the list of connection points", nameof(source));
             }
             this.connectionPoints.Add(typeof(SinkType).GUID, new ConnectionPoint<SinkType>(this, source));
         }
@@ -64,11 +64,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (null == container)
             {
-                throw new ArgumentNullException("container");
+                throw new ArgumentNullException(nameof(container));
             }
             if (null == source)
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
             this.container = container;
             this.source = source;

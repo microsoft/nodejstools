@@ -62,8 +62,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string canonicalName;
-                ErrorHandler.ThrowOnFailure(get_CanonicalName(out canonicalName));
+                ErrorHandler.ThrowOnFailure(get_CanonicalName(out var canonicalName));
                 return canonicalName;
             }
         }
@@ -78,8 +77,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Generate dependencies if such a task exist
             if (this._project.BuildProject.Targets.ContainsKey(this._targetName))
             {
-                var succeeded = false;
-                this._project.BuildTarget(this._targetName, out succeeded);
+                this._project.BuildTarget(this._targetName, out var succeeded);
                 if (!succeeded)
                 {
                     Debug.WriteLine("Failed to build target {0}", this._targetName);
@@ -160,10 +158,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrDescription = null;
 
-            string description;
-            var hr = this.get_CanonicalName(out description);
+            var hr = this.get_CanonicalName(out var description);
             if (ErrorHandler.Succeeded(hr))
+            {
                 pbstrDescription = this.Project.GetOutputGroupDescription(description);
+            }
+
             return hr;
         }
 
@@ -171,10 +171,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrDisplayName = null;
 
-            string displayName;
-            var hr = this.get_CanonicalName(out displayName);
+            var hr = this.get_CanonicalName(out var displayName);
             if (ErrorHandler.Succeeded(hr))
+            {
                 pbstrDisplayName = this.Project.GetOutputGroupDisplayName(displayName);
+            }
+
             return hr;
         }
 
@@ -182,7 +184,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrCanonicalName = null;
             if (this._keyOutput == null)
+            {
                 Refresh();
+            }
+
             if (this._keyOutput == null)
             {
                 pbstrCanonicalName = string.Empty;
@@ -206,7 +211,10 @@ namespace Microsoft.VisualStudioTools.Project
             }
             ppKeyOutput = this._keyOutput;
             if (ppKeyOutput == null)
+            {
                 return VSConstants.S_FALSE;
+            }
+
             return VSConstants.S_OK;
         }
 
@@ -229,7 +237,10 @@ namespace Microsoft.VisualStudioTools.Project
             if (celt == 0 || rgpcfg == null)
             {
                 if (pcActual != null && pcActual.Length > 0)
+                {
                     pcActual[0] = (uint)this._outputs.Count;
+                }
+
                 return VSConstants.S_OK;
             }
 
@@ -245,7 +256,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             if (pcActual != null && pcActual.Length > 0)
+            {
                 pcActual[0] = count;
+            }
 
             // If the number asked for does not match the number returned, return S_FALSE
             return (count == celt) ? VSConstants.S_OK : VSConstants.S_FALSE;

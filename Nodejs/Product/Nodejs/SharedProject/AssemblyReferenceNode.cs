@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -91,11 +91,11 @@ namespace Microsoft.VisualStudioTools.Project
             // Validate the input parameters.
             if (null == root)
             {
-                throw new ArgumentNullException("root");
+                throw new ArgumentNullException(nameof(root));
             }
             if (string.IsNullOrEmpty(assemblyPath))
             {
-                throw new ArgumentNullException("assemblyPath");
+                throw new ArgumentNullException(nameof(assemblyPath));
             }
 
             this.InitializeFileChangeEvents();

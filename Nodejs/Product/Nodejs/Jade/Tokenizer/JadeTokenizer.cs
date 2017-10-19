@@ -37,7 +37,9 @@ namespace Microsoft.NodejsTools.Jade
             SkipWhiteSpace();
 
             if (this._cs.IsEndOfStream())
+            {
                 return true;
+            }
 
             // C++ style comments must be placed on their own line
             if (IsAtComment())
@@ -87,7 +89,9 @@ namespace Microsoft.NodejsTools.Jade
         protected override JadeToken GetStringToken(int start, int length)
         {
             if (this._attributeState)
+            {
                 return new JadeToken(JadeTokenType.AttributeValue, start, length);
+            }
 
             return new JadeToken(JadeTokenType.String, start, length);
         }
@@ -109,10 +113,14 @@ namespace Microsoft.NodejsTools.Jade
                     indent = CalculateLineIndent();
 
                     if (indent <= blockIndent)
+                    {
                         break;
+                    }
 
                     if (text)
+                    {
                         OnText(strings: false, html: true, entities: true);
+                    }
                 }
             }
         }
@@ -142,7 +150,9 @@ namespace Microsoft.NodejsTools.Jade
                 if (this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)))
                 {
                     if (this._cs.Position > start)
+                    {
                         this.Tokens.Add(GetStringToken(start, this._cs.Position - start));
+                    }
 
                     OnHtml();
 
@@ -156,7 +166,9 @@ namespace Microsoft.NodejsTools.Jade
 
             var range = TextRange.FromBounds(start, this._cs.Position);
             if (range.Length > 0)
+            {
                 this.Tokens.Add(GetStringToken(start, range.Length));
+            }
 
             return range;
         }

@@ -57,21 +57,21 @@ namespace Microsoft.NodejsTools.Repl
         private List<IReplCommand> _commands;
         private IWpfTextViewHost _textViewHost;
         private IEditorOperations _editorOperations;
-        private readonly History/*!*/ _history;
+        private readonly History _history;
         private TaskScheduler _uiScheduler;
         private PropertyCollection _properties;
 
         //
         // Services
         // 
-        private readonly IComponentModel/*!*/ _componentModel;
+        private readonly IComponentModel _componentModel;
         private readonly Guid _langSvcGuid;
         private readonly string _replId;
-        private readonly IContentType/*!*/ _languageContentType;
+        private readonly IContentType _languageContentType;
         private readonly string[] _roles;
         private readonly IClassifierAggregatorService _classifierAgg;
         private ReplAggregateClassifier _primaryClassifier;
-        private readonly IReplEvaluator/*!*/ _evaluator;
+        private readonly IReplEvaluator _evaluator;
         private IVsFindTarget _findTarget;
         private IVsTextView _view;
         private ISmartIndent _languageIndenter;
@@ -149,7 +149,7 @@ namespace Microsoft.NodejsTools.Repl
         private static readonly char[] _whitespaceChars = new[] { '\r', '\n', ' ', '\t' };
         private const string _boxSelectionCutCopyTag = "MSDEVColumnSelect";
 
-        public ReplWindow(IComponentModel/*!*/ model, IReplEvaluator/*!*/ evaluator, IContentType/*!*/ contentType, string[] roles, string/*!*/ title, Guid languageServiceGuid, string replId)
+        public ReplWindow(IComponentModel model, IReplEvaluator evaluator, IContentType contentType, string[] roles, string title, Guid languageServiceGuid, string replId)
         {
             Contract.Assert(evaluator != null);
             Contract.Assert(contentType != null);
@@ -278,8 +278,7 @@ namespace Microsoft.NodejsTools.Repl
             IVsTextView textViewAdapter = adapterFactory.CreateVsTextViewAdapter(provider, CreateRoleSet());
 
             // make us a code window so we'll have the same colors as a normal code window.
-            IVsTextEditorPropertyContainer propContainer;
-            ErrorHandler.ThrowOnFailure(((IVsTextEditorPropertyCategoryContainer)textViewAdapter).GetPropertyCategory(Microsoft.VisualStudio.Editor.DefGuidList.guidEditPropCategoryViewMasterSettings, out propContainer));
+            ErrorHandler.ThrowOnFailure(((IVsTextEditorPropertyCategoryContainer)textViewAdapter).GetPropertyCategory(Microsoft.VisualStudio.Editor.DefGuidList.guidEditPropCategoryViewMasterSettings, out var propContainer));
             propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewComposite_AllCodeWindowDefaults, true);
             propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewGlobalOpt_AutoScrollCaretOnTextEntry, true);
 
@@ -371,7 +370,7 @@ namespace Microsoft.NodejsTools.Repl
             return applicable;
         }
 
-        private List<IReplCommand>/*!*/ CreateCommands()
+        private List<IReplCommand> CreateCommands()
         {
             var commands = new List<IReplCommand>();
             var commandTypes = new HashSet<Type>();
@@ -406,14 +405,13 @@ namespace Microsoft.NodejsTools.Repl
 
             // add our toolbar which  is defined in our VSCT file
             var frame = (IVsWindowFrame)Frame;
-            object otbh;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out otbh));
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out var otbh));
             IVsToolWindowToolbarHost tbh = otbh as IVsToolWindowToolbarHost;
             Guid guidPerfMenuGroup = Guids.guidReplWindowCmdSet;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdReplToolbar));
         }
 
-        private ITextViewRoleSet/*!*/ CreateRoleSet()
+        private ITextViewRoleSet CreateRoleSet()
         {
             var textEditorFactoryService = ComponentModel.GetService<ITextEditorFactoryService>();
             return textEditorFactoryService.CreateTextViewRoleSet(
@@ -484,7 +482,7 @@ namespace Microsoft.NodejsTools.Repl
             get { return _componentModel; }
         }
 
-        public ITextBuffer/*!*/ TextBuffer
+        public ITextBuffer TextBuffer
         {
             get { return TextView.TextBuffer; }
         }
@@ -549,8 +547,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public static ReplWindow FromBuffer(ITextBuffer buffer)
         {
-            object result;
-            buffer.Properties.TryGetProperty(typeof(ReplWindow), out result);
+            buffer.Properties.TryGetProperty(typeof(ReplWindow), out object result);
             return result as ReplWindow;
         }
 
@@ -563,7 +560,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public IWpfTextView/*!*/ TextView
+        public IWpfTextView TextView
         {
             get
             {
@@ -574,7 +571,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public IReplEvaluator/*!*/ Evaluator
+        public IReplEvaluator Evaluator
         {
             get
             {
@@ -585,7 +582,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public string/*!*/ Title
+        public string Title
         {
             get
             {
@@ -2474,9 +2471,7 @@ namespace Microsoft.NodejsTools.Repl
             int insertBeforePrompt = -1;
             if (!_isRunning)
             {
-                int lastPrimaryPrompt, lastPrompt;
-
-                IndexOfLastPrompt(out lastPrimaryPrompt, out lastPrompt);
+                IndexOfLastPrompt(out var lastPrimaryPrompt, out var lastPrompt);
 
                 // If the last prompt is STDIN prompt insert output before it, otherwise before the primary prompt:
                 insertBeforePrompt = (lastPrompt != -1 && _projectionSpans[lastPrompt].Kind == ReplSpanKind.StandardInputPrompt) ? lastPrompt : lastPrimaryPrompt;
@@ -3011,22 +3006,22 @@ namespace Microsoft.NodejsTools.Repl
             return prompt;
         }
 
-        internal string/*!*/ Prompt
+        internal string Prompt
         {
             get { return _prompt; }
         }
 
-        internal string/*!*/ SecondaryPrompt
+        internal string SecondaryPrompt
         {
             get { return _secondPrompt; }
         }
 
-        internal string/*!*/ InputPrompt
+        internal string InputPrompt
         {
             get { return _stdInputPrompt; }
         }
 
-        internal Control/*!*/ HostControl
+        internal Control HostControl
         {
             get { return _textViewHost.HostControl; }
         }
@@ -3302,7 +3297,7 @@ namespace Microsoft.NodejsTools.Repl
             List<SpanRangeEdit> spanEdits = new List<SpanRangeEdit>();
 
             // a span in the new snapshot that includes all line changes:
-            int newMinPosition = Int32.MaxValue;
+            int newMinPosition = int.MaxValue;
             int newMaxPosition = -1;
 
             // changes are sorted by position
