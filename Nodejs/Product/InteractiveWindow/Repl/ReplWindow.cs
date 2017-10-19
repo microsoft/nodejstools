@@ -57,21 +57,21 @@ namespace Microsoft.NodejsTools.Repl
         private List<IReplCommand> _commands;
         private IWpfTextViewHost _textViewHost;
         private IEditorOperations _editorOperations;
-        private readonly History/*!*/ _history;
+        private readonly History _history;
         private TaskScheduler _uiScheduler;
         private PropertyCollection _properties;
 
         //
         // Services
         // 
-        private readonly IComponentModel/*!*/ _componentModel;
+        private readonly IComponentModel _componentModel;
         private readonly Guid _langSvcGuid;
         private readonly string _replId;
-        private readonly IContentType/*!*/ _languageContentType;
+        private readonly IContentType _languageContentType;
         private readonly string[] _roles;
         private readonly IClassifierAggregatorService _classifierAgg;
         private ReplAggregateClassifier _primaryClassifier;
-        private readonly IReplEvaluator/*!*/ _evaluator;
+        private readonly IReplEvaluator _evaluator;
         private IVsFindTarget _findTarget;
         private IVsTextView _view;
         private ISmartIndent _languageIndenter;
@@ -149,7 +149,7 @@ namespace Microsoft.NodejsTools.Repl
         private static readonly char[] _whitespaceChars = new[] { '\r', '\n', ' ', '\t' };
         private const string _boxSelectionCutCopyTag = "MSDEVColumnSelect";
 
-        public ReplWindow(IComponentModel/*!*/ model, IReplEvaluator/*!*/ evaluator, IContentType/*!*/ contentType, string[] roles, string/*!*/ title, Guid languageServiceGuid, string replId)
+        public ReplWindow(IComponentModel model, IReplEvaluator evaluator, IContentType contentType, string[] roles, string title, Guid languageServiceGuid, string replId)
         {
             Contract.Assert(evaluator != null);
             Contract.Assert(contentType != null);
@@ -371,7 +371,7 @@ namespace Microsoft.NodejsTools.Repl
             return applicable;
         }
 
-        private List<IReplCommand>/*!*/ CreateCommands()
+        private List<IReplCommand> CreateCommands()
         {
             var commands = new List<IReplCommand>();
             var commandTypes = new HashSet<Type>();
@@ -413,7 +413,7 @@ namespace Microsoft.NodejsTools.Repl
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdReplToolbar));
         }
 
-        private ITextViewRoleSet/*!*/ CreateRoleSet()
+        private ITextViewRoleSet CreateRoleSet()
         {
             var textEditorFactoryService = ComponentModel.GetService<ITextEditorFactoryService>();
             return textEditorFactoryService.CreateTextViewRoleSet(
@@ -484,7 +484,7 @@ namespace Microsoft.NodejsTools.Repl
             get { return _componentModel; }
         }
 
-        public ITextBuffer/*!*/ TextBuffer
+        public ITextBuffer TextBuffer
         {
             get { return TextView.TextBuffer; }
         }
@@ -563,7 +563,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public IWpfTextView/*!*/ TextView
+        public IWpfTextView TextView
         {
             get
             {
@@ -574,7 +574,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public IReplEvaluator/*!*/ Evaluator
+        public IReplEvaluator Evaluator
         {
             get
             {
@@ -585,7 +585,7 @@ namespace Microsoft.NodejsTools.Repl
         /// <summary>
         /// See IReplWindow
         /// </summary>
-        public string/*!*/ Title
+        public string Title
         {
             get
             {
@@ -3011,22 +3011,22 @@ namespace Microsoft.NodejsTools.Repl
             return prompt;
         }
 
-        internal string/*!*/ Prompt
+        internal string Prompt
         {
             get { return _prompt; }
         }
 
-        internal string/*!*/ SecondaryPrompt
+        internal string SecondaryPrompt
         {
             get { return _secondPrompt; }
         }
 
-        internal string/*!*/ InputPrompt
+        internal string InputPrompt
         {
             get { return _stdInputPrompt; }
         }
 
-        internal Control/*!*/ HostControl
+        internal Control HostControl
         {
             get { return _textViewHost.HostControl; }
         }

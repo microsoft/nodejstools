@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Repl
 
         #region IReplWindowProvider Members
 
-        public IReplWindow CreateReplWindow(IContentType contentType, string/*!*/ title, Guid languageServiceGuid, string replId)
+        public IReplWindow CreateReplWindow(IContentType contentType, string title, Guid languageServiceGuid, string replId)
         {
             int curId = 0;
 
@@ -207,7 +207,7 @@ namespace Microsoft.NodejsTools.Repl
             return null;
         }
 
-        public IReplWindow CreateReplWindow(IReplEvaluator/*!*/ evaluator, IContentType/*!*/ contentType, string[] roles, int id, string/*!*/ title, Guid languageServiceGuid, string replId)
+        public IReplWindow CreateReplWindow(IReplEvaluator evaluator, IContentType contentType, string[] roles, int id, string title, Guid languageServiceGuid, string replId)
         {
             return CreateReplWindowInternal(evaluator, contentType, roles, id, title, languageServiceGuid, replId);
         }

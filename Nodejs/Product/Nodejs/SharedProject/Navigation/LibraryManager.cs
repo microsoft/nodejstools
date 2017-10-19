@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Navigation
     /// </summary>
     internal abstract partial class LibraryManager : IDisposable, IVsRunningDocTableEvents
     {
-        private readonly CommonPackage/*!*/ _package;
+        private readonly CommonPackage _package;
         private readonly Dictionary<uint, TextLineEventListener> _documents;
         private readonly Dictionary<IVsHierarchy, HierarchyInfo> _hierarchies = new Dictionary<IVsHierarchy, HierarchyInfo>();
         private readonly Dictionary<ModuleId, LibraryNode> _files;
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         private uint _objectManagerCookie;
         private uint _runningDocTableCookie;
 
-        public LibraryManager(CommonPackage/*!*/ package)
+        public LibraryManager(CommonPackage package)
         {
             Contract.Assert(package != null);
             this._package = package;
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             return new LibraryNode(null, name, filename, libraryNodeType);
         }
 
-        private object GetPackageService(Type/*!*/ type)
+        private object GetPackageService(Type type)
         {
             return ((System.IServiceProvider)this._package).GetService(type);
         }

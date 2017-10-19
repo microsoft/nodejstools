@@ -1684,7 +1684,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// This method retrieves an instance of a service that 
         /// allows to start a project or a file with or without debugging.
         /// </summary>
-        public abstract IProjectLauncher/*!*/ GetLauncher();
+        public abstract IProjectLauncher GetLauncher();
 
         /// <summary>
         /// Returns resolved value of the current working directory property.
