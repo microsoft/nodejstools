@@ -41,8 +41,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (uiWindow != null)
                 {
                     __VSHIERARCHYITEMSTATE state;
-                    uint stateAsInt;
-                    if (uiWindow.GetItemState(uiHierarchy, VSConstants.VSITEMID_ROOT, (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded, out stateAsInt) == VSConstants.S_OK)
+                    if (uiWindow.GetItemState(uiHierarchy, VSConstants.VSITEMID_ROOT, (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded, out var stateAsInt) == VSConstants.S_OK)
                     {
                         state = (__VSHIERARCHYITEMSTATE)stateAsInt;
                         if (state != __VSHIERARCHYITEMSTATE.HIS_Expanded)

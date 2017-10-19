@@ -73,8 +73,7 @@ namespace Microsoft.NodejsTools.Options
                 return null;
             }
 
-            int val;
-            if (int.TryParse(res, out val))
+            if (int.TryParse(res, out var val))
             {
                 return val;
             }
@@ -89,8 +88,7 @@ namespace Microsoft.NodejsTools.Options
                 return null;
             }
 
-            bool val;
-            if (bool.TryParse(res, out val))
+            if (bool.TryParse(res, out var val))
             {
                 return val;
             }
@@ -124,8 +122,7 @@ namespace Microsoft.NodejsTools.Options
                 return null;
             }
 
-            T enumRes;
-            if (Enum.TryParse<T>(res, out enumRes))
+            if (Enum.TryParse<T>(res, out var enumRes))
             {
                 return enumRes;
             }
@@ -140,8 +137,7 @@ namespace Microsoft.NodejsTools.Options
                 return null;
             }
 
-            DateTime dateRes;
-            if (DateTime.TryParse(res, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateRes))
+            if (DateTime.TryParse(res, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateRes))
             {
                 return dateRes;
             }

@@ -333,8 +333,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             Utilities.ArgumentNotNull("pNavInfoNode", pNavInfoNode);
 
             pulIndex = NullIndex;
-            string nodeName;
-            ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out nodeName));
+            ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out var nodeName));
             for (var i = 0; i < this._children.Count; i++)
             {
                 if (StringComparer.OrdinalIgnoreCase.Equals(this._children[i].UniqueName, nodeName))

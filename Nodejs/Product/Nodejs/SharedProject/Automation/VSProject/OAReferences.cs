@@ -112,8 +112,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
 
             // Get the hierarchy for this project.
-            IVsHierarchy projectHierarchy;
-            ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy));
+            ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out var projectHierarchy));
 
             // Create the selector data.
             VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();

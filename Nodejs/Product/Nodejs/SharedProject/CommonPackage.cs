@@ -142,8 +142,7 @@ namespace Microsoft.VisualStudioTools
             {
                 return null;
             }
-            object curDocument;
-            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out curDocument)))
+            if (ErrorHandler.Failed(monitorSelection.GetCurrentElementValue((uint)VSConstants.VSSELELEMID.SEID_DocumentFrame, out var curDocument)))
             {
                 // TODO: Report error
                 return null;
@@ -156,8 +155,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
-            object docView = null;
-            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView)))
+            if (ErrorHandler.Failed(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var docView)))
             {
                 // TODO: Report error
                 return null;
@@ -165,8 +163,7 @@ namespace Microsoft.VisualStudioTools
 
             if (docView is IVsCodeWindow)
             {
-                IVsTextView textView;
-                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out textView)))
+                if (ErrorHandler.Failed(((IVsCodeWindow)docView).GetPrimaryView(out var textView)))
                 {
                     // TODO: Report error
                     return null;
@@ -191,8 +188,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
             var buildMgr = (IVsSolutionBuildManager)serviceProvider.GetService(typeof(IVsSolutionBuildManager));
-            IVsHierarchy hierarchy;
-            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out hierarchy)) && hierarchy != null)
+            if (buildMgr != null && ErrorHandler.Succeeded(buildMgr.get_StartupProject(out var hierarchy)) && hierarchy != null)
             {
                 return hierarchy.GetProject().GetCommonProject();
             }
@@ -234,8 +230,7 @@ namespace Microsoft.VisualStudioTools
                     return;
                 }
 
-                IVsWindowFrame frame;
-                ErrorHandler.ThrowOnFailure(web.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out frame));
+                ErrorHandler.ThrowOnFailure(web.Navigate(url, (uint)__VSWBNAVIGATEFLAGS.VSNWB_ForceNew, out var frame));
                 frame.Show();
             });
         }

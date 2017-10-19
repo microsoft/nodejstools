@@ -19,12 +19,4 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>HRESULT indicating success or failure.</returns>
         int LaunchFile(string file, bool debug);
     }
-
-    public interface IProjectLauncher2 : IProjectLauncher
-    {
-        /// <summary>
-        /// Starts a file in a project with custom settings.
-        /// </summary>
-        int LaunchFile(string file, bool debug, IProjectLaunchProperties properties);
-    }
 }

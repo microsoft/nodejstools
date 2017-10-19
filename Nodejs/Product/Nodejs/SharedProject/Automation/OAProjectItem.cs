@@ -92,8 +92,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         {
             get
             {
-                Guid guid;
-                ErrorHandler.ThrowOnFailure(this.node.GetGuidProperty((int)__VSHPROPID.VSHPROPID_TypeGuid, out guid));
+                ErrorHandler.ThrowOnFailure(this.node.GetGuidProperty((int)__VSHPROPID.VSHPROPID_TypeGuid, out var guid));
                 return guid.ToString("B");
             }
         }

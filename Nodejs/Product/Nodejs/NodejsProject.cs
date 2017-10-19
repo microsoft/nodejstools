@@ -62,12 +62,11 @@ namespace Microsoft.NodejsTools
 
             base.InitializeForOuter(fileName, location, name, flags, ref guidProject, out cancel);
 
-            object extObject;
             ErrorHandler.ThrowOnFailure(
                 this._innerVsHierarchy.GetProperty(
                     VSConstants.VSITEMID_ROOT,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
-                    out extObject
+                    out var extObject
                 )
             );
 
@@ -120,8 +119,7 @@ namespace Microsoft.NodejsTools
 
             foreach (var vsItemSelection in GetSelectedItems())
             {
-                object name;
-                ErrorHandler.ThrowOnFailure(vsItemSelection.pHier.GetProperty(vsItemSelection.itemid, (int)__VSHPROPID.VSHPROPID_Name, out name));
+                ErrorHandler.ThrowOnFailure(vsItemSelection.pHier.GetProperty(vsItemSelection.itemid, (int)__VSHPROPID.VSHPROPID_Name, out var name));
 
                 if (IsJavaScriptFile(Name(vsItemSelection)))
                 {
@@ -137,20 +135,18 @@ namespace Microsoft.NodejsTools
 
         internal static string GetItemName(IVsHierarchy hier, uint itemid)
         {
-            object name;
-            ErrorHandler.ThrowOnFailure(hier.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out name));
+            ErrorHandler.ThrowOnFailure(hier.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out var name));
             return (string)name;
         }
 
         private int OpenWithDefaultEditor(uint selectionItemId)
         {
             var view = Guid.Empty;
-            IVsWindowFrame frame;
             var hr = ((IVsProject)this._innerVsHierarchy).OpenItem(
                 selectionItemId,
                 ref view,
                 IntPtr.Zero,
-                out frame
+                out var frame
             );
             if (ErrorHandler.Succeeded(hr))
             {
@@ -205,9 +201,7 @@ namespace Microsoft.NodejsTools
             var selectionContainer = IntPtr.Zero;
             try
             {
-                uint selectionItemId;
-                IVsMultiItemSelect multiItemSelect = null;
-                ErrorHandler.ThrowOnFailure(monitorSelection.GetCurrentSelection(out hierarchyPtr, out selectionItemId, out multiItemSelect, out selectionContainer));
+                ErrorHandler.ThrowOnFailure(monitorSelection.GetCurrentSelection(out hierarchyPtr, out var selectionItemId, out var multiItemSelect, out selectionContainer));
 
                 if (selectionItemId != VSConstants.VSITEMID_NIL && hierarchyPtr != IntPtr.Zero)
                 {
@@ -223,12 +217,7 @@ namespace Microsoft.NodejsTools
                     }
                     else if (multiItemSelect != null)
                     {
-                        // This is a multiple item selection.
-                        // Get number of items selected and also determine if the items are located in more than one hierarchy
-
-                        uint numberOfSelectedItems;
-                        int isSingleHierarchyInt;
-                        ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out numberOfSelectedItems, out isSingleHierarchyInt));
+                        ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out var numberOfSelectedItems, out var isSingleHierarchyInt));
                         var isSingleHierarchy = (isSingleHierarchyInt != 0);
 
                         // Now loop all selected items and add to the list only those that are selected within this hierarchy
@@ -379,8 +368,7 @@ namespace Microsoft.NodejsTools
 
         private bool IsJavaScriptFile(IVsHierarchy iVsHierarchy, uint itemid)
         {
-            object name;
-            ErrorHandler.ThrowOnFailure(iVsHierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out name));
+            ErrorHandler.ThrowOnFailure(iVsHierarchy.GetProperty(itemid, (int)__VSHPROPID.VSHPROPID_Name, out var name));
 
             return IsJavaScriptFile(name);
         }
@@ -491,11 +479,10 @@ namespace Microsoft.NodejsTools
             // want the web application project to influence our config as that alters our debug
             // launch story.  We control that w/ the Django project which is actually just letting the
             // base Node.js project handle it.  So we keep the base Node.js project config here.
-            IVsProjectFlavorCfg webCfg;
             ErrorHandler.ThrowOnFailure(
                 this._innerVsProjectFlavorCfgProvider.CreateProjectFlavorCfg(
                     pBaseProjectCfg,
-                    out webCfg
+                    out var webCfg
                 )
             );
             ppFlavorCfg = new NodejsProjectConfig(pBaseProjectCfg, webCfg);
@@ -610,13 +597,12 @@ namespace Microsoft.NodejsTools
 
         private static EnvDTE.ProjectItem GetExtensionObject(IVsHierarchy hierarchy, uint itemId)
         {
-            object project;
 
             ErrorHandler.ThrowOnFailure(
                 hierarchy.GetProperty(
                     itemId,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
-                    out project
+                    out var project
                 )
             );
 
@@ -630,7 +616,6 @@ namespace Microsoft.NodejsTools
             var properties = GetExtensionObject(this._innerVsHierarchy, selectionItemId).Properties;
 
             var view = Guid.Empty;
-            IVsWindowFrame frame;
 
             // DOCDATAEXISTING_UNKNOWN http://msdn.microsoft.com/en-us/library/vstudio/bb139396(v=vs.110).aspx
             // Force OpenStandardEditor to lookup if the document is currently open or not, and if it is.  If it's
@@ -643,7 +628,7 @@ namespace Microsoft.NodejsTools
                 null,
                 ref view,
                 docDataExistingUnknown,
-                out frame
+                out var frame
             );
             if (frame != null && ErrorHandler.Succeeded(hr))
             {
@@ -664,8 +649,7 @@ namespace Microsoft.NodejsTools
             if (selectedItems.MoveNext())
             {
                 var currentId = selectedItems.Current.itemid;
-                string name;
-                GetCanonicalName(currentId, out name);
+                GetCanonicalName(currentId, out var name);
                 var nodeFolderNode = project.FindNodeByFullPath(name) as NodejsFolderNode;
             }
 
@@ -788,11 +772,10 @@ namespace Microsoft.NodejsTools
             this._package.GetUIThread().Invoke(() =>
             {
                 string caption;
-                object captionObj;
                 if (ErrorHandler.Failed(this._innerVsHierarchy.GetProperty(
                     (uint)VSConstants.VSITEMID.Root,
                     (int)__VSHPROPID.VSHPROPID_Caption,
-                    out captionObj
+                    out var captionObj
                 )) || string.IsNullOrEmpty(caption = captionObj as string))
                 {
                     return;
@@ -848,43 +831,35 @@ namespace Microsoft.NodejsTools
         {
             Utilities.ArgumentNotNull("project", project);
 
-            object obj;
             ErrorHandler.ThrowOnFailure(project.GetProperty(
                 (uint)VSConstants.VSITEMID.Root,
                 (int)__VSHPROPID.VSHPROPID_FirstChild,
-                out obj
+                out var obj
             ));
 
-            uint id;
-            while (TryGetItemId(obj, out id))
+            while (TryGetItemId(obj, out var id))
             {
-                Guid itemType;
-                string mkDoc;
 
-                if (ErrorHandler.Succeeded(project.GetGuidProperty(id, (int)__VSHPROPID.VSHPROPID_TypeGuid, out itemType)) &&
+                if (ErrorHandler.Succeeded(project.GetGuidProperty(id, (int)__VSHPROPID.VSHPROPID_TypeGuid, out var itemType)) &&
                     itemType == VSConstants.GUID_ItemType_PhysicalFile &&
                     ErrorHandler.Succeeded(project.GetProperty(id, (int)__VSHPROPID.VSHPROPID_Name, out obj)) &&
                     "ServiceDefinition.csdef".Equals(obj as string, StringComparison.InvariantCultureIgnoreCase) &&
-                    ErrorHandler.Succeeded(project.GetCanonicalName(id, out mkDoc)) &&
+                    ErrorHandler.Succeeded(project.GetCanonicalName(id, out var mkDoc)) &&
                     !string.IsNullOrEmpty(mkDoc)
                 )
                 {
                     // We have found the file
                     var rdt = site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
 
-                    IVsHierarchy docHier;
-                    uint docId, docCookie;
-                    IntPtr pDocData;
-
                     var updateFileOnDisk = true;
 
                     if (ErrorHandler.Succeeded(rdt.FindAndLockDocument(
                         (uint)_VSRDTFLAGS.RDT_EditLock,
                         mkDoc,
-                        out docHier,
-                        out docId,
-                        out pDocData,
-                        out docCookie
+                        out var docHier,
+                        out var docId,
+                        out var pDocData,
+                        out var docCookie
                     )))
                     {
                         try
@@ -979,11 +954,8 @@ namespace Microsoft.NodejsTools
                 throw new ArgumentException("lines");
             }
 
-            int lastLine, lastIndex;
-            string text;
-
-            ErrorHandler.ThrowOnFailure(lines.GetLastLineIndex(out lastLine, out lastIndex));
-            ErrorHandler.ThrowOnFailure(lines.GetLineText(0, 0, lastLine, lastIndex, out text));
+            ErrorHandler.ThrowOnFailure(lines.GetLastLineIndex(out var lastLine, out var lastIndex));
+            ErrorHandler.ThrowOnFailure(lines.GetLineText(0, 0, lastLine, lastIndex, out var text));
 
             var doc = new XmlDocument();
             doc.LoadXml(text);
@@ -996,9 +968,8 @@ namespace Microsoft.NodejsTools
             if (userData != null)
             {
                 var guid = VSConstants.VsTextBufferUserDataGuid.VsBufferEncodingVSTFF_guid;
-                object data;
                 int cp;
-                if (ErrorHandler.Succeeded(userData.GetData(ref guid, out data)) &&
+                if (ErrorHandler.Succeeded(userData.GetData(ref guid, out var data)) &&
                     (cp = (data as int? ?? (int)(data as uint? ?? 0)) & (int)__VSTFF.VSTFF_CPMASK) != 0)
                 {
                     try

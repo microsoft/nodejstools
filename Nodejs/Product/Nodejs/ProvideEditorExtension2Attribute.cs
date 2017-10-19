@@ -193,8 +193,7 @@ namespace Microsoft.NodejsTools
                     foreach (var extension in this._extensions)
                     {
                         var extensionAndPri = extension.Split(':');
-                        int pri;
-                        if (extensionAndPri.Length != 2 || !Int32.TryParse(extensionAndPri[1], out pri))
+                        if (extensionAndPri.Length != 2 || !Int32.TryParse(extensionAndPri[1], out var pri))
                         {
                             throw new InvalidOperationException("Expected extension:priority");
                         }

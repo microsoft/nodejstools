@@ -55,8 +55,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                 throw new NotSupportedException("Only V3 source maps are supported");
             }
 
-            object value;
-            if (this._mapInfo.TryGetValue("sources", out value))
+            if (this._mapInfo.TryGetValue("sources", out var value))
             {
                 var sourceRoot = this.SourceRoot;
 
@@ -81,8 +80,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             }
 
             var lineInfos = new List<LineInfo>();
-            object mappingsObj;
-            if (this._mapInfo.TryGetValue("mappings", out mappingsObj) && mappingsObj is string)
+            if (this._mapInfo.TryGetValue("mappings", out var mappingsObj) && mappingsObj is string)
             {
                 var mappings = (string)mappingsObj;
                 var lines = mappings.Split(';');
@@ -353,8 +351,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         private T GetValue<T>(string name, T defaultValue)
         {
-            object version;
-            if (this._mapInfo.TryGetValue(name, out version) && version is T)
+            if (this._mapInfo.TryGetValue(name, out var version) && version is T)
             {
                 return (T)version;
             }

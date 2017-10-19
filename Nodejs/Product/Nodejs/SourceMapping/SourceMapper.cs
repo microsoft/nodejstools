@@ -16,8 +16,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         private JavaScriptSourceMapInfo TryGetMapInfo(string filename)
         {
-            JavaScriptSourceMapInfo mapInfo;
-            if (!this._originalFileToSourceMap.TryGetValue(filename, out mapInfo))
+            if (!this._originalFileToSourceMap.TryGetValue(filename, out var mapInfo))
             {
                 if (File.Exists(filename))
                 {
@@ -102,7 +101,6 @@ namespace Microsoft.NodejsTools.SourceMapping
             var mapInfo = TryGetMapInfo(filename);
             if (mapInfo != null)
             {
-                SourceMapInfo mapping;
                 if (line < mapInfo.Lines.Length)
                 {
                     var lineText = mapInfo.Lines[line];
@@ -120,7 +118,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                         }
                     }
                 }
-                if (mapInfo.Map.TryMapPoint(line, column, out mapping))
+                if (mapInfo.Map.TryMapPoint(line, column, out var mapping))
                 {
                     return mapping;
                 }
@@ -141,8 +139,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             if (sourceMap != null)
             {
-                SourceMapInfo result;
-                if (sourceMap.Mapping.TryMapPointBack(requestedLineNo, requestedColumnNo, out result))
+                if (sourceMap.Mapping.TryMapPointBack(requestedLineNo, requestedColumnNo, out var result))
                 {
                     lineNo = result.Line;
                     columnNo = result.Column;
@@ -225,8 +222,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         private ReverseSourceMap GetReverseSourceMap(string fileName)
         {
-            ReverseSourceMap sourceMap;
-            if (!this._generatedFileToSourceMap.TryGetValue(fileName, out sourceMap))
+            if (!this._generatedFileToSourceMap.TryGetValue(fileName, out var sourceMap))
             {
                 // See if we are using source maps for this file.
                 foreach (var keyValue in this._originalFileToSourceMap)
@@ -335,7 +331,6 @@ namespace Microsoft.NodejsTools.SourceMapping
                     }
                 }
 
-                SourceMapInfo mapping;
                 // We explicitly don't convert our 1 based line numbers into 0 based
                 // line numbers here.  V8 is giving us the starting line of the function,
                 // and TypeScript doesn't give the right name for the declaring name.
@@ -343,7 +338,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                 // for a function definition, and we're always mapping line numbers from
                 // function definitions, so mapping line + 1 happens to work out for
                 // the time being.
-                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out mapping))
+                if (map != null && map.TryMapLine(funcInfo.LineNumber.Value, out var mapping))
                 {
                     var filename = mapping.FileName;
                     if (filename != null && !Path.IsPathRooted(filename))

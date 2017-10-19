@@ -38,8 +38,7 @@ namespace Microsoft.NodejsTools.Jade
 
             if (e.Changes.Count > 0)
             {
-                int start, oldLength, newLength;
-                TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
+                TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
                 var changeStart = Int32.MaxValue;
                 var changeEnd = 0;

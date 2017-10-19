@@ -185,9 +185,8 @@ namespace Microsoft.NodejsTools.Jade
         {
             lock (this._lock)
             {
-                object service = null;
 
-                if (!this._servicesByType.TryGetValue(typeof(T), out service))
+                if (!this._servicesByType.TryGetValue(typeof(T), out var service))
                 {
                     // try walk through and cast. Perhaps someone is asking for IFoo
                     // that is implemented on class Bar but Bar was added as Bar, not as IFoo
@@ -207,9 +206,8 @@ namespace Microsoft.NodejsTools.Jade
         {
             lock (this._lock)
             {
-                object service = null;
 
-                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out service);
+                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out var service);
                 if (service != null)
                     return service as T;
 

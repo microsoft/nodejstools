@@ -101,14 +101,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>String loaded for the specified resource</returns>
         public string GetResourceString(string resourceName)
         {
-            string resourceValue;
             var resourceManager = (IVsResourceManager)GetService(typeof(SVsResourceManager));
             if (resourceManager == null)
             {
                 throw new InvalidOperationException("Could not get SVsResourceManager service. Make sure the package is Sited before calling this method");
             }
             var packageGuid = this.GetType().GUID;
-            var hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out resourceValue);
+            var hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out var resourceValue);
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
             return resourceValue;
         }

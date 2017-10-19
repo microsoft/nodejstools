@@ -208,8 +208,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 var project = task.ModuleID.Hierarchy.GetProject().GetCommonProject();
 
                 HierarchyNode fileNode = fileNode = project.NodeFromItemId(task.ModuleID.ItemID);
-                HierarchyInfo parent;
-                if (fileNode == null || !this._hierarchies.TryGetValue(task.ModuleID.Hierarchy, out parent))
+                if (fileNode == null || !this._hierarchies.TryGetValue(task.ModuleID.Hierarchy, out var parent))
                 {
                     return;
                 }
@@ -330,8 +329,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 if (this._files.TryGetValue(id, out node))
                 {
                     this._files.Remove(id);
-                    HierarchyInfo parent;
-                    if (this._hierarchies.TryGetValue(hierarchy, out parent))
+                    if (this._hierarchies.TryGetValue(hierarchy, out var parent))
                     {
                         parent.ProjectLibraryNode.RemoveNode(node);
                     }
@@ -367,8 +365,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         /// </summary>
         protected bool IsNonMemberItem(IVsHierarchy hierarchy, uint itemId)
         {
-            object val;
-            var hr = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out val);
+            var hr = hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_IsNonMemberItem, out var val);
             return ErrorHandler.Succeeded(hr) && (bool)val;
         }
 
@@ -383,16 +380,12 @@ namespace Microsoft.VisualStudioTools.Navigation
                 var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                 if (rdt != null)
                 {
-                    uint flags, readLocks, editLocks, itemid;
-                    IVsHierarchy hier;
                     var docData = IntPtr.Zero;
-                    string moniker;
                     int hr;
                     try
                     {
-                        hr = rdt.GetDocumentInfo(docCookie, out flags, out readLocks, out editLocks, out moniker, out hier, out itemid, out docData);
-                        TextLineEventListener listner;
-                        if (this._documents.TryGetValue(docCookie, out listner))
+                        hr = rdt.GetDocumentInfo(docCookie, out var flags, out var readLocks, out var editLocks, out var moniker, out var hier, out var itemid, out docData);
+                        if (this._documents.TryGetValue(docCookie, out var listner))
                         {
                             listner.FileName = moniker;
                         }
@@ -435,16 +428,8 @@ namespace Microsoft.VisualStudioTools.Navigation
             var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (null != rdt)
             {
-                // Note that here we don't want to throw in case of error.
-                uint flags;
-                uint readLocks;
-                uint writeLoks;
-                string documentMoniker;
-                IVsHierarchy hierarchy;
-                uint itemId;
-                IntPtr unkDocData;
-                var hr = rdt.GetDocumentInfo(docCookie, out flags, out readLocks, out writeLoks,
-                                             out documentMoniker, out hierarchy, out itemId, out unkDocData);
+                var hr = rdt.GetDocumentInfo(docCookie, out var flags, out var readLocks, out var writeLoks,
+                                             out var documentMoniker, out var hierarchy, out var itemId, out var unkDocData);
                 try
                 {
                     if (Microsoft.VisualStudio.ErrorHandler.Failed(hr) || (IntPtr.Zero == unkDocData))
@@ -496,8 +481,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return VSConstants.S_OK;
             }
-            TextLineEventListener listener;
-            if (!this._documents.TryGetValue(docCookie, out listener) || (null == listener))
+            if (!this._documents.TryGetValue(docCookie, out var listener) || (null == listener))
             {
                 return VSConstants.S_OK;
             }

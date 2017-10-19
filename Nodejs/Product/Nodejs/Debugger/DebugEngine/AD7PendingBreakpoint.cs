@@ -63,10 +63,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 // Get the location in the document that the breakpoint is in.
                 var startPosition = new TEXT_POSITION[1];
                 var endPosition = new TEXT_POSITION[1];
-                string fileName;
                 var docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(this._bpRequestInfo.bpLocation.unionmember2));
                 EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));
-                EngineUtils.CheckOk(docPosition.GetFileName(out fileName));
+                EngineUtils.CheckOk(docPosition.GetFileName(out var fileName));
 
                 this._breakpoint = this._engine.Process.AddBreakpoint(
                     fileName,

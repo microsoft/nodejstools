@@ -38,16 +38,12 @@ namespace Microsoft.VisualStudioTools.Project
             try
             {
                 var rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-
-                IVsHierarchy hierarchy;
-                uint itemId;
-                uint docCookie;
                 IVsFileChangeEx fileChange;
 
                 if (rdt == null)
                     return;
 
-                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.documentFileName, out hierarchy, out itemId, out docData, out docCookie));
+                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.documentFileName, out var hierarchy, out var itemId, out docData, out var docCookie));
 
                 if ((docCookie == (uint)ShellConstants.VSDOCCOOKIE_NIL) || docData == IntPtr.Zero)
                     return;

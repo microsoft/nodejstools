@@ -89,8 +89,7 @@ namespace Microsoft.NodejsTools.Debugger
                     try
                     {
                         var strPid = File.ReadAllText(pidFile);
-                        int pidValue;
-                        if (Int32.TryParse(strPid, out pidValue))
+                        if (Int32.TryParse(strPid, out var pidValue))
                         {
                             pid = pidValue;
                             break;

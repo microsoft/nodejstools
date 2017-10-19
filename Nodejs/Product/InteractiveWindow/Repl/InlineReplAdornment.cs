@@ -29,8 +29,7 @@ namespace Microsoft.NodejsTools.Repl
 
         internal static InlineReplAdornmentManager GetManager(ITextView view)
         {
-            InlineReplAdornmentManager result;
-            if (!view.Properties.TryGetProperty<InlineReplAdornmentManager>(typeof(InlineReplAdornmentManager), out result))
+            if (!view.Properties.TryGetProperty<InlineReplAdornmentManager>(typeof(InlineReplAdornmentManager), out var result))
             {
                 return null;
             }

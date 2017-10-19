@@ -102,8 +102,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_LANGUAGE) != 0)
             {
-                Guid dummy;
-                AD7Engine.MapLanguageInfo(this._stackFrame.FileName, out frameInfo.m_bstrLanguage, out dummy);
+                AD7Engine.MapLanguageInfo(this._stackFrame.FileName, out frameInfo.m_bstrLanguage, out var dummy);
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_LANGUAGE;
             }
 
@@ -356,8 +355,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 }
             }
 
-            string errorMsg;
-            if (!this._stackFrame.TryParseText(pszCode, out errorMsg))
+            if (!this._stackFrame.TryParseText(pszCode, out var errorMsg))
             {
                 pbstrError = "Error: " + errorMsg;
                 pichError = (uint)pbstrError.Length;
@@ -388,8 +386,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         int IDebugProperty2.EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
         {
-            uint pcelt;
-            return ((IDebugStackFrame2)this).EnumProperties(dwFields, dwRadix, ref guidFilter, dwTimeout, out pcelt, out ppEnum);
+            return ((IDebugStackFrame2)this).EnumProperties(dwFields, dwRadix, ref guidFilter, dwTimeout, out var pcelt, out ppEnum);
         }
 
         int IDebugProperty2.GetParent(out IDebugProperty2 ppParent)

@@ -278,8 +278,7 @@ namespace Microsoft.NodejsTools.Repl
             IVsTextView textViewAdapter = adapterFactory.CreateVsTextViewAdapter(provider, CreateRoleSet());
 
             // make us a code window so we'll have the same colors as a normal code window.
-            IVsTextEditorPropertyContainer propContainer;
-            ErrorHandler.ThrowOnFailure(((IVsTextEditorPropertyCategoryContainer)textViewAdapter).GetPropertyCategory(Microsoft.VisualStudio.Editor.DefGuidList.guidEditPropCategoryViewMasterSettings, out propContainer));
+            ErrorHandler.ThrowOnFailure(((IVsTextEditorPropertyCategoryContainer)textViewAdapter).GetPropertyCategory(Microsoft.VisualStudio.Editor.DefGuidList.guidEditPropCategoryViewMasterSettings, out var propContainer));
             propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewComposite_AllCodeWindowDefaults, true);
             propContainer.SetProperty(VSEDITPROPID.VSEDITPROPID_ViewGlobalOpt_AutoScrollCaretOnTextEntry, true);
 
@@ -406,8 +405,7 @@ namespace Microsoft.NodejsTools.Repl
 
             // add our toolbar which  is defined in our VSCT file
             var frame = (IVsWindowFrame)Frame;
-            object otbh;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out otbh));
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_ToolbarHost, out var otbh));
             IVsToolWindowToolbarHost tbh = otbh as IVsToolWindowToolbarHost;
             Guid guidPerfMenuGroup = Guids.guidReplWindowCmdSet;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(tbh.AddToolbar(VSTWT_LOCATION.VSTWT_TOP, ref guidPerfMenuGroup, PkgCmdIDList.menuIdReplToolbar));
@@ -549,8 +547,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public static ReplWindow FromBuffer(ITextBuffer buffer)
         {
-            object result;
-            buffer.Properties.TryGetProperty(typeof(ReplWindow), out result);
+            buffer.Properties.TryGetProperty(typeof(ReplWindow), out object result);
             return result as ReplWindow;
         }
 
@@ -2474,9 +2471,7 @@ namespace Microsoft.NodejsTools.Repl
             int insertBeforePrompt = -1;
             if (!_isRunning)
             {
-                int lastPrimaryPrompt, lastPrompt;
-
-                IndexOfLastPrompt(out lastPrimaryPrompt, out lastPrompt);
+                IndexOfLastPrompt(out var lastPrimaryPrompt, out var lastPrompt);
 
                 // If the last prompt is STDIN prompt insert output before it, otherwise before the primary prompt:
                 insertBeforePrompt = (lastPrompt != -1 && _projectionSpans[lastPrompt].Kind == ReplSpanKind.StandardInputPrompt) ? lastPrompt : lastPrimaryPrompt;

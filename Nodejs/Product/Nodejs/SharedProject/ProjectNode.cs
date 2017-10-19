@@ -1355,9 +1355,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             contextParams[4] = itemName;
 
-            object objInstallationDir = null;
             var shell = (IVsShell)this.GetService(typeof(IVsShell));
-            ErrorHandler.ThrowOnFailure(shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out objInstallationDir));
+            ErrorHandler.ThrowOnFailure(shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out var objInstallationDir));
             var installDir = CommonUtils.NormalizeDirectoryPath((string)objInstallationDir);
 
             contextParams[5] = installDir;
@@ -1912,9 +1911,8 @@ namespace Microsoft.VisualStudioTools.Project
             else
             {
                 // See if the parent node already exist in the hierarchy
-                uint parentItemID;
                 var path = CommonUtils.GetAbsoluteFilePath(this.ProjectHome, dependentOf);
-                if (ErrorHandler.Succeeded(this.ParseCanonicalName(path, out parentItemID)) &&
+                if (ErrorHandler.Succeeded(this.ParseCanonicalName(path, out var parentItemID)) &&
                     parentItemID != 0)
                 {
                     parent = this.NodeFromItemId(parentItemID);
@@ -2244,8 +2242,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // If the folder already exists, return early
             var strFullPath = CommonUtils.GetAbsoluteDirectoryPath(this.ProjectHome, path);
-            uint uiItemId;
-            if (ErrorHandler.Succeeded(ParseCanonicalName(strFullPath, out uiItemId)) &&
+            if (ErrorHandler.Succeeded(ParseCanonicalName(strFullPath, out var uiItemId)) &&
                 uiItemId != 0)
             {
                 var folder = this.NodeFromItemId(uiItemId) as FolderNode;
@@ -2332,8 +2329,7 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(!CommonUtils.HasEndSeparator(relativePath));
 
             FolderNode folderNode = null;
-            uint uiItemId;
-            if (ErrorHandler.Succeeded(this.ParseCanonicalName(fullPath, out uiItemId)) &&
+            if (ErrorHandler.Succeeded(this.ParseCanonicalName(fullPath, out var uiItemId)) &&
                 uiItemId != 0)
             {
                 Debug.Assert(this.NodeFromItemId(uiItemId) is FolderNode, "Not a FolderNode");
@@ -2395,11 +2391,7 @@ namespace Microsoft.VisualStudioTools.Project
             var selectionContainer = IntPtr.Zero;
             try
             {
-                // Get the current project hierarchy, project item, and selection container for the current selection
-                // If the selection spans multiple hierachies, hierarchyPtr is Zero
-                uint itemid;
-                IVsMultiItemSelect multiItemSelect = null;
-                ErrorHandler.ThrowOnFailure(monitorSelection.GetCurrentSelection(out hierarchyPtr, out itemid, out multiItemSelect, out selectionContainer));
+                ErrorHandler.ThrowOnFailure(monitorSelection.GetCurrentSelection(out hierarchyPtr, out var itemid, out var multiItemSelect, out selectionContainer));
 
                 // We only care if there are one ore more nodes selected in the tree
                 if (itemid != VSConstants.VSITEMID_NIL && hierarchyPtr != IntPtr.Zero)
@@ -2420,12 +2412,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     else if (multiItemSelect != null)
                     {
-                        // This is a multiple item selection.
-
-                        //Get number of items selected and also determine if the items are located in more than one hierarchy
-                        uint numberOfSelectedItems;
-                        int isSingleHierarchyInt;
-                        ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out numberOfSelectedItems, out isSingleHierarchyInt));
+                        ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out var numberOfSelectedItems, out var isSingleHierarchyInt));
                         var isSingleHierarchy = (isSingleHierarchyInt != 0);
 
                         // Now loop all selected items and add to the list only those that are selected within this hierarchy
@@ -2559,9 +2546,8 @@ namespace Microsoft.VisualStudioTools.Project
             // Figure out what the new full name is
             var oldFile = this.Url;
 
-            var canContinue = 0;
             var vsSolution = (IVsSolution)GetService(typeof(SVsSolution));
-            if (ErrorHandler.Succeeded(vsSolution.QueryRenameProject(GetOuterInterface<IVsProject>(), oldFile, newFile, 0, out canContinue))
+            if (ErrorHandler.Succeeded(vsSolution.QueryRenameProject(GetOuterInterface<IVsProject>(), oldFile, newFile, 0, out var canContinue))
                 && canContinue != 0)
             {
                 var isFileSame = CommonUtils.IsSamePath(oldFile, newFile);
@@ -2928,8 +2914,7 @@ namespace Microsoft.VisualStudioTools.Project
             var solution = this.Site.GetService(typeof(IVsSolution)) as IVsSolution;
             Utilities.CheckNotNull(solution, "Could not retrieve the solution form the service provider");
 
-            var canRenameContinue = 0;
-            ErrorHandler.ThrowOnFailure(solution.QueryRenameProject(this.GetOuterInterface<IVsProject>(), this.filename, newFileName, 0, out canRenameContinue));
+            ErrorHandler.ThrowOnFailure(solution.QueryRenameProject(this.GetOuterInterface<IVsProject>(), this.filename, newFileName, 0, out var canRenameContinue));
 
             if (canRenameContinue == 0)
             {
@@ -3207,8 +3192,7 @@ namespace Microsoft.VisualStudioTools.Project
             ErrorHandler.ThrowOnFailure(
                 solutionBuild.FindActiveProjectCfg(IntPtr.Zero, IntPtr.Zero, GetOuterHierarchy(), cfg));
 
-            string name;
-            ErrorHandler.ThrowOnFailure(cfg[0].get_CanonicalName(out name));
+            ErrorHandler.ThrowOnFailure(cfg[0].get_CanonicalName(out var name));
             SetConfiguration(name);
         }
 
@@ -3623,9 +3607,6 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         qef |= tagVSQueryEditFlags.QEF_NoReload;
                     }
-
-                    uint verdict;
-                    uint moreInfo;
                     var flags = new uint[files.Length];
                     var attributes = new VSQEQS_FILE_ATTRIBUTE_DATA[files.Length];
                     var hr = queryEditQuerySave.QueryEditFiles(
@@ -3634,8 +3615,8 @@ namespace Microsoft.VisualStudioTools.Project
                         files, // array of files
                         flags, // no per file flags
                         attributes, // no per file file attributes
-                        out verdict,
-                        out moreInfo // ignore additional results
+                        out var verdict,
+                        out var moreInfo // ignore additional results
                     );
 
                     var qer = (tagVSQueryEditResult)verdict;
@@ -3882,8 +3863,7 @@ namespace Microsoft.VisualStudioTools.Project
                 InitializeCATIDs();
             }
 
-            Guid result;
-            if (this.catidMapping.TryGetValue(type, out result))
+            if (this.catidMapping.TryGetValue(type, out var result))
             {
                 return result;
             }
@@ -3931,8 +3911,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // We need to loop through all the flavors
-            string flavorsGuid;
-            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out flavorsGuid));
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out var flavorsGuid));
             foreach (var flavor in Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(flavorsGuid))
             {
                 // Look for a matching fragment
@@ -4027,8 +4006,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 // We need to loop through all the flavors
-                string flavorsGuid;
-                ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out flavorsGuid));
+                ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out var flavorsGuid));
                 foreach (var flavor in Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(flavorsGuid))
                 {
                     var outerHierarchy = GetOuterInterface<IPersistXMLFragment>();
@@ -4060,8 +4038,7 @@ namespace Microsoft.VisualStudioTools.Project
                     foreach (var config in configs)
                     {
                         // Get the fragment for this flavor/config pair
-                        string fragment;
-                        ErrorHandler.ThrowOnFailure(((ProjectConfig)config).GetXmlFragment(flavor, _PersistStorageType.PST_PROJECT_FILE, out fragment));
+                        ErrorHandler.ThrowOnFailure(((ProjectConfig)config).GetXmlFragment(flavor, _PersistStorageType.PST_PROJECT_FILE, out var fragment));
                         if (!string.IsNullOrEmpty(fragment))
                         {
                             WrapXmlFragment(doc, root, flavor, ((ProjectConfig)config).ConfigName, ((ProjectConfig)config).PlatformName, fragment);
@@ -4144,12 +4121,11 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             i = 0;
-            int count;
-            ErrorHandler.ThrowOnFailure(parse.GetParamCount(out count));
+            ErrorHandler.ThrowOnFailure(parse.GetParamCount(out var count));
             for (i = 0; i < count; ++i)
             {
-                string key = i.ToString(), value;
-                ErrorHandler.ThrowOnFailure(parse.GetParam(i, out value));
+                string key = i.ToString();
+                ErrorHandler.ThrowOnFailure(parse.GetParam(i, out var value));
                 res[key] = value;
             }
 
@@ -5191,11 +5167,8 @@ If the files in the existing folder have the same names as files in the folder y
             {
                 return VSConstants.E_ABORT;
             }
-
-            string doc;
-            int found;
             IVsHierarchy pHier;
-            uint id, readLocks, editLocks;
+            uint id;
             var docdataForCookiePtr = IntPtr.Zero;
             var docDataPtr = IntPtr.Zero;
             var hierPtr = IntPtr.Zero;
@@ -5216,7 +5189,7 @@ If the files in the existing folder have the same names as files in the folder y
             //Get the document info
             try
             {
-                ErrorHandler.ThrowOnFailure(pRdt.GetDocumentInfo(cookie, out grfFlags, out readLocks, out editLocks, out doc, out pHier, out id, out docDataPtr));
+                ErrorHandler.ThrowOnFailure(pRdt.GetDocumentInfo(cookie, out grfFlags, out var readLocks, out var editLocks, out var doc, out pHier, out id, out docDataPtr));
             }
             finally
             {
@@ -5229,7 +5202,7 @@ If the files in the existing folder have the same names as files in the folder y
             // Now see if the document is in the project. If not, we fail
             try
             {
-                ErrorHandler.ThrowOnFailure(IsDocumentInProject(newMkDoc, out found, priority, out itemid));
+                ErrorHandler.ThrowOnFailure(IsDocumentInProject(newMkDoc, out var found, priority, out itemid));
                 Debug.Assert(itemid != VSConstants.VSITEMID_NIL && itemid != VSConstants.VSITEMID_ROOT);
                 hierPtr = Marshal.GetComInterfaceForObject(this, typeof(IVsUIHierarchy));
                 // Now rename the document
@@ -5724,14 +5697,13 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                IVsCfg configurationInterface;
                 int platformStart;
                 if ((platformStart = configName.IndexOf('|')) != -1)
                 {
                     // matches C# project system, GetPropertyValue handles display name, not just config name
                     configName = configName.Substring(0, platformStart);
                 }
-                ErrorHandler.ThrowOnFailure(this.ConfigProvider.GetCfgOfName(configName, string.Empty, out configurationInterface));
+                ErrorHandler.ThrowOnFailure(this.ConfigProvider.GetCfgOfName(configName, string.Empty, out var configurationInterface));
                 var config = (ProjectConfig)configurationInterface;
                 propertyValue = config.GetConfigurationProperty(propertyName, true);
             }
@@ -5788,8 +5760,7 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                IVsCfg configurationInterface;
-                ErrorHandler.ThrowOnFailure(this.ConfigProvider.GetCfgOfName(configName, string.Empty, out configurationInterface));
+                ErrorHandler.ThrowOnFailure(this.ConfigProvider.GetCfgOfName(configName, string.Empty, out var configurationInterface));
                 var config = (ProjectConfig)configurationInterface;
                 config.SetConfigurationProperty(propertyName, propertyValue);
             }
@@ -5871,8 +5842,7 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                HierarchyNode parent;
-                if (this._diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(this.ProjectHome, strPath)) + "\\", out parent))
+                if (this._diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(this.ProjectHome, strPath)) + "\\", out var parent))
                 {
                     // fast path, filename is normalized, and the folder already exists
                     return parent;
@@ -6359,8 +6329,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             Debug.Assert(Path.IsPathRooted(name));
 
-            HierarchyNode node;
-            this._diskNodes.TryGetValue(name, out node);
+            this._diskNodes.TryGetValue(name, out var node);
             return node;
         }
 
@@ -6856,8 +6825,7 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                bool cancel, showStandardDialog;
-                items[0].ShowDeleteMessage(items, (__VSDELETEITEMOPERATION)dwDelItemOps, out cancel, out showStandardDialog);
+                items[0].ShowDeleteMessage(items, (__VSDELETEITEMOPERATION)dwDelItemOps, out var cancel, out var showStandardDialog);
 
                 if (showStandardDialog || cancel)
                 {

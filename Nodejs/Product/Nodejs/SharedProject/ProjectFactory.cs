@@ -167,9 +167,7 @@ namespace Microsoft.VisualStudioTools.Project
             var iid = typeof(IVsHierarchy).GUID;
             return VsTaskLibraryHelper.CreateAndStartTask(this.taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
             {
-                IntPtr project;
-                int cancelled;
-                CreateProject(filename, location, pszName, flags, ref iid, out project, out cancelled);
+                CreateProject(filename, location, pszName, flags, ref iid, out var project, out var cancelled);
                 if (cancelled != 0)
                 {
                     throw new OperationCanceledException();
@@ -303,13 +301,12 @@ namespace Microsoft.VisualStudioTools.Project
 
             // We first run (or re-run) the upgrade check and bail out early if
             // there is actually no need to upgrade.
-            uint dummy;
             var hr = ((IVsProjectUpgradeViaFactory)this).UpgradeProject_CheckOnly(
                 bstrFileName,
                 pLogger,
                 out pUpgradeRequired,
                 out pguidNewProjectFactory,
-                out dummy
+                out var dummy
             );
 
             if (!ErrorHandler.Succeeded(hr))
@@ -409,8 +406,6 @@ namespace Microsoft.VisualStudioTools.Project
                 var queryEdit = this.site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
                 if (queryEdit != null)
                 {
-                    uint editVerdict;
-                    uint queryEditMoreInfo;
                     var tagVSQueryEditFlags_QEF_AllowUnopenedProjects = (tagVSQueryEditFlags)0x80;
 
                     ErrorHandler.ThrowOnFailure(queryEdit.QueryEditFiles(
@@ -421,8 +416,8 @@ namespace Microsoft.VisualStudioTools.Project
                         new[] { bstrFileName },
                         null,
                         null,
-                        out editVerdict,
-                        out queryEditMoreInfo
+                        out var editVerdict,
+                        out var queryEditMoreInfo
                     ));
 
                     if (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK)

@@ -345,8 +345,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (langSid != Guid.Empty)
                 {
                     var vsCoreSid = new Guid("{8239bec4-ee87-11d0-8c98-00c04fc2ab22}");
-                    Guid currentSid;
-                    ErrorHandler.ThrowOnFailure(textLines.GetLanguageServiceID(out currentSid));
+                    ErrorHandler.ThrowOnFailure(textLines.GetLanguageServiceID(out var currentSid));
                     // If the language service is set to the default SID, then
                     // set it to our language
                     if (currentSid == vsCoreSid)

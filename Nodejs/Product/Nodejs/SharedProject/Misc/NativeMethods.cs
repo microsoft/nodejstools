@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -571,8 +571,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public static void SetErrorDescription(string description, params object[] args)
         {
-            ICreateErrorInfo errInfo;
-            ErrorHandler.ThrowOnFailure(CreateErrorInfo(out errInfo));
+            ErrorHandler.ThrowOnFailure(CreateErrorInfo(out var errInfo));
 
             errInfo.SetDescription(string.Format(description, args));
             var guidNull = Guid.Empty;
@@ -738,9 +737,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         public static ProcessorArchitecture GetBinaryType(string path)
         {
-            GetBinaryTypeResult result;
 
-            if (_GetBinaryType(path, out result))
+            if (_GetBinaryType(path, out var result))
             {
                 switch (result)
                 {

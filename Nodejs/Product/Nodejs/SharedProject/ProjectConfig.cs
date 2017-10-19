@@ -305,8 +305,7 @@ namespace Microsoft.VisualStudioTools.Project
                 var actual = new uint[1];
                 name = this.configName;
                 // currently, we only support one platform, so just add it..
-                IVsCfgProvider provider;
-                ErrorHandler.ThrowOnFailure(this.project.GetCfgProvider(out provider));
+                ErrorHandler.ThrowOnFailure(this.project.GetCfgProvider(out var provider));
                 ErrorHandler.ThrowOnFailure(((IVsCfgProvider2)provider).GetPlatformNames(1, platform, actual));
                 if (!string.IsNullOrEmpty(platform[0]))
                 {
@@ -386,8 +385,7 @@ namespace Microsoft.VisualStudioTools.Project
         public virtual int get_ProjectCfgProvider(out IVsProjectCfgProvider p)
         {
             p = null;
-            IVsCfgProvider cfgProvider = null;
-            this.project.GetCfgProvider(out cfgProvider);
+            this.project.GetCfgProvider(out var cfgProvider);
             if (cfgProvider != null)
             {
                 p = cfgProvider as IVsProjectCfgProvider;
@@ -432,8 +430,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Search through our list of groups to find the one they are looking forgroupName
             foreach (var group in this.OutputGroups)
             {
-                string groupName;
-                group.get_CanonicalName(out groupName);
+                group.get_CanonicalName(out var groupName);
                 if (StringComparer.OrdinalIgnoreCase.Equals(groupName, szCanonicalName))
                 {
                     ppIVsOutputGroup = group;
@@ -617,8 +614,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
             var guidsList = string.Empty;
             var hierarchy = this.project.GetOuterInterface<IVsHierarchy>();
-            object variant = null;
-            ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList, out variant), new int[] { VSConstants.DISP_E_MEMBERNOTFOUND, VSConstants.E_NOTIMPL });
+            ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList, out var variant), new int[] { VSConstants.DISP_E_MEMBERNOTFOUND, VSConstants.E_NOTIMPL });
             guidsList = (string)variant;
 
             var guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
@@ -870,8 +866,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else if (iidCfg == typeof(IVsBuildableProjectCfg).GUID)
             {
-                IVsBuildableProjectCfg buildableConfig;
-                this.get_BuildableProjectCfg(out buildableConfig);
+                this.get_BuildableProjectCfg(out var buildableConfig);
                 //
                 //In some cases we've intentionally shutdown the build options
                 //  If buildableConfig is null then don't try to get the BuildableProjectCfg interface

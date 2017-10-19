@@ -82,19 +82,14 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
-                        IVsUIHierarchy hier;
-                        uint itemid;
 
-                        IVsWindowFrame windowFrame;
 
-                        VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, VSConstants.LOGVIEWID_Any, out hier, out itemid, out windowFrame);
+                        VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, VSConstants.LOGVIEWID_Any, out var hier, out var itemid, out var windowFrame);
 
                         if (windowFrame != null)
                         {
-                            object var;
-                            ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocCookie, out var));
-                            object documentAsObject;
-                            ErrorHandler.ThrowOnFailure(scope.Extensibility.GetDocumentFromDocCookie((int)var, out documentAsObject));
+                            ErrorHandler.ThrowOnFailure(windowFrame.GetProperty((int)__VSFPROPID.VSFPROPID_DocCookie, out var var));
+                            ErrorHandler.ThrowOnFailure(scope.Extensibility.GetDocumentFromDocCookie((int)var, out var documentAsObject));
                             Utilities.CheckNotNull(documentAsObject);
 
                             document = (Document)documentAsObject;
@@ -138,17 +133,13 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                             // Not a valid guid
                             throw new ArgumentException(SR.GetString(SR.ParameterMustBeAValidGuid), "viewKind");
                         }
-
-                        uint itemid;
-                        IVsHierarchy ivsHierarchy;
-                        uint docCookie;
                         var rdt = this.Node.ProjectMgr.Site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
                         if (rdt == null)
                         {
                             throw new InvalidOperationException("Could not get running document table from the services exposed by this project");
                         }
 
-                        ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.Node.Url, out ivsHierarchy, out itemid, out docData, out docCookie));
+                        ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.Node.Url, out var ivsHierarchy, out var itemid, out docData, out var docCookie));
 
                         // Open the file using the IVsProject interface
                         // We get the outer hierarchy so that projects can customize opening.
@@ -238,12 +229,9 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             {
                 this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    IVsUIHierarchy hier;
-                    uint itemid;
 
-                    IVsWindowFrame windowFrame;
 
-                    isOpen = VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, logicalViewGuid, out hier, out itemid, out windowFrame);
+                    isOpen = VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, logicalViewGuid, out var hier, out var itemid, out var windowFrame);
                 });
             }
 
@@ -298,15 +286,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         {
                             throw new InvalidOperationException("Could not get running document table from the services exposed by this project");
                         }
-
-                        // First we see if someone else has opened the requested view of the file.
-                        uint itemid;
-                        IVsHierarchy ivsHierarchy;
-                        uint docCookie;
                         int canceled;
                         var url = this.Node.Url;
 
-                        ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, url, out ivsHierarchy, out itemid, out docData, out docCookie));
+                        ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, url, out var ivsHierarchy, out var itemid, out docData, out var docCookie));
 
                         // If an empty file name is passed in for Save then make the file name the project name.
                         if (!isCalledFromSaveAs && fileName.Length == 0)

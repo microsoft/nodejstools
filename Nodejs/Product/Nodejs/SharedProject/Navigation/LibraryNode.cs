@@ -116,8 +116,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             lock (this.Children)
             {
                 this.Children.Add(node);
-                LibraryNode[] nodes;
-                if (!this._childrenByName.TryGetValue(node.Name, out nodes))
+                if (!this._childrenByName.TryGetValue(node.Name, out var nodes))
                 {
                     // common case, no duplicates by name
                     this._childrenByName[node.Name] = new[] { node };
@@ -143,8 +142,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 {
                     this.Children.Remove(node);
 
-                    LibraryNode[] items;
-                    if (this._childrenByName.TryGetValue(node.Name, out items))
+                    if (this._childrenByName.TryGetValue(node.Name, out var items))
                     {
                         if (items.Length == 1)
                         {
@@ -248,8 +246,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         public IVsSimpleObjectList2 FilterView(uint filterType)
         {
             var libraryNodeType = (LibraryNodeType)filterType;
-            LibraryNode filtered = null;
-            if (this._filteredView.TryGetValue(libraryNodeType, out filtered))
+            if (this._filteredView.TryGetValue(libraryNodeType, out var filtered))
             {
                 return filtered as IVsSimpleObjectList2;
             }

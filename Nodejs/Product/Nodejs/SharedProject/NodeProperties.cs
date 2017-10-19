@@ -178,8 +178,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
                 var guidsList = string.Empty;
                 var hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
-                object variant = null;
-                ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out variant));
+                ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out var variant));
                 guidsList = (string)variant;
 
                 var guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
@@ -699,8 +698,7 @@ namespace Microsoft.VisualStudioTools.Project
             // as this is how the Properties Browser calls us
             if (editorBaseType == typeof(ComponentEditor))
             {
-                IOleServiceProvider sp;
-                ErrorHandler.ThrowOnFailure(this.Node.ProjectMgr.GetSite(out sp));
+                ErrorHandler.ThrowOnFailure(this.Node.ProjectMgr.GetSite(out var sp));
                 return new PropertiesEditorLauncher(new ServiceProvider(sp));
             }
 

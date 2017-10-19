@@ -32,16 +32,14 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             // at our program provider and debug->attach doesn't work.
             if (port != null && port.QueryIsLocal() == VSConstants.S_FALSE)
             {
-                IDebugCoreServer3 server;
-                if (ErrorHandler.Succeeded(port.GetServer(out server)))
+                if (ErrorHandler.Succeeded(port.GetServer(out var server)))
                 {
                     var dbgServer = server as IDebugCoreServer90;
                     if (dbgServer != null)
                     {
                         var g = typeof(IDebugProgramProvider2).GUID;
-                        IntPtr remoteProviderPunk;
 
-                        var hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out remoteProviderPunk);
+                        var hr = dbgServer.CreateManagedInstanceInServer(typeof(AD7ProgramProvider).FullName, typeof(AD7ProgramProvider).Assembly.FullName, 0, ref g, out var remoteProviderPunk);
                         try
                         {
                             if (ErrorHandler.Succeeded(hr))

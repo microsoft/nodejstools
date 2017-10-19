@@ -228,9 +228,8 @@ namespace Microsoft.NodejsTools.Jade
                 // make sure our package is loaded so we can use its
                 // OnIdle event
                 var nodePackage = new Guid(Guids.NodejsPackageString);
-                IVsPackage package;
                 var shell = (IVsShell)NodejsPackage.GetGlobalService(typeof(SVsShell));
-                shell.LoadPackage(ref nodePackage, out package);
+                shell.LoadPackage(ref nodePackage, out var package);
 
                 NodejsPackage.Instance.OnIdle += this.OnIdle;
             }

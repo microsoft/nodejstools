@@ -40,13 +40,9 @@ namespace Microsoft.NodejsTools.Debugger
         /// </summary>
         public FilePosition GetPosition(SourceMapper mapper)
         {
-            // Checks whether source map is available
-            string javaScriptFileName;
-            int javaScriptLine;
-            int javaScriptColumn;
 
             if (mapper != null &&
-                mapper.MapToJavaScript(this.Target.FileName, this.Target.Line, this.Target.Column, out javaScriptFileName, out javaScriptLine, out javaScriptColumn))
+                mapper.MapToJavaScript(this.Target.FileName, this.Target.Line, this.Target.Column, out var javaScriptFileName, out var javaScriptLine, out var javaScriptColumn))
             {
                 return new FilePosition(javaScriptFileName, javaScriptLine, javaScriptColumn);
             }

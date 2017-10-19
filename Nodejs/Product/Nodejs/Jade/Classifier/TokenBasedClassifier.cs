@@ -55,8 +55,7 @@ namespace Microsoft.NodejsTools.Jade
 
         protected virtual void OnTextChanged(object sender, TextContentChangedEventArgs e)
         {
-            int start, oldLength, newLength;
-            TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
+            TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
             // check if change is still within current snapshot. the problem is that
             // change could have been calculated against projected buffer and then

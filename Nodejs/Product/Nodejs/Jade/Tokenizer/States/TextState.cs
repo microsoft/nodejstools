@@ -39,8 +39,7 @@ namespace Microsoft.NodejsTools.Jade
                     if (this._cs.CurrentChar == ';')
                     {
                         var candidate = this._cs.GetSubstringAt(range.Start, range.Length);
-                        char mappedChar;
-                        if (EntityTable.IsEntity(candidate, out mappedChar))
+                        if (EntityTable.IsEntity(candidate, out var mappedChar))
                         {
                             this._cs.MoveToNextChar();
                             AddToken(JadeTokenType.Entity, range.Start - 1, range.Length + 2);

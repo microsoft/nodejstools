@@ -169,8 +169,7 @@ namespace Microsoft.NodejsTools.Repl
                 }
             }
 
-            Guid languageServiceGuid;
-            if (!Guid.TryParse(languageServiceId, out languageServiceGuid))
+            if (!Guid.TryParse(languageServiceId, out var languageServiceGuid))
             {
                 return false;
             }
@@ -182,8 +181,7 @@ namespace Microsoft.NodejsTools.Repl
                 return false;
             }
 
-            string[] roles;
-            var evaluator = GetReplEvaluator(model, replId, out roles);
+            var evaluator = GetReplEvaluator(model, replId, out var roles);
             if (evaluator == null)
             {
                 return false;
@@ -199,8 +197,7 @@ namespace Microsoft.NodejsTools.Repl
 
         private ReplWindow FindReplWindowInternal(int id)
         {
-            ReplWindow res;
-            if (_windows.TryGetValue(id, out res))
+            if (_windows.TryGetValue(id, out var res))
             {
                 return res;
             }
@@ -224,7 +221,6 @@ namespace Microsoft.NodejsTools.Repl
             Guid clsId = replWindow.ToolClsid;
             Guid toolType = typeof(ReplWindow).GUID;
             Guid empty = Guid.Empty;
-            IVsWindowFrame frame;
 
             // we don't pass __VSCREATETOOLWIN.CTW_fMultiInstance because multi instance panes are
             // destroyed when closed.  We are really multi instance but we don't want to be closed.  This
@@ -245,7 +241,7 @@ namespace Microsoft.NodejsTools.Repl
                     null,
                     title,
                     null,
-                    out frame
+                    out var frame
                 )
             );
 

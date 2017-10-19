@@ -35,11 +35,8 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new InvalidOperationException("Could not get the UI shell from the project");
             }
 
-            object pvar;
-            IVsWindowFrame frame;
-
-            if (ErrorHandler.Succeeded(shell.FindToolWindow(0, ref persistenceSlot, out frame)) &&
-                ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out pvar)))
+            if (ErrorHandler.Succeeded(shell.FindToolWindow(0, ref persistenceSlot, out var frame)) &&
+                ErrorHandler.Succeeded(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var pvar)))
             {
                 return pvar as IVsUIHierarchyWindow;
             }
@@ -85,8 +82,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             ErrorHandler.ThrowOnFailure(pWindowFrame.Show());
-            int line, col;
-            ErrorHandler.ThrowOnFailure(viewAdapter.GetLineAndColumn(pos, out line, out col));
+            ErrorHandler.ThrowOnFailure(viewAdapter.GetLineAndColumn(pos, out var line, out var col));
             ErrorHandler.ThrowOnFailure(viewAdapter.SetCaretPos(line, col));
             // Make sure that the text is visible.
             viewAdapter.CenterLines(line, 1);
@@ -95,30 +91,25 @@ namespace Microsoft.VisualStudioTools.Project
         internal static void OpenDocument(IServiceProvider serviceProvider, string filename, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame)
         {
             var textMgr = (IVsTextManager)serviceProvider.GetService(typeof(SVsTextManager));
-
-            IVsUIHierarchy hierarchy;
-            uint itemid;
             VsShellUtilities.OpenDocument(
                 serviceProvider,
                 filename,
                 Guid.Empty,
-                out hierarchy,
-                out itemid,
+                out var hierarchy,
+                out var itemid,
                 out pWindowFrame,
                 out viewAdapter);
         }
 
         internal static void OpenDocument(IServiceProvider serviceProvider, string filename, Guid docViewGuid, out IVsTextView viewAdapter, out IVsWindowFrame pWindowFrame)
         {
-            IVsUIHierarchy hierarchy;
-            uint itemid;
             VsShellUtilities.OpenDocumentWithSpecificEditor(
                 serviceProvider,
                 filename,
                 docViewGuid,
                 Guid.Empty,
-                out hierarchy,
-                out itemid,
+                out var hierarchy,
+                out var itemid,
                 out pWindowFrame
             );
             viewAdapter = VsShellUtilities.GetTextView(pWindowFrame);

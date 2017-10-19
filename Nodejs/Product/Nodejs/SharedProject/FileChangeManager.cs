@@ -210,8 +210,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (!this.observedItems.ContainsKey(fullFileName))
             {
                 // Observe changes to the file
-                uint fileChangeCookie;
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out fileChangeCookie));
+                ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out var fileChangeCookie));
 
                 var itemInfo = new ObservedItemInfo();
                 itemInfo.ItemID = id;

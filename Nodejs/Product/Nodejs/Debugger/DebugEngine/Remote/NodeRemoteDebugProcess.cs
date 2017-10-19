@@ -152,8 +152,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         {
             get
             {
-                string portName;
-                this._port.GetPortName(out portName);
+                this._port.GetPortName(out var portName);
                 return Path.GetFileName(this._exe) + " @ " + portName;
             }
         }

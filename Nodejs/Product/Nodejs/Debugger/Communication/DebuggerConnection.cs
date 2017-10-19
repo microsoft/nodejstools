@@ -294,8 +294,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                             match = _nodeVersionFieldRegex.Match(field);
                             if (match.Success)
                             {
-                                Version nodeVersion;
-                                Version.TryParse(match.Groups[1].Value, out nodeVersion);
+                                Version.TryParse(match.Groups[1].Value, out var nodeVersion);
                                 this._nodeVersion = nodeVersion;
                             }
                         }

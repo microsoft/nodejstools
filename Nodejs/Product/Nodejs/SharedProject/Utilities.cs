@@ -39,11 +39,9 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull("site", site);
 
             var selectionMonitor = site.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
-            uint cookie = 0;
-            var active = 0;
             var designContext = VSConstants.UICONTEXT_DesignMode;
-            ErrorHandler.ThrowOnFailure(selectionMonitor.GetCmdUIContextCookie(ref designContext, out cookie));
-            ErrorHandler.ThrowOnFailure(selectionMonitor.IsCmdUIContextActive(cookie, out active));
+            ErrorHandler.ThrowOnFailure(selectionMonitor.GetCmdUIContextCookie(ref designContext, out var cookie));
+            ErrorHandler.ThrowOnFailure(selectionMonitor.IsCmdUIContextActive(cookie, out var active));
             return active != 0;
         }
 
@@ -63,8 +61,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 throw new InvalidOperationException();
             }
-            var inAutomation = 0;
-            ErrorHandler.ThrowOnFailure(extensibility.IsInAutomationFunction(out inAutomation));
+            ErrorHandler.ThrowOnFailure(extensibility.IsInAutomationFunction(out var inAutomation));
             return inAutomation != 0;
         }
 
@@ -154,14 +151,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal static bool GuidEquals(string x, string y)
         {
-            Guid gx, gy;
-            return Guid.TryParse(x, out gx) && Guid.TryParse(y, out gy) && gx == gy;
+            return Guid.TryParse(x, out var gx) && Guid.TryParse(y, out var gy) && gx == gy;
         }
 
         internal static bool GuidEquals(Guid x, string y)
         {
-            Guid gy;
-            return Guid.TryParse(y, out gy) && x == gy;
+            return Guid.TryParse(y, out var gy) && x == gy;
         }
 
         internal static void CheckNotNull(object value, string message = null)

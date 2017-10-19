@@ -62,8 +62,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string canonicalName;
-                ErrorHandler.ThrowOnFailure(get_CanonicalName(out canonicalName));
+                ErrorHandler.ThrowOnFailure(get_CanonicalName(out var canonicalName));
                 return canonicalName;
             }
         }
@@ -78,8 +77,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Generate dependencies if such a task exist
             if (this._project.BuildProject.Targets.ContainsKey(this._targetName))
             {
-                var succeeded = false;
-                this._project.BuildTarget(this._targetName, out succeeded);
+                this._project.BuildTarget(this._targetName, out var succeeded);
                 if (!succeeded)
                 {
                     Debug.WriteLine("Failed to build target {0}", this._targetName);
@@ -160,8 +158,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrDescription = null;
 
-            string description;
-            var hr = this.get_CanonicalName(out description);
+            var hr = this.get_CanonicalName(out var description);
             if (ErrorHandler.Succeeded(hr))
                 pbstrDescription = this.Project.GetOutputGroupDescription(description);
             return hr;
@@ -171,8 +168,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             pbstrDisplayName = null;
 
-            string displayName;
-            var hr = this.get_CanonicalName(out displayName);
+            var hr = this.get_CanonicalName(out var displayName);
             if (ErrorHandler.Succeeded(hr))
                 pbstrDisplayName = this.Project.GetOutputGroupDisplayName(displayName);
             return hr;
