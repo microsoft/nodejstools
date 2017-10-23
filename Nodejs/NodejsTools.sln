@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27019.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -29,6 +29,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TargetsVsix", "Product\TargetsVsix\TargetsVsix.csproj", "{CBA217C4-4338-4E50-9DEC-9227705F8124}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterShim", "Product\TestAdapterShim\TestAdapterShim.csproj", "{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodejsTools", "Setup\NodejsTools.vsmanproj", "{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F3DB625F-EA2D-420F-BBC7-E4026CC6ECA3} = {F3DB625F-EA2D-420F-BBC7-E4026CC6ECA3}
+		{4EB09870-7422-4368-B8C8-74582764EAB3} = {4EB09870-7422-4368-B8C8-74582764EAB3}
+		{CBA217C4-4338-4E50-9DEC-9227705F8124} = {CBA217C4-4338-4E50-9DEC-9227705F8124}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{8AB8B6AC-77EB-47E7-904F-422588542C4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +89,10 @@ Global
 		{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +109,7 @@ Global
 		{F3DB625F-EA2D-420F-BBC7-E4026CC6ECA3} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{CBA217C4-4338-4E50-9DEC-9227705F8124} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
 		{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9} = {F9719B35-F359-47A7-A2F8-34F42E53C809}
+		{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9} = {8AB8B6AC-77EB-47E7-904F-422588542C4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1CAB318-7961-42BF-A7B1-FBDB3EC225E9}
