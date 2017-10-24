@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27019.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodejs", "Product\Nodejs\Nodejs.csproj", "{32EC5259-98DA-40CA-9E2D-1B1B2E966F88}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebRole", "Product\WebRole\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Npm", "Product\Npm\Npm.csproj", "{E5EF4B0A-AB41-4B98-8FA8-98D6348003A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapter", "Product\TestAdapter\TestAdapter.csproj", "{5085DF35-3A32-4894-835E-E5A3956D4F57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterImpl", "Product\TestAdapterImpl\TestAdapterImpl.csproj", "{5085DF35-3A32-4894-835E-E5A3956D4F57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PressAnyKey", "Product\PressAnyKey\PressAnyKey.csproj", "{CB61D8BD-48DC-40F4-A4BA-5B68A10A7481}"
 EndProject
@@ -28,7 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodejsToolsVsix", "Product\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TargetsVsix", "Product\TargetsVsix\TargetsVsix.csproj", "{CBA217C4-4338-4E50-9DEC-9227705F8124}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapterShim", "Product\TestAdapterShim\TestAdapterShim.csproj", "{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAdapter", "Product\TestAdapter\TestAdapter.csproj", "{A9609A35-B083-41A9-A0E8-AA1E2C4DA9A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

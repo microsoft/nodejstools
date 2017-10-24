@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -302,7 +302,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                         KillNodeProcess();
                     }
 #else
-                    } catch (COMException) {
+                    }
+                    catch (COMException)
+                    {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         KillNodeProcess();
                     }
@@ -369,6 +371,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var env = new Dictionary<string, string>();
 
             var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
+
             if (!string.IsNullOrEmpty(root))
             {
                 env["VsInstallRoot"] = root;
