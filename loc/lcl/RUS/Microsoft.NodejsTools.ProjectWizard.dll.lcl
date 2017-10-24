@@ -1355,7 +1355,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Failed to check out 'package.json'. Please ensure the file is checked out, before adding or removing NPM packages.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Не удалось получить package.json для изменения. Перед добавлением или удалением пакетов npm убедитесь, что файл получен для изменения.]]></Val>
+            <Val><![CDATA[Не удалось извлечь package.json. Перед добавлением или удалением пакетов npm убедитесь, что файл извлечен.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1576,12 +1576,36 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ReplInfoDescription" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Show information about the current used Node.js executable.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ReplInitializationMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js interactive window. Type .help for a list of commands.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Интерактивное окно Node.js. Введите .help для получения списка команд.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Failed to retrieve Nodejs.exe information.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeInfo" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Using Node.js exe from: '{0}']]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeVersion" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Version: {0}]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -3424,7 +3448,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11003.1]]></Val>
+        <Val><![CDATA[1.4.11022.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3451,7 +3475,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11003.1 commit:db23adabbfa66b00b8e24ef710f12054755f4307]]></Val>
+        <Val><![CDATA[1.4.11022.1 commit:782c7d653192bbc7d812925c03a98c1c2e217f7e]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

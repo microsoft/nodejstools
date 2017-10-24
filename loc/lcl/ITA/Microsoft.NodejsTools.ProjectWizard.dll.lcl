@@ -1576,11 +1576,47 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ReplInfoDescription" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Show information about the current used Node.js executable.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Visualizza informazioni sull'eseguibile Node.js usato attualmente.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ReplInitializationMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js interactive window. Type .help for a list of commands.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Finestra interattiva di Node.js. Per un elenco di comandi, digitare .help.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Failed to retrieve Nodejs.exe information.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Non è stato possibile recuperare le informazioni su Nodejs.exe.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeInfo" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Using Node.js exe from: '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Uso dell'eseguibile di Node.js da: '{0}']]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ReplNodeVersion" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Version: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Versione di Node.js: {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3421,7 +3457,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10927.3]]></Val>
+        <Val><![CDATA[1.4.11022.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3448,7 +3484,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10927.3 commit:6100526fe1cf676f48bdecbb29a228548023fb87]]></Val>
+        <Val><![CDATA[1.4.11022.1 commit:782c7d653192bbc7d812925c03a98c1c2e217f7e]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

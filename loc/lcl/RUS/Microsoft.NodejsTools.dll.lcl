@@ -1865,7 +1865,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Failed to check out 'package.json'. Please ensure the file is checked out, before adding or removing NPM packages.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Не удалось получить package.json для изменения. Перед добавлением или удалением пакетов npm убедитесь, что файл получен для изменения.]]></Val>
+            <Val><![CDATA[Не удалось извлечь package.json. Перед добавлением или удалением пакетов npm убедитесь, что файл извлечен.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
