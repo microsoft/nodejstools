@@ -175,7 +175,11 @@ namespace Microsoft.VisualStudioTools
             return (DTE)runningObject;
         }
 
-        private static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+        private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
+        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
+        internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+
+        private static readonly Guid Node2AttachEngineGuid = Guid.Parse("3F14B534-C345-44B5-AF84-642246EEEB62");
 
         public bool AttachToProcessNode2DebugAdapter(int processId, string script)
         {
@@ -183,29 +187,36 @@ namespace Microsoft.VisualStudioTools
 
             var serviceProvider = new ServiceProvider(dte);
 
-            var configuration = new JObject(
-                    new JProperty("name", "Debug Node.js program from Visual Studio"),
-                    new JProperty("type", "node2"),
-                    new JProperty("request", "attach"),
-                    new JProperty("trace", "all"),
-                    new JProperty("processId", processId));
-
-            var jsonConfiguration = configuration.ToString();
-
-            var debugTargets = new[] {
-                new VsDebugTargetInfo4() {
+            // setup debug info and attach
+            var pDebugEngine = Marshal.AllocCoTaskMem(Marshal.SizeOf<Guid>());
+            var debugUri = $"http://127.0.0.1:{process.DebuggerPort}";
+            try
+            {
+                Marshal.StructureToPtr(Node2AttachEngineGuid, pDebugEngine, false);
+                var dbgInfo = new VsDebugTargetInfo4()
+                {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning,
-                    guidLaunchDebugEngine = WebKitDebuggerV2Guid,
-                    bstrOptions = jsonConfiguration,
-                    dwProcessId = (uint)processId,
-                    bstrExe = $"\01"
+                    pDebugEngines = pDebugEngine,
+                    dwDebugEngineCount = 1,
+                    bstrExe = "dummy",
+                    guidPortSupplier = WebkitPortSupplierGuid,
+                    bstrPortName = debugUri,
+                    dwProcessId = 1
+                };
+
+
+                var launchResults = new VsDebugTargetProcessInfo[1];
+                var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
+                debugger.LaunchDebugTargets4(1, new[] { dbgInfo }, launchResults);
+            }
+            finally
+            {
+                if (pDebugEngine != IntPtr.Zero)
+                {
+                    Marshal.FreeCoTaskMem(pDebugEngine);
                 }
-            };
+            }
 
-            var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
-
-            var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
-            debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
 
             return true;
         }
