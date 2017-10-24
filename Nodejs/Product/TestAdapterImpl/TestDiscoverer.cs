@@ -35,6 +35,10 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             var env = new Dictionary<string, string>();
             var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
+            if (string.IsNullOrEmpty(root))
+            {
+                root = Environment.GetEnvironmentVariable("VSINSTALLDIR");
+            }
 
             if (!string.IsNullOrEmpty(root))
             {
