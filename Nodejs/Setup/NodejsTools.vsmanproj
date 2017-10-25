@@ -4,10 +4,10 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <ProjectGuid>{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}</ProjectGuid>
   </PropertyGroup>
-
+  <PropertyGroup Condition="$(Configuration) == 'Release' " />
+  <PropertyGroup Condition="$(Configuration) == 'Debug' " />
   <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" />
   <Import Project=".\SetupProjectBefore.settings" />
-  
   <PropertyGroup>
     <!-- Define properties that drive the manifest creation here. -->
     <FinalizeManifest>true</FinalizeManifest>
@@ -15,21 +15,18 @@
     <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
     <TargetName>$(MSBuildProjectName)</TargetName>
   </PropertyGroup>
-
   <PropertyGroup>
     <!-- NTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
              But VS Manifest task wants BuildNumber to be 'major.minor.build.revision' -->
     <BuildNumber>$(BuildVersion)</BuildNumber>
     <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
   </PropertyGroup>
-  
   <ItemGroup>
     <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
     <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" />
     <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
     <Node Include="packages.config" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\Product\NodejsToolsVsix\NodejsToolsVsix.csproj">
       <Project>{f3db625f-ea2d-420f-bbc7-e4026cc6eca3}</Project>
@@ -44,7 +41,11 @@
       <Name>TestAdapterVsix</Name>
     </ProjectReference>
   </ItemGroup>
-  
+
+  <Target Name="Build" />
+  <Target Name="Clean" />
+  <Target Name="ReBuild" />
+
   <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" />
   <Import Project=".\SetupProjectAfter.settings" />
 </Project>
