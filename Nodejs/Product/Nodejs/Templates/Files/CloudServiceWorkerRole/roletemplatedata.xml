@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <RoleTemplateData RoleProjectTargetFramework="4.0" MinWindowsAzureToolsVersion="2.4" MaxWindowsAzureToolsVersion="2.9" RoleProjectGuid="38CD0F90-16C9-4258-8FF8-BEC3DDC394EC">
-  <VsTemplate Name="AzureNodejsWorker.zip" Language="Node.js"/>
+  <VsTemplate Name="AzureNodejsApp.vstemplate" Language="JavaScript"/>
   <ServiceModel>
     <Role Type="Worker" />
   </ServiceModel>
