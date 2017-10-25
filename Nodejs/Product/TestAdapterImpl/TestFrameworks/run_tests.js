@@ -9,6 +9,12 @@ var rl = readline.createInterface({
 
 rl.on('line', (line) => {
     rl.close();
+
+    // strip the BOM in case of UTF-8
+    if (line.charCodeAt(0) === 0xFEFF) {
+        line = line.slice(1);
+    }
+
     var testCases = JSON.parse(line);
     // get rid of leftover quotations from C# (necessary?)
     for (var test in testCases) {

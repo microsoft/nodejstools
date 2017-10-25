@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
             var testFrameworkRoot = GetTestframeworkFolderRoot();
             if(!Directory.Exists(testFrameworkRoot))
             {
-                throw new InvalidOperationException("Unable to find test framework folder");
+                throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
             foreach (var directory in Directory.GetDirectories(testFrameworkRoot))
@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
             if (!this.frameworkDirectories.TryGetValue(ExportRunnerFramework, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
             {
-                throw new InvalidOperationException("Missing generic test framework");
+                throw new InvalidOperationException("Missing generic test framework.");
             }
         }
 
