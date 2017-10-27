@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.Project
             }
             else if (debug && chromeProtocolRequired)
             {
-                if (false && CheckUseNewChromeDebugProtocolOption())
+                if (CheckUseNewChromeDebugProtocolOption())
                 {
                     StartWithChromeV2Debugger(file, nodePath, startBrowser);
                     TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
@@ -142,24 +142,22 @@ namespace Microsoft.NodejsTools.Project
             // setup debug info and attach
             var debugUri = $"http://127.0.0.1:{process.DebuggerPort}";
 
-            var configuration = new JObject(
-                new JProperty("name", "Debug Node.js program from Visual Studio"),
-                new JProperty("type", "node2"),
-                new JProperty("request", "attach"),
-                new JProperty("trace", "all"),
-                new JProperty("processId", process.Id),
-                new JProperty("sourceMaps", true),
-                new JProperty("stopOnEntry", true));
+            var dbgInfo = new VsDebugTargetInfo4();
+            dbgInfo.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning;
+            dbgInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
 
-            var jsonContent = configuration.ToString();
+            dbgInfo.guidLaunchDebugEngine = WebkitDebuggerGuid;
+            dbgInfo.dwDebugEngineCount = 1;
 
-            var dbgInfo = new VsDebugTargetInfo4()
-            {
-                dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning,
-                guidLaunchDebugEngine = WebKitDebuggerV2Guid,
-                bstrExe = (char)0 + process.Id.ToString("X"),
-                bstrOptions = jsonContent
-            };
+            var enginesPtr = MarshalDebugEngines(new[] { WebkitDebuggerGuid });
+            dbgInfo.pDebugEngines = enginesPtr;
+            dbgInfo.guidPortSupplier = WebkitPortSupplierGuid;
+            dbgInfo.bstrPortName = debugUri;
+            dbgInfo.fSendToOutputWindow = 0;
+
+            // we connect through a URI, so no need to set the process, 
+            // we need to set the process id to '1' so the debugger is able to attach 
+            dbgInfo.bstrExe = $"\01";
 
             AttachDebugger(dbgInfo);
 

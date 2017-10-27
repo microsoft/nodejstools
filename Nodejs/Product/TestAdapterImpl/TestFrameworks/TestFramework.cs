@@ -140,11 +140,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 
             var processStartInfo = new ProcessStartInfo(nodeExePath, arguments)
             {
-#if DEBUG
-                CreateNoWindow = false,
-#else
+
                 CreateNoWindow = true,
-#endif
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
