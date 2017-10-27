@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudioTools
 
         private static readonly Guid Node2AttachEngineGuid = Guid.Parse("3F14B534-C345-44B5-AF84-642246EEEB62");
 
-        public bool AttachToProcessNode2DebugAdapter(int processId, string script)
+        public bool AttachToProcessNode2DebugAdapter(int port)
         {
             var dte = (VisualStudio.OLE.Interop.IServiceProvider)GetDTE();
 
@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudioTools
 
             // setup debug info and attach
             var pDebugEngine = Marshal.AllocCoTaskMem(Marshal.SizeOf<Guid>());
-            var debugUri = $"http://127.0.0.1:{process.DebuggerPort}";
+            var debugUri = $"http://127.0.0.1:{port}";
             try
             {
                 Marshal.StructureToPtr(Node2AttachEngineGuid, pDebugEngine, false);
@@ -204,7 +204,6 @@ namespace Microsoft.VisualStudioTools
                     dwProcessId = 1
                 };
 
-
                 var launchResults = new VsDebugTargetProcessInfo[1];
                 var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
                 debugger.LaunchDebugTargets4(1, new[] { dbgInfo }, launchResults);
@@ -216,7 +215,6 @@ namespace Microsoft.VisualStudioTools
                     Marshal.FreeCoTaskMem(pDebugEngine);
                 }
             }
-
 
             return true;
         }

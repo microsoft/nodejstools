@@ -270,7 +270,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 {
                     app.GetDTE().Debugger.DetachAll();
                     // Ensure that --debug-brk is the first argument
-                    nodeArgs.InsertRange(0, GetDebugArgs(nodeVersion, out port));
+                    nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
                 }
 
                 this.nodeProcess = ProcessOutput.Run(
@@ -284,13 +284,11 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
-                    System.Diagnostics.Debugger.Launch();
-
                     try
                     {
                         if (nodeVersion >= Node8Version)
                         {
-                            app.AttachToProcessNode2DebugAdapter((int)this.nodeProcess.ProcessId, nodeArgs[1]);
+                            app.AttachToProcessNode2DebugAdapter(port);
                         }
                         else
                         {
@@ -314,7 +312,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                         KillNodeProcess();
                     }
 #else
-                    } catch (COMException) {
+                    }
+                    catch (COMException)
+                    {
                         frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                         KillNodeProcess();
                     }
@@ -366,21 +366,16 @@ namespace Microsoft.NodejsTools.TestAdapter
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
-        private static IEnumerable<string> GetDebugArgs(Version nodeVersion, out int port)
+        private static string GetDebugArgs(Version nodeVersion, out int port)
         {
             port = GetFreePort();
 
             if (nodeVersion >= Node8Version)
             {
-                return new[]
-                {
-                    $"--inspect-brk={port}"
-                };
+                return $"--inspect-brk={port}";
             }
 
-            return new[] {
-                $"--debug-brk={port}"
-            };
+            return $"--debug-brk={port}";
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile)
@@ -426,6 +421,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 result.Duration = result.EndTime - result.StartTime;
                 result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
             }
+
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));

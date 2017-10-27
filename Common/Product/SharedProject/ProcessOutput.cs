@@ -60,56 +60,6 @@ namespace Microsoft.VisualStudioTools.Project
         }
     }
 
-    internal sealed class TeeRedirector : Redirector, IDisposable
-    {
-        private readonly Redirector[] redirectors;
-
-        public TeeRedirector(params Redirector[] redirectors)
-        {
-            this.redirectors = redirectors;
-        }
-
-        public void Dispose()
-        {
-            foreach (var redir in this.redirectors.OfType<IDisposable>())
-            {
-                redir.Dispose();
-            }
-        }
-
-        public override void WriteLine(string line)
-        {
-            foreach (var redir in this.redirectors)
-            {
-                redir.WriteLine(line);
-            }
-        }
-
-        public override void WriteErrorLine(string line)
-        {
-            foreach (var redir in this.redirectors)
-            {
-                redir.WriteErrorLine(line);
-            }
-        }
-
-        public override void Show()
-        {
-            foreach (var redir in this.redirectors)
-            {
-                redir.Show();
-            }
-        }
-
-        public override void ShowAndActivate()
-        {
-            foreach (var redir in this.redirectors)
-            {
-                redir.ShowAndActivate();
-            }
-        }
-    }
-
     /// <summary>
     /// Represents a process and its captured output.
     /// </summary>
@@ -270,8 +220,11 @@ namespace Microsoft.VisualStudioTools.Project
                     QuoteSingleArgument(errFile))
             };
 
-            var process = new Process();
-            process.StartInfo = psi;
+            var process = new Process
+            {
+                StartInfo = psi
+            };
+
             var result = new ProcessOutput(process, redirector);
             if (redirector != null)
             {

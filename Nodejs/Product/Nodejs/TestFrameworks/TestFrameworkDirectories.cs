@@ -9,16 +9,16 @@ namespace Microsoft.NodejsTools.TestFrameworks
 {
     internal class TestFrameworkDirectories
     {
-        public const string ExportRunnerFramework = "ExportRunner";
-        private const string TestFrameworksDirectory = "TestFrameworks";
-        private const string TestAdapterDirectory = "TestAdapter";
+        public const string ExportRunnerFrameworkName = "ExportRunner";
+        private const string TestFrameworksFolderName = "TestFrameworks";
+        private const string TestAdapterFolderName = "TestAdapter";
 
-        private readonly Dictionary<string, string> frameworkDirectories;
+        private readonly Dictionary<string, string> frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public static string TestFrameworksFolder1 => TestFrameworksFolderName;
 
         public TestFrameworkDirectories()
         {
-            this.frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
             var testFrameworkRoot = GetTestframeworkFolderRoot();
             if (!Directory.Exists(testFrameworkRoot))
             {
@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 this.frameworkDirectories.Add(name, directory);
             }
 
-            if (!this.frameworkDirectories.TryGetValue(ExportRunnerFramework, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
+            if (!this.frameworkDirectories.TryGetValue(ExportRunnerFrameworkName, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
             {
                 throw new InvalidOperationException("Missing generic test framework");
             }
@@ -51,26 +51,25 @@ namespace Microsoft.NodejsTools.TestFrameworks
             //
             // However in both cases, we should just go up a folder to the nodejstools root, and then into the TestAdapter folder.
 
+            string testAdapterAssemblyFolder;
+
             var currentAssembly = typeof(TestFrameworkDirectories).Assembly;
 
             if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase))
             {
-                var testAdapterAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
-
-                return Path.Combine(testAdapterAssemblyFolder, TestFrameworksDirectory);
+                testAdapterAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
+            }
+            else if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools", StringComparison.OrdinalIgnoreCase))
+            {
+                var NodeJsToolsFolder = Path.GetDirectoryName(currentAssembly.Location);
+                testAdapterAssemblyFolder = Path.Combine(Path.GetDirectoryName(NodeJsToolsFolder), TestAdapterFolderName);
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unable to find '{TestFrameworksFolderName}' folder.");
             }
 
-            System.Diagnostics.Debugger.Launch();
-
-            var currentAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
-            var nodejsRootFolder = Path.GetDirectoryName(currentAssemblyFolder);
-
-            var baseDirectory = Path.Combine(nodejsRootFolder, TestAdapterDirectory, TestFrameworksDirectory);
-#if DEBUG
-            // To allow easier debugging of the test adapter, try to use the local directory as a fallback.
-            baseDirectory = Directory.Exists(baseDirectory) ? baseDirectory : Path.Combine(Directory.GetCurrentDirectory(), TestFrameworksDirectory);
-#endif
-            return baseDirectory;
+            return Path.Combine(testAdapterAssemblyFolder, TestFrameworksFolderName);
         }
     }
 }

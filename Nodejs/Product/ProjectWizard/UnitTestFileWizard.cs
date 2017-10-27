@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
             if (!replacementsDictionary.TryGetValue("TestFramework", out _framework) ||
                 string.IsNullOrWhiteSpace(_framework))
             {
-                _framework = TestFrameworkDirectories.ExportRunnerFramework;
+                _framework = TestFrameworkDirectories.ExportRunnerFrameworkName;
             }
         }
 
