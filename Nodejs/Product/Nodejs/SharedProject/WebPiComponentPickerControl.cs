@@ -206,9 +206,8 @@ namespace Microsoft.VisualStudioTools.Project
                 int? res = null;
                 if (this.Column == 1)
                 {
-                    DateTime dtX, dtY;
-                    if (DateTime.TryParse(itemX.SubItems[1].Text, out dtX) &&
-                        DateTime.TryParse(itemY.SubItems[1].Text, out dtY))
+                    if (DateTime.TryParse(itemX.SubItems[1].Text, out var dtX) &&
+                        DateTime.TryParse(itemY.SubItems[1].Text, out var dtY))
                     {
                         res = dtX.CompareTo(dtY);
                     }
@@ -293,11 +292,9 @@ namespace Microsoft.VisualStudioTools.Project
                     if (parentHwnd != IntPtr.Zero)
                     {
                         var grandParentHwnd = NativeMethods.GetParent(parentHwnd);
-
-                        User32RECT parentClientRect, grandParentClientRect;
                         if (grandParentHwnd != IntPtr.Zero &&
-                            NativeMethods.GetClientRect(parentHwnd, out parentClientRect) &&
-                                NativeMethods.GetClientRect(grandParentHwnd, out grandParentClientRect))
+                            NativeMethods.GetClientRect(parentHwnd, out var parentClientRect) &&
+                                NativeMethods.GetClientRect(grandParentHwnd, out var grandParentClientRect))
                         {
                             var width = grandParentClientRect.Width;
                             var height = grandParentClientRect.Height;

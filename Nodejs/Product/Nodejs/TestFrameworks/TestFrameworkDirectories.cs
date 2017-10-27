@@ -22,7 +22,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
             var testFrameworkRoot = GetTestframeworkFolderRoot();
             if (!Directory.Exists(testFrameworkRoot))
             {
-                throw new InvalidOperationException("Unable to find test framework folder");
+                throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
             foreach (var directory in Directory.GetDirectories(testFrameworkRoot))
@@ -33,7 +33,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
             if (!this.frameworkDirectories.TryGetValue(ExportRunnerFrameworkName, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
             {
-                throw new InvalidOperationException("Missing generic test framework");
+                throw new InvalidOperationException("Missing generic test framework.");
             }
         }
 

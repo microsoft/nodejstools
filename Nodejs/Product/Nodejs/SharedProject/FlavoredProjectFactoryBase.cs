@@ -155,13 +155,20 @@ namespace Microsoft.VisualStudioTools.Project
             finally
             {
                 if (newProjectIUnknown != IntPtr.Zero)
+                {
                     Marshal.Release(newProjectIUnknown);
+                }
+
                 if (aggregateProjectIUnknown != IntPtr.Zero)
+                {
                     Marshal.Release(aggregateProjectIUnknown);
+                }
             }
 
             if (projectIUnknown == IntPtr.Zero)
+            {
                 return VSConstants.E_FAIL;
+            }
 
             return VSConstants.S_OK;
         }

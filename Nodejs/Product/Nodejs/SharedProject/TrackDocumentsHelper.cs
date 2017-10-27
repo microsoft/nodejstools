@@ -166,8 +166,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            var iCanContinue = 0;
-            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRenameFile(this.projectMgr.GetOuterInterface<IVsProject>(), oldFileName, newFileName, flag, out iCanContinue));
+            ErrorHandler.ThrowOnFailure(this.GetIVsTrackProjectDocuments2().OnQueryRenameFile(this.projectMgr.GetOuterInterface<IVsProject>(), oldFileName, newFileName, flag, out var iCanContinue));
             return (iCanContinue != 0);
         }
 

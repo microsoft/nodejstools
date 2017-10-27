@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel.Composition;
@@ -15,19 +15,21 @@ namespace Microsoft.NodejsTools.Repl
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public sealed class ReplRoleAttribute : Attribute
     {
-        private readonly string _name;
+        public readonly string Name;
 
         public ReplRoleAttribute(string name)
         {
+            if( name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             if (name.Contains(","))
-                throw new ArgumentException("ReplRoleAttribute name cannot contain any commas. Apply multiple attributes if you want to support multiple roles.", "name");
+            {
+                throw new ArgumentException("ReplRoleAttribute name cannot contain any commas. Apply multiple attributes if you want to support multiple roles.", nameof(name));
+            }
 
-            _name = name;
-        }
-
-        public string Name
-        {
-            get { return _name; }
+            this.Name = name;
         }
     }
 }

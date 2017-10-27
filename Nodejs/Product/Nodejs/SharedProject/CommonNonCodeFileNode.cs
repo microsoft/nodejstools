@@ -27,8 +27,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
             var viewGuid = Guid.Empty;
-            IVsWindowFrame frame;
-            manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
+            manager.Open(false, false, viewGuid, out var frame, WindowFrameShowAction.Show);
         }
     }
 }

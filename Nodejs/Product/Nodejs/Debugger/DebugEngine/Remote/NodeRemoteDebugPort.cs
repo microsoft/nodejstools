@@ -61,8 +61,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
                 return VSConstants.E_FAIL;
             }
 
-            IEnumDebugProcesses2 processEnum;
-            var hr = EnumProcesses(out processEnum);
+            var hr = EnumProcesses(out var processEnum);
             if (ErrorHandler.Failed(hr))
             {
                 return hr;

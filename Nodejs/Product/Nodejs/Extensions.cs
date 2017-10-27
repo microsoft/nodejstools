@@ -17,8 +17,7 @@ namespace Microsoft.NodejsTools
         internal static bool IsPlatformAware(this ProjectNode projectNode)
         {
             var platAwarePropStr = projectNode.BuildProject.GetPropertyValue(ProjectFileConstants.PlatformAware);
-            var isPlatformAware = false;
-            bool.TryParse(platAwarePropStr, out isPlatformAware);
+            bool.TryParse(platAwarePropStr, out var isPlatformAware);
             return isPlatformAware;
         }
 
@@ -29,14 +28,12 @@ namespace Microsoft.NodejsTools
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_MATCHTYPE) :
                 (uint)(__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION | __VSENUMPROJFLAGS.EPF_ALLVIRTUAL);
             var guid = new Guid(Guids.NodejsBaseProjectFactoryString);
-            IEnumHierarchies hierarchies;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
                 flags,
                 ref guid,
-                out hierarchies)));
+                out var hierarchies)));
             var hierarchy = new IVsHierarchy[1];
-            uint fetched;
-            while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out fetched)) && fetched == 1)
+            while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out var fetched)) && fetched == 1)
             {
                 var project = hierarchy[0] as IVsProject;
                 if (project != null)
@@ -52,19 +49,17 @@ namespace Microsoft.NodejsTools
             var hierarchy = (IVsHierarchy)project;
             if (enumHierarchyItemsFactory != null && project != null)
             {
-                IEnumHierarchyItems enumHierarchyItems;
                 if (ErrorHandler.Succeeded(
                     enumHierarchyItemsFactory.EnumHierarchyItems(
                         hierarchy,
                         (uint)(__VSEHI.VSEHI_Leaf | __VSEHI.VSEHI_Nest | __VSEHI.VSEHI_OmitHier),
                         (uint)VSConstants.VSITEMID_ROOT,
-                        out enumHierarchyItems)))
+                        out var enumHierarchyItems)))
                 {
                     if (enumHierarchyItems != null)
                     {
                         var rgelt = new VSITEMSELECTION[1];
-                        uint fetched;
-                        while (VSConstants.S_OK == enumHierarchyItems.Next(1, rgelt, out fetched) && fetched == 1)
+                        while (VSConstants.S_OK == enumHierarchyItems.Next(1, rgelt, out var fetched) && fetched == 1)
                         {
                             yield return rgelt[0].itemid;
                         }
@@ -80,13 +75,12 @@ namespace Microsoft.NodejsTools
 
         internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy)
         {
-            object project;
 
             ErrorHandler.ThrowOnFailure(
                 hierarchy.GetProperty(
                     VSConstants.VSITEMID_ROOT,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
-                    out project
+                    out var project
                 )
             );
 

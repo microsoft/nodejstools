@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Verify that the index is inside the expected range.
             if ((iconIndex < 0) || (iconIndex >= this.iconHandles.Count))
             {
-                throw new ArgumentOutOfRangeException("iconIndex");
+                throw new ArgumentOutOfRangeException(nameof(iconIndex));
             }
 
             // Check if the icon is in the cache.

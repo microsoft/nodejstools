@@ -105,8 +105,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
                 {
-                    int port;
-                    if (Int32.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port))
+                    if (int.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out var port))
                     {
                         return port;
                     }
@@ -152,8 +151,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    bool res;
-                    if (Boolean.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res))
+                    if (Boolean.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out var res))
                     {
                         return res;
                     }

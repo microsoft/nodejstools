@@ -640,8 +640,7 @@ namespace Microsoft.NodejsTools.Debugger
 
             foreach (var module in modules)
             {
-                NodeModule newModule;
-                if (GetOrAddModule(module, out newModule))
+                if (GetOrAddModule(module, out var newModule))
                 {
                     foreach (var breakpoint in this.breakpointBindings)
                     {
@@ -719,16 +718,14 @@ namespace Microsoft.NodejsTools.Debugger
                 var breakpointBindings = new List<NodeBreakpointBinding>();
                 foreach (var breakpoint in args.BreakpointEvent.Breakpoints)
                 {
-                    NodeBreakpointBinding nodeBreakpointBinding;
-                    if (this.breakpointBindings.TryGetValue(breakpoint, out nodeBreakpointBinding))
+                    if (this.breakpointBindings.TryGetValue(breakpoint, out var nodeBreakpointBinding))
                     {
                         breakpointBindings.Add(nodeBreakpointBinding);
                     }
                 }
 
                 // Retrieve a local module
-                NodeModule module;
-                GetOrAddModule(breakpointEvent.Module, out module);
+                GetOrAddModule(breakpointEvent.Module, out var module);
                 module = module ?? breakpointEvent.Module;
 
                 // Process break for breakpoint bindings, if any
@@ -849,8 +846,7 @@ namespace Microsoft.NodejsTools.Debugger
                 }
 
                 var errorNumber = exception.ErrorNumber.Value;
-                string errorCodeFromMap;
-                if (this.errorCodes.TryGetValue(errorNumber, out errorCodeFromMap))
+                if (this.errorCodes.TryGetValue(errorNumber, out var errorCodeFromMap))
                 {
                     ReportException(exception, errorCodeFromMap);
                     return;
@@ -932,8 +928,7 @@ namespace Microsoft.NodejsTools.Debugger
             foreach (var stackFrame in stackFrames)
             {
                 // Retrieve a local module
-                NodeModule module;
-                GetOrAddModule(stackFrame.Module, out module, stackFrame);
+                GetOrAddModule(stackFrame.Module, out var module, stackFrame);
                 module = module ?? stackFrame.Module;
 
                 var line = stackFrame.Line;
@@ -1248,9 +1243,8 @@ namespace Microsoft.NodejsTools.Debugger
         {
             var listBreakpointsCommand = new ListBreakpointsCommand(this.CommandId);
 
-            int hitCount;
             if (await TrySendRequestAsync(listBreakpointsCommand, cancellationToken).ConfigureAwait(false) &&
-                listBreakpointsCommand.Breakpoints.TryGetValue(breakpointId, out hitCount))
+                listBreakpointsCommand.Breakpoints.TryGetValue(breakpointId, out var hitCount))
             {
                 return hitCount;
             }
@@ -1468,8 +1462,7 @@ namespace Microsoft.NodejsTools.Debugger
         /// <returns>Module.</returns>
         public NodeModule GetModuleForFilePath(string filePath)
         {
-            NodeModule module;
-            this.modules.TryGetValue(filePath, out module);
+            this.modules.TryGetValue(filePath, out var module);
             return module;
         }
 

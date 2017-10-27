@@ -118,7 +118,7 @@
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Editor, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -271,6 +271,7 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
+    <Compile Include="Repl\InfoReplCommand.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
@@ -1185,6 +1186,9 @@
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
       <Version>0.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.AppDesigner">
+      <Version>15.3.0-rc-6162104</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
       <Version>15.3.799-masterDDDBA9E4</Version>

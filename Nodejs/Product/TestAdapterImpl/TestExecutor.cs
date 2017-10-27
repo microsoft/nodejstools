@@ -197,8 +197,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
 
-            var defaultSession = TelemetryService.DefaultSession;
-            defaultSession.PostEvent(userTask);
+            TelemetryService.DefaultSession?.PostEvent(userTask);
         }
 
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
@@ -250,7 +249,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         frameworkHandle.SendMessage(
                             TestMessageLevel.Error,
-                            $"Unable to determine interpreter to use for {test.Source}.");
+                            $"Unable to determine interpreter to use for '{test.Source}'.");
                         frameworkHandle.RecordEnd(test, TestOutcome.Failed);
                     }
 
@@ -383,6 +382,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             var env = new Dictionary<string, string>();
 
             var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
+            if (string.IsNullOrEmpty(root))
+            {
+                root = Environment.GetEnvironmentVariable("VSINSTALLDIR");
+            }
+
             if (!string.IsNullOrEmpty(root))
             {
                 env["VsInstallRoot"] = root;

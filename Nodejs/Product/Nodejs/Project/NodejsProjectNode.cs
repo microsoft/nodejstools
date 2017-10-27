@@ -278,16 +278,14 @@ namespace Microsoft.NodejsTools.Project
             var res = base.GetConfigurationDependentPropertyPages();
 
             var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
-            bool fEnableTs;
-            if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs)
+            if (enableTs != null && Boolean.TryParse(enableTs, out var fEnableTs) && fEnableTs)
             {
                 var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null)
                 {
                     foreach (var strGuid in typeScriptPages.Split(';'))
                     {
-                        Guid guid;
-                        if (Guid.TryParse(strGuid, out guid))
+                        if (Guid.TryParse(strGuid, out var guid))
                         {
                             res = res.Append(guid);
                         }
@@ -396,7 +394,7 @@ namespace Microsoft.NodejsTools.Project
                     default:
                         if (propPage != null)
                         {
-                            this.PropertyPage.IsDirty = true;
+                            propPage.IsDirty = true;
                         }
                         break;
                 }
@@ -418,8 +416,7 @@ namespace Microsoft.NodejsTools.Project
 
         private static void AddFolderForFile(Dictionary<FileNode, List<CommonFolderNode>> directoryPackages, FileNode rootFile, CommonFolderNode folderChild)
         {
-            List<CommonFolderNode> folders;
-            if (!directoryPackages.TryGetValue(rootFile, out folders))
+            if (!directoryPackages.TryGetValue(rootFile, out var folders))
             {
                 directoryPackages[rootFile] = folders = new List<CommonFolderNode>();
             }
@@ -485,8 +482,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetProjectTypeGuids()
         {
-            var projectTypeGuids = "";
-            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out var projectTypeGuids));
             return projectTypeGuids;
         }
 
@@ -605,8 +601,7 @@ namespace Microsoft.NodejsTools.Project
 
             basePath = CommonUtils.EnsureEndSeparator(basePath);
 
-            WIN32_FIND_DATA wfd;
-            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
+            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out var wfd);
             if (hFind == NativeMethods.INVALID_HANDLE_VALUE)
             {
                 yield break;

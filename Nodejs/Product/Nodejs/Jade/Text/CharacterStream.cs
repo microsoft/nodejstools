@@ -99,7 +99,9 @@ namespace Microsoft.NodejsTools.Jade
             var pos = this.Position + offset;
 
             if (pos < 0 || pos >= this._text.Length)
+            {
                 return '\0';
+            }
 
             return this._text[pos];
         }
@@ -212,13 +214,17 @@ namespace Microsoft.NodejsTools.Jade
         private void CheckBounds()
         {
             if (this._position < 0)
+            {
                 this._position = 0;
+            }
 
             var maxPosition = Math.Min(this._text.Length, this._range.End);
 
             this._isEndOfStream = this._position >= maxPosition;
             if (this._isEndOfStream)
+            {
                 this._position = maxPosition;
+            }
 
             this._currentChar = this._isEndOfStream ? '\0' : this._text[this.Position];
         }

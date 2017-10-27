@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudioTools.Project
             #region input validation
             if (serviceProvider == null)
             {
-                throw new ArgumentNullException("serviceProvider");
+                throw new ArgumentNullException(nameof(serviceProvider));
             }
             #endregion
 
@@ -147,12 +147,12 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (filesChanged == null)
             {
-                throw new ArgumentNullException("filesChanged");
+                throw new ArgumentNullException(nameof(filesChanged));
             }
 
             if (flags == null)
             {
-                throw new ArgumentNullException("flags");
+                throw new ArgumentNullException(nameof(flags));
             }
 
             if (this.FileChangedOnDisk != null)
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudioTools.Project
             #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
             #endregion
 
@@ -210,8 +210,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (!this.observedItems.ContainsKey(fullFileName))
             {
                 // Observe changes to the file
-                uint fileChangeCookie;
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out fileChangeCookie));
+                ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this, out var fileChangeCookie));
 
                 var itemInfo = new ObservedItemInfo();
                 itemInfo.ItemID = id;
@@ -232,7 +231,7 @@ namespace Microsoft.VisualStudioTools.Project
             #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
             #endregion
 
@@ -253,7 +252,7 @@ namespace Microsoft.VisualStudioTools.Project
             #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "fileName");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
             #endregion
 

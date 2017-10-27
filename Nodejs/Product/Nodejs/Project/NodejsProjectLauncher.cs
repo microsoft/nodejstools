@@ -42,8 +42,7 @@ namespace Microsoft.NodejsTools.Project
             this._project = project;
 
             var portNumber = this._project.GetProjectProperty(NodeProjectProperty.NodejsPort);
-            int portNum;
-            if (Int32.TryParse(portNumber, out portNum))
+            if (int.TryParse(portNumber, out var portNum))
             {
                 this._testServerPort = portNum;
             }
@@ -333,8 +332,7 @@ namespace Microsoft.NodejsTools.Project
         internal static string GetFullUrl(string host, int port)
         {
             UriBuilder builder;
-            Uri uri;
-            if (Uri.TryCreate(host, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(host, UriKind.Absolute, out var uri))
             {
                 builder = new UriBuilder(uri);
             }
@@ -587,9 +585,8 @@ namespace Microsoft.NodejsTools.Project
         private bool ShouldStartBrowser()
         {
             var startBrowser = this._project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
-            bool fStartBrowser;
             if (!string.IsNullOrEmpty(startBrowser) &&
-                Boolean.TryParse(startBrowser, out fStartBrowser))
+                Boolean.TryParse(startBrowser, out var fStartBrowser))
             {
                 return fStartBrowser;
             }

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,20 @@ namespace Microsoft.NodejsTools.Repl
             this._site = site;
         }
 
+        private string nodeExePath;
+
+        public string NodeExePath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.nodeExePath))
+                {
+                    this.nodeExePath = this.GetNodeExePath();
+                }
+                return this.nodeExePath;
+            }
+        }
+
         #region IReplEvaluator Members
 
         public Task<ExecutionResult> Initialize(IReplWindow window)
@@ -62,7 +76,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public Task<ExecutionResult> Reset()
         {
-            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(TruePredicate);
+            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(_ => true);
             for (var i = 0; i < buffersBeforeReset.Count - 1; i++)
             {
                 var buffer = buffersBeforeReset[i];
@@ -75,11 +89,6 @@ namespace Microsoft.NodejsTools.Repl
 
             Connect();
             return ExecutionResult.Succeeded;
-        }
-
-        private static bool TruePredicate(ITextBuffer buffer)
-        {
-            return true;
         }
 
         public bool CanExecuteText(string text)
@@ -143,6 +152,30 @@ namespace Microsoft.NodejsTools.Repl
             }
         }
 
+        /// <summary>
+        /// Checks if Node.js Exe is installed correctly.
+        /// Writes an error message if it's not.
+        /// </summary>
+        /// <returns></returns>
+        public bool EnsureNodeInstalled()
+        {
+            if (string.IsNullOrWhiteSpace(this.NodeExePath))
+            {
+                this._window.WriteError(Resources.NodejsNotInstalled);
+                this._window.WriteError(Environment.NewLine);
+                return false;
+            }
+
+            if (!File.Exists(this.NodeExePath))
+            {
+                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
+                this._window.WriteError(Environment.NewLine);
+                return false;
+            }
+
+            return true;
+        }
+
         private void Connect()
         {
             if (this._listener != null)
@@ -152,23 +185,11 @@ namespace Microsoft.NodejsTools.Repl
                 this._listener = null;
             }
 
-            var nodeExePath = GetNodeExePath();
-            if (string.IsNullOrWhiteSpace(nodeExePath))
+            if(!this.EnsureNodeInstalled())
             {
-                this._window.WriteError(Resources.NodejsNotInstalled);
-                this._window.WriteError(Environment.NewLine);
                 return;
             }
-            else if (!File.Exists(nodeExePath))
-            {
-                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, nodeExePath));
-                this._window.WriteError(Environment.NewLine);
-                return;
-            }
-
-            Socket socket;
-            int port;
-            CreateConnection(out socket, out port);
+            CreateConnection(out var socket, out var port);
 
             var scriptPath = "\"" +
                     Path.Combine(
@@ -176,15 +197,14 @@ namespace Microsoft.NodejsTools.Repl
                         "visualstudio_nodejs_repl.js"
                     ) + "\"";
 
-            var psi = new ProcessStartInfo(nodeExePath, scriptPath + " " + port);
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
-
-            string fileName, directory = null;
-
-            if (this._site.TryGetStartupFileAndDirectory(out fileName, out directory))
+            var psi = new ProcessStartInfo(this.NodeExePath, scriptPath + " " + port)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+            if (this._site.TryGetStartupFileAndDirectory(out var _, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
@@ -402,8 +422,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 var cmd = this._serializer.Deserialize<Dictionary<string, object>>(response.Body);
 
-                object type;
-                if (cmd.TryGetValue("type", out type) && type is string)
+                if (cmd.TryGetValue("type", out var type) && type is string)
                 {
                     switch ((string)type)
                     {

@@ -7,13 +7,17 @@ namespace Microsoft.NodejsTools.Jade
         private void OnInlineCode()
         {
             if (this._cs.CurrentChar == '-' || this._cs.CurrentChar == '=')
+            {
                 this._cs.MoveToNextChar();
+            }
 
             // Make tokens for code keywords
             while (!this._cs.IsEndOfStream())
             {
                 if (SkipWhiteSpace())
+                {
                     break;
+                }
 
                 if (IsAtString())
                 {
@@ -25,7 +29,9 @@ namespace Microsoft.NodejsTools.Jade
                     var ident = this._cs.GetSubstringAt(range.Start, range.Length);
 
                     if (JadeCodeKeywords.IsKeyword(ident))
+                    {
                         AddToken(JadeTokenType.CodeKeyword, range.Start, range.Length);
+                    }
                 }
                 else if (this._cs.CurrentChar == '=' || this._cs.CurrentChar == '+' || this._cs.CurrentChar == '*' || this._cs.CurrentChar == '/' || this._cs.CurrentChar == '-')
                 {
