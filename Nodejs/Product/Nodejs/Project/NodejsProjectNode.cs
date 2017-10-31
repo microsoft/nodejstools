@@ -31,6 +31,8 @@ namespace Microsoft.NodejsTools.Project
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
+        private readonly MissingNodeInfoBar infoBarManager;
+
         // We delay analysis until things calm down in the node_modules folder.
 #pragma warning disable 0414
         private readonly object _idleNodeModulesLock = new object();
@@ -46,6 +48,7 @@ namespace Microsoft.NodejsTools.Project
             InitNodejsProjectImages();
 #pragma warning restore 0612
 
+            infoBarManager = new MissingNodeInfoBar(package);
         }
 
         private void OnIdleNodeModules(object state)
@@ -341,6 +344,27 @@ namespace Microsoft.NodejsTools.Project
 
                 this.ModulesNode.ReloadHierarchySafe();
             }
+        }
+
+        public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
+        {
+            base.Load(filename, location, name, flags, ref iidProject, out canceled);
+
+            // check the property
+            var nodeProperty = GetProjectProperty(NodeProjectProperty.NodeExePath);
+            if (!string.IsNullOrEmpty(nodeProperty))
+            {
+                return;
+            }
+
+            // see if we can locate the Node.js runtime from the environment
+            if (!string.IsNullOrEmpty(Nodejs.GetPathToNodeExecutableFromEnvironment()))
+            {
+                return;
+            }
+
+            // show info bar
+            infoBarManager.Show(this);
         }
 
         private void UpdateProjectNodeFromProjectProperties()

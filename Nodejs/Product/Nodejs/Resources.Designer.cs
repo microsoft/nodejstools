@@ -144,6 +144,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Configure project properties.
+        /// </summary>
+        internal static string ConfigureProjectProperties {
+            get {
+                return ResourceManager.GetString("ConfigureProjectProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting &apos;Set as Node.js Startup File&apos; or by modifying your configuration in project properties.
         /// </summary>
         internal static string DebugCouldNotResolveStartupFileErrorMessage {
@@ -249,6 +258,15 @@ namespace Microsoft.NodejsTools {
         internal static string DependencyNodeModuleDoesNotExist {
             get {
                 return ResourceManager.GetString("DependencyNodeModuleDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Node.js.
+        /// </summary>
+        internal static string DownloadNodejs {
+            get {
+                return ResourceManager.GetString("DownloadNodejs", resourceCulture);
             }
         }
         
@@ -667,6 +685,15 @@ namespace Microsoft.NodejsTools {
         internal static string NodejsNotInstalledAnyCode {
             get {
                 return ResourceManager.GetString("NodejsNotInstalledAnyCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js runtime and restart VS, or specify the location of the Node runtime in the project&apos;s properties page..
+        /// </summary>
+        internal static string NodejsNotInstalledInfoBar {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledInfoBar", resourceCulture);
             }
         }
         

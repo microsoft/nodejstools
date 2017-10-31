@@ -722,4 +722,13 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Node.js Version: {0}</value>
     <comment>template is substituted with version info</comment>
   </data>
+  <data name="ConfigureProjectProperties" xml:space="preserve">
+    <value>Configure project properties</value>
+  </data>
+  <data name="DownloadNodejs" xml:space="preserve">
+    <value>Download Node.js</value>
+  </data>
+  <data name="NodejsNotInstalledInfoBar" xml:space="preserve">
+    <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js runtime and restart VS, or specify the location of the Node runtime in the project's properties page.</value>
+  </data>
 </root>
