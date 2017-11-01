@@ -58,6 +58,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private readonly ManualResetEvent cancelRequested = new ManualResetEvent(false);
 
+        private readonly ManualResetEvent testsCompleted = new ManualResetEvent(false);
+
         private static readonly char[] needToBeQuoted = new[] { ' ', '"' };
         private ProcessOutput nodeProcess;
         private object syncObject = new object();
@@ -87,8 +89,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         case "test start":
                             {
-                                this.currentResult = new TestResult(tests.First());
-                                this.currentResult.StartTime = DateTimeOffset.Now;
+                                this.currentResult = new TestResult(tests.First())
+                                {
+                                    StartTime = DateTimeOffset.Now
+                                };
                                 this.frameworkHandle.RecordStart(tests.First());
                             }
                             break;
@@ -108,6 +112,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 else if (testEvent.type == "suite end")
                 {
                     this.currentResultObject = testEvent.result;
+                    this.testsCompleted.Set();
                 }
             }
             catch (JsonReaderException)
@@ -272,6 +277,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
                 }
 
+                // make sure the testscompleted is not signalled.
+                this.testsCompleted.Reset();
+
                 this.nodeProcess = ProcessOutput.Run(
                     settings.NodeExePath,
                     nodeArgs,
@@ -321,13 +329,22 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
                 // Send the process the list of tests to run and wait for it to complete
                 this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
-                this.nodeProcess.Wait();
+
+                // for node 8 the process doesn't automatically exit when debugging, so always detach
+                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
+                if(runContext.IsBeingDebugged && app != null)
+                {
+                    app.GetDTE().Debugger.DetachAll();
+                }
 
                 // Automatically fail tests that haven't been run by this point (failures in before() hooks)
                 foreach (var notRunTest in this.currentTests)
                 {
-                    var result = new TestResult(notRunTest);
-                    result.Outcome = TestOutcome.Failed;
+                    var result = new TestResult(notRunTest)
+                    {
+                        Outcome = TestOutcome.Failed
+                    };
+
                     if (this.currentResultObject != null)
                     {
                         result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, this.currentResultObject.stdout));
@@ -343,10 +360,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             lock (this.syncObject)
             {
-                if (this.nodeProcess != null)
-                {
-                    this.nodeProcess.Kill();
-                }
+                this.nodeProcess?.Kill();
             }
         }
 
@@ -432,19 +446,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
             this.currentTests.Remove(test);
-        }
-    }
-}
-
-internal class DataReceiver
-{
-    public readonly StringBuilder Data = new StringBuilder();
-
-    public void DataReceived(object sender, DataReceivedEventArgs e)
-    {
-        if (e.Data != null)
-        {
-            this.Data.AppendLine(e.Data);
         }
     }
 }
