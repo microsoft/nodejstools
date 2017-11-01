@@ -9,12 +9,6 @@ namespace Microsoft.NodejsTools.TestAdapter
     [Export(typeof(IRunFromContextFileExtensions))]
     internal class RunFromContextFileExtensions : IRunFromContextFileExtensions
     {
-        #region IRunFromContextFileExtensions Members
-
-        private static readonly IEnumerable<string> fileTypes = new[] { NodejsConstants.JavaScriptExtension };
-
-        public IEnumerable<string> FileTypes => fileTypes;
-
-        #endregion
+        public IEnumerable<string> FileTypes { get; } = new[] { NodejsConstants.JavaScriptExtension };
     }
 }

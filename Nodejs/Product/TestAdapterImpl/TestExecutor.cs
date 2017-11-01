@@ -2,12 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.Telemetry;
@@ -23,7 +21,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     internal class TestExecutionRedirector : Redirector
     {
-        Action<string> writer;
+        private readonly Action<string> writer;
 
         public TestExecutionRedirector(Action<string> onWriteLine)
         {
