@@ -238,6 +238,7 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
+    <Compile Include="Project\MissingNodeInfoBar.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
       <SubType>Form</SubType>
