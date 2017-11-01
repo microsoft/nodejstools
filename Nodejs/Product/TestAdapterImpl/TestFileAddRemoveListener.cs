@@ -24,9 +24,9 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         public TestFileChangedEventArgs(IVsProject project, string file, TestFileChangedReason reason)
         {
-            Project = project;
-            File = file;
-            ChangedReason = reason;
+            this.Project = project;
+            this.File = file;
+            this.ChangedReason = reason;
         }
     }
 
@@ -45,28 +45,28 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             ValidateArg.NotNull(serviceProvider, "serviceProvider");
 
-            _testProjectGuid = projectGuid;
+            this._testProjectGuid = projectGuid;
 
-            _projectDocTracker = serviceProvider.GetService<IVsTrackProjectDocuments2>(typeof(SVsTrackProjectDocuments));
+            this._projectDocTracker = serviceProvider.GetService<IVsTrackProjectDocuments2>(typeof(SVsTrackProjectDocuments));
         }
 
         public void StartListeningForTestFileChanges()
         {
-            if (_projectDocTracker != null)
+            if (this._projectDocTracker != null)
             {
-                var hr = _projectDocTracker.AdviseTrackProjectDocumentsEvents(this, out _cookie);
+                var hr = this._projectDocTracker.AdviseTrackProjectDocumentsEvents(this, out this._cookie);
                 ErrorHandler.ThrowOnFailure(hr); // do nothing if this fails
             }
         }
 
         public void StopListeningForTestFileChanges()
         {
-            if (_cookie != VSConstants.VSCOOKIE_NIL && _projectDocTracker != null)
+            if (this._cookie != VSConstants.VSCOOKIE_NIL && this._projectDocTracker != null)
             {
-                var hr = _projectDocTracker.UnadviseTrackProjectDocumentsEvents(_cookie);
+                var hr = this._projectDocTracker.UnadviseTrackProjectDocumentsEvents(this._cookie);
                 ErrorHandler.Succeeded(hr); // do nothing if this fails
 
-                _cookie = VSConstants.VSCOOKIE_NIL;
+                this._cookie = VSConstants.VSCOOKIE_NIL;
             }
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 var projectIndex = rgFirstIndices[index];
                 var project = changedProjects[projectIndex];
 
-                if (project != null && project.IsTestProject(_testProjectGuid))
+                if (project != null && project.IsTestProject(this._testProjectGuid))
                 {
                     var evt = TestFileChanged;
                     if (evt != null)

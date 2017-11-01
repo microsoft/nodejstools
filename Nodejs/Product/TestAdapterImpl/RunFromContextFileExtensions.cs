@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         #region IRunFromContextFileExtensions Members
 
-        private static readonly string[] fileTypes = new[] { NodejsConstants.JavaScriptExtension };
+        private static readonly IEnumerable<string> fileTypes = new[] { NodejsConstants.JavaScriptExtension };
 
         public IEnumerable<string> FileTypes => fileTypes;
 

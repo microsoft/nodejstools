@@ -96,6 +96,8 @@ namespace Microsoft.NodejsTools.Project
             return VSConstants.S_OK;
         }
 
+        // todo: move usersettings to separate class, so we can use this from other places.
+
         internal static bool CheckUseNewChromeDebugProtocolOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");
@@ -153,8 +155,8 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.bstrPortName = debugUri;
             dbgInfo.fSendToOutputWindow = 0;
 
-            // we connect through a URI, so no need to set the process,
-            // we need to set the process id to '1' so the debugger is able to attach
+            // we connect through a URI, so no need to set the process, 
+            // we need to set the process id to '1' so the debugger is able to attach 
             dbgInfo.bstrExe = $"\01";
 
             AttachDebugger(dbgInfo);

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -8,12 +8,6 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 {
     internal static class ServiceProviderExtensions
     {
-        public static T GetService<T>(this IServiceProvider serviceProvider)
-            where T : class
-        {
-            return serviceProvider.GetService<T>(typeof(T));
-        }
-
         public static T GetService<T>(this IServiceProvider serviceProvider, Type serviceType)
             where T : class
         {

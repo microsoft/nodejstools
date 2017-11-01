@@ -50,10 +50,15 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
         public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
+
+        private static readonly Version Node8Version = new Version(8, 0);
+
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
         private static readonly Guid NodejsRemoteDebugPortSupplierUnsecuredId = new Guid("{9E16F805-5EFC-4CE5-8B67-9AE9B643EF80}");
 
         private readonly ManualResetEvent cancelRequested = new ManualResetEvent(false);
+
+        private readonly ManualResetEvent testsCompleted = new ManualResetEvent(false);
 
         private static readonly char[] needToBeQuoted = new[] { ' ', '"' };
         private ProcessOutput nodeProcess;
@@ -84,8 +89,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         case "test start":
                             {
-                                this.currentResult = new TestResult(tests.First());
-                                this.currentResult.StartTime = DateTimeOffset.Now;
+                                this.currentResult = new TestResult(tests.First())
+                                {
+                                    StartTime = DateTimeOffset.Now
+                                };
                                 this.frameworkHandle.RecordStart(tests.First());
                             }
                             break;
@@ -105,6 +112,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 else if (testEvent.type == "suite end")
                 {
                     this.currentResultObject = testEvent.result;
+                    this.testsCompleted.Set();
                 }
             }
             catch (JsonReaderException)
@@ -259,37 +267,47 @@ namespace Microsoft.NodejsTools.TestAdapter
                         nodeArgs.Add(args[0]);
                     }
 
-                    testObjects.Add(new TestCaseObject(args[1], args[2], args[3], args[4], args[5]));
+                    testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
                 }
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
                     app.GetDTE().Debugger.DetachAll();
                     // Ensure that --debug-brk is the first argument
-                    nodeArgs.InsertRange(0, GetDebugArgs(out port));
+                    nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
                 }
+
+                // make sure the testscompleted is not signalled.
+                this.testsCompleted.Reset();
 
                 this.nodeProcess = ProcessOutput.Run(
                     settings.NodeExePath,
                     nodeArgs,
                     settings.WorkingDir,
-                    /* env */        null,
-                    /* visible */    false,
-                    /* redirector */ new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                    /* quote args */ false);
+                    env: null,
+                    visible: false,
+                    redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                    quoteArgs: false);
 
                 if (runContext.IsBeingDebugged && app != null)
                 {
                     try
                     {
-                        //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-                        //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                        var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                        while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
+                        if (nodeVersion >= Node8Version)
                         {
-                            if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                            app.AttachToProcessNode2DebugAdapter(port);
+                        }
+                        else
+                        {
+                            //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                            //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                            var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                            while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
                             {
-                                break;
+                                if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                                {
+                                    break;
+                                }
                             }
                         }
 #if DEBUG
@@ -311,13 +329,22 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
                 // Send the process the list of tests to run and wait for it to complete
                 this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
-                this.nodeProcess.Wait();
+
+                // for node 8 the process doesn't automatically exit when debugging, so always detach
+                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
+                if(runContext.IsBeingDebugged && app != null)
+                {
+                    app.GetDTE().Debugger.DetachAll();
+                }
 
                 // Automatically fail tests that haven't been run by this point (failures in before() hooks)
                 foreach (var notRunTest in this.currentTests)
                 {
-                    var result = new TestResult(notRunTest);
-                    result.Outcome = TestOutcome.Failed;
+                    var result = new TestResult(notRunTest)
+                    {
+                        Outcome = TestOutcome.Failed
+                    };
+
                     if (this.currentResultObject != null)
                     {
                         result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, this.currentResultObject.stdout));
@@ -333,10 +360,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             lock (this.syncObject)
             {
-                if (this.nodeProcess != null)
-                {
-                    this.nodeProcess.Kill();
-                }
+                this.nodeProcess?.Kill();
             }
         }
 
@@ -355,14 +379,16 @@ namespace Microsoft.NodejsTools.TestAdapter
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
-        private static IEnumerable<string> GetDebugArgs(out int port)
+        private static string GetDebugArgs(Version nodeVersion, out int port)
         {
             port = GetFreePort();
 
-            // TODO: Need to use --inspect-brk on Node.js 8 or later
-            return new[] {
-                "--debug-brk=" + port.ToString()
-            };
+            if (nodeVersion >= Node8Version)
+            {
+                return $"--inspect-brk={port}";
+            }
+
+            return $"--debug-brk={port}";
         }
 
         private NodejsProjectSettings LoadProjectSettings(string projectFile)
@@ -400,10 +426,10 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)
         {
-            string[] standardOutputLines = resultObject.stdout.Split('\n');
-            string[] standardErrorLines = resultObject.stderr.Split('\n');
+            var standardOutputLines = resultObject.stdout.Split('\n');
+            var standardErrorLines = resultObject.stderr.Split('\n');
 
-            if (resultObject.pending != null && (bool)resultObject.pending)
+            if (resultObject.pending == true)
             {
                 result.Outcome = TestOutcome.Skipped;
             }
@@ -413,25 +439,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                 result.Duration = result.EndTime - result.StartTime;
                 result.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
             }
+
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
             result.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
             frameworkHandle.RecordResult(result);
             frameworkHandle.RecordEnd(test, result.Outcome);
             this.currentTests.Remove(test);
-        }
-    }
-}
-
-internal class DataReceiver
-{
-    public readonly StringBuilder Data = new StringBuilder();
-
-    public void DataReceived(object sender, DataReceivedEventArgs e)
-    {
-        if (e.Data != null)
-        {
-            this.Data.AppendLine(e.Data);
         }
     }
 }

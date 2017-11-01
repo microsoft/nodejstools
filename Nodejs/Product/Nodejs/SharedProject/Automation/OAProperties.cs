@@ -109,6 +109,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 }
             }
 
+            // per API we should throw if we can't find the property.
             throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(index));
         }
         /// <summary>
