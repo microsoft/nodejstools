@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudioTools
 {
     internal class ProjectEventArgs : EventArgs
     {
-        public IVsProject Project { get; }
+        public readonly IVsProject Project;
 
         public ProjectEventArgs(IVsProject project)
         {
@@ -23,6 +23,8 @@ namespace Microsoft.VisualStudioTools
         private uint cookie1 = VSConstants.VSCOOKIE_NIL;
         private uint cookie2 = VSConstants.VSCOOKIE_NIL;
         private uint cookie3 = VSConstants.VSCOOKIE_NIL;
+
+        public uint Cookie2 { get => this.cookie2; set => this.cookie2 = value; }
 
         public event EventHandler SolutionOpened;
         public event EventHandler SolutionClosed;
@@ -51,12 +53,8 @@ namespace Microsoft.VisualStudioTools
 
         public SolutionEventsListener(IVsSolution service, IVsSolutionBuildManager3 buildManager = null)
         {
-            if (service == null)
-            {
-                throw new ArgumentNullException(nameof(service));
-            }
-            this._solution = service;
-            this._buildManager = buildManager;
+            this.solution = service ?? throw new ArgumentNullException(nameof(service));
+            this.buildManager = buildManager;
         }
 
         public void StartListeningForChanges()
@@ -64,8 +62,7 @@ namespace Microsoft.VisualStudioTools
             ErrorHandler.ThrowOnFailure(this.solution.AdviseSolutionEvents(this, out this.cookie1));
             if (this.buildManager != null)
             {
-                var bm2 = this.buildManager as IVsSolutionBuildManager2;
-                if (bm2 != null)
+                if (this.buildManager is IVsSolutionBuildManager2 bm2)
                 {
                     ErrorHandler.ThrowOnFailure(bm2.AdviseUpdateSolutionEvents(this, out this.cookie2));
                 }
@@ -103,11 +100,7 @@ namespace Microsoft.VisualStudioTools
 
         public int UpdateSolution_Begin(ref int pfCancelUpdate)
         {
-            var buildStarted = BuildStarted;
-            if (buildStarted != null)
-            {
-                buildStarted(this, EventArgs.Empty);
-            }
+            BuildStarted?.Invoke(this, EventArgs.Empty);
             return VSConstants.S_OK;
         }
 
@@ -115,11 +108,7 @@ namespace Microsoft.VisualStudioTools
 
         public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand)
         {
-            var buildCompleted = BuildCompleted;
-            if (buildCompleted != null)
-            {
-                buildCompleted(this, EventArgs.Empty);
-            }
+            BuildCompleted?.Invoke(this, EventArgs.Empty);
             return VSConstants.S_OK;
         }
 
@@ -127,11 +116,7 @@ namespace Microsoft.VisualStudioTools
 
         int IVsUpdateSolutionEvents3.OnAfterActiveSolutionCfgChange(IVsCfg pOldActiveSlnCfg, IVsCfg pNewActiveSlnCfg)
         {
-            var evt = ActiveSolutionConfigurationChanged;
-            if (evt != null)
-            {
-                evt(this, EventArgs.Empty);
-            }
+            ActiveSolutionConfigurationChanged?.Invoke(this, EventArgs.Empty);
             return VSConstants.S_OK;
         }
 
@@ -139,11 +124,7 @@ namespace Microsoft.VisualStudioTools
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
-            var evt = SolutionClosed;
-            if (evt != null)
-            {
-                evt(this, EventArgs.Empty);
-            }
+            SolutionClosed?.Invoke(this, EventArgs.Empty);
             return VSConstants.S_OK;
         }
 
@@ -155,25 +136,16 @@ namespace Microsoft.VisualStudioTools
 
         public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
         {
-            var project = pHierarchy as IVsProject;
-            if (project != null)
+            if (pHierarchy is IVsProject project)
             {
-                var evt = ProjectLoaded;
-                if (evt != null)
-                {
-                    evt(this, new ProjectEventArgs(project));
-                }
+                ProjectLoaded?.Invoke(this, new ProjectEventArgs(project));
             }
             return VSConstants.S_OK;
         }
 
         public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
         {
-            var evt = SolutionOpened;
-            if (evt != null)
-            {
-                evt(this, EventArgs.Empty);
-            }
+            SolutionOpened?.Invoke(this, EventArgs.Empty);
             return VSConstants.S_OK;
         }
 
@@ -181,14 +153,9 @@ namespace Microsoft.VisualStudioTools
 
         public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
         {
-            var project = pHierarchy as IVsProject;
-            if (project != null)
+            if (pHierarchy is IVsProject project)
             {
-                var evt = ProjectClosing;
-                if (evt != null)
-                {
-                    evt(this, new ProjectEventArgs(project));
-                }
+                ProjectClosing?.Invoke(this, new ProjectEventArgs(project));
             }
             return VSConstants.S_OK;
         }
@@ -201,14 +168,9 @@ namespace Microsoft.VisualStudioTools
 
         public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
         {
-            var project = pRealHierarchy as IVsProject;
-            if (project != null)
+            if (pRealHierarchy is IVsProject project)
             {
-                var evt = ProjectUnloading;
-                if (evt != null)
-                {
-                    evt(this, new ProjectEventArgs(project));
-                }
+                ProjectUnloading?.Invoke(this, new ProjectEventArgs(project));
             }
             return VSConstants.S_OK;
         }
@@ -225,14 +187,9 @@ namespace Microsoft.VisualStudioTools
 
         public int OnAfterRenameProject(IVsHierarchy pHierarchy)
         {
-            var project = pHierarchy as IVsProject;
-            if (project != null)
+            if (pHierarchy is IVsProject project)
             {
-                var evt = ProjectRenamed;
-                if (evt != null)
-                {
-                    evt(this, new ProjectEventArgs(project));
-                }
+                ProjectRenamed?.Invoke(this, new ProjectEventArgs(project));
             }
             return VSConstants.S_OK;
         }
