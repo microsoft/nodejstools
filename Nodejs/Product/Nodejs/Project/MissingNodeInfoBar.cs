@@ -9,22 +9,18 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal sealed class MissingNodeInfoBar
+    internal static class MissingNodeInfoBar
     {
-        private IServiceProvider serviceProvider;
-        private IVsInfoBarUIElement currentInfoBarElement;
+        private static IVsInfoBarUIElement CurrentInfoBarElement;
 
-        public MissingNodeInfoBar(IServiceProvider serviceProvider)
+        public static void Show(NodejsProjectNode projectNode)
         {
-            this.serviceProvider = serviceProvider;
-        }
+            var serviceProvider = projectNode.Site;
 
-        public void Show(NodejsProjectNode projectNode)
-        {
-            this.serviceProvider.GetUIThread().MustBeCalledFromUIThread();
+            serviceProvider.GetUIThread().MustBeCalledFromUIThread();
 
-            var vsShell = (IVsShell)this.serviceProvider.GetService(typeof(SVsShell));
-            var infoBarUIFactory = (IVsInfoBarUIFactory)this.serviceProvider.GetService(typeof(SVsInfoBarUIFactory));
+            var vsShell = (IVsShell)serviceProvider.GetService(typeof(SVsShell));
+            var infoBarUIFactory = (IVsInfoBarUIFactory)serviceProvider.GetService(typeof(SVsInfoBarUIFactory));
 
             if (ErrorHandler.Failed(vsShell.GetProperty((int)__VSSPROPID7.VSSPROPID_MainWindowInfoBarHost, out var tmp)))
             {
@@ -34,7 +30,7 @@ namespace Microsoft.NodejsTools.Project
             var infoBarHost = (IVsInfoBarHost)tmp;
 
             // make sure we close the previous infobar
-            this.Close();
+            CurrentInfoBarElement?.Close();
 
             Action downloadNode = DownloadNode;
             Action openProjectProps = ShowProjectProperties;
@@ -48,14 +44,14 @@ namespace Microsoft.NodejsTools.Project
             var infoBarModel = new InfoBarModel(Resources.NodejsNotInstalledInfoBar, actionItems, isCloseButtonVisible: true, image: KnownMonikers.StatusError);
 
             uint eventCookie = 0;
-            this.currentInfoBarElement = infoBarUIFactory.CreateInfoBar(infoBarModel);
-            this.currentInfoBarElement.Advise(new InfoBarUIEvents(OnClose), out eventCookie);
+            CurrentInfoBarElement = infoBarUIFactory.CreateInfoBar(infoBarModel);
+            CurrentInfoBarElement.Advise(new InfoBarUIEvents(OnClose), out eventCookie);
 
-            infoBarHost.AddInfoBar(this.currentInfoBarElement);
+            infoBarHost.AddInfoBar(CurrentInfoBarElement);
 
             void OnClose()
             {
-                this.currentInfoBarElement.Unadvise(eventCookie);
+                CurrentInfoBarElement.Unadvise(eventCookie);
             }
 
             void DownloadNode()
@@ -77,13 +73,6 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        public void Close()
-        {
-            this.serviceProvider.GetUIThread().MustBeCalledFromUIThread();
-
-            this.currentInfoBarElement?.Close();
-        }
-
         private sealed class InfoBarUIEvents : IVsInfoBarUIEvents
         {
             private readonly Action OnClose;
@@ -95,13 +84,7 @@ namespace Microsoft.NodejsTools.Project
 
             public void OnClosed(IVsInfoBarUIElement infoBarUIElement) => this.OnClose();
 
-            public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem)
-            {
-                if (actionItem.ActionContext is Action action)
-                {
-                    action.Invoke();
-                }
-            }
+            public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem) => (actionItem.ActionContext as Action)?.Invoke();
         }
     }
 }

@@ -31,8 +31,6 @@ namespace Microsoft.NodejsTools.Project
         private string _intermediateOutputPath;
         private readonly Dictionary<NodejsProjectImageName, int> _imageIndexFromNameDictionary = new Dictionary<NodejsProjectImageName, int>();
 
-        private readonly MissingNodeInfoBar infoBarManager;
-
         // We delay analysis until things calm down in the node_modules folder.
 #pragma warning disable 0414
         private readonly object _idleNodeModulesLock = new object();
@@ -47,8 +45,6 @@ namespace Microsoft.NodejsTools.Project
 #pragma warning disable 0612
             InitNodejsProjectImages();
 #pragma warning restore 0612
-
-            infoBarManager = new MissingNodeInfoBar(package);
         }
 
         private void OnIdleNodeModules(object state)
@@ -364,7 +360,7 @@ namespace Microsoft.NodejsTools.Project
             }
 
             // show info bar
-            infoBarManager.Show(this);
+            MissingNodeInfoBar.Show(this);
         }
 
         private void UpdateProjectNodeFromProjectProperties()
