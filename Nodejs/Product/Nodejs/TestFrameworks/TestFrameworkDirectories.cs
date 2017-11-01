@@ -48,8 +48,6 @@ namespace Microsoft.NodejsTools.TestFrameworks
             // "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll"
             // and
             // "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Enterprise\Common7\IDE\Extensions\Microsoft\NodeJsTools\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll"
-            //
-            // However in both cases, we should just go up a folder to the nodejstools root, and then into the TestAdapter folder.
 
             string testAdapterAssemblyFolder;
 
