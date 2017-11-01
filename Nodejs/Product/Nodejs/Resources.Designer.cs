@@ -689,7 +689,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js runtime and restart VS, or specify the location of the Node runtime in the project&apos;s properties page..
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page..
         /// </summary>
         internal static string NodejsNotInstalledInfoBar {
             get {
