@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Debugger
         {
             if (kind != BreakOnKind.Always && count < 1)
             {
-                throw new ArgumentException("Invalid BreakOn count");
+                throw new ArgumentException("Invalid BreakOn count", nameof(kind));
             }
 
             this.Kind = kind;

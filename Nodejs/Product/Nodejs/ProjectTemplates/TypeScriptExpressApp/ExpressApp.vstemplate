@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3087"/>
@@ -31,34 +32,10 @@
         <ProjectItem>layout.pug</ProjectItem>
         <ProjectItem>error.pug</ProjectItem>
       </Folder>
-      <Folder Name="typings">
-        <Folder Name="globals">
-          <Folder Name="express">
-            <ProjectItem TargetFileName="index.d.ts">express.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">express.typings.json</ProjectItem>
-          </Folder>
-          <Folder Name="express-serve-static-core">
-            <ProjectItem TargetFileName="index.d.ts">express-serve-static-core.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">express-serve-static-core.typings.json</ProjectItem>
-          </Folder>
-          <Folder Name="mime">
-            <ProjectItem TargetFileName="index.d.ts">mime.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">mime.typings.json</ProjectItem>
-          </Folder>
-          <Folder Name="serve-static">
-            <ProjectItem TargetFileName="index.d.ts">serve-static.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">serve-static.typings.json</ProjectItem>
-          </Folder>
-          <Folder Name="debug">
-            <ProjectItem TargetFileName="index.d.ts">debug.d.ts</ProjectItem>
-            <ProjectItem TargetFileName="typings.json">debug.typings.json</ProjectItem>
-          </Folder>
-        </Folder>
-      </Folder>
+      <ProjectItem>tsconfig.json</ProjectItem>
       <ProjectItem OpenInEditor="true">app.ts</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
-      <ProjectItem>typings.json</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -56,16 +55,6 @@
     </VSTemplate>-->
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ApplicationInsights, Version=2.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ApplicationInsights.2.3.0\lib\net46\Microsoft.ApplicationInsights.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.ApplicationInsights.PersistenceChannel, Version=1.2.3.490, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.ApplicationInsights.PersistenceChannel.1.2.3\lib\net45\Microsoft.ApplicationInsights.PersistenceChannel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Diagnostics.Tracing.EventSource, Version=1.1.28.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.28\lib\net46\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.ImageCatalog, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Imaging, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <!-- 
@@ -73,13 +62,6 @@
     TODO: https://github.com/Microsoft/nodejstools/issues/759 
     -->
     <Reference Include="Microsoft.VisualStudio.Imaging.Interop.14.0.DesignTime, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.RemoteControl, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.RemoteControl.14.0.262-masterA5CACE98\lib\net45\Microsoft.VisualStudio.RemoteControl.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.11.2273\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -97,9 +79,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.15.3.DesignTime, Version=15.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Telemetry, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Telemetry.15.3.789-masterCC863119\lib\net45\Microsoft.VisualStudio.Telemetry.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -115,29 +94,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Utilities.Internal, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.Internal.14.0.72-masterF9EB1D39\lib\net45\Microsoft.VisualStudio.Utilities.Internal.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Validation, Version=15.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Validation.15.3.15\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Workspaces.15.0.215-pre\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.VSIntegration.Contracts, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -161,7 +118,7 @@
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Editor, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -195,7 +152,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
@@ -220,6 +176,27 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs">
+      <Link>SharedProject\CommonConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
+      <Link>SharedProject\CommonUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
+      <Link>SharedProject\ExceptionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ILambdaConverterProvider.cs">
+      <Link>SharedProject\Wpf\LambdaConverter\ILambdaConverterProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\LambdaConverter.cs">
+      <Link>SharedProject\Wpf\LambdaConverter\LambdaConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
+      <Link>SharedProject\ProcessOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\SolutionEventsListener.cs">
+      <Link>SharedProject\SolutionEventsListener.cs</Link>
+    </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>Project\TypeScriptHelpers.cs</Link>
     </Compile>
@@ -230,6 +207,11 @@
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Debugger\NodeDebugProvider.cs" />
+    <Compile Include="GeneratedHelpAboutVersion.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GeneratedHelpAboutVersion.tt</DependentUpon>
+    </Compile>
     <Compile Include="ImportWizardResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -255,8 +237,8 @@
       <DependentUpon>NpmPackageInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
-    <Compile Include="Options\TypeScriptRegistrySwitches.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
+    <Compile Include="Project\MissingNodeInfoBar.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
       <SubType>Form</SubType>
@@ -290,6 +272,7 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
+    <Compile Include="Repl\InfoReplCommand.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
@@ -530,6 +513,13 @@
     <Compile Include="Telemetry\TelemetryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\..\Common\Product\SharedProject\ProjectResources.resx">
+      <Link>SharedProject\ProjectResources.resx</Link>
+      <ManifestResourceName>Microsoft.VisualStudio.Project</ManifestResourceName>
+    </EmbeddedResource>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProjectResources.cs">
+      <Link>SharedProject\ProjectResources.cs</Link>
+    </Compile>
     <EmbeddedResource Include="ImportWizardResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportWizardResources.Designer.cs</LastGenOutput>
@@ -593,30 +583,15 @@
     <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyXml\EmptyXml.xml" />
-    <Content Include="TypingsAcquisitionTool\index.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="TypingsAcquisitionTool\package.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="TypingsAcquisitionTool\bin\install_typings">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.ccproj" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceDefinition.csdef" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\Express4App\index.pug" />
     <ZipProject Include="ProjectTemplates\Express4App\layout.pug" />
     <ZipProject Include="ProjectTemplates\Express4App\package.json" />
@@ -639,18 +614,6 @@
     <ZipItem Include="Templates\Files\TypeScriptTapeUnitTest\UnitTest.ts" />
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.json" />
     <ZipItem Include="Templates\Files\TypeScriptTsConfig\tsconfig.vstemplate" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\debug.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\debug.typings.json" />
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
@@ -664,15 +627,39 @@
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSAzureApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSAzureApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSConsole.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSConsole.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSWeb.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSWeb.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\JSWorker.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\JSWorker.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\NodeJSApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\NodeJSApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\NodeTSApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\NodeTSApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSAzureApplication.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSAzureApplication.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSConsole.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSConsole.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSWeb.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSWeb.ico</Link>
+    </Resource>
+    <Resource Include="..\Icons\NewProjectDialogIconsICO\TSWorker.ico">
+      <Link>Resources\Icons\NewProjectDialogIconsICO\TSWorker.ico</Link>
+    </Resource>
     <Content Include="Credits.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="Debugger\RemoteDebug\RemoteDebug.js">
-      <Link>RemoteDebug\RemoteDebug.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <VSIXSubPath>RemoteDebug</VSIXSubPath>
     </Content>
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.njsproj">
       <SubType>Designer</SubType>
@@ -680,23 +667,102 @@
     <ZipProject Include="ProjectTemplates\FromExistingCode\FromExistingCode.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\typings.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
+    <!-- Start of TypeScript templates -->
+    <!-- Blank Node.js console application -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.vstemplate" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\NodejsConsoleApp.vstemplate" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptConsoleApp\tsconfig.json" />
+    <!-- Blank Node.js web application -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.vstemplate" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.njsproj">
       <SubType>Designer</SubType>
     </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\NodejsWebApp.vstemplate" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\Preview.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptWebApp\tsconfig.json" />
+    <!-- Blank Azure Node.js web application -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\tsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
+    <!-- Basic Node.js Express 4 application -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\error.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\tsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
+    <!-- Basic Azure Node.js Express 4 application -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptAzureExpressApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\error.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\tsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
+    <!-- Misc -->
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\TypeScriptAzureNodejsWorker.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <!-- End of TypeScript templates -->
+    <Content Include="GeneratedHelpAboutVersion.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GeneratedHelpAboutVersion.cs</LastGenOutput>
+    </Content>
     <Content Include="License.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -718,12 +784,10 @@
     </EmbeddedResource>
     <ZipProject Include="ProjectTemplates\CloudService\cloudservice.ico" />
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.vstemplate" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Preview.png" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.vstemplate" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptAzureWebRole.vstemplate">
       <SubType>Designer</SubType>
-    </ZipProject>
+    </TypeScriptProject>
     <ZipProject Include="ProjectTemplates\Express4App\app.js" />
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
@@ -731,7 +795,6 @@
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\Express4App\typings.json" />
     <ZipProject Include="ProjectTemplates\Express4App\index.js" />
     <ZipProject Include="ProjectTemplates\Express4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\Express4App\users.js" />
@@ -739,45 +802,19 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\ExpressApp.vstemplate">
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\AzureExpress4App.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureExpress4App\index.js" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureExpress4App\users.js" />
-    <Content Include="Scripts\Typings\node\node.d.ts">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptFromExistingCode\FromExistingCode.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\worker.js" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\startup.js" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.vstemplate">
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\AzureNodejsWorker.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\package.json" />
@@ -799,7 +836,6 @@
       <SubType>Designer</SubType>
     </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
-    <Resource Include="version.txt" />
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>false</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -827,47 +863,6 @@
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\app.js" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.njsproj" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\NodejsConsoleApp.vstemplate" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\ExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\index.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\error.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\layout.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\TypeScriptWebApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.Debug.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\error.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\layout.pug" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\main.css" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Preview.png" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\server.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\startup.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.njsproj">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
-      <SubType>Designer</SubType>
-    </TypeScriptProject>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\package.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\README.md" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -966,44 +961,199 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebApp\server.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\app.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\index.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\user.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\server.ts" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RemoteDebug\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\express-serve-static-core.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\serve-static.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\mime.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express-serve-static-core.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\express.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\serve-static.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\mime.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <ZipItem Include="Templates\Files\EmptyTs\EmptyTs.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\debug.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\debug.d.ts" />
+    <Compile Include="SharedProject\Navigation\SourceLocation.cs" />
+    <Compile Include="SharedProject\AllFilesProjectElement.cs" />
+    <Compile Include="SharedProject\HierarchyNodeFlags.cs" />
+    <Compile Include="SharedProject\OutputWindowRedirector.cs" />
+    <Compile Include="SharedProject\OverwriteFileDialog.xaml.cs">
+      <DependentUpon>OverwriteFileDialog.xaml</DependentUpon>
+    </Compile>
+    <Page Include="SharedProject\OverwriteFileDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="SharedProject\Navigation\IScopeNode.cs" />
+    <Compile Include="SharedProject\CommonPackage.cs" />
+    <Compile Include="SharedProject\DebugTimer.cs" />
+    <Compile Include="SharedProject\DeveloperActivityAttribute.cs" />
+    <Compile Include="SharedProject\DialogWindowVersioningWorkaround.cs" />
+    <Compile Include="SharedProject\Navigation\CommonLibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\ProjectLibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\HierarchyListener.cs" />
+    <Compile Include="SharedProject\Navigation\ICustomSearchListProvider.cs" />
+    <Compile Include="SharedProject\Navigation\ILibraryManager.cs" />
+    <Compile Include="SharedProject\Navigation\ISimpleObject.cs" />
+    <Compile Include="SharedProject\Navigation\Library.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryManager.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryNode.cs" />
+    <Compile Include="SharedProject\Navigation\LibraryTask.cs" />
+    <Compile Include="SharedProject\Navigation\ModuleId.cs" />
+    <Compile Include="SharedProject\Navigation\SimpleObject.cs" />
+    <Compile Include="SharedProject\Navigation\SimpleObjectList.cs" />
+    <Compile Include="SharedProject\Navigation\TextLineEventListener.cs" />
+    <Compile Include="SharedProject\AssemblyReferenceNode.cs" />
+    <Compile Include="SharedProject\Attributes.cs" />
+    <Compile Include="SharedProject\Automation\AutomationScope.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectConfigurationProperties.cs" />
+    <Compile Include="SharedProject\Automation\OAFileItem.cs" />
+    <Compile Include="SharedProject\Automation\OAFolderItem.cs" />
+    <Compile Include="SharedProject\Automation\OANavigableProjectItems.cs" />
+    <Compile Include="SharedProject\Automation\OANullProperty.cs" />
+    <Compile Include="SharedProject\Automation\OAProject.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectItem.cs" />
+    <Compile Include="SharedProject\Automation\OAProjectItems.cs" />
+    <Compile Include="SharedProject\Automation\OAProperties.cs" />
+    <Compile Include="SharedProject\Automation\OAProperty.cs" />
+    <Compile Include="SharedProject\Automation\OAReferenceFolderItem.cs" />
+    <Compile Include="SharedProject\Automation\OAReferenceItem.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAAssemblyReference.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAProjectReference.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAReferenceBase.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAReferences.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAVSProject.cs" />
+    <Compile Include="SharedProject\Automation\VSProject\OAVSProjectItem.cs" />
+    <Compile Include="SharedProject\BuildDependency.cs" />
+    <Compile Include="SharedProject\BuildPropertyPage.cs" />
+    <Compile Include="SharedProject\CommonConfigProvider.cs" />
+    <Compile Include="SharedProject\CommonEditorFactory.cs" />
+    <Compile Include="SharedProject\CommonFileNode.cs" />
+    <Compile Include="SharedProject\CommonFolderNode.cs" />
+    <Compile Include="SharedProject\CommonNonCodeFileNode.cs" />
+    <Compile Include="SharedProject\CommonProjectConfig.cs" />
+    <Compile Include="SharedProject\CommonProjectNode.cs" />
+    <Compile Include="SharedProject\CommonProjectNodeProperties.cs" />
+    <Compile Include="SharedProject\CommonProjectPackage.cs" />
+    <Compile Include="SharedProject\CommonPropertyPage.cs" />
+    <Compile Include="SharedProject\CommonReferenceContainerNode.cs" />
+    <Compile Include="SharedProject\ConfigProvider.cs" />
+    <Compile Include="SharedProject\FileWatcher.cs" />
+    <Compile Include="SharedProject\FlavoredProjectFactoryBase.cs" />
+    <Compile Include="SharedProject\DataObject.cs" />
+    <Compile Include="SharedProject\DependentFileNode.cs" />
+    <Compile Include="SharedProject\DesignPropertyDescriptor.cs" />
+    <Compile Include="SharedProject\DirtyChangedEventArgs.cs" />
+    <Compile Include="SharedProject\DocumentManager.cs" />
+    <Compile Include="SharedProject\EnumBSTR.cs" />
+    <Compile Include="SharedProject\EnumDependencies.cs" />
+    <Compile Include="SharedProject\ExtensibilityEventsDispatcher.cs" />
+    <Compile Include="SharedProject\FileChangeManager.cs" />
+    <Compile Include="SharedProject\FileDocumentManager.cs" />
+    <Compile Include="SharedProject\FileNode.cs" />
+    <Compile Include="SharedProject\FolderNode.cs" />
+    <Compile Include="SharedProject\HierarchyNode.cs" />
+    <Compile Include="SharedProject\HierarchyIdMap.cs" />
+    <Compile Include="SharedProject\IDEBuildLogger.cs" />
+    <Compile Include="SharedProject\IdleManager.cs" />
+    <Compile Include="SharedProject\ClipboardServiceBase.cs" />
+    <Compile Include="SharedProject\ClipboardService.cs" />
+    <Compile Include="SharedProject\ImageHandler.cs" />
+    <Compile Include="SharedProject\Interfaces.cs" />
+    <Compile Include="SharedProject\IProjectLauncher.cs" />
+    <Compile Include="SharedProject\IProjectLaunchProperties.cs" />
+    <Compile Include="SharedProject\IProjectPublisher.cs" />
+    <Compile Include="SharedProject\IPublishFile.cs" />
+    <Compile Include="SharedProject\IPublishProject.cs" />
+    <Compile Include="SharedProject\LocalizableProperties.cs" />
+    <Compile Include="SharedProject\Misc\ConnectionPointContainer.cs" />
+    <Compile Include="SharedProject\Misc\ExternDll.cs" />
+    <Compile Include="SharedProject\Misc\NativeMethods.cs" />
+    <Compile Include="SharedProject\Misc\UnsafeNativeMethods.cs" />
+    <Compile Include="SharedProject\MsBuildProjectElement.cs" />
+    <Compile Include="SharedProject\NodeProperties.cs" />
+    <Compile Include="SharedProject\ObservableCollectionExtensions.cs" />
+    <Compile Include="SharedProject\Output.cs" />
+    <Compile Include="SharedProject\OutputGroup.cs" />
+    <Compile Include="SharedProject\ProjectConfig.cs" />
+    <Compile Include="SharedProject\ProjectDesignerDocumentManager.cs" />
+    <Compile Include="SharedProject\ProjectDocumentsListener.cs" />
+    <Compile Include="SharedProject\ProjectDocumentsListenerForStartupFileUpdates.cs" />
+    <Compile Include="SharedProject\ProjectElement.cs" />
+    <Compile Include="SharedProject\ProjectFactory.cs" />
+    <Compile Include="SharedProject\ProjectFileConstants.cs" />
+    <Compile Include="SharedProject\ProjectNode.CopyPaste.cs" />
+    <Compile Include="SharedProject\ProjectNode.IOleCommandTarget.cs" />
+    <Compile Include="SharedProject\ProjectNode.cs" />
+    <Compile Include="SharedProject\ProjectNode.Events.cs" />
+    <Compile Include="SharedProject\ProjectPackage.cs" />
+    <Compile Include="SharedProject\ProjectReferenceNode.cs" />
+    <Compile Include="SharedProject\PropertiesEditorLauncher.cs" />
+    <Compile Include="SharedProject\PublishFailedException.cs" />
+    <Compile Include="SharedProject\PublishFile.cs" />
+    <Compile Include="SharedProject\PublishProject.cs" />
+    <Compile Include="SharedProject\PublishProjectOptions.cs" />
+    <Compile Include="SharedProject\ReferenceContainerNode.cs" />
+    <Compile Include="SharedProject\ReferenceNode.cs" />
+    <Compile Include="SharedProject\SolutionListener.cs" />
+    <Compile Include="SharedProject\SolutionListenerForBuildDependencyUpdate.cs" />
+    <Compile Include="SharedProject\SolutionListenerForProjectOpen.cs" />
+    <Compile Include="SharedProject\StructuresEnums.cs" />
+    <Compile Include="SharedProject\SuspendFileChanges.cs" />
+    <Compile Include="SharedProject\TaskProgressBar.xaml.cs">
+      <DependentUpon>TaskProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SharedProject\IDiskBasedNode.cs" />
+    <Compile Include="SharedProject\Command.cs" />
+    <Compile Include="SharedProject\SharedCommands.cs" />
+    <Page Include="SharedProject\TaskProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="SharedProject\TrackDocumentsHelper.cs" />
+    <Compile Include="SharedProject\UIThread.cs" />
+    <Compile Include="SharedProject\UIThreadBase.cs" />
+    <Compile Include="SharedProject\UIThreadSynchronizer.cs" />
+    <Compile Include="SharedProject\UpdateSolutionEventsListener.cs" />
+    <Compile Include="SharedProject\Utilities.cs" />
+    <Compile Include="SharedProject\VirtualProjectElement.cs" />
+    <Compile Include="SharedProject\VsCommands.cs" />
+    <Compile Include="SharedProject\VSShellUtilities.cs" />
+    <Compile Include="SharedProject\WaitDialog.cs" />
+    <Compile Include="SharedProject\WebPiComponentPickerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SharedProject\WebPiComponentPickerControl.Designer.cs">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SharedProject\ProvideDebugEngineAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugExceptionAttribute.cs" />
+    <Compile Include="SharedProject\WebSocketStream.cs" />
+    <Compile Include="SharedProject\ProvideCodeExpansionsAttribute.cs" />
+    <Compile Include="SharedProject\ProvideCodeExpansionPathAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugLanguageAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugPortSupplierAttribute.cs" />
+    <Compile Include="SharedProject\ProvideDebugPortPickerAttribute.cs" />
+    <Compile Include="SharedProject\ProvideTextEditorAutomationAttribute.cs" />
+    <Compile Include="SharedProject\VsExtensions.cs" />
+    <Compile Include="SharedProject\TaskExtensions.cs" />
+    <Compile Include="SharedProject\VsTaskExtensions.cs" />
+    <Compile Include="SharedProject\Wpf\Commands.cs" />
+    <Compile Include="SharedProject\Wpf\ConfigurationControl.cs" />
+    <Compile Include="SharedProject\Wpf\LabelledButton.cs" />
+    <Compile Include="SharedProject\Wpf\LabelledControl.cs" />
+    <Compile Include="SharedProject\Wpf\Controls.cs" />
+    <Compile Include="SharedProject\Wpf\NativeMethods.cs" />
+    <Compile Include="SharedProject\Wpf\Dialogs.cs" />
+    <Page Include="SharedProject\Wpf\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaExtension.cs" />
+    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaProperties.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SharedProject\WebPiComponentPickerControl.resx">
+      <DependentUpon>WebPiComponentPickerControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <FilesToLocalize Include="$(OutDir)\$(AssemblyName).dll">
@@ -1021,6 +1171,32 @@
       <InProject>false</InProject>
     </FilesToSign>
   </ItemGroup>
+  <ItemGroup>
+    <T4ParameterValues Include="BuildVersion">
+      <Value>$(VSIXBuildVersion)</Value>
+      <Visible>false</Visible>
+    </T4ParameterValues>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MicroBuild.Core">
+      <Version>0.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.AppDesigner">
+      <Version>15.3.0-rc-6162104</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>15.3.799-masterDDDBA9E4</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading">
+      <Version>15.5.13-beta</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Workspaces">
+      <Version>15.0.215-pre</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
   <PropertyGroup>
     <!--
     To specify a different registry root to register your package, uncomment the TargetRegistryRoot
@@ -1035,17 +1211,14 @@
     <CreateVsixContainer>false</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
-  <Import Project="$(BuildRoot)\Common\Product\SharedProject\SharedProject.proj" />
+  <PropertyGroup>
+    <TransformOnBuild>true</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+  </PropertyGroup>
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets" />
   <Import Project="..\ProjectAfter.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -1053,7 +1226,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="TransformTypeScriptProjects" BeforeTargets="MainResourcesGeneration">
+  <Target Name="TransformTypeScriptProjects" BeforeTargets="CalculateZipFiles">
     <ItemGroup>
       <ZipProject Include="@(TypeScriptProject)">
         <Language>TypeScript</Language>
@@ -1064,9 +1237,9 @@
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>
-      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
-    </PostBuildEvent>
+    <PostBuildEvent>mkdir $(OutDir)RemoteDebug\
+copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
+</PostBuildEvent>
   </PropertyGroup>
   <!-- 
       We build these assemblies into separate folders to avoid incremental cleaning issues,
@@ -1081,5 +1254,4 @@
   <Target Name="_DeleteAfterCreatePkgDef" AfterTargets="GeneratePkgDef">
     <Delete Files="@(_CopiedForCreatePkgdef)" />
   </Target>
-  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
 </Project>

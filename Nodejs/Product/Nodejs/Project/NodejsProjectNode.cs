@@ -1,13 +1,10 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +18,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.VisualStudioTools.Project.Automation;
-using MSBuild = Microsoft.Build.Evaluation;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 
 namespace Microsoft.NodejsTools.Project
@@ -49,7 +45,6 @@ namespace Microsoft.NodejsTools.Project
 #pragma warning disable 0612
             InitNodejsProjectImages();
 #pragma warning restore 0612
-
         }
 
         private void OnIdleNodeModules(object state)
@@ -76,7 +71,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private static string[] _excludedAvailableItems = new[] {
+        private readonly static string[] _excludedAvailableItems = new[] {
             "ApplicationDefinition",
             "Page",
             "Resource",
@@ -129,46 +124,6 @@ namespace Microsoft.NodejsTools.Project
         public override Guid SharedCommandGuid => Guids.NodejsCmdSet;
 
         internal override string IssueTrackerUrl => NodejsConstants.IssueTrackerUrl;
-        protected override void FinishProjectCreation(string sourceFolder, string destFolder)
-        {
-            foreach (var item in this.BuildProject.Items)
-            {
-                if (IsProjectTypeScriptSourceFile(item.EvaluatedInclude))
-                {
-                    // Create the 'typings' folder
-                    var typingsFolder = Path.Combine(this.ProjectHome, "Scripts", "typings");
-                    if (!Directory.Exists(typingsFolder))
-                    {
-                        Directory.CreateDirectory(typingsFolder);
-                    }
-
-                    // Deploy node.d.ts
-                    var nodeTypingsFolder = Path.Combine(typingsFolder, "node");
-                    if (!Directory.Exists(Path.Combine(nodeTypingsFolder)))
-                    {
-                        Directory.CreateDirectory(nodeTypingsFolder);
-                    }
-
-                    var nodeFolder = ((OAProject)this.GetAutomationObject()).ProjectItems
-                        .AddFolder("Scripts").ProjectItems
-                        .AddFolder("typings").ProjectItems
-                        .AddFolder("node");
-
-                    nodeFolder.ProjectItems.AddFromFileCopy(
-                        Path.Combine(
-                            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                            "Scripts",
-                            "typings",
-                            "node",
-                            "node.d.ts"
-                        )
-                    );
-                    break;
-                }
-            }
-
-            base.FinishProjectCreation(sourceFolder, destFolder);
-        }
 
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName)
         {
@@ -322,16 +277,14 @@ namespace Microsoft.NodejsTools.Project
             var res = base.GetConfigurationDependentPropertyPages();
 
             var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
-            bool fEnableTs;
-            if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs)
+            if (enableTs != null && Boolean.TryParse(enableTs, out var fEnableTs) && fEnableTs)
             {
                 var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null)
                 {
                     foreach (var strGuid in typeScriptPages.Split(';'))
                     {
-                        Guid guid;
-                        if (Guid.TryParse(strGuid, out guid))
+                        if (Guid.TryParse(strGuid, out var guid))
                         {
                             res = res.Append(guid);
                         }
@@ -389,6 +342,27 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
+        public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
+        {
+            base.Load(filename, location, name, flags, ref iidProject, out canceled);
+
+            // check the property
+            var nodeProperty = GetProjectProperty(NodeProjectProperty.NodeExePath);
+            if (!string.IsNullOrEmpty(nodeProperty))
+            {
+                return;
+            }
+
+            // see if we can locate the Node.js runtime from the environment
+            if (!string.IsNullOrEmpty(Nodejs.GetPathToNodeExecutableFromEnvironment()))
+            {
+                return;
+            }
+
+            // show info bar
+            MissingNodeInfoBar.Show(this);
+        }
+
         private void UpdateProjectNodeFromProjectProperties()
         {
             this._intermediateOutputPath = Path.Combine(this.ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
@@ -440,7 +414,7 @@ namespace Microsoft.NodejsTools.Project
                     default:
                         if (propPage != null)
                         {
-                            this.PropertyPage.IsDirty = true;
+                            propPage.IsDirty = true;
                         }
                         break;
                 }
@@ -462,8 +436,7 @@ namespace Microsoft.NodejsTools.Project
 
         private static void AddFolderForFile(Dictionary<FileNode, List<CommonFolderNode>> directoryPackages, FileNode rootFile, CommonFolderNode folderChild)
         {
-            List<CommonFolderNode> folders;
-            if (!directoryPackages.TryGetValue(rootFile, out folders))
+            if (!directoryPackages.TryGetValue(rootFile, out var folders))
             {
                 directoryPackages[rootFile] = folders = new List<CommonFolderNode>();
             }
@@ -529,8 +502,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetProjectTypeGuids()
         {
-            var projectTypeGuids = "";
-            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out var projectTypeGuids));
             return projectTypeGuids;
         }
 
@@ -626,72 +598,14 @@ namespace Microsoft.NodejsTools.Project
             try
             {
                 this._isCheckingForLongPaths = true;
-                TaskDialogButton dedupeButton, ignoreButton, disableButton;
-                var taskDialog = new TaskDialog(NodejsPackage.Instance)
-                {
-                    AllowCancellation = true,
-                    EnableHyperlinks = true,
-                    Title = Resources.LongPathWarningTitle,
-                    MainIcon = TaskDialogIcon.Warning,
-                    Content = Resources.LongPathWarningText,
-                    CollapsedControlText = Resources.LongPathShowPathsExceedingTheLimit,
-                    ExpandedControlText = Resources.LongPathHidePathsExceedingTheLimit,
-                    Buttons = {
-                        (dedupeButton = new TaskDialogButton(Resources.LongPathNpmDedupe, Resources.LongPathNpmDedupeDetail)),
-                        (ignoreButton = new TaskDialogButton(Resources.LongPathDoNothingButWarnNextTime)),
-                        (disableButton = new TaskDialogButton(Resources.LongPathDoNothingAndDoNotWarnAgain, Resources.LongPathDoNothingAndDoNotWarnAgainDetail))
-                    },
-                    FooterIcon = TaskDialogIcon.Information,
-                    Footer = Resources.LongPathFooter
-                };
-
-                taskDialog.HyperlinkClicked += (sender, e) =>
-                {
-                    switch (e.Url)
-                    {
-                        case "#msdn":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=454508");
-                            break;
-                        case "#uservoice":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkID=456509");
-                            break;
-                        case "#help":
-                            Process.Start("https://go.microsoft.com/fwlink/?LinkId=456511");
-                            break;
-                        default:
-                            System.Windows.Clipboard.SetText(e.Url);
-                            break;
-                    }
-                };
-
-                recheck:
 
                 var longPaths = await Task.Factory.StartNew(() =>
-                    GetLongSubPaths(this.ProjectHome)
-                    .Concat(GetLongSubPaths(this._intermediateOutputPath))
-                    .Select(lpi => string.Format(CultureInfo.InvariantCulture, "\u2022 {1}\u00A0<a href=\"{0}\">{2}</a>", lpi.FullPath, lpi.RelativePath, Resources.LongPathClickToCopy))
-                    .ToArray());
-                if (longPaths.Length == 0)
-                {
-                    return;
-                }
-                taskDialog.ExpandedInformation = string.Join("\r\n", longPaths);
+                    GetLongSubPaths(this.ProjectHome).Any() || GetLongSubPaths(this._intermediateOutputPath).Any());
 
-                var button = taskDialog.ShowModal();
-                if (button == dedupeButton)
+                if (longPaths)
                 {
-                    var repl = NodejsPackage.Instance.OpenReplWindow(focus: false);
-                    await repl.ExecuteCommand(".npm dedupe").HandleAllExceptions(SR.ProductName);
-
-                    taskDialog.Content += "\r\n\r\n" + Resources.LongPathNpmDedupeDidNotHelp;
-                    taskDialog.Buttons.Remove(dedupeButton);
-                    goto recheck;
-                }
-                else if (button == disableButton)
-                {
-                    var page = NodejsPackage.Instance.GeneralOptionsPage;
-                    page.CheckForLongPaths = false;
-                    page.SaveSettingsToStorage();
+                    Utilities.ShowMessageBox(
+                      this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 }
             }
             finally
@@ -707,8 +621,7 @@ namespace Microsoft.NodejsTools.Project
 
             basePath = CommonUtils.EnsureEndSeparator(basePath);
 
-            WIN32_FIND_DATA wfd;
-            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
+            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out var wfd);
             if (hFind == NativeMethods.INVALID_HANDLE_VALUE)
             {
                 yield break;

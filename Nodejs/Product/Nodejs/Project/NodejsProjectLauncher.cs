@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -42,8 +42,7 @@ namespace Microsoft.NodejsTools.Project
             this._project = project;
 
             var portNumber = this._project.GetProjectProperty(NodeProjectProperty.NodejsPort);
-            int portNum;
-            if (Int32.TryParse(portNumber, out portNum))
+            if (int.TryParse(portNumber, out var portNum))
             {
                 this._testServerPort = portNum;
             }
@@ -96,6 +95,8 @@ namespace Microsoft.NodejsTools.Project
 
             return VSConstants.S_OK;
         }
+
+        // todo: move usersettings to separate class, so we can use this from other places.
 
         internal static bool CheckUseNewChromeDebugProtocolOption()
         {
@@ -154,8 +155,8 @@ namespace Microsoft.NodejsTools.Project
             dbgInfo.bstrPortName = debugUri;
             dbgInfo.fSendToOutputWindow = 0;
 
-            // we connect through a URI, so no need to set the process,
-            // we need to set the process id to '1' so the debugger is able to attach
+            // we connect through a URI, so no need to set the process, 
+            // we need to set the process id to '1' so the debugger is able to attach 
             dbgInfo.bstrExe = $"\01";
 
             AttachDebugger(dbgInfo);
@@ -329,8 +330,7 @@ namespace Microsoft.NodejsTools.Project
         internal static string GetFullUrl(string host, int port)
         {
             UriBuilder builder;
-            Uri uri;
-            if (Uri.TryCreate(host, UriKind.Absolute, out uri))
+            if (Uri.TryCreate(host, UriKind.Absolute, out var uri))
             {
                 builder = new UriBuilder(uri);
             }
@@ -376,36 +376,12 @@ namespace Microsoft.NodejsTools.Project
         {
             var serviceProvider = _project.Site;
 
-            var setupConfiguration = new SetupConfiguration();
-
-            var setupInstance = setupConfiguration.GetInstanceForCurrentProcess();
-
-            var visualStudioInstallationInstanceID = setupInstance.GetInstanceId();
-
-            // The Node2Adapter depends on features only in Node v6+, so the old v5.4 version of node will not suffice for this scenario
-            // This node.exe will be the one used by the node2 debug adapter, not the one used to host the user code.
-            var pathToNodeExe = Path.Combine(setupInstance.GetInstallationPath(), "JavaScript\\Node.JS\\v6.4.0_x86\\Node.exe");
-
-            // We check the registry to see if any parameters for the node.exe invocation have been specified (like "--inspect"), and append them if we find them.
-            string nodeParams = CheckForRegistrySpecifiedNodeParams();
-            if (!string.IsNullOrEmpty(nodeParams))
-            {
-                pathToNodeExe = pathToNodeExe + " " + nodeParams;
-            }
-
-            var pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
-                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\extension\out\src\nodeDebug.js""");
-
-            string trimmedPathToNode2DebugAdapter = pathToNode2DebugAdapterRuntime.Replace("\"", "");
-            if (!File.Exists(trimmedPathToNode2DebugAdapter))
-            {
-                pathToNode2DebugAdapterRuntime = Environment.ExpandEnvironmentVariables(@"""%ALLUSERSPROFILE%\" +
-                    $@"Microsoft\VisualStudio\NodeAdapter\{visualStudioInstallationInstanceID}\out\src\nodeDebug.js""");
-            }
-
             // Here we need to massage the env variables into the format expected by node and vs code
             var webBrowserUrl = GetFullUrl();
             var envVars = GetEnvironmentVariables(webBrowserUrl);
+
+            var runtimeArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments));
+            var scriptArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments));
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
             var configuration = new JObject(
@@ -413,15 +389,15 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("type", "node2"),
                 new JProperty("request", "launch"),
                 new JProperty("program", file),
+                new JProperty("args", scriptArguments),
                 new JProperty("runtimeExecutable", nodePath),
+                new JProperty("runtimeArgs", runtimeArguments),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("env", JObject.FromObject(envVars)),
                 new JProperty("trace", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
-                new JProperty("stopOnEntry", true),
-                new JProperty("$adapter", pathToNodeExe),
-                new JProperty("$adapterArgs", pathToNode2DebugAdapterRuntime));
+                new JProperty("stopOnEntry", true));
 
             var jsonContent = configuration.ToString();
 
@@ -436,30 +412,31 @@ namespace Microsoft.NodejsTools.Project
 
             var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
 
-            var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
+            var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
             debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
 
             // Launch browser 
-            if (startBrowser)
+            if (startBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
             {
-                Uri uri = null;
-                if (!String.IsNullOrWhiteSpace(webBrowserUrl))
-                {
-                    uri = new Uri(webBrowserUrl);
-                }
-
-                if (uri != null)
-                {
-                    OnPortOpenedHandler.CreateHandler(
-                        uri.Port,
-                        shortCircuitPredicate: () => false,
-                        action: () =>
-                        {
-                            VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                        }
-                    );
-                }
+                var uri = new Uri(webBrowserUrl);
+                OnPortOpenedHandler.CreateHandler(
+                    uri.Port,
+                    shortCircuitPredicate: () => false,
+                    action: () =>
+                    {
+                        VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+                    }
+                );
             }
+        }
+
+        private static string[] ConvertArguments(string argumentString)
+        {
+            if (argumentString != null)
+            {
+                return argumentString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return Array.Empty<string>();
         }
 
         private void LaunchDebugger(IServiceProvider provider, VsDebugTargetInfo dbgInfo)
@@ -606,9 +583,8 @@ namespace Microsoft.NodejsTools.Project
         private bool ShouldStartBrowser()
         {
             var startBrowser = this._project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
-            bool fStartBrowser;
             if (!string.IsNullOrEmpty(startBrowser) &&
-                Boolean.TryParse(startBrowser, out fStartBrowser))
+                Boolean.TryParse(startBrowser, out var fStartBrowser))
             {
                 return fStartBrowser;
             }

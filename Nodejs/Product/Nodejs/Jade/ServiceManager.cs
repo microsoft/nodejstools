@@ -98,7 +98,9 @@ namespace Microsoft.NodejsTools.Jade
         {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             if (sm != null)
+            {
                 return sm.GetService<T>(contentType);
+            }
 
             return null;
         }
@@ -107,7 +109,9 @@ namespace Microsoft.NodejsTools.Jade
         {
             var sm = ServiceManager.FromPropertyOwner(propertyOwner);
             if (sm != null)
+            {
                 return sm.GetAllServices<T>();
+            }
 
             return new List<T>();
         }
@@ -185,9 +189,8 @@ namespace Microsoft.NodejsTools.Jade
         {
             lock (this._lock)
             {
-                object service = null;
 
-                if (!this._servicesByType.TryGetValue(typeof(T), out service))
+                if (!this._servicesByType.TryGetValue(typeof(T), out var service))
                 {
                     // try walk through and cast. Perhaps someone is asking for IFoo
                     // that is implemented on class Bar but Bar was added as Bar, not as IFoo
@@ -195,7 +198,9 @@ namespace Microsoft.NodejsTools.Jade
                     {
                         service = kvp.Value as T;
                         if (service != null)
+                        {
                             break;
+                        }
                     }
                 }
 
@@ -207,11 +212,12 @@ namespace Microsoft.NodejsTools.Jade
         {
             lock (this._lock)
             {
-                object service = null;
 
-                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out service);
+                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out var service);
                 if (service != null)
+                {
                     return service as T;
+                }
 
                 // Try walking through and cast. Perhaps someone is asking for IFoo
                 // that is implemented on class Bar but Bar was added as Bar, not as IFoo
@@ -232,7 +238,9 @@ namespace Microsoft.NodejsTools.Jade
                 {
                     service = GetService<T>(ct);
                     if (service != null)
+                    {
                         break;
+                    }
                 }
 
                 return service as T;
@@ -246,13 +254,17 @@ namespace Microsoft.NodejsTools.Jade
                 foreach (var kvp in this._servicesByGuid)
                 {
                     if (serviceGuid.Equals(kvp.Key))
+                    {
                         return kvp.Value;
+                    }
                 }
 
                 foreach (var kvp in this._servicesByType)
                 {
                     if (serviceGuid.Equals(kvp.Value.GetType().GUID))
+                    {
                         return kvp.Value;
+                    }
                 }
 
                 return null;
@@ -269,7 +281,9 @@ namespace Microsoft.NodejsTools.Jade
                 {
                     var service = kvp.Value as T;
                     if (service != null)
+                    {
                         list.Add(service);
+                    }
                 }
             }
 
@@ -303,7 +317,9 @@ namespace Microsoft.NodejsTools.Jade
             lock (this._lock)
             {
                 if (GetService(ref serviceGuid) == null)
+                {
                     this._servicesByGuid.Add(serviceGuid, serviceInstance);
+                }
             }
         }
 

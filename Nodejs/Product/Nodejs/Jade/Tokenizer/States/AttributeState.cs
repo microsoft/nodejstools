@@ -9,7 +9,9 @@ namespace Microsoft.NodejsTools.Jade
             this._attributeState = true;
 
             if (this._cs.CurrentChar == '(')
+            {
                 this._cs.MoveToNextChar();
+            }
 
             while (!this._cs.IsEndOfStream())
             {
@@ -56,7 +58,9 @@ namespace Microsoft.NodejsTools.Jade
                         {
                             range = GetAttributeValue();
                             if (range.Length > 0)
+                            {
                                 AddToken(JadeTokenType.AttributeValue, range.Start, range.Length);
+                            }
                         }
                     }
                 }

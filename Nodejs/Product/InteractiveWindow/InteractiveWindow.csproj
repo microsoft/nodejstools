@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" />
   <PropertyGroup>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -42,27 +41,7 @@
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Diagnostics.Tracing.EventSource, Version=1.1.28.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.28\lib\net46\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.RemoteControl, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.RemoteControl.14.0.262-masterA5CACE98\lib\net45\Microsoft.VisualStudio.RemoteControl.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.Telemetry, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Telemetry.15.3.795-master67D3E818\lib\net45\Microsoft.VisualStudio.Telemetry.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Utilities.Internal, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.VisualStudio.Utilities.Internal.14.0.73-master6E8F6515\lib\net45\Microsoft.VisualStudio.Utilities.Internal.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -115,7 +94,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -135,6 +113,51 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Guids.cs" />
+    <Compile Include="ReplMouseProcessor.cs" />
+    <Compile Include="Repl\InlineReplAdornmentManager.cs" />
+    <Compile Include="Repl\IReplCommand2.cs" />
+    <Compile Include="Repl\Margin\GlyphPrompts.cs" />
+    <Compile Include="Repl\Margin\PromptMarginVisualManager.cs" />
+    <Compile Include="Repl\Margin\PromptMargin.cs" />
+    <Compile Include="Repl\OutputBuffer.cs" />
+    <Compile Include="Repl\OutputColors.cs" />
+    <Compile Include="Repl\ReplOutputClassificationFormatDefinitions.cs" />
+    <Compile Include="Repl\ReplOutputClassifier.cs" />
+    <Compile Include="Repl\ReplOutputClassifierProvider.cs" />
+    <Compile Include="Repl\ReplOutputContentType.cs" />
+    <Compile Include="Repl\CustomTrackingSpan.cs" />
+    <Compile Include="Repl\IContentTypeMetadata.cs" />
+    <Compile Include="Repl\IReplWindowCreationListener.cs" />
+    <Compile Include="Repl\ReplInput.cs" />
+    <Compile Include="Repl\Commands\CancelExecutionCommand.cs" />
+    <Compile Include="Repl\Commands\ClearScreenReplCommand.cs" />
+    <Compile Include="Repl\Commands\EchoReplCommand.cs" />
+    <Compile Include="Repl\Commands\ResetReplCommand.cs" />
+    <Compile Include="Repl\Commands\WaitReplCommand.cs" />
+    <Compile Include="Repl\ReplAggregateClassifier.cs" />
+    <Compile Include="Repl\ReplAggregateClassifierProvider.cs" />
+    <Compile Include="Repl\ReplConstants.cs" />
+    <Compile Include="Repl\ExecutionResult.cs" />
+    <Compile Include="Repl\History.cs" />
+    <Compile Include="Repl\IMultipleScopeEvaluator.cs" />
+    <Compile Include="Repl\InlineReplAdornment.cs" />
+    <Compile Include="Repl\IReplCommand.cs" />
+    <Compile Include="Repl\IReplEvaluator.cs" />
+    <Compile Include="Repl\IReplEvaluatorProvider.cs" />
+    <Compile Include="Repl\IReplWindow.cs" />
+    <Compile Include="Repl\IReplWindowProvider.cs" />
+    <Compile Include="Repl\ReplContentType.cs" />
+    <Compile Include="Repl\ReplOptions.cs" />
+    <Compile Include="Repl\ReplRoleAttribute.cs" />
+    <Compile Include="Repl\ReplWindow.cs" />
+    <Compile Include="Repl\ReplWindowExtensions.cs" />
+    <Compile Include="Repl\ReplWindowProvider.cs" />
+    <Compile Include="Repl\ResizingAdorner.cs" />
+    <Compile Include="Repl\ZoomableInlineAdornment.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ReplWindowPackage.cs" />
+    <Compile Include="PkgCmdID.cs" />
     <VSCTCompile Include="InteractiveWindow.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
@@ -170,6 +193,17 @@
       <InProject>false</InProject>
     </FilesToSign>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MicroBuild.Core">
+      <Version>0.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>15.3.799-masterDDDBA9E4</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
     <RegisterOutputPackage>true</RegisterOutputPackage>
@@ -182,16 +216,7 @@
     <CreateVsixContainer>False</CreateVsixContainer>
     <CopyVsixExtensionFiles>false</CopyVsixExtensionFiles>
   </PropertyGroup>
-  <Import Project="$(BuildRoot)\Common\Product\ReplWindow\ReplWindow.proj" />
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="..\ProjectAfter.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props'))" />
-    <Error Condition="!Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets'))" />
-  </Target>
-  <Import Project="..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" Condition="Exists('..\..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets')" />
 </Project>

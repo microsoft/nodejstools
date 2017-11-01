@@ -31,7 +31,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
+            
+            <x:Array Type="ComboBoxItem" x:Key="LatestVersionComboItem">
+                <ComboBoxItem Content="{x:Static resx:NpmInstallWindowResources.LatestVersion }" />
+            </x:Array>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -149,6 +153,13 @@
                                            Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
 
                                 <TextBlock Grid.Column="1"
+                                           x:Name="LocalInstallMissingMessage"
+                                           Visibility="Collapsed"
+                                           FontWeight="Bold"
+                                           Foreground="Red"
+                                           Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
+                                
+                                <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
                                            FontWeight="Bold"
@@ -170,6 +181,9 @@
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsInstalledLocally}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLocalInstallMissing}" Value="true">
+                                <Setter TargetName="LocalInstallMissingMessage" Property="Visibility" Value="Visible" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsLocalInstallOutOfDate}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Collapsed" />
@@ -392,10 +406,12 @@
                             <ComboBox.Resources>
                                 <CollectionViewSource x:Key="AvailableVersionViewSource"
                                                       Source="{Binding Path=SelectedPackage.AvailableVersions, Mode=OneWay}"/>
+                                <CollectionViewSource x:Key="LatestVersionViewSource"
+                                                      Source="{StaticResource LatestVersionComboItem}"/>
                             </ComboBox.Resources>
                             <ComboBox.ItemsSource>
                                 <CompositeCollection>
-                                    <sys:String>(latest)</sys:String>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource LatestVersionViewSource}, Mode=OneWay}"/>
                                     <CollectionContainer Collection="{Binding Source={StaticResource AvailableVersionViewSource}, Mode=OneWay}"/>
                                 </CompositeCollection>
                             </ComboBox.ItemsSource>

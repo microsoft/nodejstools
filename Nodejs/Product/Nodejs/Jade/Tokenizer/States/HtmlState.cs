@@ -18,12 +18,16 @@ namespace Microsoft.NodejsTools.Jade
 
             var range = GetAttribute();
             if (range.Length > 0)
+            {
                 AddToken(JadeTokenType.TagName, range.Start, range.Length);
+            }
 
             OnAttributes('>');
 
             if (this._cs.LookAhead(-1) == '>')
+            {
                 AddToken(JadeTokenType.AngleBracket, this._cs.Position - 1, 1);
+            }
         }
     }
 }

@@ -14,8 +14,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             Utilities.ArgumentNotNull("references", references);
 
             this.Id = (int)prototype["ref"];
-            JToken reference;
-            if (!references.TryGetValue(this.Id, out reference))
+            if (!references.TryGetValue(this.Id, out var reference))
             {
                 reference = prototype;
             }
