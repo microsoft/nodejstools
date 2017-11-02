@@ -198,8 +198,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
             userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
 
-            //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
-
             TelemetryService.DefaultSession?.PostEvent(userTask);
         }
 

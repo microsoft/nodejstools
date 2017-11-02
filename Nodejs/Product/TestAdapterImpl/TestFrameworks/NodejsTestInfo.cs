@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 using (var stream = File.OpenRead(filePath))
                 {
                     var hash = Hash.GetFnvHashCode(stream);
-                    return Encoding.UTF8.GetString(hash);
+                    return Convert.ToBase64String(hash);
                 }
             }
             catch (IOException)
