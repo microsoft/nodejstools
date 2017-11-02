@@ -703,6 +703,12 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ConfigureProjectProperties" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Configure project properties]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";DebugCouldNotResolveStartupFileErrorMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties]]></Val>
@@ -808,6 +814,12 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Cesta k modulu neexistuje:]D;]A;{0}]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";DownloadNodejs" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Download Node.js]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1240,6 +1252,12 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Na počítači se nepodařilo najít modul runtime Node.js. Stáhněte si a nainstalujte aktuální verzi Node.js z https://nodejs.org nebo zadejte umístění vašeho souboru Node.exe do souboru {0}.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodejsNotInstalledInfoBar" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2336,7 +2354,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not find Typings package manager tool used for IntelliSense]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nepovedlo se najít nástroj pro správu balíčků Typings, který se používá pro IntelliSense.]]></Val>
+            <Val><![CDATA[Nepovedlo se najít správce balíčků Typings, který se používá pro IntelliSense.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5446,7 +5464,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1]]></Val>
+        <Val><![CDATA[1.4.11101.3]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5473,7 +5491,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1 commit:e98daaaa05cd6aafe44b28a3cf2dbd3cca9c3176]]></Val>
+        <Val><![CDATA[1.4.11101.3 commit:91a9c20627b5330cf664e09dd1b49ddc1678648f]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
