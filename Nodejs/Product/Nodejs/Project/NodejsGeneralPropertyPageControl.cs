@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Editors.PropertyPages;
-using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
 {
@@ -21,7 +20,6 @@ namespace Microsoft.NodejsTools.Project
             InitializeComponent();
 
             LocalizeLabels();
-            SetCueBanner();
             AddToolTips();
 
             this._nodeExeErrorProvider.SetIconAlignment(this._nodeExePath, ErrorIconAlignment.MiddleLeft);
@@ -197,33 +195,11 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
+        //public bool IsDirty;
+
         private void Changed(object sender, EventArgs e)
         {
             this.IsDirty = true;
-        }
-
-        private void SetCueBanner()
-        {
-            var cueBanner = Nodejs.NodeExePath;
-            if (string.IsNullOrEmpty(cueBanner))
-            {
-                cueBanner = Resources.NodejsNotInstalledShort;
-            }
-
-            NativeMethods.SendMessageW(
-                this._nodeExePath.Handle,
-                NativeMethods.EM_SETCUEBANNER,
-                new IntPtr(1),  // fDrawFocused == true
-                cueBanner
-            );
-
-            // set cue banner for environment variables
-            NativeMethods.SendMessageW(
-                this._envVars.Handle,
-                NativeMethods.EM_SETCUEBANNER,
-                new IntPtr(1),  // fDrawFocused == true
-                "Env1=Val1\r\nEnv2=Val2"
-            );
         }
 
         private void NodeExePathChanged(object sender, EventArgs e)
@@ -242,12 +218,10 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowsePathClick(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog();
-            dialog.CheckFileExists = true;
-            dialog.Filter = _exeFilter;
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var nodeExePath = this._nodeExePath.Text;
+            if (this.GetFileViaBrowse(nodeExePath, ref nodeExePath, _exeFilter) && !string.IsNullOrEmpty(nodeExePath))
             {
-                this._nodeExePath.Text = dialog.FileName;
+                this._nodeExePath.Text = nodeExePath;
                 this._nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
@@ -259,10 +233,10 @@ namespace Microsoft.NodejsTools.Project
             {
                 dir = this._propPage.Project.ProjectHome;
             }
-            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
-            if (!string.IsNullOrEmpty(path))
+
+            if (this.GetDirectoryViaBrowseRelative(dir, this._propPage.Project.ProjectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
             {
-                this._workingDir.Text = path;
+                this._workingDir.Text = string.IsNullOrEmpty(dir) ? "." : dir;
             }
         }
 
@@ -270,7 +244,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var textSender = (TextBox)sender;
             if (!textSender.Text.Contains("$(") &&
-                textSender.Text.Any(ch => !Char.IsDigit(ch)))
+                textSender.Text.Any(ch => !char.IsDigit(ch)))
             {
                 this._nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
             }
@@ -283,15 +257,21 @@ namespace Microsoft.NodejsTools.Project
 
         private void WorkingDirChanged(object sender, EventArgs e)
         {
-            if (!this._workingDir.Text.Contains("$(") && !Directory.Exists(this._workingDir.Text))
-            {
-                this._nodeExeErrorProvider.SetError(this._workingDir, Resources.WorkingDirInvalidOrMissing);
-            }
-            else
-            {
-                this._nodeExeErrorProvider.SetError(this._workingDir, string.Empty);
-            }
+            var errorMessage = ValidateWorkingDir(this._workingDir.Text) ? "" : Resources.WorkingDirInvalidOrMissing;
+            this._nodeExeErrorProvider.SetError(this._workingDir, errorMessage);
+
             Changed(sender, e);
+
+            bool ValidateWorkingDir(string workingDir)
+            {
+                if (workingDir.Contains("$("))
+                {
+                    return true;
+                }
+
+                var fullPath = Path.IsPathRooted(workingDir) ? workingDir : Path.Combine(this._propPage.Project.ProjectHome, workingDir);
+                return Directory.Exists(fullPath);
+            }
         }
     }
 }

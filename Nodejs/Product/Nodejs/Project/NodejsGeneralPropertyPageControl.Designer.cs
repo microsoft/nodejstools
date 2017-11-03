@@ -31,6 +31,10 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TableLayoutPanel startActionTableLayoutPanel;
             System.Windows.Forms.TableLayoutPanel nodeHeaderTableLayoutPanel;
+            this.startActionHeaderLabelLine = new System.Windows.Forms.Label();
+            this._startActionHeaderLabel = new System.Windows.Forms.Label();
+            this.nodeHeaderLabelLine = new System.Windows.Forms.Label();
+            this._nodeHeaderLabel = new System.Windows.Forms.Label();
             this._nodeArgumentsLabel = new System.Windows.Forms.Label();
             this._scriptLabel = new System.Windows.Forms.Label();
             this._scriptArgsLabel = new System.Windows.Forms.Label();
@@ -40,8 +44,6 @@
             this._debuggerPortLabel = new System.Windows.Forms.Label();
             this._envVarsLabel = new System.Windows.Forms.Label();
             this.overallPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.startActionHeaderLabelLine = new System.Windows.Forms.Label();
-            this._startActionHeaderLabel = new System.Windows.Forms.Label();
             this._scriptFile = new System.Windows.Forms.TextBox();
             this._scriptArguments = new System.Windows.Forms.TextBox();
             this._workingDir = new System.Windows.Forms.TextBox();
@@ -50,8 +52,6 @@
             this._nodejsPort = new System.Windows.Forms.TextBox();
             this._envVars = new System.Windows.Forms.TextBox();
             this._startBrowser = new System.Windows.Forms.CheckBox();
-            this.nodeHeaderLabelLine = new System.Windows.Forms.Label();
-            this._nodeHeaderLabel = new System.Windows.Forms.Label();
             this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeExePath = new System.Windows.Forms.TextBox();
             this._browsePath = new System.Windows.Forms.Button();
@@ -61,11 +61,87 @@
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             startActionTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             nodeHeaderTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.overallPanel.SuspendLayout();
             startActionTableLayoutPanel.SuspendLayout();
             nodeHeaderTableLayoutPanel.SuspendLayout();
+            this.overallPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).BeginInit();
             this.SuspendLayout();
+            // 
+            // startActionTableLayoutPanel
+            // 
+            startActionTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            startActionTableLayoutPanel.AutoSize = true;
+            startActionTableLayoutPanel.ColumnCount = 2;
+            this.overallPanel.SetColumnSpan(startActionTableLayoutPanel, 3);
+            startActionTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            startActionTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            startActionTableLayoutPanel.Controls.Add(this.startActionHeaderLabelLine, 1, 0);
+            startActionTableLayoutPanel.Controls.Add(this._startActionHeaderLabel, 0, 0);
+            startActionTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            startActionTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            startActionTableLayoutPanel.Name = "startActionTableLayoutPanel";
+            startActionTableLayoutPanel.RowCount = 1;
+            startActionTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            startActionTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
+            startActionTableLayoutPanel.TabIndex = 0;
+            // 
+            // startActionHeaderLabelLine
+            // 
+            this.startActionHeaderLabelLine.AccessibleRole = System.Windows.Forms.AccessibleRole.Separator;
+            this.startActionHeaderLabelLine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.startActionHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.startActionHeaderLabelLine.Location = new System.Drawing.Point(130, 6);
+            this.startActionHeaderLabelLine.Name = "startActionHeaderLabelLine";
+            this.startActionHeaderLabelLine.Size = new System.Drawing.Size(667, 1);
+            this.startActionHeaderLabelLine.TabIndex = 1;
+            // 
+            // _startActionHeaderLabel
+            // 
+            this._startActionHeaderLabel.AutoSize = true;
+            this._startActionHeaderLabel.Location = new System.Drawing.Point(0, 0);
+            this._startActionHeaderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this._startActionHeaderLabel.Name = "_startActionHeaderLabel";
+            this._startActionHeaderLabel.Size = new System.Drawing.Size(124, 13);
+            this._startActionHeaderLabel.TabIndex = 0;
+            this._startActionHeaderLabel.Text = "_startActionHeaderLabel";
+            // 
+            // nodeHeaderTableLayoutPanel
+            // 
+            nodeHeaderTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            nodeHeaderTableLayoutPanel.AutoSize = true;
+            nodeHeaderTableLayoutPanel.ColumnCount = 2;
+            this.overallPanel.SetColumnSpan(nodeHeaderTableLayoutPanel, 3);
+            nodeHeaderTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            nodeHeaderTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            nodeHeaderTableLayoutPanel.Controls.Add(this.nodeHeaderLabelLine, 1, 0);
+            nodeHeaderTableLayoutPanel.Controls.Add(this._nodeHeaderLabel, 0, 0);
+            nodeHeaderTableLayoutPanel.Location = new System.Drawing.Point(0, 259);
+            nodeHeaderTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            nodeHeaderTableLayoutPanel.Name = "nodeHeaderTableLayoutPanel";
+            nodeHeaderTableLayoutPanel.RowCount = 1;
+            nodeHeaderTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            nodeHeaderTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
+            nodeHeaderTableLayoutPanel.TabIndex = 0;
+            // 
+            // nodeHeaderLabelLine
+            // 
+            this.nodeHeaderLabelLine.AccessibleRole = System.Windows.Forms.AccessibleRole.Separator;
+            this.nodeHeaderLabelLine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.nodeHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.nodeHeaderLabelLine.Location = new System.Drawing.Point(104, 6);
+            this.nodeHeaderLabelLine.Name = "nodeHeaderLabelLine";
+            this.nodeHeaderLabelLine.Size = new System.Drawing.Size(693, 1);
+            this.nodeHeaderLabelLine.TabIndex = 16;
+            // 
+            // _nodeHeaderLabel
+            // 
+            this._nodeHeaderLabel.AutoSize = true;
+            this._nodeHeaderLabel.Location = new System.Drawing.Point(0, 0);
+            this._nodeHeaderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this._nodeHeaderLabel.Name = "_nodeHeaderLabel";
+            this._nodeHeaderLabel.Size = new System.Drawing.Size(98, 13);
+            this._nodeHeaderLabel.TabIndex = 16;
+            this._nodeHeaderLabel.Text = "_nodeHeaderLabel";
             // 
             // _nodeArgumentsLabel
             // 
@@ -188,7 +264,7 @@
             this.overallPanel.Location = new System.Drawing.Point(0, 0);
             this.overallPanel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.overallPanel.Name = "overallPanel";
-            this.overallPanel.RowCount = 12;
+            this.overallPanel.RowCount = 13;
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -204,44 +280,6 @@
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.overallPanel.Size = new System.Drawing.Size(800, 500);
             this.overallPanel.TabIndex = 0;
-            // 
-            // startActionTableLayoutPanel
-            // 
-            startActionTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            startActionTableLayoutPanel.AutoSize = true;
-            startActionTableLayoutPanel.ColumnCount = 2;
-            this.overallPanel.SetColumnSpan(startActionTableLayoutPanel, 3);
-            startActionTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            startActionTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            startActionTableLayoutPanel.Controls.Add(this.startActionHeaderLabelLine, 1, 0);
-            startActionTableLayoutPanel.Controls.Add(this._startActionHeaderLabel, 0, 0);
-            startActionTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            startActionTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
-            startActionTableLayoutPanel.Name = "startActionTableLayoutPanel";
-            startActionTableLayoutPanel.RowCount = 1;
-            startActionTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            startActionTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
-            startActionTableLayoutPanel.TabIndex = 0;
-            // 
-            // startActionHeaderLabelLine
-            // 
-            this.startActionHeaderLabelLine.AccessibleRole = System.Windows.Forms.AccessibleRole.Separator;
-            this.startActionHeaderLabelLine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.startActionHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.startActionHeaderLabelLine.Location = new System.Drawing.Point(130, 6);
-            this.startActionHeaderLabelLine.Name = "startActionHeaderLabelLine";
-            this.startActionHeaderLabelLine.Size = new System.Drawing.Size(667, 1);
-            this.startActionHeaderLabelLine.TabIndex = 1;
-            // 
-            // _startActionHeaderLabel
-            // 
-            this._startActionHeaderLabel.AutoSize = true;
-            this._startActionHeaderLabel.Location = new System.Drawing.Point(0, 0);
-            this._startActionHeaderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this._startActionHeaderLabel.Name = "_startActionHeaderLabel";
-            this._startActionHeaderLabel.Size = new System.Drawing.Size(124, 13);
-            this._startActionHeaderLabel.TabIndex = 0;
-            this._startActionHeaderLabel.Text = "_startActionHeaderLabel";
             // 
             // _scriptFile
             // 
@@ -327,44 +365,6 @@
             this._startBrowser.UseVisualStyleBackColor = true;
             this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
             // 
-            // nodeHeaderTableLayoutPanel
-            // 
-            nodeHeaderTableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            nodeHeaderTableLayoutPanel.AutoSize = true;
-            nodeHeaderTableLayoutPanel.ColumnCount = 2;
-            this.overallPanel.SetColumnSpan(nodeHeaderTableLayoutPanel, 3);
-            nodeHeaderTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            nodeHeaderTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            nodeHeaderTableLayoutPanel.Controls.Add(this.nodeHeaderLabelLine, 1, 0);
-            nodeHeaderTableLayoutPanel.Controls.Add(this._nodeHeaderLabel, 0, 0);
-            nodeHeaderTableLayoutPanel.Location = new System.Drawing.Point(0, 259);
-            nodeHeaderTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
-            nodeHeaderTableLayoutPanel.Name = "nodeHeaderTableLayoutPanel";
-            nodeHeaderTableLayoutPanel.RowCount = 1;
-            nodeHeaderTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            nodeHeaderTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
-            nodeHeaderTableLayoutPanel.TabIndex = 0;
-            // 
-            // nodeHeaderLabelLine
-            // 
-            this.nodeHeaderLabelLine.AccessibleRole = System.Windows.Forms.AccessibleRole.Separator;
-            this.nodeHeaderLabelLine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.nodeHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.nodeHeaderLabelLine.Location = new System.Drawing.Point(104, 6);
-            this.nodeHeaderLabelLine.Name = "nodeHeaderLabelLine";
-            this.nodeHeaderLabelLine.Size = new System.Drawing.Size(693, 1);
-            this.nodeHeaderLabelLine.TabIndex = 16;
-            // 
-            // _nodeHeaderLabel
-            // 
-            this._nodeHeaderLabel.AutoSize = true;
-            this._nodeHeaderLabel.Location = new System.Drawing.Point(0, 0);
-            this._nodeHeaderLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this._nodeHeaderLabel.Name = "_nodeHeaderLabel";
-            this._nodeHeaderLabel.Size = new System.Drawing.Size(98, 13);
-            this._nodeHeaderLabel.TabIndex = 16;
-            this._nodeHeaderLabel.Text = "_nodeHeaderLabel";
-            // 
             // _nodeExePathLabel
             // 
             this._nodeExePathLabel.AutoSize = true;
@@ -382,7 +382,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._nodeExePath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this._nodeExePath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this._nodeExePath.BackColor = System.Drawing.SystemColors.Window;
             this._nodeExePath.Location = new System.Drawing.Point(122, 275);
             this._nodeExePath.Name = "_nodeExePath";
             this._nodeExePath.Size = new System.Drawing.Size(620, 20);
@@ -431,12 +430,12 @@
             this.MinimumSize = new System.Drawing.Size(850, 550);
             this.Name = "NodejsGeneralPropertyPageControl";
             this.Size = new System.Drawing.Size(850, 550);
-            this.overallPanel.ResumeLayout(false);
-            this.overallPanel.PerformLayout();
             startActionTableLayoutPanel.ResumeLayout(false);
             startActionTableLayoutPanel.PerformLayout();
             nodeHeaderTableLayoutPanel.ResumeLayout(false);
             nodeHeaderTableLayoutPanel.PerformLayout();
+            this.overallPanel.ResumeLayout(false);
+            this.overallPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

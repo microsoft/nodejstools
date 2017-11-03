@@ -99,6 +99,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Working Dir.
+        /// </summary>
+        internal static string BrowseWorkingDirDialogTitle {
+            get {
+                return ResourceManager.GetString("BrowseWorkingDirDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not clear Node.js cache directory. Try manually deleting the directory: {0}.
         /// </summary>
         internal static string CacheDirectoryClearFailedCaption {
@@ -1467,7 +1476,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.&amp;js port:.
+        ///   Looks up a localized string similar to Applica&amp;tion port:.
         /// </summary>
         internal static string PropertiesNodePort {
             get {
