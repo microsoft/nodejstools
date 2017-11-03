@@ -48,6 +48,8 @@ namespace Microsoft.NodejsTools.Project
             this._debuggerPortLabel.Text = Resources.PropertiesDebuggerPort;
             this._envVarsLabel.Text = Resources.PropertiesEnvVars;
             this._startBrowser.Text = Resources.PropertiesStartBrowser;
+            this._startActionHeaderLabel.Text = Resources.StartActionHeader;
+            this._nodeHeaderLabel.Text = Resources.NodeHeader;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
             this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;

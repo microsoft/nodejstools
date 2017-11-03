@@ -671,6 +671,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node.
+        /// </summary>
+        internal static string NodeHeader {
+            get {
+                return ResourceManager.GetString("NodeHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project&apos;s properties page..
         /// </summary>
         internal static string NodejsNotInstalled {
@@ -1690,6 +1699,15 @@ namespace Microsoft.NodejsTools {
         internal static string ScriptFileTooltip {
             get {
                 return ResourceManager.GetString("ScriptFileTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Action.
+        /// </summary>
+        internal static string StartActionHeader {
+            get {
+                return ResourceManager.GetString("StartActionHeader", resourceCulture);
             }
         }
         
