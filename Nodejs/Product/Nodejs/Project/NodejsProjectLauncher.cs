@@ -421,7 +421,7 @@ namespace Microsoft.NodejsTools.Project
                 var uri = new Uri(webBrowserUrl);
                 OnPortOpenedHandler.CreateHandler(
                     uri.Port,
-                    shortCircuitPredicate: () => false,
+                    timeout: 5_000, // 5 seconds
                     action: () =>
                     {
                         VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
