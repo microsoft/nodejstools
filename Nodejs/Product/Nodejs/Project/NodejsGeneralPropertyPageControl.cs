@@ -216,6 +216,14 @@ namespace Microsoft.NodejsTools.Project
                 new IntPtr(1),  // fDrawFocused == true
                 cueBanner
             );
+
+            // set cue banner for environment variables
+            NativeMethods.SendMessageW(
+                this._envVars.Handle,
+                NativeMethods.EM_SETCUEBANNER,
+                new IntPtr(1),  // fDrawFocused == true
+                "Env1=Val1\r\nEnv2=Val2"
+            );
         }
 
         private void NodeExePathChanged(object sender, EventArgs e)
