@@ -195,8 +195,6 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        //public bool IsDirty;
-
         private void Changed(object sender, EventArgs e)
         {
             this.IsDirty = true;
