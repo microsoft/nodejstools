@@ -7,7 +7,7 @@
   },
   "description": "$projectname$",
   "author": {
-    "name": "$username$"
+    "name": ""
   },
   "main": "app.js",
   "dependencies": {

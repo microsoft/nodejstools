@@ -6,7 +6,7 @@
     "start": "node worker"
   },
   "author": {
-    "name": "$username$"
+    "name": ""
   },
   "engines": {
     "node": "~6.10.2"

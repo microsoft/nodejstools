@@ -4,6 +4,6 @@
   "description": "$projectname$",
   "main": "app.js",
   "author": {
-    "name": "$username$"
+    "name": ""
   }
 }

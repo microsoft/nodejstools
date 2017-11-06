@@ -7,7 +7,7 @@
   },
   "description": "$projectname$",
   "author": {
-    "name": "$username$"
+    "name": ""
   },
   "dependencies": {
     "body-parser": "^1.15.0",
