@@ -636,7 +636,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Launch &amp;URL:</value>
   </data>
   <data name="PropertiesNodePort" xml:space="preserve">
-    <value>Node.&amp;js port:</value>
+    <value>Applica&amp;tion port:</value>
   </data>
   <data name="PropertiesScript" xml:space="preserve">
     <value>&amp;Script (startup file):</value>
@@ -730,5 +730,14 @@ Error retrieving websocket debug proxy information from web.config.</value>
   </data>
   <data name="NodejsNotInstalledInfoBar" xml:space="preserve">
     <value>Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.</value>
+  </data>
+  <data name="NodeHeader" xml:space="preserve">
+    <value>Node</value>
+  </data>
+  <data name="StartActionHeader" xml:space="preserve">
+    <value>Start Action</value>
+  </data>
+  <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
+    <value>Select Working Dir</value>
   </data>
 </root>
