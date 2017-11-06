@@ -116,7 +116,6 @@
     <Compile Include="TestExecutor.cs" />
     <Compile Include="TestFileAddRemoveListener.cs" />
     <Compile Include="TestFilesUpdateWatcher.cs" />
-    <Compile Include="TestFrameworks\Hash.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />
     <Compile Include="TestFrameworks\FrameworkDiscover.cs" />

@@ -2,7 +2,8 @@
 
 using System;
 using System.IO;
-using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
@@ -17,41 +18,28 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
 
             this.ModulePath = modulePath;
-            this.ModulePath = parts[0];
+
+            this.ModuleName = parts[0];
             this.TestName = parts[1];
             this.TestFramework = parts[2];
         }
 
-        public NodejsTestInfo(string modulePath, string testName, string testFramework, int line, int column)
+        public NodejsTestInfo(string modulePath, string testName, string testFramework, int line, int column, string projectRootDir)
         {
-            var moduleName = Path.GetFileNameWithoutExtension(modulePath);
-            var hash = GetHash(modulePath);
+            var relativePath = CommonUtils.GetRelativeFilePath(projectRootDir, modulePath);
+            var moduleName = Regex.Replace(relativePath, @"[ \\/]", "_"); // use regex to replace spaces and slashes with '_' 
+
+            var fileName = Path.GetFileNameWithoutExtension(modulePath);
 
             this.ModulePath = modulePath;
-            this.ModuleName = $"{moduleName}[{hash}]";
+            this.ModuleName = moduleName;
             this.TestName = testName;
             this.TestFramework = testFramework;
             this.SourceLine = line;
             this.SourceColumn = column;
         }
 
-        private string GetHash(string filePath)
-        {
-            try
-            {
-                using (var stream = File.OpenRead(filePath))
-                {
-                    var hash = Hash.GetFnvHashCode(stream);
-                    return Convert.ToBase64String(hash);
-                }
-            }
-            catch (IOException)
-            {
-                return "FILE_NOT_FOUND";
-            }
-        }
-
-        public string FullyQualifiedName => string.Join("::", this.ModuleName, this.TestName, this.TestFramework);
+        public string FullyQualifiedName => $"{this.ModuleName}::{this.TestName}::{this.TestFramework}";
 
         public string ModulePath { get; }
 
