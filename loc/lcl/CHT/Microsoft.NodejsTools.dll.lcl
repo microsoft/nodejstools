@@ -703,6 +703,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ConfigureProjectProperties" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Configure project properties]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[設定專案屬性]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";DebugCouldNotResolveStartupFileErrorMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties]]></Val>
@@ -807,6 +816,15 @@
           <Val><![CDATA[Path to module does not exist:]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[模組的路徑不存在:]D;]A;{0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";DownloadNodejs" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Download Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[下載 Node.js]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1240,6 +1258,12 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[在您的電腦上找不到 Node.js 執行階段。請從 'https://nodejs.org' 下載並安裝 Node.js 目前的版本，或在 '{0}' 檔案中指定您 Node.exe 的位置。]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodejsNotInstalledInfoBar" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5446,7 +5470,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1]]></Val>
+        <Val><![CDATA[1.4.11106.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5473,7 +5497,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1 commit:e98daaaa05cd6aafe44b28a3cf2dbd3cca9c3176]]></Val>
+        <Val><![CDATA[1.4.11106.1 commit:65514d48200ed988f3fd5b8447c8573d5eb5cd5e]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

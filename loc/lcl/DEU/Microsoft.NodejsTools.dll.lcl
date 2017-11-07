@@ -820,6 +820,9 @@
       <Item ItemId=";DownloadNodejs" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Download Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Node.js herunterladen]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5464,7 +5467,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11101.3]]></Val>
+        <Val><![CDATA[1.4.11106.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5491,7 +5494,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11101.3 commit:91a9c20627b5330cf664e09dd1b49ddc1678648f]]></Val>
+        <Val><![CDATA[1.4.11106.1 commit:65514d48200ed988f3fd5b8447c8573d5eb5cd5e]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
