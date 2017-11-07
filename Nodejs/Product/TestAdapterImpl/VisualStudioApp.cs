@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -9,24 +9,27 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
+using Newtonsoft.Json.Linq;
 using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools
 {
     internal class VisualStudioApp : IDisposable
     {
-        private static readonly Dictionary<int, VisualStudioApp> _knownInstances = new Dictionary<int, VisualStudioApp>();
-        private readonly int _processId;
+        private static readonly Dictionary<int, VisualStudioApp> KnownInstances = new Dictionary<int, VisualStudioApp>();
+        private readonly int processId;
 
         public static VisualStudioApp FromProcessId(int processId)
         {
             VisualStudioApp inst;
-            lock (_knownInstances)
+            lock (KnownInstances)
             {
-                if (!_knownInstances.TryGetValue(processId, out inst))
+                if (!KnownInstances.TryGetValue(processId, out inst))
                 {
-                    _knownInstances[processId] = inst = new VisualStudioApp(processId);
+                    KnownInstances[processId] = inst = new VisualStudioApp(processId);
                 }
             }
             return inst;
@@ -40,8 +43,7 @@ namespace Microsoft.VisualStudioTools
                 return null;
             }
 
-            int processId;
-            if (!int.TryParse(pid, out processId))
+            if (!int.TryParse(pid, out var processId))
             {
                 return null;
             }
@@ -49,16 +51,16 @@ namespace Microsoft.VisualStudioTools
             return FromProcessId(processId);
         }
 
-        public VisualStudioApp(int processId)
+        private VisualStudioApp(int processId)
         {
-            _processId = processId;
+            this.processId = processId;
         }
 
         public void Dispose()
         {
-            lock (_knownInstances)
+            lock (KnownInstances)
             {
-                _knownInstances.Remove(_processId);
+                KnownInstances.Remove(this.processId);
             }
         }
 
@@ -70,10 +72,10 @@ namespace Microsoft.VisualStudioTools
 
         public DTE GetDTE()
         {
-            var dte = GetDTE(_processId);
+            var dte = GetDTE(this.processId);
             if (dte == null)
             {
-                throw new InvalidOperationException("Could not find VS DTE object for process " + _processId);
+                throw new InvalidOperationException("Could not find VS DTE object for process " + this.processId);
             }
             return dte;
         }
@@ -173,6 +175,47 @@ namespace Microsoft.VisualStudioTools
             return (DTE)runningObject;
         }
 
+        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
+        private static readonly Guid Node2AttachEngineGuid = Guid.Parse("3F14B534-C345-44B5-AF84-642246EEEB62");
+
+        public bool AttachToProcessNode2DebugAdapter(int port)
+        {
+            var dte = (VisualStudio.OLE.Interop.IServiceProvider)GetDTE();
+
+            var serviceProvider = new ServiceProvider(dte);
+
+            // setup debug info and attach
+            var pDebugEngine = Marshal.AllocCoTaskMem(Marshal.SizeOf<Guid>());
+            var debugUri = $"http://127.0.0.1:{port}";
+            try
+            {
+                Marshal.StructureToPtr(Node2AttachEngineGuid, pDebugEngine, false);
+                var dbgInfo = new VsDebugTargetInfo4()
+                {
+                    dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning,
+                    pDebugEngines = pDebugEngine,
+                    dwDebugEngineCount = 1,
+                    bstrExe = "dummy",
+                    guidPortSupplier = WebkitPortSupplierGuid,
+                    bstrPortName = debugUri,
+                    dwProcessId = 1
+                };
+
+                var launchResults = new VsDebugTargetProcessInfo[1];
+                var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
+                debugger.LaunchDebugTargets4(1, new[] { dbgInfo }, launchResults);
+            }
+            finally
+            {
+                if (pDebugEngine != IntPtr.Zero)
+                {
+                    Marshal.FreeCoTaskMem(pDebugEngine);
+                }
+            }
+
+            return true;
+        }
+
         public bool AttachToProcess(ProcessOutput processOutput, Guid portSupplier, string transportQualifierUri)
         {
             var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
@@ -200,22 +243,6 @@ namespace Microsoft.VisualStudioTools
 
             var process = processes.Item(1);
             return AttachToProcess(processOutput, process);
-        }
-
-        public bool AttachToProcess(ProcessOutput processOutput, Guid[] engines)
-        {
-            var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
-            var processes = debugger3.LocalProcesses;
-            for (var i = 1; i < processes.Count; ++i)
-            {
-                var process = processes.Item(i);
-                if (process.ProcessID == processOutput.ProcessId)
-                {
-                    return AttachToProcess(processOutput, process, engines);
-                }
-            }
-
-            return false;
         }
 
         public bool AttachToProcess(ProcessOutput processOutput, EnvDTE.Process process, Guid[] engines = null)
@@ -266,16 +293,14 @@ namespace Microsoft.VisualStudioTools
         // Start the filter.
         public static void Register()
         {
-            IOleMessageFilter newFilter = new MessageFilter();
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(newFilter, out oldFilter);
+            var newFilter = new MessageFilter();
+            CoRegisterMessageFilter(newFilter, out var oldFilter);
         }
 
         // Done with the filter, close it.
         public static void Revoke()
         {
-            IOleMessageFilter oldFilter = null;
-            CoRegisterMessageFilter(null, out oldFilter);
+            CoRegisterMessageFilter(null, out var oldFilter);
         }
 
         private const int SERVERCALL_ISHANDLED = 0;

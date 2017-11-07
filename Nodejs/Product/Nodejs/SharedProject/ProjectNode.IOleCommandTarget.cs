@@ -193,8 +193,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // Handle commands that are independent of a selection.
-            var handled = false;
-            var returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out handled);
+            var returnValue = this.ExecCommandIndependentOfSelection(cmdGroup, cmdId, cmdExecOpt, vaIn, vaOut, commandOrigin, out var handled);
             if (handled)
             {
                 return returnValue;

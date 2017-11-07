@@ -33,8 +33,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                IPackage pkg;
-                this._packagesByName.TryGetValue(name, out pkg);
+                this._packagesByName.TryGetValue(name, out var pkg);
                 return pkg;
             }
         }

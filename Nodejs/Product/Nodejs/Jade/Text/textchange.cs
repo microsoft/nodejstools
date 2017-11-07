@@ -81,7 +81,9 @@ namespace Microsoft.NodejsTools.Jade
         public void Combine(TextChange other)
         {
             if (other.IsEmpty())
+            {
                 return;
+            }
 
             if (this.OldRange == TextRange.EmptyRange || this.NewRange == TextRange.EmptyRange)
             {

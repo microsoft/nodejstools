@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio;
@@ -92,8 +92,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             public int OnItemAdded(uint itemidParent, uint itemidSiblingPrev, uint itemidAdded)
             {
                 // Check if the item is my language file.
-                string name;
-                if (!IsAnalyzableSource(itemidAdded, out name))
+                if (!IsAnalyzableSource(itemidAdded, out var name))
                 {
                     return VSConstants.S_OK;
                 }
@@ -107,8 +106,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             public int OnItemDeleted(uint itemid)
             {
                 // Notify that the item is deleted only if it is my language file.
-                string name;
-                if (!IsAnalyzableSource(itemid, out name))
+                if (!IsAnalyzableSource(itemid, out var name))
                 {
                     return VSConstants.S_OK;
                 }
@@ -129,8 +127,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 {
                     return VSConstants.S_OK;
                 }
-                string name;
-                if (!IsAnalyzableSource(itemid, out name))
+                if (!IsAnalyzableSource(itemid, out var name))
                 {
                     return VSConstants.S_OK;
                 }
@@ -167,8 +164,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 while (VSConstants.VSITEMID_NIL != currentItem)
                 {
                     // If this item is a my language file, then send the add item event.
-                    string itemName;
-                    if (IsAnalyzableSource(currentItem, out itemName))
+                    if (IsAnalyzableSource(currentItem, out var itemName))
                     {
                         var args = new HierarchyEventArgs(currentItem, itemName);
                         this._manager.OnNewFile(this._hierarchy, args);
@@ -178,9 +174,8 @@ namespace Microsoft.VisualStudioTools.Navigation
                     // children of this node.
                     // Before looking at the children we have to make sure that the enumeration has not
                     // side effects to avoid unexpected behavior.
-                    object propertyValue;
                     var canScanSubitems = true;
-                    var hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out propertyValue);
+                    var hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_HasEnumerationSideEffects, out var propertyValue);
                     if ((VSConstants.S_OK == hr) && (propertyValue is bool))
                     {
                         canScanSubitems = !(bool)propertyValue;
@@ -188,8 +183,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     // If it is allow to look at the sub-items of the current one, lets do it.
                     if (canScanSubitems)
                     {
-                        object child;
-                        hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_FirstChild, out child);
+                        hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_FirstChild, out var child);
                         if (VSConstants.S_OK == hr)
                         {
                             // There is a sub-item, call this same function on it.
@@ -198,8 +192,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     }
 
                     // Move the current item to its first visible sibling.
-                    object sibling;
-                    hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_NextSibling, out sibling);
+                    hr = this._hierarchy.GetProperty(currentItem, (int)__VSHPROPID.VSHPROPID_NextSibling, out var sibling);
                     if (VSConstants.S_OK != hr)
                     {
                         currentItem = VSConstants.VSITEMID_NIL;
@@ -250,17 +243,35 @@ namespace Microsoft.VisualStudioTools.Navigation
             private static uint GetItemId(object variantValue)
             {
                 if (variantValue == null)
+                {
                     return VSConstants.VSITEMID_NIL;
+                }
+
                 if (variantValue is int)
+                {
                     return (uint)(int)variantValue;
+                }
+
                 if (variantValue is uint)
+                {
                     return (uint)variantValue;
+                }
+
                 if (variantValue is short)
+                {
                     return (uint)(short)variantValue;
+                }
+
                 if (variantValue is ushort)
+                {
                     return (uint)(ushort)variantValue;
+                }
+
                 if (variantValue is long)
+                {
                     return (uint)(long)variantValue;
+                }
+
                 return VSConstants.VSITEMID_NIL;
             }
         }

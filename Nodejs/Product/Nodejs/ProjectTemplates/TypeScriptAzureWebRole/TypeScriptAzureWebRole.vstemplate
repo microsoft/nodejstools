@@ -3,7 +3,7 @@
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3083"/>
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="3084"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="410"/>
-    <ProjectType>JavaScript</ProjectType>
+    <ProjectType>TypeScript</ProjectType>
     <TemplateID>Microsoft.JavaScript.TypeScriptNodejsWebApp</TemplateID>
     <SortOrder>140</SortOrder>
     <Hidden>true</Hidden>

@@ -23,8 +23,7 @@ namespace Microsoft.NodejsTools.Debugger
             var updated = false;
             foreach (var exceptionTreatment in exceptionTreatments)
             {
-                ExceptionHitTreatment treatmentValue;
-                if (!this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue) ||
+                if (!this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out var treatmentValue) ||
                     (exceptionTreatment.Value != treatmentValue))
                 {
                     this._exceptionTreatments[exceptionTreatment.Key] = exceptionTreatment.Value;
@@ -39,8 +38,7 @@ namespace Microsoft.NodejsTools.Debugger
             var updated = false;
             foreach (var exceptionTreatment in exceptionTreatments)
             {
-                ExceptionHitTreatment treatmentValue;
-                if (this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out treatmentValue))
+                if (this._exceptionTreatments.TryGetValue(exceptionTreatment.Key, out var treatmentValue))
                 {
                     this._exceptionTreatments.Remove(exceptionTreatment.Key);
                     updated = true;
@@ -72,8 +70,7 @@ namespace Microsoft.NodejsTools.Debugger
 
         public ExceptionHitTreatment GetExceptionHitTreatment(string exceptionName)
         {
-            ExceptionHitTreatment exceptionTreatment;
-            if (!this._exceptionTreatments.TryGetValue(exceptionName, out exceptionTreatment))
+            if (!this._exceptionTreatments.TryGetValue(exceptionName, out var exceptionTreatment))
             {
                 exceptionTreatment = this._defaultExceptionTreatment;
             }

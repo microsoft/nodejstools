@@ -118,7 +118,7 @@
     <Reference Include="Microsoft.VisualStudio.Debugger.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.Designer.Interfaces, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Editor, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Language.Intellisense, Version=$(VSTarget).0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
@@ -238,6 +238,7 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
+    <Compile Include="Project\MissingNodeInfoBar.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
       <SubType>Form</SubType>
@@ -271,6 +272,7 @@
     <Compile Include="Debugger\ExceptionHitTreatment.cs" />
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
+    <Compile Include="Repl\InfoReplCommand.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
@@ -585,14 +587,11 @@
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Cloud.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceConfiguration.Local.cscfg" />
     <ZipProject Include="ProjectTemplates\CloudService\ServiceDefinition.csdef" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\package.json" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.njsproj" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.config" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Web.Debug.config" />
     <ZipProject Include="ProjectTemplates\Express4App\index.pug" />
     <ZipProject Include="ProjectTemplates\Express4App\layout.pug" />
     <ZipProject Include="ProjectTemplates\Express4App\package.json" />
@@ -722,7 +721,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptExpressApp\user.ts" />
     <!-- Basic Azure Node.js Express 4 application -->
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptAzureExpressApp.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\TypeScriptExpressApp.njsproj">
@@ -742,7 +741,7 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.config" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureExpressApp\Web.Debug.config" />
     <!-- Misc -->
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\TypeScriptAzureNodejsWorker.vstemplate">
       <SubType>Designer</SubType>
     </TypeScriptProject>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureNodejsWorker\Worker.njsproj">
@@ -785,12 +784,10 @@
     </EmbeddedResource>
     <ZipProject Include="ProjectTemplates\CloudService\cloudservice.ico" />
     <ZipProject Include="ProjectTemplates\CloudService\CloudService.vstemplate" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Preview.png" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\Worker.vstemplate" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptWebApp.vstemplate">
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\Preview.png" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\TypeScriptAzureWebRole.vstemplate">
       <SubType>Designer</SubType>
-    </ZipProject>
+    </TypeScriptProject>
     <ZipProject Include="ProjectTemplates\Express4App\app.js" />
     <ZipProject Include="ProjectTemplates\Express4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
@@ -805,7 +802,7 @@
     <ZipProject Include="ProjectTemplates\AzureExpress4App\ExpressApp.njsproj">
       <SubType>Designer</SubType>
     </ZipProject>
-    <ZipProject Include="ProjectTemplates\AzureExpress4App\ExpressApp.vstemplate">
+    <ZipProject Include="ProjectTemplates\AzureExpress4App\AzureExpress4App.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureExpress4App\index.js" />
@@ -817,7 +814,7 @@
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\worker.js" />
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\startup.js" />
-    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\Worker.vstemplate">
+    <ZipProject Include="ProjectTemplates\AzureNodejsWorker\AzureNodejsWorker.vstemplate">
       <SubType>Designer</SubType>
     </ZipProject>
     <ZipProject Include="ProjectTemplates\AzureNodejsWorker\package.json" />
@@ -971,9 +968,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\server.ts" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureNodejsWorkerRole\startup.ts" />
-    <ZipProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RemoteDebug\" />
@@ -1192,6 +1187,9 @@
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
       <Version>0.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.AppDesigner">
+      <Version>15.3.0-rc-6162104</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
       <Version>15.3.799-masterDDDBA9E4</Version>

@@ -1,35 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build"
-         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-    <PropertyGroup>
-        <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    </PropertyGroup>
-    <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" />
-    <Import Project=".\SetupProjectBefore.settings" />
-
-    <PropertyGroup>
-        <!-- Define properties that drive the manifest creation here. -->
-        <FinalizeManifest>true</FinalizeManifest>
-        <FinalizeSkipLayout>true</FinalizeSkipLayout>
-        <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
-        <TargetName>$(MSBuildProjectName)</TargetName>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <!-- NTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <ProjectGuid>{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration) == 'Release' " />
+  <PropertyGroup Condition="$(Configuration) == 'Debug' " />
+  <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.props" />
+  <Import Project=".\SetupProjectBefore.settings" />
+  <PropertyGroup>
+    <!-- Define properties that drive the manifest creation here. -->
+    <FinalizeManifest>true</FinalizeManifest>
+    <FinalizeSkipLayout>true</FinalizeSkipLayout>
+    <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
+    <TargetName>$(MSBuildProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- NTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
              But VS Manifest task wants BuildNumber to be 'major.minor.build.revision' -->
-        <BuildNumber>$(BuildVersion)</BuildNumber>
-        <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
-        <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" />
-        <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
-        <Node Include="packages.config" />
-    </ItemGroup>
+    <BuildNumber>$(BuildVersion)</BuildNumber>
+    <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" />
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
+    <Node Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Product\NodejsToolsVsix\NodejsToolsVsix.csproj">
+      <Project>{f3db625f-ea2d-420f-bbc7-e4026cc6eca3}</Project>
+      <Name>NodejsToolsVsix</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Product\TargetsVsix\TargetsVsix.csproj">
+      <Project>{cba217c4-4338-4e50-9dec-9227705f8124}</Project>
+      <Name>TargetsVsix</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Product\TestAdapterVsix\TestAdapterVsix.csproj">
+      <Project>{4eb09870-7422-4368-b8c8-74582764eab3}</Project>
+      <Name>TestAdapterVsix</Name>
+    </ProjectReference>
+  </ItemGroup>
 
-    <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" />
-    <Import Project=".\SetupProjectAfter.settings" />
+  <Target Name="Build" />
+  <Target Name="Clean" />
+  <Target Name="ReBuild" />
+
+  <Import Project="..\packages\MicroBuild.Core.0.2.0\build\MicroBuild.Core.targets" />
+  <Import Project=".\SetupProjectAfter.settings" />
 </Project>

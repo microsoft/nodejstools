@@ -138,8 +138,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             }
 
             // Checks whether name points on array element
-            int indexer;
-            if (int.TryParse(name, out indexer))
+            if (int.TryParse(name, out var indexer))
             {
                 name = string.Format(CultureInfo.InvariantCulture, "[{0}]", indexer);
                 fullName = parent.FullName + name;

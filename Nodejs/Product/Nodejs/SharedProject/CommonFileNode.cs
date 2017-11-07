@@ -132,8 +132,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             var viewGuid =
                 (this.IsFormSubType ? VSConstants.LOGVIEWID_Designer : VSConstants.LOGVIEWID_Code);
-            IVsWindowFrame frame;
-            manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
+            manager.Open(false, false, viewGuid, out var frame, WindowFrameShowAction.Show);
         }
 
         private static Guid CLSID_VsTextBuffer = new Guid("{8E7B96A8-E33D-11d0-A6D5-00C04FB67F6A}");
@@ -157,12 +156,10 @@ namespace Microsoft.VisualStudioTools.Project
             var textMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
             var model = GetService(typeof(SComponentModel)) as IComponentModel;
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
-            uint itemid;
 
             var rdt = this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (rdt != null)
             {
-                IVsHierarchy hier;
                 IVsPersistDocData persistDocData;
                 uint cookie;
                 var docInRdt = true;
@@ -171,7 +168,7 @@ namespace Microsoft.VisualStudioTools.Project
                 try
                 {
                     //Getting a read lock on the document. Must be released later.
-                    hr = rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_ReadLock, GetMkDocument(), out hier, out itemid, out docData, out cookie);
+                    hr = rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_ReadLock, GetMkDocument(), out var hier, out var itemid, out docData, out cookie);
                     if (ErrorHandler.Failed(hr) || docData == IntPtr.Zero)
                     {
                         if (!create)
@@ -227,21 +224,16 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var model = GetService(typeof(SComponentModel)) as IComponentModel;
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
-
-            IVsTextView viewAdapter;
-            uint itemid;
             var uiShellOpenDocument = GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-            IVsUIHierarchy hierarchy;
-            IVsWindowFrame pWindowFrame;
 
             VsShellUtilities.OpenDocument(
                 this.ProjectMgr.Site,
                 this.GetMkDocument(),
                 Guid.Empty,
-                out hierarchy,
-                out itemid,
-                out pWindowFrame,
-                out viewAdapter);
+                out var hierarchy,
+                out var itemid,
+                out var pWindowFrame,
+                out var viewAdapter);
 
             ErrorHandler.ThrowOnFailure(pWindowFrame.Show());
             return adapter.GetWpfTextView(viewAdapter);

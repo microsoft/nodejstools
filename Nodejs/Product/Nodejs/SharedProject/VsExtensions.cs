@@ -22,13 +22,12 @@ namespace Microsoft.VisualStudioTools
 
         internal static EnvDTE.Project GetProject(this IVsHierarchy hierarchy)
         {
-            object project;
 
             ErrorHandler.ThrowOnFailure(
                 hierarchy.GetProperty(
                     VSConstants.VSITEMID_ROOT,
                     (int)__VSHPROPID.VSHPROPID_ExtObject,
-                    out project
+                    out var project
                 )
             );
 
@@ -56,8 +55,7 @@ namespace Microsoft.VisualStudioTools
 
         public static string GetRootCanonicalName(this IVsHierarchy heirarchy)
         {
-            string path;
-            ErrorHandler.ThrowOnFailure(heirarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out path));
+            ErrorHandler.ThrowOnFailure(heirarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out var path));
             return path;
         }
 
@@ -71,8 +69,7 @@ namespace Microsoft.VisualStudioTools
 
         internal static string GetFilePath(this ITextBuffer textBuffer)
         {
-            ITextDocument textDocument;
-            if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDocument))
+            if (textBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out var textDocument))
             {
                 return textDocument.FilePath;
             }

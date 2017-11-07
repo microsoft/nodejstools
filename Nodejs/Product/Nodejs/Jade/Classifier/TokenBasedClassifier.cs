@@ -55,8 +55,7 @@ namespace Microsoft.NodejsTools.Jade
 
         protected virtual void OnTextChanged(object sender, TextContentChangedEventArgs e)
         {
-            int start, oldLength, newLength;
-            TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
+            TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
             // check if change is still within current snapshot. the problem is that
             // change could have been calculated against projected buffer and then
@@ -124,7 +123,9 @@ namespace Microsoft.NodejsTools.Jade
 
             this._lastValidPosition = Math.Min(this._lastValidPosition, start);
             if (this.Tokens.Count > 0)
+            {
                 this.Tokens.RemoveInRange(TextRange.FromBounds(this._lastValidPosition, this.Tokens[this.Tokens.Count - 1].End), true);
+            }
 
             // In line-based tokenizers like SaSS or Jade we need to start at the beginning 
             // of the line i.e. at 'anchor' position that is canculated depending on particular
@@ -157,7 +158,9 @@ namespace Microsoft.NodejsTools.Jade
             {
                 var ws = textSnapshot.GetText(span);
                 if (string.IsNullOrWhiteSpace(ws))
+                {
                     return classifications;
+                }
             }
 
             // Token collection at this point contains valid tokens at least to a point

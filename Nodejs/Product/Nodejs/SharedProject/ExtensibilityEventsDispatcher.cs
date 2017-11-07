@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using EnvDTE;
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudioTools.Project
         private readonly ProjectNode _project;
         private bool _suspended;
 
-        public ExtensibilityEventsDispatcher(ProjectNode/*!*/ project)
+        public ExtensibilityEventsDispatcher(ProjectNode project)
         {
             Utilities.ArgumentNotNull("project", project);
 

@@ -254,13 +254,12 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
             return Task.Run<string>(() =>
             {
                 var success = false;
-                Guid projectGuid;
                 try
                 {
                     string typeScriptVersion = GetLatestAvailableTypeScriptVersionFromSetup();
                     using (var writer = GetDefaultWriter(projectPath))
                     {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, typeScriptVersion, true, out projectGuid);
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, typeScriptVersion, true, out var projectGuid);
                     }
                     TelemetryHelper.LogProjectImported();
                     success = true;
@@ -536,9 +535,8 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
 
             // Populate the package status
             uint count = 0;
-            uint sizeNeeded = 0;
             IVsSetupPackageInfo[] packages = null;
-            setupCompositionService.GetSetupPackagesInfo(count, packages, out sizeNeeded);
+            setupCompositionService.GetSetupPackagesInfo(count, packages, out var sizeNeeded);
 
             if (sizeNeeded > 0)
             {

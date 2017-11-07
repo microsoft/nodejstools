@@ -32,8 +32,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
-            List<ColoredSpan> coloredSpans;
-            if (!_buffer.Properties.TryGetProperty(ColorKey, out coloredSpans))
+            if (!_buffer.Properties.TryGetProperty(ColorKey, out List<ColoredSpan> coloredSpans))
             {
                 return new ClassificationSpan[0];
             }
@@ -49,8 +48,7 @@ namespace Microsoft.NodejsTools.Repl
             int spanEnd = span.End.Position;
             for (int i = startIndex; i < coloredSpans.Count && coloredSpans[i].Span.Start < spanEnd; i++)
             {
-                IClassificationType type;
-                if (_provider.TryGetValue(coloredSpans[i].Color, out type))
+                if (_provider.TryGetValue(coloredSpans[i].Color, out var type))
                 {
                     var overlap = span.Overlap(coloredSpans[i].Span);
                     if (overlap != null)

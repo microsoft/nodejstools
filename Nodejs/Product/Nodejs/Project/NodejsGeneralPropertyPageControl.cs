@@ -6,11 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Microsoft.VisualStudioTools.Project;
+using Microsoft.VisualStudio.Editors.PropertyPages;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal partial class NodejsGeneralPropertyPageControl : UserControl
+    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -20,7 +20,6 @@ namespace Microsoft.NodejsTools.Project
             InitializeComponent();
 
             LocalizeLabels();
-            SetCueBanner();
             AddToolTips();
 
             this._nodeExeErrorProvider.SetIconAlignment(this._nodeExePath, ErrorIconAlignment.MiddleLeft);
@@ -47,9 +46,11 @@ namespace Microsoft.NodejsTools.Project
             this._debuggerPortLabel.Text = Resources.PropertiesDebuggerPort;
             this._envVarsLabel.Text = Resources.PropertiesEnvVars;
             this._startBrowser.Text = Resources.PropertiesStartBrowser;
+            this._startActionHeaderLabel.Text = Resources.StartActionHeader;
+            this._nodeHeaderLabel.Text = Resources.NodeHeader;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
-            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
         }
 
         private void AddToolTips()
@@ -65,6 +66,10 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
         }
+
+        protected override bool DisableOnBuild => false;
+
+        protected override bool DisableOnDebug => false;
 
         public string NodeExePath
         {
@@ -192,23 +197,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void Changed(object sender, EventArgs e)
         {
-            this._propPage.IsDirty = true;
-        }
-
-        private void SetCueBanner()
-        {
-            var cueBanner = Nodejs.NodeExePath;
-            if (string.IsNullOrEmpty(cueBanner))
-            {
-                cueBanner = Resources.NodejsNotInstalledShort;
-            }
-
-            NativeMethods.SendMessageW(
-                this._nodeExePath.Handle,
-                NativeMethods.EM_SETCUEBANNER,
-                new IntPtr(1),  // fDrawFocused == true
-                cueBanner
-            );
+            this.IsDirty = true;
         }
 
         private void NodeExePathChanged(object sender, EventArgs e)
@@ -227,12 +216,10 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowsePathClick(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog();
-            dialog.CheckFileExists = true;
-            dialog.Filter = _exeFilter;
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var nodeExePath = this._nodeExePath.Text;
+            if (this.GetFileViaBrowse(nodeExePath, ref nodeExePath, _exeFilter) && !string.IsNullOrEmpty(nodeExePath))
             {
-                this._nodeExePath.Text = dialog.FileName;
+                this._nodeExePath.Text = nodeExePath;
                 this._nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
@@ -244,10 +231,10 @@ namespace Microsoft.NodejsTools.Project
             {
                 dir = this._propPage.Project.ProjectHome;
             }
-            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
-            if (!string.IsNullOrEmpty(path))
+
+            if (this.GetDirectoryViaBrowseRelative(dir, this._propPage.Project.ProjectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
             {
-                this._workingDir.Text = path;
+                this._workingDir.Text = string.IsNullOrEmpty(dir) ? "." : dir;
             }
         }
 
@@ -255,7 +242,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var textSender = (TextBox)sender;
             if (!textSender.Text.Contains("$(") &&
-                textSender.Text.Any(ch => !Char.IsDigit(ch)))
+                textSender.Text.Any(ch => !char.IsDigit(ch)))
             {
                 this._nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
             }
@@ -268,15 +255,21 @@ namespace Microsoft.NodejsTools.Project
 
         private void WorkingDirChanged(object sender, EventArgs e)
         {
-            if (!this._workingDir.Text.Contains("$(") && !Directory.Exists(this._workingDir.Text))
-            {
-                this._nodeExeErrorProvider.SetError(this._workingDir, Resources.WorkingDirInvalidOrMissing);
-            }
-            else
-            {
-                this._nodeExeErrorProvider.SetError(this._workingDir, string.Empty);
-            }
+            var errorMessage = ValidateWorkingDir(this._workingDir.Text) ? "" : Resources.WorkingDirInvalidOrMissing;
+            this._nodeExeErrorProvider.SetError(this._workingDir, errorMessage);
+
             Changed(sender, e);
+
+            bool ValidateWorkingDir(string workingDir)
+            {
+                if (workingDir.Contains("$("))
+                {
+                    return true;
+                }
+
+                var fullPath = Path.IsPathRooted(workingDir) ? workingDir : Path.Combine(this._propPage.Project.ProjectHome, workingDir);
+                return Directory.Exists(fullPath);
+            }
         }
     }
 }

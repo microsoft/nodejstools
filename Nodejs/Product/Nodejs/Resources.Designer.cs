@@ -99,6 +99,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select Working Dir.
+        /// </summary>
+        internal static string BrowseWorkingDirDialogTitle {
+            get {
+                return ResourceManager.GetString("BrowseWorkingDirDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not clear Node.js cache directory. Try manually deleting the directory: {0}.
         /// </summary>
         internal static string CacheDirectoryClearFailedCaption {
@@ -140,6 +149,15 @@ namespace Microsoft.NodejsTools {
         internal static string CategoryVersion {
             get {
                 return ResourceManager.GetString("CategoryVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure project properties.
+        /// </summary>
+        internal static string ConfigureProjectProperties {
+            get {
+                return ResourceManager.GetString("ConfigureProjectProperties", resourceCulture);
             }
         }
         
@@ -249,6 +267,15 @@ namespace Microsoft.NodejsTools {
         internal static string DependencyNodeModuleDoesNotExist {
             get {
                 return ResourceManager.GetString("DependencyNodeModuleDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Node.js.
+        /// </summary>
+        internal static string DownloadNodejs {
+            get {
+                return ResourceManager.GetString("DownloadNodejs", resourceCulture);
             }
         }
         
@@ -653,6 +680,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Node.
+        /// </summary>
+        internal static string NodeHeader {
+            get {
+                return ResourceManager.GetString("NodeHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project&apos;s properties page..
         /// </summary>
         internal static string NodejsNotInstalled {
@@ -667,6 +703,15 @@ namespace Microsoft.NodejsTools {
         internal static string NodejsNotInstalledAnyCode {
             get {
                 return ResourceManager.GetString("NodejsNotInstalledAnyCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page..
+        /// </summary>
+        internal static string NodejsNotInstalledInfoBar {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledInfoBar", resourceCulture);
             }
         }
         
@@ -1431,7 +1476,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.&amp;js port:.
+        ///   Looks up a localized string similar to Applica&amp;tion port:.
         /// </summary>
         internal static string PropertiesNodePort {
             get {
@@ -1541,11 +1586,47 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show information about the current used Node.js executable..
+        /// </summary>
+        internal static string ReplInfoDescription {
+            get {
+                return ResourceManager.GetString("ReplInfoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
         /// </summary>
         internal static string ReplInitializationMessage {
             get {
                 return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve Nodejs.exe information..
+        /// </summary>
+        internal static string ReplNodeError {
+            get {
+                return ResourceManager.GetString("ReplNodeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using Node.js exe from: &apos;{0}&apos;.
+        /// </summary>
+        internal static string ReplNodeInfo {
+            get {
+                return ResourceManager.GetString("ReplNodeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Version: {0}.
+        /// </summary>
+        internal static string ReplNodeVersion {
+            get {
+                return ResourceManager.GetString("ReplNodeVersion", resourceCulture);
             }
         }
         
@@ -1627,6 +1708,15 @@ namespace Microsoft.NodejsTools {
         internal static string ScriptFileTooltip {
             get {
                 return ResourceManager.GetString("ScriptFileTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Action.
+        /// </summary>
+        internal static string StartActionHeader {
+            get {
+                return ResourceManager.GetString("StartActionHeader", resourceCulture);
             }
         }
         

@@ -94,13 +94,19 @@ namespace Microsoft.NodejsTools.Jade
         public virtual int GetItemAtPosition(int position)
         {
             if (this.Count == 0)
+            {
                 return -1;
+            }
 
             if (position < this[0].Start)
+            {
                 return -1;
+            }
 
             if (position >= this[this.Count - 1].End)
+            {
                 return -1;
+            }
 
             var min = 0;
             var max = this.Count - 1;
@@ -111,7 +117,9 @@ namespace Microsoft.NodejsTools.Jade
                 var item = this[mid];
 
                 if (item.Start == position)
+                {
                     return mid;
+                }
 
                 if (position < item.Start)
                 {
@@ -134,13 +142,19 @@ namespace Microsoft.NodejsTools.Jade
         public virtual int GetItemContaining(int position)
         {
             if (this.Count == 0)
+            {
                 return -1;
+            }
 
             if (position < this[0].Start)
+            {
                 return -1;
+            }
 
             if (position > this[this.Count - 1].End)
+            {
                 return -1;
+            }
 
             var min = 0;
             var max = this.Count - 1;
@@ -151,10 +165,14 @@ namespace Microsoft.NodejsTools.Jade
                 var item = this[mid];
 
                 if (item.Contains(position))
+                {
                     return mid;
+                }
 
                 if (mid < this.Count - 1 && item.End <= position && position < this[mid + 1].Start)
+                {
                     return -1;
+                }
 
                 if (position < item.Start)
                 {
@@ -177,10 +195,14 @@ namespace Microsoft.NodejsTools.Jade
         public virtual int GetFirstItemAfterPosition(int position)
         {
             if (this.Count == 0 || position > this[this.Count - 1].End)
+            {
                 return -1;
+            }
 
             if (position < this[0].Start)
+            {
                 return 0;
+            }
 
             var min = 0;
             var max = this.Count - 1;
@@ -260,10 +282,14 @@ namespace Microsoft.NodejsTools.Jade
         public virtual int GetLastItemBeforeOrAtPosition(int position)
         {
             if (this.Count == 0 || position < this[0].Start)
+            {
                 return -1;
+            }
 
             if (position >= this[this.Count - 1].End)
+            {
                 return this.Count - 1;
+            }
 
             var min = 0;
             var max = this.Count - 1;
@@ -307,14 +333,18 @@ namespace Microsoft.NodejsTools.Jade
         public virtual int GetFirstItemBeforePosition(int position)
         {
             if (this.Count == 0 || position < this[0].End)
+            {
                 return -1;
+            }
 
             var min = 0;
             var lastIndex = this.Count - 1;
             var max = this.Count - 1;
 
             if (position >= this[lastIndex].End)
+            {
                 return max;
+            }
 
             while (min <= max)
             {
@@ -372,7 +402,9 @@ namespace Microsoft.NodejsTools.Jade
                     }
 
                     if (mid < this.Count - 1 && item.End <= position && position < this[mid + 1].Start)
+                    {
                         break;
+                    }
 
                     if (position < item.Start)
                     {
@@ -438,7 +470,9 @@ namespace Microsoft.NodejsTools.Jade
             var max = this.Count - 1;
 
             if (this.Count == 0)
+            {
                 return;
+            }
 
             if (position <= this[0].Start)
             {
@@ -463,7 +497,9 @@ namespace Microsoft.NodejsTools.Jade
                         {
                             var expandable = this[mid] as IExpandableTextRange;
                             if (expandable != null)
+                            {
                                 expandable.Expand(0, offset);
+                            }
                         }
 
                         // Now shift all remaining siblings that are below this one
@@ -522,12 +558,16 @@ namespace Microsoft.NodejsTools.Jade
                 for (var i = first; i < this.Count; i++)
                 {
                     if (this._items[i].Start >= range.End)
+                    {
                         break;
+                    }
 
                     if (TextRange.Intersect(this._items[i], range))
                     {
                         if (list == _emptyList)
+                        {
                             list = new List<T>();
+                        }
 
                         list.Add(this._items[i]);
                     }
@@ -560,7 +600,9 @@ namespace Microsoft.NodejsTools.Jade
             var first = GetFirstItemAfterPosition(range.Start);
 
             if (first < 0 || (!inclusiveEnds && this[first].Start >= range.End) || (inclusiveEnds && this[first].Start > range.End))
+            {
                 return removed;
+            }
 
             var lastCandidate = GetLastItemBeforeOrAtPosition(range.End);
             var last = -1;
@@ -591,7 +633,9 @@ namespace Microsoft.NodejsTools.Jade
             if (first >= 0 && last >= 0)
             {
                 if (removed == _emptyList)
+                {
                     removed = new List<T>();
+                }
 
                 for (var i = first; i <= last; i++)
                 {
@@ -662,7 +706,9 @@ namespace Microsoft.NodejsTools.Jade
             if (indexEnd > indexStart && indexStart >= 0)
             {
                 if (this[indexEnd].Start == start + oldLength)
+                {
                     indexEnd--;
+                }
             }
 
             if (indexStart != indexEnd || (indexStart < 0 && indexEnd < 0))
@@ -675,7 +721,9 @@ namespace Microsoft.NodejsTools.Jade
                 var offset = newLength - oldLength;
 
                 if (removed != _emptyList && removed.Count > 0)
+                {
                     indexStart = GetItemContaining(start);
+                }
 
                 if (indexStart >= 0)
                 {
@@ -722,7 +770,9 @@ namespace Microsoft.NodejsTools.Jade
                                 indexStart--;
 
                                 if (removed == _emptyList)
+                                {
                                     removed = new List<T>();
+                                }
 
                                 removed.Add(range);
                             }
@@ -748,19 +798,27 @@ namespace Microsoft.NodejsTools.Jade
             var otherCount = 0;
 
             foreach (var item in other)
+            {
                 otherCount++;
+            }
 
             if (this.Count != otherCount)
+            {
                 return false;
+            }
 
             var i = 0;
             foreach (var item in other)
             {
                 if (this[i].Start != item.Start)
+                {
                     return false;
+                }
 
                 if (this[i].Length != item.Length)
+                {
                     return false;
+                }
 
                 i++;
             }
@@ -825,18 +883,26 @@ namespace Microsoft.NodejsTools.Jade
         public virtual ITextRange RangeDifference(IEnumerable<ITextRange> otherCollection, int lowerBound, int upperBound)
         {
             if (otherCollection == null)
+            {
                 return TextRange.FromBounds(lowerBound, upperBound);
+            }
 
             var other = new TextRangeCollection<ITextRange>(otherCollection);
 
             if (this.Count == 0 && other.Count == 0)
+            {
                 return TextRange.EmptyRange;
+            }
 
             if (this.Count == 0)
+            {
                 return TextRange.FromBounds(lowerBound, upperBound);
+            }
 
             if (other.Count == 0)
+            {
                 return TextRange.FromBounds(lowerBound, upperBound);
+            }
 
             var minCount = Math.Min(this.Count, other.Count);
             var start = 0;
@@ -848,18 +914,26 @@ namespace Microsoft.NodejsTools.Jade
                 start = Math.Min(this[i].Start, other[i].Start);
 
                 if (this[i].Start != other[i].Start || this[i].Length != other[i].Length)
+                {
                     break;
+                }
             }
 
             if (i == minCount)
             {
                 if (this.Count == other.Count)
+                {
                     return TextRange.EmptyRange;
+                }
 
                 if (this.Count > other.Count)
+                {
                     return TextRange.FromBounds(Math.Min(upperBound, other[minCount - 1].Start), upperBound);
+                }
                 else
+                {
                     return TextRange.FromBounds(Math.Min(this[minCount - 1].Start, upperBound), upperBound);
+                }
             }
 
             for (i = this.Count - 1, j = other.Count - 1; i >= 0 && j >= 0; i--, j--)
@@ -867,11 +941,15 @@ namespace Microsoft.NodejsTools.Jade
                 end = Math.Max(this[i].End, other[j].End);
 
                 if (this[i].Start != other[j].Start || this[i].Length != other[j].Length)
+                {
                     break;
+                }
             }
 
             if (start < end)
+            {
                 return TextRange.FromBounds(start, end);
+            }
 
             return TextRange.FromBounds(lowerBound, upperBound);
         }

@@ -59,8 +59,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
             }
             finally
             {
-                TaskCompletionSource<JObject> promise;
-                this._messages.TryRemove(command.Id, out promise);
+                this._messages.TryRemove(command.Id, out var promise);
             }
         }
 
@@ -201,8 +200,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         {
             var messageId = message["request_seq"];
 
-            TaskCompletionSource<JObject> promise;
-            if (messageId != null && _messages.TryGetValue((int)messageId, out promise))
+            if (messageId != null && _messages.TryGetValue((int)messageId, out var promise))
             {
                 promise.SetResult(message);
             }

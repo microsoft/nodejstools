@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Npm
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid pre-release version: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
                         preReleaseVersion),
-                    "preReleaseVersion");
+                    nameof(preReleaseVersion));
             }
 
             if (!IsValidOptionalFragment(buildMetadata))
@@ -102,7 +102,7 @@ namespace Microsoft.NodejsTools.Npm
                     string.Format(CultureInfo.CurrentCulture,
                         "Invalid build metadata: '{0}'. Must be a dot separated sequence of identifiers containing only characters [0-9A-Za-z-].",
                         preReleaseVersion),
-                    "buildMetadata");
+                    nameof(buildMetadata));
             }
 
             this.Major = major;

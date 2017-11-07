@@ -45,7 +45,6 @@ namespace Microsoft.NodejsTools.Project
 #pragma warning disable 0612
             InitNodejsProjectImages();
 #pragma warning restore 0612
-
         }
 
         private void OnIdleNodeModules(object state)
@@ -278,16 +277,14 @@ namespace Microsoft.NodejsTools.Project
             var res = base.GetConfigurationDependentPropertyPages();
 
             var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
-            bool fEnableTs;
-            if (enableTs != null && Boolean.TryParse(enableTs, out fEnableTs) && fEnableTs)
+            if (enableTs != null && Boolean.TryParse(enableTs, out var fEnableTs) && fEnableTs)
             {
                 var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null)
                 {
                     foreach (var strGuid in typeScriptPages.Split(';'))
                     {
-                        Guid guid;
-                        if (Guid.TryParse(strGuid, out guid))
+                        if (Guid.TryParse(strGuid, out var guid))
                         {
                             res = res.Append(guid);
                         }
@@ -345,6 +342,27 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
+        public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
+        {
+            base.Load(filename, location, name, flags, ref iidProject, out canceled);
+
+            // check the property
+            var nodeProperty = GetProjectProperty(NodeProjectProperty.NodeExePath);
+            if (!string.IsNullOrEmpty(nodeProperty))
+            {
+                return;
+            }
+
+            // see if we can locate the Node.js runtime from the environment
+            if (!string.IsNullOrEmpty(Nodejs.GetPathToNodeExecutableFromEnvironment()))
+            {
+                return;
+            }
+
+            // show info bar
+            MissingNodeInfoBar.Show(this);
+        }
+
         private void UpdateProjectNodeFromProjectProperties()
         {
             this._intermediateOutputPath = Path.Combine(this.ProjectHome, GetProjectProperty("BaseIntermediateOutputPath"));
@@ -396,7 +414,7 @@ namespace Microsoft.NodejsTools.Project
                     default:
                         if (propPage != null)
                         {
-                            this.PropertyPage.IsDirty = true;
+                            propPage.IsDirty = true;
                         }
                         break;
                 }
@@ -418,8 +436,7 @@ namespace Microsoft.NodejsTools.Project
 
         private static void AddFolderForFile(Dictionary<FileNode, List<CommonFolderNode>> directoryPackages, FileNode rootFile, CommonFolderNode folderChild)
         {
-            List<CommonFolderNode> folders;
-            if (!directoryPackages.TryGetValue(rootFile, out folders))
+            if (!directoryPackages.TryGetValue(rootFile, out var folders))
             {
                 directoryPackages[rootFile] = folders = new List<CommonFolderNode>();
             }
@@ -485,8 +502,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetProjectTypeGuids()
         {
-            var projectTypeGuids = "";
-            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out projectTypeGuids));
+            ErrorHandler.ThrowOnFailure(((IVsAggregatableProject)this).GetAggregateProjectTypeGuids(out var projectTypeGuids));
             return projectTypeGuids;
         }
 
@@ -605,8 +621,7 @@ namespace Microsoft.NodejsTools.Project
 
             basePath = CommonUtils.EnsureEndSeparator(basePath);
 
-            WIN32_FIND_DATA wfd;
-            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out wfd);
+            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out var wfd);
             if (hFind == NativeMethods.INVALID_HANDLE_VALUE)
             {
                 yield break;

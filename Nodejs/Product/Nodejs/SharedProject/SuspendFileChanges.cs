@@ -32,25 +32,27 @@ namespace Microsoft.VisualStudioTools.Project
         public void Suspend()
         {
             if (this.isSuspending)
+            {
                 return;
+            }
 
             var docData = IntPtr.Zero;
             try
             {
                 var rdt = this.site.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-
-                IVsHierarchy hierarchy;
-                uint itemId;
-                uint docCookie;
                 IVsFileChangeEx fileChange;
 
                 if (rdt == null)
+                {
                     return;
+                }
 
-                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.documentFileName, out hierarchy, out itemId, out docData, out docCookie));
+                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, this.documentFileName, out var hierarchy, out var itemId, out docData, out var docCookie));
 
                 if ((docCookie == (uint)ShellConstants.VSDOCCOOKIE_NIL) || docData == IntPtr.Zero)
+                {
                     return;
+                }
 
                 fileChange = this.site.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
 
@@ -96,7 +98,10 @@ namespace Microsoft.VisualStudioTools.Project
         public void Resume()
         {
             if (!this.isSuspending)
+            {
                 return;
+            }
+
             IVsFileChangeEx fileChange;
             fileChange = this.site.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
             if (fileChange != null)

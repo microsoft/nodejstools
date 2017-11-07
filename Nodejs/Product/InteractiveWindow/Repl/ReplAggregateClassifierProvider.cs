@@ -18,8 +18,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public IClassifier GetClassifier(ITextBuffer textBuffer)
         {
-            ReplAggregateClassifier res;
-            if (!textBuffer.Properties.TryGetProperty<ReplAggregateClassifier>(typeof(ReplAggregateClassifier), out res))
+            if (!textBuffer.Properties.TryGetProperty<ReplAggregateClassifier>(typeof(ReplAggregateClassifier), out var res))
             {
                 res = new ReplAggregateClassifier(_bufferGraphFact, textBuffer);
                 textBuffer.Properties.AddProperty(typeof(ReplAggregateClassifier), res);

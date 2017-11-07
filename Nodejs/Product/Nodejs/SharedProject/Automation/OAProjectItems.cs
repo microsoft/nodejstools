@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             //Verify that kind is null, empty, or a physical folder
             if (!(string.IsNullOrEmpty(kind) || kind.Equals(EnvDTE.Constants.vsProjectItemKindPhysicalFolder)))
             {
-                throw new ArgumentException("Parameter specification for AddFolder was not meet", "kind");
+                throw new ArgumentException("Parameter specification for AddFolder was not meet", nameof(kind));
             }
 
             return this.Project.ProjectNode.Site.GetUIThread().Invoke<EnvDTE.ProjectItem>(() =>
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     {
                         return existingChild.GetAutomationObject() as ProjectItem;
                     }
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Folder already exists with the name '{0}'", name));
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Folder already exists with the name '{0}'", name), nameof(name));
                 }
 
                 var proj = this.Project.ProjectNode;

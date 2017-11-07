@@ -89,8 +89,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             Trace.WriteLineIf(Thread.CurrentThread.GetApartmentState() != ApartmentState.STA, "WARNING: IDEBuildLogger constructor running on the wrong thread.");
 
-            IOleServiceProvider site;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hierarchy.GetSite(out site));
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hierarchy.GetSite(out var site));
 
             this.taskProvider = taskProvider;
             this.outputWindowPane = output;
@@ -360,9 +359,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal void FlushBuildOutput()
         {
-            OutputQueueEntry output;
 
-            while (this.outputQueue.TryDequeue(out output))
+            while (this.outputQueue.TryDequeue(out var output))
             {
                 ErrorHandler.ThrowOnFailure(output.Pane.OutputString(output.Message));
             }
@@ -445,9 +443,8 @@ namespace Microsoft.VisualStudioTools.Project
                 this.taskProvider.SuspendRefresh();
                 try
                 {
-                    Func<ErrorTask> taskFunc;
 
-                    while (this.taskQueue.TryDequeue(out taskFunc))
+                    while (this.taskQueue.TryDequeue(out var taskFunc))
                     {
                         // Create the error task
                         var task = taskFunc();

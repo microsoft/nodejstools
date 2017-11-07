@@ -30,8 +30,7 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             //Need to deal with the format being relative and explicit
             var props = (IVsBuildPropertyStorage)project;
-            String outDir;
-            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out outDir));
+            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out var outDir));
 
             var projHome = GetProjectHome(project);
 
@@ -64,11 +63,10 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             Debug.Assert(project != null);
             var hier = (IVsHierarchy)project;
-            object extObject;
             ErrorHandler.ThrowOnFailure(hier.GetProperty(
                 (uint)VSConstants.VSITEMID.Root,
                 (int)__VSHPROPID.VSHPROPID_ExtObject,
-                out extObject
+                out var extObject
             ));
             var proj = extObject as EnvDTE.Project;
             if (proj == null)

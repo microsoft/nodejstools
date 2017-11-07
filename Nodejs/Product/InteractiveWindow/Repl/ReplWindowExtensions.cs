@@ -8,8 +8,7 @@ namespace Microsoft.NodejsTools.Repl
     {
         public static IReplEvaluator GetReplEvaluator(this ITextBuffer textBuffer)
         {
-            IReplEvaluator res;
-            if (textBuffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out res))
+            if (textBuffer.Properties.TryGetProperty<IReplEvaluator>(typeof(IReplEvaluator), out var res))
             {
                 return res;
             }

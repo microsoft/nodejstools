@@ -17,7 +17,9 @@ namespace Microsoft.NodejsTools.Jade
         {
             var tagger = ServiceManager.GetService<JadeOutliningTagger>(buffer);
             if (tagger == null)
+            {
                 tagger = new JadeOutliningTagger(buffer);
+            }
 
             return tagger as ITagger<T>;
         }

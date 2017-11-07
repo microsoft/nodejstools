@@ -157,7 +157,9 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // Do they reference the same element?
             if (Object.ReferenceEquals(element1, element2))
+            {
                 return true;
+            }
 
             // Verify that they are not null (cast to object first to avoid stack overflow)
             if (element1 as object == null || element2 as object == null)

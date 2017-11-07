@@ -189,4 +189,7 @@
   <data name="MissingLocallyMessage" xml:space="preserve">
     <value>Package missing</value>
   </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>(latest)</value>
+  </data>
 </root>

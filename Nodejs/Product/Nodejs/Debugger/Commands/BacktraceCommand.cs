@@ -60,8 +60,7 @@ namespace Microsoft.NodejsTools.Debugger.Commands
                 var functionName = GetFunctionName(frame);
                 var moduleId = (int?)frame["func"]["scriptId"];
 
-                NodeModule module;
-                if (!moduleId.HasValue || !this.Modules.TryGetValue(moduleId.Value, out module))
+                if (!moduleId.HasValue || !this.Modules.TryGetValue(moduleId.Value, out var module))
                 {
                     module = this._unknownModule;
                 }

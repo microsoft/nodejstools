@@ -7,7 +7,7 @@
   },
   "description": "$projectname$",
   "author": {
-    "name": "$username$"
+    "name": ""
   },
   "dependencies": {
     "debug": "^2.2.0",

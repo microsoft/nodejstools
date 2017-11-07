@@ -636,7 +636,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Launch &amp;URL:</value>
   </data>
   <data name="PropertiesNodePort" xml:space="preserve">
-    <value>Node.&amp;js port:</value>
+    <value>Applica&amp;tion port:</value>
   </data>
   <data name="PropertiesScript" xml:space="preserve">
     <value>&amp;Script (startup file):</value>
@@ -707,5 +707,37 @@ Error retrieving websocket debug proxy information from web.config.</value>
   </data>
   <data name="JadeVariable" xml:space="preserve">
     <value>Jade Variable</value>
+  </data>
+  <data name="ReplInfoDescription" xml:space="preserve">
+    <value>Show information about the current used Node.js executable.</value>
+  </data>
+  <data name="ReplNodeError" xml:space="preserve">
+    <value>Failed to retrieve Nodejs.exe information.</value>
+  </data>
+  <data name="ReplNodeInfo" xml:space="preserve">
+    <value>Using Node.js exe from: '{0}'</value>
+    <comment>template is substituted with a path.</comment>
+  </data>
+  <data name="ReplNodeVersion" xml:space="preserve">
+    <value>Node.js Version: {0}</value>
+    <comment>template is substituted with version info</comment>
+  </data>
+  <data name="ConfigureProjectProperties" xml:space="preserve">
+    <value>Configure project properties</value>
+  </data>
+  <data name="DownloadNodejs" xml:space="preserve">
+    <value>Download Node.js</value>
+  </data>
+  <data name="NodejsNotInstalledInfoBar" xml:space="preserve">
+    <value>Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.</value>
+  </data>
+  <data name="NodeHeader" xml:space="preserve">
+    <value>Node</value>
+  </data>
+  <data name="StartActionHeader" xml:space="preserve">
+    <value>Start Action</value>
+  </data>
+  <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
+    <value>Select Working Dir</value>
   </data>
 </root>

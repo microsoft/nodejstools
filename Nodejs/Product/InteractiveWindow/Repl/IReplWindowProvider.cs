@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.Repl
         /// 
         /// The returned object is also a ToolWindowPane and can be cast for access to control the docking with VS.
         /// </summary>
-        IReplWindow CreateReplWindow(IContentType/*!*/ contentType, string/*!*/ title, Guid languageServiceGuid, string replId);
+        IReplWindow CreateReplWindow(IContentType contentType, string title, Guid languageServiceGuid, string replId);
 
         /// <summary>
         /// Finds the REPL w/ the specified ID or returns null if the window hasn't been created.  An IReplEvaluatorProvider must exist
