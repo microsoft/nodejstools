@@ -703,6 +703,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ConfigureProjectProperties" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Configure project properties]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Configurar propriedades do projeto]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";DebugCouldNotResolveStartupFileErrorMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties]]></Val>
@@ -807,6 +816,15 @@
           <Val><![CDATA[Path to module does not exist:]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[O caminho para o módulo não existe:]D;]A;{0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";DownloadNodejs" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Download Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Baixe o Node.js]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1239,6 +1257,15 @@
           <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Não foi possível encontrar um tempo de execução do Node.js no computador. Baixe e instale a versão atual do Node.js em 'https://nodejs.org' ou especifique a localização do Node.exe no arquivo '{0}'.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodejsNotInstalledInfoBar" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Não foi possível encontrar um tempo de execução do Node.js no computador. Instale Node.js e reinicie o VS ou especifique a localização do node.exe na página de propriedades do projeto.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5446,7 +5473,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11022.1]]></Val>
+        <Val><![CDATA[1.4.11102.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5473,7 +5500,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11022.1 commit:782c7d653192bbc7d812925c03a98c1c2e217f7e]]></Val>
+        <Val><![CDATA[1.4.11102.1 commit:92e56cb0ffdb3df70d628eeb4c4467baa0a17ab1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
