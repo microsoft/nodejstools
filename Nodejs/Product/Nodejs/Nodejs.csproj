@@ -836,6 +836,13 @@
       <SubType>Designer</SubType>
     </ZipItem>
     <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
+    <ZipItem Include="Templates\Files\JasmineUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\JasmineUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
     <Content Include="VSTemplateStore.pkgdef">
       <IncludeInVSIX>false</IncludeInVSIX>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -1196,6 +1203,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--

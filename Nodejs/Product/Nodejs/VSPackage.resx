@@ -486,4 +486,16 @@
     <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\StylusSheet.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>{Locked}</comment>
   </data>
+  <data name="4005" xml:space="preserve">
+    <value>JavaScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4006" xml:space="preserve">
+    <value>A JavaScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4007" xml:space="preserve">
+    <value>TypeScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4008" xml:space="preserve">
+    <value>A TypeScript Jasmine UnitTest file</value>
+  </data>
 </root>
