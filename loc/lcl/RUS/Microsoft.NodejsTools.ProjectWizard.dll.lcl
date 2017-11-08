@@ -145,6 +145,12 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Select Working Dir]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";CacheDirectoryClearFailedCaption" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not clear Node.js cache directory. Try manually deleting the directory: {0}]]></Val>
@@ -186,6 +192,15 @@
           <Val><![CDATA[Version]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Версия]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ConfigureProjectProperties" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Configure project properties]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Настроить свойства проекта]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -294,6 +309,15 @@
           <Val><![CDATA[Path to module does not exist:]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Путь к модулю не существует:]D;]A;{0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";DownloadNodejs" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Download Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Скачать Node.js]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -703,6 +727,12 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NodeHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NodeModulesCouldNotParsePackageJsonErrorMessageText" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to parse {0} from your project.  Please fix any errors and try again.]]></Val>
@@ -726,6 +756,15 @@
           <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Не удалось найти среду выполнения Node.js на вашем компьютере.  Скачайте и установите текущий выпуск Node.js со страницы https://nodejs.org или укажите расположение Node.exe в файле "{0}".]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodejsNotInstalledInfoBar" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Не удалось найти среду выполнения Node.js на вашем компьютере. Установите Node.js и перезапустите Visual Studio или укажите расположение файла node.exe на странице свойств проекта.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1470,10 +1509,13 @@
       </Item>
       <Item ItemId=";PropertiesNodePort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.&js port:]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Applica&tion port:]]></Val>
+          <Tgt Cat="Text" Stat="Update" Orig="New">
             <Val><![CDATA[П&орт Node.js:]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Node.&js port:]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1699,6 +1741,12 @@
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Указывает сценарий, выполняющийся при запуске.]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";StartActionHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Start Action]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -3460,7 +3508,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1]]></Val>
+        <Val><![CDATA[1.4.11107.7]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3487,7 +3535,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11024.1 commit:e98daaaa05cd6aafe44b28a3cf2dbd3cca9c3176]]></Val>
+        <Val><![CDATA[1.4.11107.7 commit:046b6bc69838ebc7982673f52032febf77fcba78]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
