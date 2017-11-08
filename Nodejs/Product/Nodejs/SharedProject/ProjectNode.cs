@@ -174,6 +174,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         private MSBuild.Project buildProject;
 
+        private MSBuild.Project userBuildProject;
+
         private MSBuildExecution.ProjectInstance currentConfig;
 
         private ConfigProvider configProvider;
@@ -792,6 +794,10 @@ namespace Microsoft.VisualStudioTools.Project
                 this.buildEngine = value;
             }
         }
+
+        protected internal MSBuild.Project UserBuildProject => this.userBuildProject;
+
+        protected bool IsUserProjectFileDirty => this.userBuildProject?.Xml.HasUnsavedChanges == true;
 
         #endregion
 
@@ -2014,6 +2020,42 @@ namespace Microsoft.VisualStudioTools.Project
             this.currentConfig = null;
         }
 
+        /// <summary>
+        /// Set value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        /// <param name="propertyValue">Value of property</param>
+        public virtual void SetUserProjectProperty(string propertyName, string propertyValue)
+        {
+            Utilities.ArgumentNotNull("propertyName", propertyName);
+
+            if (this.userBuildProject == null)
+            {
+                // user project file doesn't exist yet, create it.
+                var root = Microsoft.Build.Construction.ProjectRootElement.Create(this.BuildProject.ProjectCollection);
+                this.userBuildProject = new MSBuild.Project(root, null, null, this.BuildProject.ProjectCollection);
+                this.userBuildProject.FullPath = this.FileName + PerUserFileExtension;
+            }
+            this.userBuildProject.SetProperty(propertyName, propertyValue ?? string.Empty);
+        }
+
+        /// <summary>
+        /// Get value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        public virtual string GetUserProjectProperty(string propertyName)
+        {
+            Utilities.ArgumentNotNull("propertyName", propertyName);
+
+            if (this.userBuildProject == null)
+            {
+                return null;
+            }
+
+            // If user project file exists during project load/reload userBuildProject is initiated 
+            return this.userBuildProject.GetPropertyValue(propertyName);
+        }
+
         public virtual CompilerParameters GetProjectOptions(string config)
         {
             // This needs to be commented out because if you build for Debug the properties from the Debug 
@@ -2292,19 +2334,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// List of Guids of the config independent property pages. It is called by the GetProperty for VSHPROPID_PropertyPagesCLSIDList property.
         /// </summary>
         /// <returns></returns>
-        protected virtual Guid[] GetConfigurationIndependentPropertyPages()
-        {
-            return new Guid[] { };
-        }
+        protected virtual Guid[] GetConfigurationIndependentPropertyPages() => Array.Empty<Guid>();
 
         /// <summary>
         /// Returns a list of Guids of the configuration dependent property pages. It is called by the GetProperty for VSHPROPID_CfgPropertyPagesCLSIDList property.
         /// </summary>
         /// <returns></returns>
-        protected virtual Guid[] GetConfigurationDependentPropertyPages()
-        {
-            return new Guid[] { };
-        }
+        protected virtual Guid[] GetConfigurationDependentPropertyPages() => Array.Empty<Guid>();
 
         /// <summary>
         /// An ordered list of guids of the prefered property pages. See <see cref="__VSHPROPID.VSHPROPID_PriorityPropertyPagesCLSIDList"/>
@@ -2510,6 +2546,12 @@ namespace Microsoft.VisualStudioTools.Project
                 this.eventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
 
                 SetBuildProject(Utilities.ReinitializeMsBuildProject(this.buildEngine, this.filename, this.buildProject));
+
+                var userProjectFilename = this.FileName + PerUserFileExtension;
+                if (File.Exists(userProjectFilename))
+                {
+                    this.userBuildProject = this.BuildProject.ProjectCollection.LoadProject(userProjectFilename);
+                }
 
                 // Load the guid
                 SetProjectGuidFromProjectFile();
