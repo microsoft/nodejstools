@@ -88,5 +88,6 @@ namespace Microsoft.NodejsTools
         internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
         internal const string TypeScriptOutDir = "TypeScriptOutDir";
         internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        internal const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
     }
 }

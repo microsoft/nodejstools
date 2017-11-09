@@ -1757,6 +1757,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Apply Node.js settings to all users (store in project file).
+        /// </summary>
+        internal static string StoreNodeSettingsInProjectFile {
+            get {
+                return ResourceManager.GetString("StoreNodeSettingsInProjectFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test Framework.
         /// </summary>
         internal static string TestFramework {

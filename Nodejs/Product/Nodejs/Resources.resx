@@ -740,4 +740,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
     <value>Select Working Dir</value>
   </data>
+  <data name="StoreNodeSettingsInProjectFile" xml:space="preserve">
+    <value>&amp;Apply Node.js settings to all users (store in project file)</value>
+  </data>
 </root>
