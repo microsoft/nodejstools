@@ -740,4 +740,55 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
     <value>Select Working Dir</value>
   </data>
+  <data name="ClassificationBlack" xml:space="preserve">
+    <value>Node.js Interactive - Black</value>
+  </data>
+  <data name="ClassificationBlue" xml:space="preserve">
+    <value>Node.js Interactive - Blue</value>
+  </data>
+  <data name="ClassificationCyan" xml:space="preserve">
+    <value>Node.js Interactive - Cyan</value>
+  </data>
+  <data name="ClassificationDarkBlue" xml:space="preserve">
+    <value>Node.js Interactive - Dark Blue</value>
+  </data>
+  <data name="ClassificationDarkCyan" xml:space="preserve">
+    <value>Node.js Interactive - Dark Cyan</value>
+  </data>
+  <data name="ClassificationDarkGray" xml:space="preserve">
+    <value>Node.js Interactive - Dark Gray</value>
+  </data>
+  <data name="ClassificationDarkGreen" xml:space="preserve">
+    <value>Node.js Interactive - Dark Green</value>
+  </data>
+  <data name="ClassificationDarkMagenta" xml:space="preserve">
+    <value>Node.js Interactive - Dark Magenta</value>
+  </data>
+  <data name="ClassificationDarkRed" xml:space="preserve">
+    <value>Node.js Interactive - Dark Red</value>
+  </data>
+  <data name="ClassificationDarkYellow" xml:space="preserve">
+    <value>Node.js Interactive - Dark Yellow</value>
+  </data>
+  <data name="ClassificationError" xml:space="preserve">
+    <value>Node.js Interactive - Error</value>
+  </data>
+  <data name="ClassificationGray" xml:space="preserve">
+    <value>Node.js Interactive - Gray</value>
+  </data>
+  <data name="ClassificationGreen" xml:space="preserve">
+    <value>Node.js Interactive - Green</value>
+  </data>
+  <data name="ClassificationMagenta" xml:space="preserve">
+    <value>Node.js Interactive - Magenta</value>
+  </data>
+  <data name="ClassificationRed" xml:space="preserve">
+    <value>Node.js Interactive - Red</value>
+  </data>
+  <data name="ClassificationWhite" xml:space="preserve">
+    <value>Node.js Interactive - White</value>
+  </data>
+  <data name="ClassificationYellow" xml:space="preserve">
+    <value>Node.js Interactive - Yellow</value>
+  </data>
 </root>

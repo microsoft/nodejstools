@@ -8,20 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using System.Globalization;
+using Microsoft.VisualStudio.InteractiveWindow.Commands;
+using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.InteractiveWindow;
 
 namespace Microsoft.NodejsTools.Repl
 {
-#if INTERACTIVE_WINDOW
-    using IReplCommand = IInteractiveWindowCommand;
-    using IReplWindow = IInteractiveWindow;    
-#endif
-
-    [Export(typeof(IReplCommand))]
-    internal class SaveReplCommand : IReplCommand
+    [Export(typeof(IInteractiveWindowCommand))]
+    [ContentType(ReplConstants.ContentType)]
+    internal class SaveReplCommand : InteractiveWindowCommand
     {
-        #region IReplCommand Members
-
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        public override Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
         {
             if (string.IsNullOrWhiteSpace(arguments))
             {
@@ -72,17 +69,13 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Succeeded;
         }
 
-        public string Description => Resources.ReplSaveDescription;
+        public override string Description => Resources.ReplSaveDescription;
 
-        public string Command => "save";
+        public override string Command => "save";
 
         private static bool IsJavaScriptBuffer(ITextBuffer buffer)
         {
             return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);
         }
-
-        public object ButtonContent => null;
-
-        #endregion
     }
 }

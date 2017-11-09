@@ -5,13 +5,17 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.InteractiveWindow;
+using Microsoft.VisualStudio.InteractiveWindow.Commands;
+using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Repl
 {
-    [Export(typeof(IReplCommand))]
-    internal sealed class InfoReplCommand : IReplCommand
+    [Export(typeof(IInteractiveWindowCommand))]
+    [ContentType(ReplConstants.ContentType)]
+    internal sealed class InfoReplCommand : InteractiveWindowCommand
     {
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        public override Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
         {
             if (window.Evaluator is NodejsReplEvaluator nodeEval)
             {
@@ -31,17 +35,15 @@ namespace Microsoft.NodejsTools.Repl
                 catch (Exception e)
                 {
                     window.WriteLine(Resources.ReplNodeError);
-                    window.WriteError(e);
+                    window.WriteError(e.Message);
                     return ExecutionResult.Failed;
                 }
             }
             return ExecutionResult.Succeeded;
         }
 
-        public string Description => Resources.ReplInfoDescription;
+        public override string Description => Resources.ReplInfoDescription;
 
-        public string Command => "info";
-
-        public object ButtonContent => null;
+        public override string Command => "info";
     }
 }
