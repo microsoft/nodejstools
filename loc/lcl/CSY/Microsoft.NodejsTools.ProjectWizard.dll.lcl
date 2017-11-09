@@ -148,6 +148,9 @@
       <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Select Working Dir]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Vybrat pracovní adresář]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -730,6 +733,9 @@
       <Item ItemId=";NodeHeader" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Uzel]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1510,8 +1516,8 @@
       <Item ItemId=";PropertiesNodePort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Applica&tion port:]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Port pro Node.&js:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[&Port aplikace:]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Node.&js port:]]></Val>
@@ -1747,6 +1753,9 @@
       <Item ItemId=";StartActionHeader" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Start Action]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Spouštěcí akce]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -3505,7 +3514,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11107.4]]></Val>
+        <Val><![CDATA[1.4.11108.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3532,7 +3541,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11107.4 commit:d81c3267e230c9908dc0762e34f888479beb5e8f]]></Val>
+        <Val><![CDATA[1.4.11108.1 commit:1df74c40beeabd1540a50b1ab386bcafa50b8b5d]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
