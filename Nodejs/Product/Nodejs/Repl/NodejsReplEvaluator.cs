@@ -22,21 +22,16 @@ namespace Microsoft.NodejsTools.Repl
     [ReplRole("Reset"), ReplRole("Execution")]
     internal sealed class NodejsReplEvaluator : IReplEvaluator
     {
-        private ListenerThread _listener;
-        private IReplWindow _window;
-        private readonly INodejsReplSite _site;
+        private ListenerThread listener;
+        private IReplWindow window;
+        private readonly VsNodejsReplSite site;
         internal static readonly object InputBeforeReset = new object();    // used to mark buffers which are no longer valid because we've done a reset
 
         private static bool LoggedReplUse = false;
 
         public NodejsReplEvaluator()
-            : this(VsNodejsReplSite.Site)
         {
-        }
-
-        public NodejsReplEvaluator(INodejsReplSite site)
-        {
-            this._site = site;
+            this.site = VsNodejsReplSite.Site;
         }
 
         private string nodeExePath;
@@ -57,15 +52,15 @@ namespace Microsoft.NodejsTools.Repl
 
         public Task<ExecutionResult> Initialize(IReplWindow window)
         {
-            this._window = window;
-            this._window.SetOptionValue(ReplOptions.CommandPrefix, ".");
-            this._window.SetOptionValue(ReplOptions.PrimaryPrompt, "> ");
-            this._window.SetOptionValue(ReplOptions.SecondaryPrompt, ". ");
-            this._window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
-            this._window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
-            this._window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
+            this.window = window;
+            this.window.SetOptionValue(ReplOptions.CommandPrefix, ".");
+            this.window.SetOptionValue(ReplOptions.PrimaryPrompt, "> ");
+            this.window.SetOptionValue(ReplOptions.SecondaryPrompt, ". ");
+            this.window.SetOptionValue(ReplOptions.DisplayPromptInMargin, false);
+            this.window.SetOptionValue(ReplOptions.SupportAnsiColors, true);
+            this.window.SetOptionValue(ReplOptions.UseSmartUpDown, true);
 
-            this._window.WriteLine(Resources.ReplInitializationMessage);
+            this.window.WriteLine(Resources.ReplInitializationMessage);
 
             return ExecutionResult.Succeeded;
         }
@@ -76,7 +71,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public Task<ExecutionResult> Reset()
         {
-            var buffersBeforeReset = this._window.TextView.BufferGraph.GetTextBuffers(_ => true);
+            var buffersBeforeReset = this.window.TextView.BufferGraph.GetTextBuffers(_ => true);
             for (var i = 0; i < buffersBeforeReset.Count - 1; i++)
             {
                 var buffer = buffersBeforeReset[i];
@@ -99,7 +94,7 @@ namespace Microsoft.NodejsTools.Repl
         public Task<ExecutionResult> ExecuteText(string text)
         {
             EnsureConnected();
-            if (this._listener == null)
+            if (this.listener == null)
             {
                 return ExecutionResult.Failed;
             }
@@ -112,7 +107,7 @@ namespace Microsoft.NodejsTools.Repl
                 LoggedReplUse = true;
             }
 
-            return this._listener.ExecuteText(text);
+            return this.listener.ExecuteText(text);
         }
 
         public void ExecuteFile(string filename)
@@ -136,9 +131,9 @@ namespace Microsoft.NodejsTools.Repl
 
         public void Dispose()
         {
-            if (this._listener != null)
+            if (this.listener != null)
             {
-                this._listener.Dispose();
+                this.listener.Dispose();
             }
         }
 
@@ -146,7 +141,7 @@ namespace Microsoft.NodejsTools.Repl
 
         private void EnsureConnected()
         {
-            if (this._listener == null)
+            if (this.listener == null)
             {
                 Connect();
             }
@@ -161,15 +156,15 @@ namespace Microsoft.NodejsTools.Repl
         {
             if (string.IsNullOrWhiteSpace(this.NodeExePath))
             {
-                this._window.WriteError(Resources.NodejsNotInstalled);
-                this._window.WriteError(Environment.NewLine);
+                this.window.WriteError(Resources.NodejsNotInstalled);
+                this.window.WriteError(Environment.NewLine);
                 return false;
             }
 
             if (!File.Exists(this.NodeExePath))
             {
-                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
-                this._window.WriteError(Environment.NewLine);
+                this.window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.NodeExeDoesntExist, this.NodeExePath));
+                this.window.WriteError(Environment.NewLine);
                 return false;
             }
 
@@ -178,11 +173,11 @@ namespace Microsoft.NodejsTools.Repl
 
         private void Connect()
         {
-            if (this._listener != null)
+            if (this.listener != null)
             {
-                this._listener.Disconnect();
-                this._listener.Dispose();
-                this._listener = null;
+                this.listener.Disconnect();
+                this.listener.Dispose();
+                this.listener = null;
             }
 
             if(!this.EnsureNodeInstalled())
@@ -204,7 +199,7 @@ namespace Microsoft.NodejsTools.Repl
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-            if (this._site.TryGetStartupFileAndDirectory(out var _, out var directory))
+            if (this.site.TryGetStartupFileAndDirectory(out var _, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
@@ -218,16 +213,16 @@ namespace Microsoft.NodejsTools.Repl
             }
             catch (Exception e)
             {
-                this._window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
+                this.window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.InteractiveWindowFailedToStartProcessErrorMessage, Environment.NewLine, e.ToString(), Environment.NewLine));
                 return;
             }
 
-            this._listener = new ListenerThread(this, process, socket);
+            this.listener = new ListenerThread(this, process, socket);
         }
 
         private string GetNodeExePath()
         {
-            var startupProject = this._site.GetStartupProject();
+            var startupProject = this.site.GetStartupProject();
             string nodeExePath;
             if (startupProject != null)
             {
@@ -253,7 +248,7 @@ namespace Microsoft.NodejsTools.Repl
 
         internal void Clear()
         {
-            this._listener.SendRequest(new Dictionary<string, object>() { { "type", "clear" } });
+            this.listener.SendRequest(new Dictionary<string, object>() { { "type", "clear" } });
         }
 
         internal class ListenerThread : JsonListener, IDisposable
@@ -266,7 +261,7 @@ namespace Microsoft.NodejsTools.Repl
             private TaskCompletionSource<ExecutionResult> _completion;
             private string _executionText;
             private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
-            private bool _disposed;
+            private bool disposed;
 #if DEBUG
             private Thread _socketLockedThread;
 #endif
@@ -293,7 +288,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 if (args.Data != null)
                 {
-                    this._eval._window.WriteOutput(args.Data + Environment.NewLine);
+                    this._eval.window.WriteOutput(args.Data + Environment.NewLine);
                 }
             }
 
@@ -301,7 +296,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 if (args.Data != null)
                 {
-                    this._eval._window.WriteError(args.Data + Environment.NewLine);
+                    this._eval.window.WriteError(args.Data + Environment.NewLine);
                 }
             }
 
@@ -312,7 +307,7 @@ namespace Microsoft.NodejsTools.Repl
 
             private void ProcessExitedWorker()
             {
-                this._eval._window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
+                this._eval.window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
                 using (new SocketLock(this))
                 {
                     if (this._completion != null)
@@ -371,7 +366,7 @@ namespace Microsoft.NodejsTools.Repl
                     {
                         if (!this.Socket.Connected)
                         {
-                            this._eval._window.WriteError(_noReplProcess);
+                            this._eval.window.WriteError(_noReplProcess);
                             return ExecutionResult.Failed;
                         }
 
@@ -381,7 +376,7 @@ namespace Microsoft.NodejsTools.Repl
                     }
                     catch (SocketException)
                     {
-                        this._eval._window.WriteError(_noReplProcess);
+                        this._eval.window.WriteError(_noReplProcess);
                         return ExecutionResult.Failed;
                     }
 
@@ -430,12 +425,12 @@ namespace Microsoft.NodejsTools.Repl
                             object result;
                             if (cmd.TryGetValue("result", out result))
                             {
-                                this._eval._window.WriteLine(result.ToString());
+                                this._eval.window.WriteLine(result.ToString());
                                 this._completion.SetResult(ExecutionResult.Success);
                             }
                             else if (cmd.TryGetValue("error", out result))
                             {
-                                this._eval._window.WriteError(result.ToString());
+                                this._eval.window.WriteError(result.ToString());
                                 this._completion.SetResult(ExecutionResult.Failure);
                             }
                             this._completion = null;
@@ -443,13 +438,13 @@ namespace Microsoft.NodejsTools.Repl
                         case "output":
                             if (cmd.TryGetValue("output", out result))
                             {
-                                this._eval._window.WriteOutput(FixOutput(result));
+                                this._eval.window.WriteOutput(FixOutput(result));
                             }
                             break;
                         case "output_error":
                             if (cmd.TryGetValue("output", out result))
                             {
-                                this._eval._window.WriteError(FixOutput(result));
+                                this._eval.window.WriteError(FixOutput(result));
                             }
                             break;
 #if DEBUG
@@ -512,7 +507,7 @@ namespace Microsoft.NodejsTools.Repl
 
             protected virtual void Dispose(bool disposing)
             {
-                if (!this._disposed)
+                if (!this.disposed)
                 {
                     if (this._process != null && !this._process.HasExited)
                     {
@@ -539,7 +534,7 @@ namespace Microsoft.NodejsTools.Repl
                     {
                         this._process.Dispose();
                     }
-                    this._disposed = true;
+                    this.disposed = true;
                 }
             }
 
@@ -554,7 +549,7 @@ namespace Microsoft.NodejsTools.Repl
 
             private struct SocketLock : IDisposable
             {
-                private readonly ListenerThread _evaluator;
+                private readonly ListenerThread evaluator;
 
                 public SocketLock(ListenerThread evaluator)
                 {
@@ -563,15 +558,15 @@ namespace Microsoft.NodejsTools.Repl
                     Debug.Assert(evaluator._socketLockedThread == null);
                     evaluator._socketLockedThread = Thread.CurrentThread;
 #endif
-                    this._evaluator = evaluator;
+                    this.evaluator = evaluator;
                 }
 
                 public void Dispose()
                 {
 #if DEBUG
-                    this._evaluator._socketLockedThread = null;
+                    this.evaluator._socketLockedThread = null;
 #endif
-                    Monitor.Exit(this._evaluator._socketLock);
+                    Monitor.Exit(this.evaluator._socketLock);
                 }
             }
             #endregion
