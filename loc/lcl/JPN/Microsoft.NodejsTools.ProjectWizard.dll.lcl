@@ -145,6 +145,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Select Working Dir]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[作業ディレクトリの選択]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";CacheDirectoryClearFailedCaption" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not clear Node.js cache directory. Try manually deleting the directory: {0}]]></Val>
@@ -717,6 +726,15 @@
           <Val><![CDATA[Specifies the path to the node.exe executable.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[node.exe 実行可能ファイルへのパスを指定します。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodeHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ノード]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1497,10 +1515,13 @@
       </Item>
       <Item ItemId=";PropertiesNodePort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.&js port:]]></Val>
+          <Val><![CDATA[Applica&tion port:]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js ポート(&J):]]></Val>
+            <Val><![CDATA[アプリケーション ポート(&T):]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Node.&js port:]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1725,6 +1746,15 @@
           <Val><![CDATA[Specifies the script run on launch.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[起動時に実行するスクリプトを指定します。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";StartActionHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Start Action]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[開始動作]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3484,7 +3514,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11106.1]]></Val>
+        <Val><![CDATA[1.4.11108.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3511,7 +3541,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11106.1 commit:65514d48200ed988f3fd5b8447c8573d5eb5cd5e]]></Val>
+        <Val><![CDATA[1.4.11108.1 commit:1df74c40beeabd1540a50b1ab386bcafa50b8b5d]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
