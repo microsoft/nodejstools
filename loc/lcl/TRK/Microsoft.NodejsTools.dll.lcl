@@ -658,6 +658,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Select Working Dir]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Çalışma Dizini Seçin]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";CacheDirectoryClearFailedCaption" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not clear Node.js cache directory. Try manually deleting the directory: {0}]]></Val>
@@ -1230,6 +1239,15 @@
           <Val><![CDATA[Specifies the path to the node.exe executable.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[node.exe yürütülebilir dosyasının yolunu belirtir.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NodeHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Düğüm]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2010,10 +2028,13 @@
       </Item>
       <Item ItemId=";PropertiesNodePort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.&js port:]]></Val>
+          <Val><![CDATA[Applica&tion port:]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.&js bağlantı noktası:]]></Val>
+            <Val><![CDATA[U&ygulama bağlantı noktası:]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Node.&js port:]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2238,6 +2259,15 @@
           <Val><![CDATA[Specifies the script run on launch.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Başlatma sırasında çalıştırılacak betiği belirtir.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";StartActionHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Start Action]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Başlatma Eylemi]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5446,6 +5476,42 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";4005" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript Jasmine UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[JavaScript Jasmine UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4006" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[A JavaScript Jasmine UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Bir JavaScript Jasmine UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4007" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[TypeScript Jasmine UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[TypeScript Jasmine UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4008" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[A TypeScript Jasmine UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Bir TypeScript Jasmine UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
     </Item>
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
@@ -5473,7 +5539,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11106.1]]></Val>
+        <Val><![CDATA[1.4.11109.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5500,7 +5566,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11106.1 commit:65514d48200ed988f3fd5b8447c8573d5eb5cd5e]]></Val>
+        <Val><![CDATA[1.4.11109.2 commit:d3d338b1d8159435deb5acf014ec46ff1531f80c]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
