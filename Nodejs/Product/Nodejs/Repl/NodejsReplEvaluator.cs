@@ -253,42 +253,42 @@ namespace Microsoft.NodejsTools.Repl
 
         internal class ListenerThread : JsonListener, IDisposable
         {
-            private readonly NodejsReplEvaluator _eval;
-            private readonly Process _process;
-            private readonly object _socketLock = new object();
-            private Socket _acceptSocket;
-            internal bool _connected;
-            private TaskCompletionSource<ExecutionResult> _completion;
-            private string _executionText;
-            private readonly JavaScriptSerializer _serializer = new JavaScriptSerializer();
+            private readonly NodejsReplEvaluator eval;
+            private readonly Process process;
+            private readonly object socketLock = new object();
+            private Socket acceptSocket;
+            internal bool connected;
+            private TaskCompletionSource<ExecutionResult> completion;
+            private string executionText;
+            private readonly JavaScriptSerializer serializer = new JavaScriptSerializer();
             private bool disposed;
 #if DEBUG
-            private Thread _socketLockedThread;
+            private Thread socketLockedThread;
 #endif
-            private static string _noReplProcess = Resources.InteractiveWindowNoProcessErrorMessage + Environment.NewLine;
+            private static string noReplProcess = Resources.InteractiveWindowNoProcessErrorMessage + Environment.NewLine;
 
             public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket)
             {
-                this._eval = eval;
-                this._process = process;
-                this._acceptSocket = socket;
+                this.eval = eval;
+                this.process = process;
+                this.acceptSocket = socket;
 
-                this._acceptSocket.BeginAccept(this.SocketConnectionAccepted, null);
+                this.acceptSocket.BeginAccept(this.SocketConnectionAccepted, null);
 
-                this._process.OutputDataReceived += new DataReceivedEventHandler(this.StdOutReceived);
-                this._process.ErrorDataReceived += new DataReceivedEventHandler(this.StdErrReceived);
-                this._process.EnableRaisingEvents = true;
-                this._process.Exited += this.ProcessExited;
+                this.process.OutputDataReceived += new DataReceivedEventHandler(this.StdOutReceived);
+                this.process.ErrorDataReceived += new DataReceivedEventHandler(this.StdErrReceived);
+                this.process.EnableRaisingEvents = true;
+                this.process.Exited += this.ProcessExited;
 
-                this._process.BeginOutputReadLine();
-                this._process.BeginErrorReadLine();
+                this.process.BeginOutputReadLine();
+                this.process.BeginErrorReadLine();
             }
 
             private void StdOutReceived(object sender, DataReceivedEventArgs args)
             {
                 if (args.Data != null)
                 {
-                    this._eval.window.WriteOutput(args.Data + Environment.NewLine);
+                    this.eval.window.WriteOutput(args.Data + Environment.NewLine);
                 }
             }
 
@@ -296,7 +296,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 if (args.Data != null)
                 {
-                    this._eval.window.WriteError(args.Data + Environment.NewLine);
+                    this.eval.window.WriteError(args.Data + Environment.NewLine);
                 }
             }
 
@@ -307,36 +307,36 @@ namespace Microsoft.NodejsTools.Repl
 
             private void ProcessExitedWorker()
             {
-                this._eval.window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
+                this.eval.window.WriteError(Resources.InteractiveWindowProcessExitedMessage + Environment.NewLine);
                 using (new SocketLock(this))
                 {
-                    if (this._completion != null)
+                    if (this.completion != null)
                     {
-                        this._completion.SetResult(ExecutionResult.Failure);
+                        this.completion.SetResult(ExecutionResult.Failure);
                     }
-                    this._completion = null;
+                    this.completion = null;
                 }
             }
 
             private void SocketConnectionAccepted(IAsyncResult result)
             {
-                this.Socket = this._acceptSocket.EndAccept(result);
-                this._acceptSocket.Close();
+                this.Socket = this.acceptSocket.EndAccept(result);
+                this.acceptSocket.Close();
 
                 using (new SocketLock(this))
                 {
-                    this._connected = true;
+                    this.connected = true;
                 }
 
                 using (new SocketLock(this))
                 {
-                    if (this._executionText != null)
+                    if (this.executionText != null)
                     {
 #if DEBUG
-                        Debug.WriteLine("Executing delayed text: " + this._executionText);
+                        Debug.WriteLine("Executing delayed text: " + this.executionText);
 #endif
-                        SendExecuteText(this._executionText);
-                        this._executionText = null;
+                        SendExecuteText(this.executionText);
+                        this.executionText = null;
                     }
                 }
 
@@ -351,14 +351,14 @@ namespace Microsoft.NodejsTools.Repl
 #endif
                 using (new SocketLock(this))
                 {
-                    if (!this._connected)
+                    if (!this.connected)
                     {
                         // delay executing the text until we're connected
 #if DEBUG
                         Debug.WriteLine("Delayed executing text");
 #endif
-                        this._completion = completion = new TaskCompletionSource<ExecutionResult>();
-                        this._executionText = text;
+                        this.completion = completion = new TaskCompletionSource<ExecutionResult>();
+                        this.executionText = text;
                         return completion.Task;
                     }
 
@@ -366,17 +366,17 @@ namespace Microsoft.NodejsTools.Repl
                     {
                         if (!this.Socket.Connected)
                         {
-                            this._eval.window.WriteError(_noReplProcess);
+                            this.eval.window.WriteError(noReplProcess);
                             return ExecutionResult.Failed;
                         }
 
-                        this._completion = completion = new TaskCompletionSource<ExecutionResult>();
+                        this.completion = completion = new TaskCompletionSource<ExecutionResult>();
 
                         SendExecuteText(text);
                     }
                     catch (SocketException)
                     {
-                        this._eval.window.WriteError(_noReplProcess);
+                        this.eval.window.WriteError(noReplProcess);
                         return ExecutionResult.Failed;
                     }
 
@@ -389,7 +389,7 @@ namespace Microsoft.NodejsTools.Repl
 
             private void SendExecuteText(string text)
             {
-                AllowSetForegroundWindow(this._process.Id);
+                AllowSetForegroundWindow(this.process.Id);
                 var request = new Dictionary<string, object>() {
                     { "type", "execute" },
                     { "code", text },
@@ -400,7 +400,7 @@ namespace Microsoft.NodejsTools.Repl
 
             internal void SendRequest(Dictionary<string, object> request)
             {
-                var json = this._serializer.Serialize(request);
+                var json = this.serializer.Serialize(request);
 
                 var bytes = System.Text.Encoding.UTF8.GetBytes(json);
                 var length = "Content-length: " + bytes.Length + "\r\n\r\n";
@@ -415,7 +415,7 @@ namespace Microsoft.NodejsTools.Repl
 
             protected override void ProcessPacket(JsonResponse response)
             {
-                var cmd = this._serializer.Deserialize<Dictionary<string, object>>(response.Body);
+                var cmd = this.serializer.Deserialize<Dictionary<string, object>>(response.Body);
 
                 if (cmd.TryGetValue("type", out var type) && type is string)
                 {
@@ -425,26 +425,26 @@ namespace Microsoft.NodejsTools.Repl
                             object result;
                             if (cmd.TryGetValue("result", out result))
                             {
-                                this._eval.window.WriteLine(result.ToString());
-                                this._completion.SetResult(ExecutionResult.Success);
+                                this.eval.window.WriteLine(result.ToString());
+                                this.completion.SetResult(ExecutionResult.Success);
                             }
                             else if (cmd.TryGetValue("error", out result))
                             {
-                                this._eval.window.WriteError(result.ToString());
-                                this._completion.SetResult(ExecutionResult.Failure);
+                                this.eval.window.WriteError(result.ToString());
+                                this.completion.SetResult(ExecutionResult.Failure);
                             }
-                            this._completion = null;
+                            this.completion = null;
                             break;
                         case "output":
                             if (cmd.TryGetValue("output", out result))
                             {
-                                this._eval.window.WriteOutput(FixOutput(result));
+                                this.eval.window.WriteOutput(FixOutput(result));
                             }
                             break;
-                        case "output_error":
+                        case "outputerror":
                             if (cmd.TryGetValue("output", out result))
                             {
-                                this._eval.window.WriteError(FixOutput(result));
+                                this.eval.window.WriteError(FixOutput(result));
                             }
                             break;
 #if DEBUG
@@ -492,10 +492,10 @@ namespace Microsoft.NodejsTools.Repl
 
             internal void Disconnect()
             {
-                if (this._completion != null)
+                if (this.completion != null)
                 {
-                    this._completion.SetResult(ExecutionResult.Failure);
-                    this._completion = null;
+                    this.completion.SetResult(ExecutionResult.Failure);
+                    this.completion = null;
                 }
             }
 
@@ -509,14 +509,14 @@ namespace Microsoft.NodejsTools.Repl
             {
                 if (!this.disposed)
                 {
-                    if (this._process != null && !this._process.HasExited)
+                    if (this.process != null && !this.process.HasExited)
                     {
                         try
                         {
                             //Disconnect our event since we are forceably killing the process off
                             //  We'll synchronously send the message to the user
-                            this._process.Exited -= this.ProcessExited;
-                            this._process.Kill();
+                            this.process.Exited -= this.ProcessExited;
+                            this.process.Kill();
                         }
                         catch (InvalidOperationException)
                         {
@@ -530,9 +530,9 @@ namespace Microsoft.NodejsTools.Repl
                         ProcessExitedWorker();
                     }
 
-                    if (this._process != null)
+                    if (this.process != null)
                     {
-                        this._process.Dispose();
+                        this.process.Dispose();
                     }
                     this.disposed = true;
                 }
@@ -553,10 +553,10 @@ namespace Microsoft.NodejsTools.Repl
 
                 public SocketLock(ListenerThread evaluator)
                 {
-                    Monitor.Enter(evaluator._socketLock);
+                    Monitor.Enter(evaluator.socketLock);
 #if DEBUG
-                    Debug.Assert(evaluator._socketLockedThread == null);
-                    evaluator._socketLockedThread = Thread.CurrentThread;
+                    Debug.Assert(evaluator.socketLockedThread == null);
+                    evaluator.socketLockedThread = Thread.CurrentThread;
 #endif
                     this.evaluator = evaluator;
                 }
@@ -564,9 +564,9 @@ namespace Microsoft.NodejsTools.Repl
                 public void Dispose()
                 {
 #if DEBUG
-                    this.evaluator._socketLockedThread = null;
+                    this.evaluator.socketLockedThread = null;
 #endif
-                    Monitor.Exit(this.evaluator._socketLock);
+                    Monitor.Exit(this.evaluator.socketLock);
                 }
             }
             #endregion
