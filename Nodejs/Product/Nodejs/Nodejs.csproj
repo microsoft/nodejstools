@@ -439,7 +439,6 @@
     <Compile Include="Project\NodejsFileNode.cs" />
     <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="Repl\ClearReplCommand.cs" />
-    <Compile Include="Repl\INodejsReplSite.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\VsNodejsReplSite.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />

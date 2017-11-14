@@ -676,7 +676,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Resets the context object to an empty object and clears any multi-line expression.</value>
   </data>
   <data name="ReplSaveDescription" xml:space="preserve">
-    <value>Clears the contents of the REPL editor window.</value>
+    <value>Save the current REPL session to a file.</value>
   </data>
   <data name="ReplSaveFailed" xml:space="preserve">
     <value>Failed to save: '{0}'.</value>

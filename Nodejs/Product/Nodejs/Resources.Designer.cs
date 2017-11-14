@@ -1631,7 +1631,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Clears the contents of the REPL editor window..
+        ///   Looks up a localized string similar to Save the current REPL session to a file..
         /// </summary>
         internal static string ReplSaveDescription {
             get {
