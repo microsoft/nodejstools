@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 namespace Microsoft.NodejsTools
 {
@@ -23,5 +23,9 @@ namespace Microsoft.NodejsTools
         public const int cmdidNpmUpdateSingleModule = 0x305;
         public const int cmdidNpmOpenModuleHomepage = 0x306;
         public const int menuIdNpm = 0x3000;
+
+        public const int cmdidWorkSpaceNpmInstallMissing = 0x4001;
+        public const int cmdidWorkSpaceNpmInstallNew = 0x4002;
+        public const int cmdidWorkSpaceNpmUpdate = 0x4003;
     }
 }

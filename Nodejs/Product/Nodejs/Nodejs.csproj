@@ -94,6 +94,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Utilities, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Workspace.VSIntegration.Contracts, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -281,6 +284,8 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
+    <Compile Include="Workspace\NpmActionProviderFactory.cs" />
+    <Compile Include="Workspace\PackageJsonContextProviderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
@@ -1195,9 +1200,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading">
       <Version>15.5.13-beta</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Workspaces">
-      <Version>15.0.215-pre</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>

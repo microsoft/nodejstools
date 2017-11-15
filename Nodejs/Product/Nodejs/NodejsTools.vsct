@@ -45,6 +45,10 @@
       <Group guid="guidNodeToolsCmdSet" id="AddNewFileGroup" priority="0x0900">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CSCD_PROJECT_ADD"/>
       </Group>
+
+      <Group guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup" priority="0x1000">
+        <Parent guid="guidWorkspaceExplorerToolWindowCmdSet" id="idmWSE_ContextMenu"/>
+      </Group>
     </Groups>
 
     <Menus>
@@ -220,6 +224,33 @@
           <CommandName>Import Existing Project...</CommandName>
         </Strings>
       </Button>
+
+      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmInstallMissing" priority="0x010" type="Button">
+        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Install Missing npm Packages...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmInstallNew" priority="0x011" type="Button">
+        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Install New npm Packages...</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmUpdate" priority="0x012" type="Button">
+        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Update npm Packages...</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -265,6 +296,11 @@
     <!-- This is the package guid. -->
     <GuidSymbol name="guidNodeToolsPkg" value="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" />
 
+    <!-- Solution Explorer folder mode GUIDs and IDs. -->
+    <GuidSymbol name="guidWorkspaceExplorerToolWindowCmdSet" value="{cfb400f1-5c60-4f3c-856e-180d28def0b7}">
+      <IDSymbol name="idmWSE_ContextMenu" value="0x0002"/>
+    </GuidSymbol>
+
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
       <IDSymbol name="cmdidReplWindow" value="0x200" />
@@ -299,6 +335,13 @@
       <IDSymbol name="NpmExploreGroup" value="0x2011"/>
 
       <IDSymbol name="NpmMenu" value="0x3000"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="guidNodeToolsWorkspaceCmdSet" value="{0D701F33-94A3-421C-9865-6F65E7E4B689}">
+      <IDSymbol name="WorkspaceGroup" value="0x4000"/>
+      <IDSymbol name="cmdidWorkSpaceNpmInstallMissing" value="0x4001"/>
+      <IDSymbol name="cmdidWorkSpaceNpmInstallNew" value="0x4002"/>
+      <IDSymbol name="cmdidWorkSpaceNpmUpdate" value="0x4003"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
