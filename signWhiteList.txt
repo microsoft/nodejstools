@@ -1,0 +1,2 @@
+*.js, ignore js files
+*.vsman, ignore vsman files
