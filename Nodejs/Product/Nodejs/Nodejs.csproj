@@ -1254,7 +1254,7 @@ copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDeb
       into the NodejsTools output folder temporarily to generate the pkgdef file.
   -->
   <Target Name="_CopyForCreatePkgDef" BeforeTargets="GeneratePkgDef">
-    <Copy SourceFiles="$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;$(OutputPath)..\InteractiveWindow\Microsoft.NodejsTools.InteractiveWindow.dll;" DestinationFolder="$(OutputPath)">
+    <Copy SourceFiles="$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;" DestinationFolder="$(OutputPath)">
       <Output TaskParameter="CopiedFiles" ItemName="_CopiedForCreatePkgdef" />
     </Copy>
   </Target>
