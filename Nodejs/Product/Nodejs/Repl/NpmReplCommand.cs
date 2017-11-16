@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -14,19 +14,21 @@ using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.InteractiveWindow;
+using Microsoft.VisualStudio.InteractiveWindow.Commands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools.Project;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Repl
 {
-    [Export(typeof(IReplCommand))]
-    internal class NpmReplCommand : IReplCommand
+    [Export(typeof(IInteractiveWindowCommand))]
+    [ContentType(ReplConstants.ContentType)]
+    internal class NpmReplCommand : InteractiveWindowCommand
     {
-        #region IReplCommand Members
-
-        public async Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        public override async Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
         {
             var projectPath = string.Empty;
             var npmArguments = arguments.Trim(' ', '\t');
@@ -188,12 +190,10 @@ namespace Microsoft.NodejsTools.Repl
             return ExecutionResult.Success;
         }
 
-        public string Description => Resources.NpmExecuteCommand;
+        public override string Description => Resources.NpmExecuteCommand;
 
-        public string Command => "npm";
+        public override string Command => "npm";
 
-        public object ButtonContent => null;
-        
         // TODO: This is duplicated from Npm project
         // We should consider using InternalsVisibleTo to avoid code duplication
         internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
@@ -261,8 +261,6 @@ namespace Microsoft.NodejsTools.Repl
             return standardOutputLines;
         }
 
-        #endregion
-
         internal class NpmReplRedirector : Redirector
         {
             internal const string ErrorAnsiColor = "\x1b[31;1m";
@@ -272,11 +270,11 @@ namespace Microsoft.NodejsTools.Repl
             private const string ErrorText = "npm ERR!";
             private const string WarningText = "npm WARN";
 
-            private IReplWindow _window;
+            private readonly IInteractiveWindow window;
 
-            public NpmReplRedirector(IReplWindow window)
+            public NpmReplRedirector(IInteractiveWindow window)
             {
-                this._window = window;
+                this.window = window;
                 this.HasErrors = false;
             }
 
@@ -305,13 +303,13 @@ namespace Microsoft.NodejsTools.Repl
 
                 outputString += NormalAnsiColor + substring;
 
-                this._window.WriteLine(outputString);
+                this.window.WriteLine(outputString);
                 Debug.WriteLine(decodedString, "REPL npm");
             }
 
             public override void WriteErrorLine(string line)
             {
-                this._window.WriteError(line);
+                this.window.WriteError(line);
             }
         }
     }

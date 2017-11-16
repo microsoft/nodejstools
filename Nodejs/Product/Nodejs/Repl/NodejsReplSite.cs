@@ -4,9 +4,9 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Repl
 {
-    internal class VsNodejsReplSite
+    internal sealed class NodejsReplSite
     {
-        public static readonly VsNodejsReplSite Site = new VsNodejsReplSite();
+        internal static readonly NodejsReplSite Site = new NodejsReplSite();
 
         public CommonProjectNode GetStartupProject()
         {

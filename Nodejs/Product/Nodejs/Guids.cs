@@ -58,5 +58,8 @@ namespace Microsoft.NodejsTools
 
         // UWP project flavor guid
         public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
+
+        public const string NodejsInteractiveWindowString = "2153A414-267E-4731-B891-E875ADBA1993";
+        public static readonly Guid NodejsInteractiveWindow = new Guid(NodejsInteractiveWindowString);
     };
 }
