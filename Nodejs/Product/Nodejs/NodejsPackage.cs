@@ -57,7 +57,7 @@ namespace Microsoft.NodejsTools
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.JadeFileExtension)]
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.PugFileExtension)]
     [ProvideTextEditorAutomation(JadeContentTypeDefinition.JadeLanguageName, 3041, 3045, ProfileMigrationType.PassThrough)]
-    [ProvideInteractiveWindow(Guids.NodejsInteractiveWindowString, Style =VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow)]
+    [ProvideInteractiveWindow(Guids.NodejsInteractiveWindowString, Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow)]
     internal sealed partial class NodejsPackage : CommonPackage
     {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
@@ -185,8 +185,7 @@ namespace Microsoft.NodejsTools
         {
             if (toolWindowType == Guids.NodejsInteractiveWindow)
             {
-                var model = (IComponentModel)GetService(typeof(SComponentModel));
-                var replProvider = model.GetService<InteractiveWindowProvider>();
+                var replProvider = this.GetInteractiveWindowProvider();
 
                 replProvider.CreateReplWindow(id);
                 return VSConstants.S_OK;
@@ -197,10 +196,15 @@ namespace Microsoft.NodejsTools
 
         internal void OpenReplWindow(bool focus = true)
         {
-            var model = (IComponentModel)GetService(typeof(SComponentModel));
-            var replProvider = model.GetService<InteractiveWindowProvider>();
+            var replProvider = this.GetInteractiveWindowProvider();
 
             replProvider.OpenOrCreateWindow().Show(focus);
+        }
+
+        private InteractiveWindowProvider GetInteractiveWindowProvider()
+        {
+            var model = (IComponentModel)GetService(typeof(SComponentModel));
+            return model.GetService<InteractiveWindowProvider>();
         }
 
         internal static bool TryGetStartupFileAndDirectory(System.IServiceProvider serviceProvider, out string fileName, out string directory)
