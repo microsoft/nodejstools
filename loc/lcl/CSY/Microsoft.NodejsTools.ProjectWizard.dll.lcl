@@ -1825,8 +1825,8 @@
       <Item ItemId=";ReplSaveDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Save the current REPL session to a file.]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Vymaže obsah okna editoru REPL.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Uloží aktuální relaci REPL do souboru.]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Clears the contents of the REPL editor window.]]></Val>
@@ -3670,7 +3670,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11116.2]]></Val>
+        <Val><![CDATA[1.4.11117.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3697,7 +3697,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11116.2 commit:ea3fe83819743efef26cc6ff53a201c832c39c12]]></Val>
+        <Val><![CDATA[1.4.11117.2 commit:cfeaed29d7985b9b12bda8a199f2eb1862e27e32]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
