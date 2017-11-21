@@ -165,7 +165,11 @@ namespace Microsoft.NodejsTools.Repl
                 return ExecutionResult.Failure;
             }
 
-            var npmReplRedirector = new NpmReplRedirector(window);
+            var evaluator = window.Evaluator as NodejsReplEvaluator;
+
+            Debug.Assert(evaluator != null, "How did we end up with an evaluator that's not the nodetools evaluator?");
+
+            var npmReplRedirector = new NpmReplRedirector(evaluator);
             await ExecuteNpmCommandAsync(
                 npmReplRedirector,
                 npmPath,
@@ -261,7 +265,7 @@ namespace Microsoft.NodejsTools.Repl
             return standardOutputLines;
         }
 
-        internal class NpmReplRedirector : Redirector
+        internal sealed class NpmReplRedirector : Redirector
         {
             internal const string ErrorAnsiColor = "\x1b[31;1m";
             internal const string WarnAnsiColor = "\x1b[33;22m";
@@ -270,11 +274,11 @@ namespace Microsoft.NodejsTools.Repl
             private const string ErrorText = "npm ERR!";
             private const string WarningText = "npm WARN";
 
-            private readonly IInteractiveWindow window;
+            private readonly NodejsReplEvaluator evaluator;
 
-            public NpmReplRedirector(IInteractiveWindow window)
+            public NpmReplRedirector(NodejsReplEvaluator evaluator)
             {
-                this.window = window;
+                this.evaluator = evaluator;
                 this.HasErrors = false;
             }
 
@@ -303,13 +307,13 @@ namespace Microsoft.NodejsTools.Repl
 
                 outputString += NormalAnsiColor + substring;
 
-                this.window.WriteLine(outputString);
+                this.evaluator.WriteLine(outputString);
                 Debug.WriteLine(decodedString, "REPL npm");
             }
 
             public override void WriteErrorLine(string line)
             {
-                this.window.WriteError(line);
+                this.evaluator.WriteError(line);
             }
         }
     }
