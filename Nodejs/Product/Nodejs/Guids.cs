@@ -66,5 +66,8 @@ namespace Microsoft.NodejsTools
         // Workspace guids
         public const string PackageJsonContextTypeString = "{78F43160-2968-4FCA-8829-7E30E9B610CF}";
         public readonly static Guid PackageJsonContextType = new Guid(PackageJsonContextTypeString);
+		
+        public const string NodejsInteractiveWindowString = "2153A414-267E-4731-B891-E875ADBA1993";
+        public static readonly Guid NodejsInteractiveWindow = new Guid(NodejsInteractiveWindowString);
     };
 }
