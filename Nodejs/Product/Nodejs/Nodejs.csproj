@@ -182,12 +182,6 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
       <Link>SharedProject\ExceptionExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\ILambdaConverterProvider.cs">
-      <Link>SharedProject\Wpf\LambdaConverter\ILambdaConverterProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\LambdaConverter.cs">
-      <Link>SharedProject\Wpf\LambdaConverter\LambdaConverter.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
       <Link>SharedProject\ProcessOutput.cs</Link>
     </Compile>
@@ -1152,8 +1146,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaExtension.cs" />
-    <Compile Include="SharedProject\Wpf\LambdaConverter\LambdaProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SharedProject\WebPiComponentPickerControl.resx">
