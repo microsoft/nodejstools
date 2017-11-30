@@ -2,13 +2,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
+using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Extensions.VS;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Workspace
 {
@@ -17,45 +20,48 @@ namespace Microsoft.NodejsTools.Workspace
     {
         private const string ProviderType = "{971EA159-8F0F-44FF-A279-B11DF1D7F319}";
 
+        [Import]
+        private OutputPaneWrapper OutputPane { get; set; }
+
         public IFileContextActionProvider CreateProvider(IWorkspace workspaceContext)
         {
-            return new FileContextActionProvider(workspaceContext);
+            return new FileContextActionProvider(workspaceContext, OutputPane);
         }
 
         private class FileContextActionProvider : IFileContextActionProvider
         {
-            private IWorkspace workspaceContext;
+            public readonly IWorkspace workspaceContext;
+            public readonly OutputPaneWrapper outputPane;
 
-            public FileContextActionProvider(IWorkspace workspaceContext)
+            public FileContextActionProvider(IWorkspace workspaceContext, OutputPaneWrapper outputPane)
             {
                 this.workspaceContext = workspaceContext;
+                this.outputPane = outputPane;
             }
 
-            public Task<IReadOnlyList<IFileContextAction>> GetActionsAsync(string filePath, FileContext fileContext, CancellationToken cancellationToken)
+            public async Task<IReadOnlyList<IFileContextAction>> GetActionsAsync(string filePath, FileContext fileContext, CancellationToken cancellationToken)
             {
-                return Task.FromResult<IReadOnlyList<IFileContextAction>>(new IFileContextAction[] {
-                    new InstallMissingNpmPackagesAction(filePath, fileContext),
-                    new InstallNewNpmPackagesAction(filePath, fileContext),
-                    new UpdateNpmPackagesAction(filePath, fileContext)
-                });
+                await this.workspaceContext.JTF.SwitchToMainThreadAsync();
+                this.outputPane.ShowWindow();
+
+                return new IFileContextAction[] {
+                    new InstallMissingNpmPackagesAction(filePath, fileContext, this),
+                    new InstallNewNpmPackagesAction(filePath, fileContext, this),
+                    new UpdateNpmPackagesAction(filePath, fileContext, this)
+                };
             }
         }
 
         private class InstallMissingNpmPackagesAction : NpmPackagesAction
         {
-            public InstallMissingNpmPackagesAction(string packageJsonPath, FileContext fileContext) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallMissing)
+            public InstallMissingNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallMissing, provider)
             {
             }
 
             public override async Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
             {
-                var projectHome = Path.GetDirectoryName(this.PackageJsonPath);
-
-                var npmController = NpmControllerFactory.Create(
-                      projectHome,
-                      NodejsConstants.NpmCachePath);
-
+                using (var npmController = this.CreateController())
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     var result = await commander.Install();
@@ -66,44 +72,34 @@ namespace Microsoft.NodejsTools.Workspace
 
         private class InstallNewNpmPackagesAction : NpmPackagesAction
         {
-            public InstallNewNpmPackagesAction(string packageJsonPath, FileContext fileContext) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallNew)
+            public InstallNewNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallNew, provider)
             {
             }
 
-            public override Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
+            public override async Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
             {
-                var projectHome = Path.GetDirectoryName(this.PackageJsonPath);
-
-                var npmController = NpmControllerFactory.Create(
-                      projectHome,
-                      NodejsConstants.NpmCachePath);
-
+                using (var npmController = this.CreateController())
                 using (var npmWorker = new NpmWorker(npmController))
                 using (var manager = new NpmPackageInstallWindow(npmController, npmWorker))
                 {
                     manager.ShowModal();
                 }
 
-                return Task.FromResult<IFileContextActionResult>(new FileContextActionResult(true));
+                return new FileContextActionResult(true);
             }
         }
 
         private class UpdateNpmPackagesAction : NpmPackagesAction
         {
-            public UpdateNpmPackagesAction(string packageJsonPath, FileContext fileContext) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmUpdate)
+            public UpdateNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmUpdate, provider)
             {
             }
 
             public override async Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
             {
-                var projectHome = Path.GetDirectoryName(this.PackageJsonPath);
-
-                var npmController = NpmControllerFactory.Create(
-                      projectHome,
-                      NodejsConstants.NpmCachePath);
-
+                using (var npmController = this.CreateController())
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     var result = await commander.UpdatePackagesAsync();
@@ -111,28 +107,62 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
         }
-    }
 
-    public abstract class NpmPackagesAction : IFileContextAction, IVsCommandItem
-    {
-        public NpmPackagesAction(string packageJsonPath, FileContext source, uint commandId)
+        private abstract class NpmPackagesAction : IFileContextAction, IVsCommandItem
         {
-            this.Source = source;
-            this.CommandId = commandId;
-            this.PackageJsonPath = packageJsonPath;
+            public NpmPackagesAction(string packageJsonPath, FileContext source, uint commandId, FileContextActionProvider provider)
+            {
+                this.Source = source;
+                this.CommandId = commandId;
+                this.PackageJsonPath = packageJsonPath;
+                this.WriteLine = provider.outputPane.WriteLine;
+                this.JTF = provider.workspaceContext.JTF;
+            }
+
+            public INpmController CreateController()
+            {
+                var projectHome = Path.GetDirectoryName(this.PackageJsonPath);
+
+                var npmController = NpmControllerFactory.Create(
+                      projectHome,
+                      NodejsConstants.NpmCachePath);
+
+                npmController.ErrorLogged += this.WriteNpmOutput;
+                npmController.ExceptionLogged += this.WriteNpmException;
+                npmController.OutputLogged += this.WriteNpmOutput;
+
+                return npmController;
+            }
+
+            private void WriteNpmException(object sender, NpmExceptionEventArgs e)
+            {
+                this.WriteLine(ErrorHelper.GetExceptionDetailsText(e.Exception));
+            }
+
+            private void WriteNpmOutput(object sender, NpmLogEventArgs e)
+            {
+                if (!string.IsNullOrWhiteSpace(e.LogText))
+                {
+                    this.WriteLine(e.LogText.TrimEnd('\r', '\n'));
+                }
+            }
+
+            protected readonly Action<string> WriteLine;
+
+            protected readonly JoinableTaskFactory JTF;
+
+            public FileContext Source { get; }
+
+            public string PackageJsonPath { get; }
+
+            // Unused, since we also implement IVsCommandItem the Display Name used comes from the vsct file
+            public string DisplayName => null;
+
+            public Guid CommandGroup { get; } = Guids.NodeToolsWorkspaceCmdSet;
+
+            public uint CommandId { get; }
+
+            public abstract Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken);
         }
-
-        public FileContext Source { get; }
-
-        public string PackageJsonPath { get; }
-
-        // Unused, since we also implement IVsCommandItem the Display Name used comes from the vsct file
-        public string DisplayName => "";
-
-        public Guid CommandGroup { get; } = Guids.NodeToolsWorkspaceCmdSet;
-
-        public uint CommandId { get; }
-
-        public abstract Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken);
     }
 }

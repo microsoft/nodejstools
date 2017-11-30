@@ -277,6 +277,7 @@
     <Compile Include="Repl\ReplOutputClassificationFormatDefinitions.cs" />
     <Compile Include="Repl\ReplOutputClassifier.cs" />
     <Compile Include="Repl\ReplOutputClassifierProvider.cs" />
+    <Compile Include="SharedProject\OutputWindowWrapper.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="Debugger\NodeConstants.cs" />
