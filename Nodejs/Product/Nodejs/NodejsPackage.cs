@@ -18,6 +18,7 @@ using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.NodejsTools.Repl;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.InteractiveWindow.Shell;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
@@ -56,10 +57,10 @@ namespace Microsoft.NodejsTools
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.JadeFileExtension)]
     [ProvideLanguageExtension(typeof(JadeEditorFactory), JadeContentTypeDefinition.PugFileExtension)]
     [ProvideTextEditorAutomation(JadeContentTypeDefinition.JadeLanguageName, 3041, 3045, ProfileMigrationType.PassThrough)]
+    [ProvideInteractiveWindow(Guids.NodejsInteractiveWindowString, Style = VsDockStyle.Linked, Orientation = ToolWindowOrientation.none, Window = ToolWindowGuids80.Outputwindow)]
     internal sealed partial class NodejsPackage : CommonPackage
     {
         internal const string NodeExpressionEvaluatorGuid = "{F16F2A71-1C45-4BAB-BECE-09D28CFDE3E6}";
-        private IContentType contentType;
         internal static NodejsPackage Instance;
         internal HashSet<ITextBuffer> ChangedBuffers = new HashSet<ITextBuffer>();
 
@@ -180,31 +181,30 @@ namespace Microsoft.NodejsTools
             }
         }
 
-        internal IReplWindow2 OpenReplWindow(bool focus = true)
+        protected override int CreateToolWindow(ref Guid toolWindowType, int id)
         {
-            var compModel = this.ComponentModel;
-            var provider = compModel.GetService<IReplWindowProvider>();
-
-            var window = (IReplWindow2)provider.FindReplWindow(NodejsReplEvaluatorProvider.NodeReplId);
-            if (window == null)
+            if (toolWindowType == Guids.NodejsInteractiveWindow)
             {
-                window = (IReplWindow2)provider.CreateReplWindow(
-                    this.ReplContentType,
-                    Resources.InteractiveWindowTitle,
-                    Guids.TypeScriptLanguageInfo,
-                    NodejsReplEvaluatorProvider.NodeReplId
-                );
+                var replProvider = this.GetInteractiveWindowProvider();
+
+                replProvider.CreateReplWindow(id);
+                return VSConstants.S_OK;
             }
 
-            var windowFrame = (IVsWindowFrame)((ToolWindowPane)window).Frame;
-            ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            return base.CreateToolWindow(ref toolWindowType, id);
+        }
 
-            if (focus)
-            {
-                window.Focus();
-            }
+        internal void OpenReplWindow(bool focus = true)
+        {
+            var replProvider = this.GetInteractiveWindowProvider();
 
-            return window;
+            replProvider.OpenOrCreateWindow().Show(focus);
+        }
+
+        private InteractiveWindowProvider GetInteractiveWindowProvider()
+        {
+            var model = (IComponentModel)GetService(typeof(SComponentModel));
+            return model.GetService<InteractiveWindowProvider>();
         }
 
         internal static bool TryGetStartupFileAndDirectory(System.IServiceProvider serviceProvider, out string fileName, out string directory)
@@ -228,18 +228,6 @@ namespace Microsoft.NodejsTools
                 directory = Path.GetDirectoryName(fileName);
             }
             return true;
-        }
-
-        private IContentType ReplContentType
-        {
-            get
-            {
-                if (this.contentType == null)
-                {
-                    this.contentType = this.ComponentModel.GetService<IContentTypeRegistryService>().GetContentType(NodejsConstants.TypeScript);
-                }
-                return this.contentType;
-            }
         }
 
         #endregion

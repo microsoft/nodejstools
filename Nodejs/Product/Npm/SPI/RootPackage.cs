@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (packageJsonFile.Length < 260)
                 {
-                    this.PackageJson = PackageJsonFactory.Create(new DirectoryPackageJsonSource(fullPathToRootDirectory));
+                    this.PackageJson = PackageJsonFactory.Create(packageJsonFile);
                 }
             }
             catch (RuntimeBinderException rbe)

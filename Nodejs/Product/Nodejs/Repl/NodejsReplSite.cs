@@ -1,14 +1,12 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Repl
 {
-    internal class VsNodejsReplSite : INodejsReplSite
+    internal sealed class NodejsReplSite
     {
-        internal static VsNodejsReplSite Site = new VsNodejsReplSite();
-
-        #region INodejsReplSite Members
+        internal static readonly NodejsReplSite Site = new NodejsReplSite();
 
         public CommonProjectNode GetStartupProject()
         {
@@ -33,7 +31,5 @@ namespace Microsoft.NodejsTools.Repl
             }
             return NodejsPackage.TryGetStartupFileAndDirectory(nodeJsInstance, out fileName, out directory);
         }
-
-        #endregion
     }
 }

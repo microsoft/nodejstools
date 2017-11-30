@@ -316,6 +316,18 @@
     <GuidSymbol name="guidAzureExplorerCmdId" value="{2F32C14E-B908-42E6-AE7E-B8B3E2DED633}">
       <IDSymbol name="groupAzureDiagnostics" value="400" />
     </GuidSymbol>
+
+    <!-- InteractiveWindow Guid -->
+    <GuidSymbol name="guidInteractiveWindowCmdSet" value="{00B8868B-F9F5-4970-A048-410B05508506}">
+      <!-- https://github.com/dotnet/roslyn/blob/releases/VS2015/src/InteractiveWindow/VisualStudio/InteractiveWindow.vsct -->
+      <IDSymbol name="menuIdInteractiveToolbar" value="0x2000"/>
+      <IDSymbol name="cmdidAbortExecution" value="0x0104"/>
+      <IDSymbol name="cmdidReset" value="0x0105"/>
+      <IDSymbol name="cmdidHistoryNext" value="0x0106"/>
+      <IDSymbol name="cmdidHistoryPrevious" value="0x0107"/>
+      <IDSymbol name="cmdidClearScreen" value="0x0108"/>
+    </GuidSymbol>
+
   </Symbols>
 
 </CommandTable>
