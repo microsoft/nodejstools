@@ -55,8 +55,6 @@
     <Compile Include="SPI\AbstractNpmSearchComparer.cs" />
     <Compile Include="DependencyType.cs" />
     <Compile Include="DependencyUrlType.cs" />
-    <Compile Include="DirectoryPackageJsonSource.cs" />
-    <Compile Include="FilePackageJsonSource.cs" />
     <Compile Include="IBundledDependencies.cs" />
     <Compile Include="IDependencies.cs" />
     <Compile Include="IDependency.cs" />
@@ -72,7 +70,6 @@
     <Compile Include="INpmPathProvider.cs" />
     <Compile Include="IPackage.cs" />
     <Compile Include="IPackageJson.cs" />
-    <Compile Include="IPackageJsonSource.cs" />
     <Compile Include="IPerson.cs" />
     <Compile Include="IPkgStringArray.cs" />
     <Compile Include="IRootPackage.cs" />
@@ -94,7 +91,6 @@
     <Compile Include="PackageJsonException.cs" />
     <Compile Include="PackageJsonFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReaderPackageJsonSource.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
