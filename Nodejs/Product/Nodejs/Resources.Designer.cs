@@ -761,7 +761,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Arguments to Node.exe.
+        ///   Looks up a localized string similar to Node.exe options.
         /// </summary>
         internal static string NodeExeArguments {
             get {
@@ -887,7 +887,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.js Port.
+        ///   Looks up a localized string similar to Application port.
         /// </summary>
         internal static string NodejsPort {
             get {

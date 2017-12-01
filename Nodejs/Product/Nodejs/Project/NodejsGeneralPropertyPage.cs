@@ -59,7 +59,10 @@ namespace Microsoft.NodejsTools.Project
 
             if (this.Project.SetProjectProperty(NodeProjectProperty.SaveNodeJsSettingsInProjectFile, this.control.StoreNodeSettingsInProject.ToString()))
             {
-                // if this setting changed we should move the properties to the right file
+                // We move the settings first to the right file, and then write them.
+                // Ideally we would delete them first, and then write the correct value to the correct file,
+                // however there is some caching happening in the Project Code, which we can't reliably break.
+                // Further, writing them is a no-op if the value hasn't changed.
                 if (this.control.StoreNodeSettingsInProject)
                 {
                     this.Project.MovePropertyToProjectFile(NodeProjectProperty.NodeExePath);
