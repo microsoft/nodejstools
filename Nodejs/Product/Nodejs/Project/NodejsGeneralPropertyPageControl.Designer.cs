@@ -51,12 +51,13 @@
             this._launchUrl = new System.Windows.Forms.TextBox();
             this._nodejsPort = new System.Windows.Forms.TextBox();
             this._envVars = new System.Windows.Forms.TextBox();
-            this._startBrowser = new System.Windows.Forms.CheckBox();
+            this._startBrowserCheckBox = new System.Windows.Forms.CheckBox();
             this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeExePath = new System.Windows.Forms.TextBox();
             this._browsePath = new System.Windows.Forms.Button();
             this._nodeExeArguments = new System.Windows.Forms.TextBox();
             this._debuggerPort = new System.Windows.Forms.TextBox();
+            this._saveInProjectFileCheckBox = new System.Windows.Forms.CheckBox();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             startActionTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -82,7 +83,7 @@
             startActionTableLayoutPanel.Name = "startActionTableLayoutPanel";
             startActionTableLayoutPanel.RowCount = 1;
             startActionTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            startActionTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
+            startActionTableLayoutPanel.Size = new System.Drawing.Size(836, 13);
             startActionTableLayoutPanel.TabIndex = 0;
             // 
             // startActionHeaderLabelLine
@@ -92,7 +93,7 @@
             this.startActionHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
             this.startActionHeaderLabelLine.Location = new System.Drawing.Point(130, 6);
             this.startActionHeaderLabelLine.Name = "startActionHeaderLabelLine";
-            this.startActionHeaderLabelLine.Size = new System.Drawing.Size(667, 1);
+            this.startActionHeaderLabelLine.Size = new System.Drawing.Size(703, 1);
             this.startActionHeaderLabelLine.TabIndex = 1;
             // 
             // _startActionHeaderLabel
@@ -120,7 +121,7 @@
             nodeHeaderTableLayoutPanel.Name = "nodeHeaderTableLayoutPanel";
             nodeHeaderTableLayoutPanel.RowCount = 1;
             nodeHeaderTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            nodeHeaderTableLayoutPanel.Size = new System.Drawing.Size(800, 13);
+            nodeHeaderTableLayoutPanel.Size = new System.Drawing.Size(836, 13);
             nodeHeaderTableLayoutPanel.TabIndex = 0;
             // 
             // nodeHeaderLabelLine
@@ -130,7 +131,7 @@
             this.nodeHeaderLabelLine.BackColor = System.Drawing.SystemColors.ControlDark;
             this.nodeHeaderLabelLine.Location = new System.Drawing.Point(104, 6);
             this.nodeHeaderLabelLine.Name = "nodeHeaderLabelLine";
-            this.nodeHeaderLabelLine.Size = new System.Drawing.Size(693, 1);
+            this.nodeHeaderLabelLine.Size = new System.Drawing.Size(729, 1);
             this.nodeHeaderLabelLine.TabIndex = 16;
             // 
             // _nodeHeaderLabel
@@ -146,7 +147,7 @@
             // _nodeArgumentsLabel
             // 
             this._nodeArgumentsLabel.AutoSize = true;
-            this._nodeArgumentsLabel.Location = new System.Drawing.Point(3, 304);
+            this._nodeArgumentsLabel.Location = new System.Drawing.Point(3, 327);
             this._nodeArgumentsLabel.Margin = new System.Windows.Forms.Padding(3);
             this._nodeArgumentsLabel.Name = "_nodeArgumentsLabel";
             this._nodeArgumentsLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -212,7 +213,7 @@
             // _debuggerPortLabel
             // 
             this._debuggerPortLabel.AutoSize = true;
-            this._debuggerPortLabel.Location = new System.Drawing.Point(3, 330);
+            this._debuggerPortLabel.Location = new System.Drawing.Point(3, 353);
             this._debuggerPortLabel.Margin = new System.Windows.Forms.Padding(3);
             this._debuggerPortLabel.Name = "_debuggerPortLabel";
             this._debuggerPortLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -252,15 +253,16 @@
             this.overallPanel.Controls.Add(this._nodejsPort, 1, 5);
             this.overallPanel.Controls.Add(this._envVarsLabel, 0, 6);
             this.overallPanel.Controls.Add(this._envVars, 1, 6);
-            this.overallPanel.Controls.Add(this._startBrowser, 0, 7);
+            this.overallPanel.Controls.Add(this._startBrowserCheckBox, 0, 7);
             this.overallPanel.Controls.Add(nodeHeaderTableLayoutPanel, 0, 8);
-            this.overallPanel.Controls.Add(this._nodeExePathLabel, 0, 9);
-            this.overallPanel.Controls.Add(this._nodeExePath, 1, 9);
-            this.overallPanel.Controls.Add(this._browsePath, 2, 9);
-            this.overallPanel.Controls.Add(this._nodeArgumentsLabel, 0, 10);
-            this.overallPanel.Controls.Add(this._nodeExeArguments, 1, 10);
-            this.overallPanel.Controls.Add(this._debuggerPortLabel, 0, 11);
-            this.overallPanel.Controls.Add(this._debuggerPort, 1, 11);
+            this.overallPanel.Controls.Add(this._nodeExePathLabel, 0, 10);
+            this.overallPanel.Controls.Add(this._nodeExePath, 1, 10);
+            this.overallPanel.Controls.Add(this._browsePath, 2, 10);
+            this.overallPanel.Controls.Add(this._nodeArgumentsLabel, 0, 11);
+            this.overallPanel.Controls.Add(this._nodeExeArguments, 1, 11);
+            this.overallPanel.Controls.Add(this._debuggerPortLabel, 0, 12);
+            this.overallPanel.Controls.Add(this._debuggerPort, 1, 12);
+            this.overallPanel.Controls.Add(this._saveInProjectFileCheckBox, 0, 9);
             this.overallPanel.Location = new System.Drawing.Point(0, 0);
             this.overallPanel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.overallPanel.Name = "overallPanel";
@@ -277,15 +279,15 @@
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.overallPanel.Size = new System.Drawing.Size(800, 500);
+            this.overallPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.overallPanel.Size = new System.Drawing.Size(836, 500);
             this.overallPanel.TabIndex = 0;
             // 
             // _scriptFile
             // 
             this._scriptFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._scriptFile.Location = new System.Drawing.Point(122, 16);
+            this._scriptFile.Location = new System.Drawing.Point(181, 16);
             this._scriptFile.Name = "_scriptFile";
             this._scriptFile.Size = new System.Drawing.Size(620, 20);
             this._scriptFile.TabIndex = 3;
@@ -295,7 +297,7 @@
             // 
             this._scriptArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._scriptArguments.Location = new System.Drawing.Point(122, 42);
+            this._scriptArguments.Location = new System.Drawing.Point(181, 42);
             this._scriptArguments.Name = "_scriptArguments";
             this._scriptArguments.Size = new System.Drawing.Size(620, 20);
             this._scriptArguments.TabIndex = 5;
@@ -305,7 +307,7 @@
             // 
             this._workingDir.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._workingDir.Location = new System.Drawing.Point(122, 68);
+            this._workingDir.Location = new System.Drawing.Point(181, 68);
             this._workingDir.Name = "_workingDir";
             this._workingDir.Size = new System.Drawing.Size(620, 20);
             this._workingDir.TabIndex = 7;
@@ -314,7 +316,7 @@
             // _browseDirectory
             // 
             this._browseDirectory.AutoSize = true;
-            this._browseDirectory.Location = new System.Drawing.Point(748, 68);
+            this._browseDirectory.Location = new System.Drawing.Point(807, 68);
             this._browseDirectory.Name = "_browseDirectory";
             this._browseDirectory.Size = new System.Drawing.Size(26, 23);
             this._browseDirectory.TabIndex = 8;
@@ -326,7 +328,7 @@
             // 
             this._launchUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._launchUrl.Location = new System.Drawing.Point(122, 97);
+            this._launchUrl.Location = new System.Drawing.Point(181, 97);
             this._launchUrl.Name = "_launchUrl";
             this._launchUrl.Size = new System.Drawing.Size(620, 20);
             this._launchUrl.TabIndex = 10;
@@ -334,7 +336,7 @@
             // 
             // _nodejsPort
             // 
-            this._nodejsPort.Location = new System.Drawing.Point(122, 123);
+            this._nodejsPort.Location = new System.Drawing.Point(181, 123);
             this._nodejsPort.Name = "_nodejsPort";
             this._nodejsPort.Size = new System.Drawing.Size(105, 20);
             this._nodejsPort.TabIndex = 12;
@@ -344,7 +346,7 @@
             // 
             this._envVars.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._envVars.Location = new System.Drawing.Point(122, 149);
+            this._envVars.Location = new System.Drawing.Point(181, 149);
             this._envVars.Multiline = true;
             this._envVars.Name = "_envVars";
             this._envVars.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -352,23 +354,23 @@
             this._envVars.TabIndex = 14;
             this._envVars.TextChanged += new System.EventHandler(this.Changed);
             // 
-            // _startBrowser
+            // _startBrowserCheckBox
             // 
-            this._startBrowser.AutoSize = true;
-            this.overallPanel.SetColumnSpan(this._startBrowser, 3);
-            this._startBrowser.Location = new System.Drawing.Point(3, 239);
-            this._startBrowser.Name = "_startBrowser";
-            this._startBrowser.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this._startBrowser.Size = new System.Drawing.Size(100, 17);
-            this._startBrowser.TabIndex = 15;
-            this._startBrowser.Text = "_startBrowser";
-            this._startBrowser.UseVisualStyleBackColor = true;
-            this._startBrowser.CheckedChanged += new System.EventHandler(this.Changed);
+            this._startBrowserCheckBox.AutoSize = true;
+            this.overallPanel.SetColumnSpan(this._startBrowserCheckBox, 3);
+            this._startBrowserCheckBox.Location = new System.Drawing.Point(3, 239);
+            this._startBrowserCheckBox.Name = "_startBrowserCheckBox";
+            this._startBrowserCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this._startBrowserCheckBox.Size = new System.Drawing.Size(149, 17);
+            this._startBrowserCheckBox.TabIndex = 15;
+            this._startBrowserCheckBox.Text = "_startBrowserCheckBox";
+            this._startBrowserCheckBox.UseVisualStyleBackColor = true;
+            this._startBrowserCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExePathLabel
             // 
             this._nodeExePathLabel.AutoSize = true;
-            this._nodeExePathLabel.Location = new System.Drawing.Point(3, 275);
+            this._nodeExePathLabel.Location = new System.Drawing.Point(3, 298);
             this._nodeExePathLabel.Margin = new System.Windows.Forms.Padding(3);
             this._nodeExePathLabel.Name = "_nodeExePathLabel";
             this._nodeExePathLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -382,19 +384,19 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this._nodeExePath.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this._nodeExePath.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this._nodeExePath.Location = new System.Drawing.Point(122, 275);
+            this._nodeExePath.Location = new System.Drawing.Point(181, 298);
             this._nodeExePath.Name = "_nodeExePath";
             this._nodeExePath.Size = new System.Drawing.Size(620, 20);
-            this._nodeExePath.TabIndex = 18;
+            this._nodeExePath.TabIndex = 17;
             this._nodeExePath.TextChanged += new System.EventHandler(this.NodeExePathChanged);
             // 
             // _browsePath
             // 
             this._browsePath.AutoSize = true;
-            this._browsePath.Location = new System.Drawing.Point(748, 275);
+            this._browsePath.Location = new System.Drawing.Point(807, 298);
             this._browsePath.Name = "_browsePath";
             this._browsePath.Size = new System.Drawing.Size(26, 23);
-            this._browsePath.TabIndex = 19;
+            this._browsePath.TabIndex = 18;
             this._browsePath.Text = "...";
             this._browsePath.UseVisualStyleBackColor = true;
             this._browsePath.Click += new System.EventHandler(this.BrowsePathClick);
@@ -403,19 +405,31 @@
             // 
             this._nodeExeArguments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._nodeExeArguments.Location = new System.Drawing.Point(122, 304);
+            this._nodeExeArguments.Location = new System.Drawing.Point(181, 327);
             this._nodeExeArguments.Name = "_nodeExeArguments";
             this._nodeExeArguments.Size = new System.Drawing.Size(620, 20);
-            this._nodeExeArguments.TabIndex = 20;
+            this._nodeExeArguments.TabIndex = 19;
             this._nodeExeArguments.TextChanged += new System.EventHandler(this.Changed);
             // 
             // _debuggerPort
             // 
-            this._debuggerPort.Location = new System.Drawing.Point(122, 330);
+            this._debuggerPort.Location = new System.Drawing.Point(181, 353);
             this._debuggerPort.Name = "_debuggerPort";
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
-            this._debuggerPort.TabIndex = 22;
+            this._debuggerPort.TabIndex = 20;
             this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
+            // 
+            // _saveInProjectFileCheckBox
+            // 
+            this._saveInProjectFileCheckBox.AutoSize = true;
+            this._saveInProjectFileCheckBox.Location = new System.Drawing.Point(3, 275);
+            this._saveInProjectFileCheckBox.Name = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this._saveInProjectFileCheckBox.Size = new System.Drawing.Size(172, 17);
+            this._saveInProjectFileCheckBox.TabIndex = 16;
+            this._saveInProjectFileCheckBox.Text = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.UseVisualStyleBackColor = true;
+            this._saveInProjectFileCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExeErrorProvider
             // 
@@ -456,7 +470,7 @@
         private System.Windows.Forms.TextBox _nodejsPort;
         private System.Windows.Forms.TextBox _debuggerPort;
         private System.Windows.Forms.TextBox _envVars;
-        private System.Windows.Forms.CheckBox _startBrowser;
+        private System.Windows.Forms.CheckBox _startBrowserCheckBox;
         private System.Windows.Forms.ToolTip _tooltip;
         private System.Windows.Forms.ErrorProvider _nodeExeErrorProvider;
         private System.Windows.Forms.Label _nodeArgumentsLabel;
@@ -472,5 +486,6 @@
         private System.Windows.Forms.Label _nodeHeaderLabel;
         private System.Windows.Forms.Label nodeHeaderLabelLine;
         private System.Windows.Forms.Label _nodeExePathLabel;
+        private System.Windows.Forms.CheckBox _saveInProjectFileCheckBox;
     }
 }

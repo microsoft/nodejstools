@@ -761,7 +761,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Arguments to Node.exe.
+        ///   Looks up a localized string similar to Node.exe options.
         /// </summary>
         internal static string NodeExeArguments {
             get {
@@ -887,7 +887,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.js Port.
+        ///   Looks up a localized string similar to Application port.
         /// </summary>
         internal static string NodejsPort {
             get {
@@ -1843,6 +1843,24 @@ namespace Microsoft.NodejsTools {
         internal static string RequestedVersionRangeNone {
             get {
                 return ResourceManager.GetString("RequestedVersionRangeNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When checked the Node.js specific properties are saved per user.
+        /// </summary>
+        internal static string SaveInProjectFileToolTip {
+            get {
+                return ResourceManager.GetString("SaveInProjectFileToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Apply Node.js settings to all users (save in project file).
+        /// </summary>
+        internal static string SaveNodeSettingsInProjectFile {
+            get {
+                return ResourceManager.GetString("SaveNodeSettingsInProjectFile", resourceCulture);
             }
         }
         

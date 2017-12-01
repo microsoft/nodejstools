@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -124,7 +124,8 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.CheckNotNull(this.buildProject, "The build project should have been initialized before calling PreCreateForOuter.");
 
             // Please be very carefull what is initialized here on the ProjectNode. Normally this should only instantiate and return a project node.
-            // The reason why one should very carefully add state to the project node here is that at this point the aggregation has not yet been created and anything that would cause a CCW for the project to be created would cause the aggregation to fail
+            // The reason why one should very carefully add state to the project node here is that at this point the aggregation has not yet been created 
+            // and anything that would cause a CCW for the project to be created would cause the aggregation to fail.
             // Our reasoning is that there is no other place where state on the project node can be set that is known by the Factory and has to execute before the Load method.
             var node = this.CreateProject();
             Utilities.CheckNotNull(node, "The project failed to be created");

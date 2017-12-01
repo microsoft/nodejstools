@@ -45,9 +45,10 @@ namespace Microsoft.NodejsTools.Project
             this._nodePortLabel.Text = Resources.PropertiesNodePort;
             this._debuggerPortLabel.Text = Resources.PropertiesDebuggerPort;
             this._envVarsLabel.Text = Resources.PropertiesEnvVars;
-            this._startBrowser.Text = Resources.PropertiesStartBrowser;
+            this._startBrowserCheckBox.Text = Resources.PropertiesStartBrowser;
             this._startActionHeaderLabel.Text = Resources.StartActionHeader;
             this._nodeHeaderLabel.Text = Resources.NodeHeader;
+            this._saveInProjectFileCheckBox.Text = Resources.SaveNodeSettingsInProjectFile;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
             this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
@@ -60,11 +61,12 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._scriptFile, Resources.ScriptFileTooltip);
             this._tooltip.SetToolTip(this._scriptArguments, Resources.ScriptArgumentsToolTip);
             this._tooltip.SetToolTip(this._nodejsPort, Resources.NodejsPortToolTip);
-            this._tooltip.SetToolTip(this._startBrowser, Resources.StartBrowserToolTip);
+            this._tooltip.SetToolTip(this._startBrowserCheckBox, Resources.StartBrowserToolTip);
             this._tooltip.SetToolTip(this._workingDir, Resources.WorkingDirToolTip);
             this._tooltip.SetToolTip(this._launchUrl, Resources.LaunchUrlToolTip);
             this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
+            this._tooltip.SetToolTip(this._saveInProjectFileCheckBox, Resources.SaveInProjectFileToolTip);
         }
 
         protected override bool DisableOnBuild => false;
@@ -135,11 +137,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return this._startBrowser.Checked;
+                return this._startBrowserCheckBox.Checked;
             }
             set
             {
-                this._startBrowser.Checked = value;
+                this._startBrowserCheckBox.Checked = value;
             }
         }
 
@@ -192,6 +194,18 @@ namespace Microsoft.NodejsTools.Project
             set
             {
                 this._debuggerPort.Text = value;
+            }
+        }
+
+        public bool SaveNodeSettingsInProject
+        {
+            get
+            {
+                return this._saveInProjectFileCheckBox.Checked;
+            }
+            set
+            {
+                this._saveInProjectFileCheckBox.Checked = value;
             }
         }
 
