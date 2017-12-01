@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
-using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Extensions.VS;
 using Microsoft.VisualStudioTools.Project;
@@ -25,7 +24,7 @@ namespace Microsoft.NodejsTools.Workspace
 
         public IFileContextActionProvider CreateProvider(IWorkspace workspaceContext)
         {
-            return new FileContextActionProvider(workspaceContext, OutputPane);
+            return new FileContextActionProvider(workspaceContext, this.OutputPane);
         }
 
         private class FileContextActionProvider : IFileContextActionProvider
@@ -41,21 +40,23 @@ namespace Microsoft.NodejsTools.Workspace
 
             public async Task<IReadOnlyList<IFileContextAction>> GetActionsAsync(string filePath, FileContext fileContext, CancellationToken cancellationToken)
             {
+                // ensure we initialize the NPM Output window once, so we don't 
+                // need to switch to the UI thread for each command
                 await this.workspaceContext.JTF.SwitchToMainThreadAsync();
                 this.outputPane.ShowWindow();
 
                 return new IFileContextAction[] {
-                    new InstallMissingNpmPackagesAction(filePath, fileContext, this),
-                    new InstallNewNpmPackagesAction(filePath, fileContext, this),
-                    new UpdateNpmPackagesAction(filePath, fileContext, this)
+                    new InstallMissingNpmPackagesAction(filePath, fileContext, this.outputPane.WriteLine),
+                    new InstallNewNpmPackagesAction(filePath, fileContext, this.outputPane.WriteLine),
+                    new UpdateNpmPackagesAction(filePath, fileContext, this.outputPane.WriteLine)
                 };
             }
         }
 
         private class InstallMissingNpmPackagesAction : NpmPackagesAction
         {
-            public InstallMissingNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallMissing, provider)
+            public InstallMissingNpmPackagesAction(string packageJsonPath, FileContext fileContext, Action<string> writeLine) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallMissing, writeLine)
             {
             }
 
@@ -72,12 +73,12 @@ namespace Microsoft.NodejsTools.Workspace
 
         private class InstallNewNpmPackagesAction : NpmPackagesAction
         {
-            public InstallNewNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallNew, provider)
+            public InstallNewNpmPackagesAction(string packageJsonPath, FileContext fileContext, Action<string> writeLine) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmInstallNew, writeLine)
             {
             }
 
-            public override async Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
+            public override Task<IFileContextActionResult> ExecuteAsync(IProgress<IFileContextActionProgressUpdate> progress, CancellationToken cancellationToken)
             {
                 using (var npmController = this.CreateController())
                 using (var npmWorker = new NpmWorker(npmController))
@@ -86,14 +87,14 @@ namespace Microsoft.NodejsTools.Workspace
                     manager.ShowModal();
                 }
 
-                return new FileContextActionResult(true);
+                return Task.FromResult<IFileContextActionResult>(new FileContextActionResult(true));
             }
         }
 
         private class UpdateNpmPackagesAction : NpmPackagesAction
         {
-            public UpdateNpmPackagesAction(string packageJsonPath, FileContext fileContext, FileContextActionProvider provider) :
-                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmUpdate, provider)
+            public UpdateNpmPackagesAction(string packageJsonPath, FileContext fileContext, Action<string> writeLine) :
+                base(packageJsonPath, fileContext, PkgCmdId.cmdidWorkSpaceNpmUpdate, writeLine)
             {
             }
 
@@ -110,13 +111,12 @@ namespace Microsoft.NodejsTools.Workspace
 
         private abstract class NpmPackagesAction : IFileContextAction, IVsCommandItem
         {
-            public NpmPackagesAction(string packageJsonPath, FileContext source, uint commandId, FileContextActionProvider provider)
+            public NpmPackagesAction(string packageJsonPath, FileContext source, uint commandId, Action<string> writeLine)
             {
                 this.Source = source;
                 this.CommandId = commandId;
                 this.PackageJsonPath = packageJsonPath;
-                this.WriteLine = provider.outputPane.WriteLine;
-                this.JTF = provider.workspaceContext.JTF;
+                this.WriteLine = writeLine;
             }
 
             public INpmController CreateController()
@@ -149,16 +149,15 @@ namespace Microsoft.NodejsTools.Workspace
 
             protected readonly Action<string> WriteLine;
 
-            protected readonly JoinableTaskFactory JTF;
-
             public FileContext Source { get; }
 
             public string PackageJsonPath { get; }
 
             // Unused, since we also implement IVsCommandItem the Display Name used comes from the vsct file
+            // Can't throw a NotImeplementedException, since that crashes the Open Folder scanner
             public string DisplayName => null;
 
-            public Guid CommandGroup { get; } = Guids.NodeToolsWorkspaceCmdSet;
+            public Guid CommandGroup => Guids.NodeToolsWorkspaceCmdSet;
 
             public uint CommandId { get; }
 
