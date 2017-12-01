@@ -1847,6 +1847,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to When checked the Node.js specific properties are saved per user.
+        /// </summary>
+        internal static string SaveInProjectFileToolTip {
+            get {
+                return ResourceManager.GetString("SaveInProjectFileToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Apply Node.js settings to all users (save in project file).
+        /// </summary>
+        internal static string SaveNodeSettingsInProjectFile {
+            get {
+                return ResourceManager.GetString("SaveNodeSettingsInProjectFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Specifies the arguments passed to the script on launch..
         /// </summary>
         internal static string ScriptArgumentsToolTip {
@@ -1906,15 +1924,6 @@ namespace Microsoft.NodejsTools {
         internal static string StatusTypingsLoading {
             get {
                 return ResourceManager.GetString("StatusTypingsLoading", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &amp;Apply Node.js settings to all users (store in project file).
-        /// </summary>
-        internal static string StoreNodeSettingsInProjectFile {
-            get {
-                return ResourceManager.GetString("StoreNodeSettingsInProjectFile", resourceCulture);
             }
         }
         

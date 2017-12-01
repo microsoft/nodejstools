@@ -48,7 +48,7 @@ namespace Microsoft.NodejsTools.Project
             this._startBrowserCheckBox.Text = Resources.PropertiesStartBrowser;
             this._startActionHeaderLabel.Text = Resources.StartActionHeader;
             this._nodeHeaderLabel.Text = Resources.NodeHeader;
-            this._storeInProjectFileCheckBox.Text = Resources.StoreNodeSettingsInProjectFile;
+            this._saveInProjectFileCheckBox.Text = Resources.SaveNodeSettingsInProjectFile;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
             this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
@@ -66,6 +66,7 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._launchUrl, Resources.LaunchUrlToolTip);
             this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
+            this._tooltip.SetToolTip(this._saveInProjectFileCheckBox, Resources.SaveInProjectFileToolTip);
         }
 
         protected override bool DisableOnBuild => false;
@@ -196,15 +197,15 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        public bool StoreNodeSettingsInProject
+        public bool SaveNodeSettingsInProject
         {
             get
             {
-                return this._storeInProjectFileCheckBox.Checked;
+                return this._saveInProjectFileCheckBox.Checked;
             }
             set
             {
-                this._storeInProjectFileCheckBox.Checked = value;
+                this._saveInProjectFileCheckBox.Checked = value;
             }
         }
 

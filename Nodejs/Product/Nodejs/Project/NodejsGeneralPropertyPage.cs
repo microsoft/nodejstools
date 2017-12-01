@@ -57,13 +57,15 @@ namespace Microsoft.NodejsTools.Project
             this.Project.SetProjectProperty(NodeProjectProperty.LaunchUrl, this.control.LaunchUrl);
             this.Project.SetProjectProperty(NodeProjectProperty.Environment, this.control.Environment);
 
-            if (this.Project.SetProjectProperty(NodeProjectProperty.SaveNodeJsSettingsInProjectFile, this.control.StoreNodeSettingsInProject.ToString()))
+            var saveNodeSettingsInProject = this.control.SaveNodeSettingsInProject;
+
+            if (this.Project.SetProjectProperty(NodeProjectProperty.SaveNodeJsSettingsInProjectFile, saveNodeSettingsInProject.ToString()))
             {
                 // We move the settings first to the right file, and then write them.
                 // Ideally we would delete them first, and then write the correct value to the correct file,
                 // however there is some caching happening in the Project Code, which we can't reliably break.
                 // Further, writing them is a no-op if the value hasn't changed.
-                if (this.control.StoreNodeSettingsInProject)
+                if (saveNodeSettingsInProject)
                 {
                     this.Project.MovePropertyToProjectFile(NodeProjectProperty.NodeExePath);
                     this.Project.MovePropertyToProjectFile(NodeProjectProperty.NodeExeArguments);
@@ -77,7 +79,7 @@ namespace Microsoft.NodejsTools.Project
                 }
             }
 
-            if (this.control.StoreNodeSettingsInProject)
+            if (saveNodeSettingsInProject)
             {
                 // ensure we only have the properties in one location
                 this.Project.SetProjectProperty(NodeProjectProperty.NodeExePath, this.control.NodeExePath);
@@ -106,7 +108,7 @@ namespace Microsoft.NodejsTools.Project
             this.control.DebuggerPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
             this.control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
             this.control.StartWebBrowser = GetBoolProperty(this.Project, NodeProjectProperty.StartWebBrowser);
-            this.control.StoreNodeSettingsInProject = GetBoolProperty(this.Project, NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
+            this.control.SaveNodeSettingsInProject = GetBoolProperty(this.Project, NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
 
             bool GetBoolProperty(ProjectNode node, string property)
             {

@@ -57,9 +57,9 @@
             this._browsePath = new System.Windows.Forms.Button();
             this._nodeExeArguments = new System.Windows.Forms.TextBox();
             this._debuggerPort = new System.Windows.Forms.TextBox();
+            this._saveInProjectFileCheckBox = new System.Windows.Forms.CheckBox();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            this._storeInProjectFileCheckBox = new System.Windows.Forms.CheckBox();
             startActionTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             nodeHeaderTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             startActionTableLayoutPanel.SuspendLayout();
@@ -262,7 +262,7 @@
             this.overallPanel.Controls.Add(this._nodeExeArguments, 1, 11);
             this.overallPanel.Controls.Add(this._debuggerPortLabel, 0, 12);
             this.overallPanel.Controls.Add(this._debuggerPort, 1, 12);
-            this.overallPanel.Controls.Add(this._storeInProjectFileCheckBox, 0, 9);
+            this.overallPanel.Controls.Add(this._saveInProjectFileCheckBox, 0, 9);
             this.overallPanel.Location = new System.Drawing.Point(0, 0);
             this.overallPanel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.overallPanel.Name = "overallPanel";
@@ -419,21 +419,21 @@
             this._debuggerPort.TabIndex = 20;
             this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
             // 
+            // _saveInProjectFileCheckBox
+            // 
+            this._saveInProjectFileCheckBox.AutoSize = true;
+            this._saveInProjectFileCheckBox.Location = new System.Drawing.Point(3, 275);
+            this._saveInProjectFileCheckBox.Name = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this._saveInProjectFileCheckBox.Size = new System.Drawing.Size(172, 17);
+            this._saveInProjectFileCheckBox.TabIndex = 16;
+            this._saveInProjectFileCheckBox.Text = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.UseVisualStyleBackColor = true;
+            this._saveInProjectFileCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
+            // 
             // _nodeExeErrorProvider
             // 
             this._nodeExeErrorProvider.ContainerControl = this;
-            // 
-            // _storeInProjectFileCheckBox
-            // 
-            this._storeInProjectFileCheckBox.AutoSize = true;
-            this._storeInProjectFileCheckBox.Location = new System.Drawing.Point(3, 275);
-            this._storeInProjectFileCheckBox.Name = "_storeInProjectFileCheckBox";
-            this._storeInProjectFileCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this._storeInProjectFileCheckBox.Size = new System.Drawing.Size(172, 17);
-            this._storeInProjectFileCheckBox.TabIndex = 16;
-            this._storeInProjectFileCheckBox.Text = "_storeInProjectFileCheckBox";
-            this._storeInProjectFileCheckBox.UseVisualStyleBackColor = true;
-            this._storeInProjectFileCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // NodejsGeneralPropertyPageControl
             // 
@@ -486,6 +486,6 @@
         private System.Windows.Forms.Label _nodeHeaderLabel;
         private System.Windows.Forms.Label nodeHeaderLabelLine;
         private System.Windows.Forms.Label _nodeExePathLabel;
-        private System.Windows.Forms.CheckBox _storeInProjectFileCheckBox;
+        private System.Windows.Forms.CheckBox _saveInProjectFileCheckBox;
     }
 }

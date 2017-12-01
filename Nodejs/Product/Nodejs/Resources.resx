@@ -791,7 +791,10 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="ClassificationYellow" xml:space="preserve">
     <value>Node.js Interactive - Yellow</value>
   </data>
-  <data name="StoreNodeSettingsInProjectFile" xml:space="preserve">
-    <value>&amp;Apply Node.js settings to all users (store in project file)</value>
+  <data name="SaveNodeSettingsInProjectFile" xml:space="preserve">
+    <value>&amp;Apply Node.js settings to all users (save in project file)</value>
+  </data>
+  <data name="SaveInProjectFileToolTip" xml:space="preserve">
+    <value>When checked the Node.js specific properties are saved per user</value>
   </data>
 </root>
