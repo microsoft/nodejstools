@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         private NodeProperties target;
         private Dictionary<string, EnvDTE.Property> properties = new Dictionary<string, EnvDTE.Property>();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public OAProperties(NodeProperties target)
         {
             Utilities.ArgumentNotNull("target", target);

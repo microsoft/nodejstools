@@ -330,7 +330,6 @@ namespace Microsoft.NodejsTools.Repl
 
             Span span;
 
-
             while (escape >= 0)
             {
                 span = writer(text.Substring(start, escape - start));

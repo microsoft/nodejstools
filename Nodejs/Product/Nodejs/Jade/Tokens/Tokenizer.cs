@@ -1,23 +1,18 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.NodejsTools.Jade
 {
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer")]
     internal abstract class Tokenizer<T> : ITokenizer<T> where T : ITextRange
     {
         protected bool CComments { get; set; }
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool CppComments { get; set; }
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool MultilineCppComments { get; set; }
         protected bool SingleQuotedStrings { get; set; }
         protected bool DoubleQuotedStrings { get; set; }
 
-        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
         protected CharacterStream _cs { get; set; }
         protected TextRangeCollection<T> Tokens { get; set; }
 
@@ -155,7 +150,6 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Processes C++ style comments (//)
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool HandleCppComment()
         {
             return HandleCppComment(false);
@@ -165,7 +159,6 @@ namespace Microsoft.NodejsTools.Jade
         /// Processes C++ style comments (//)
         /// </summary>
         /// <returns>True if comment included new line characters</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool HandleCppComment(bool multiline = false)
         {
             // SaSS version can span more than one line like this (indented):
