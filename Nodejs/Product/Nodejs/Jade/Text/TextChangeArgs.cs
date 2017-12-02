@@ -15,28 +15,28 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Start position of the change
         /// </summary>
-        public int Start { get; private set; }
+        public int Start { get; }
 
         /// <summary>
         /// Length of the fragment that was deleted or replaced.
         /// Zero if operation is 'insert' or 'paste' without selection.
         /// </summary>
-        public int OldLength { get; private set; }
+        public int OldLength { get; }
 
         /// <summary>
         /// Length of the new fragment. Zero if operation is 'delete'.
         /// </summary>
-        public int NewLength { get; private set; }
+        public int NewLength { get; }
 
         /// <summary>
         /// Snaphot before the change
         /// </summary>
-        public ITextProvider OldText { get; private set; }
+        public ITextProvider OldText { get; }
 
         /// <summary>
         /// Snapshot after the change
         /// </summary>
-        public ITextProvider NewText { get; private set; }
+        public ITextProvider NewText { get; }
 
         public TextChangeEventArgs(int start, int oldLength, int newLength)
             : this(start, oldLength, newLength, null, null)

@@ -17,10 +17,10 @@ namespace Microsoft.NodejsTools.Jade
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 #pragma warning restore 67
 
-        public ITokenizer<TTokenClass> Tokenizer { get; private set; }
+        public ITokenizer<TTokenClass> Tokenizer { get; }
         public TextRangeCollection<TTokenClass> Tokens { get; protected set; }
 
-        protected ITextBuffer TextBuffer { get; set; }
+        protected ITextBuffer TextBuffer { get; }
         protected bool LineBasedClassification { get; set; }
 
         private IClassificationContextNameProvider<TTokenClass> _classificationNameProvider;

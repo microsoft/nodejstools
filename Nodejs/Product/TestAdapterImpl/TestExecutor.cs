@@ -330,7 +330,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 // for node 8 the process doesn't automatically exit when debugging, so always detach
                 WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
-                if(runContext.IsBeingDebugged && app != null)
+                if (runContext.IsBeingDebugged && app != null)
                 {
                     app.GetDTE().Debugger.DetachAll();
                 }

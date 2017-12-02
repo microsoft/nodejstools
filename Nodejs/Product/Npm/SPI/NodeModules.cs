@@ -214,7 +214,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IPackage Package { get; set; }
 
-        public IList<string> RequiredBy { get; set; }
+        public IList<string> RequiredBy { get; }
 
         internal ModuleInfo(int depth)
         {
