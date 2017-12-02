@@ -305,7 +305,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <param name="imageStream">A Stream representing a Bitmap</param>
         /// <returns>An ImageList object representing the images from the given stream</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static ImageList GetImageList(Stream imageStream)
         {
             var ilist = new ImageList();
@@ -435,8 +434,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <param name="name">File name</param>
         /// <returns>true if file name is invalid</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0",
-            Justification = "The name is validated.")]
         public static bool ContainsInvalidFileNameChars(string name)
         {
             if (string.IsNullOrEmpty(name))

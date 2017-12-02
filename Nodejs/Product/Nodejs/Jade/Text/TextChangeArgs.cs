@@ -1,8 +1,7 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.NodejsTools.Jade
 {
@@ -11,7 +10,6 @@ namespace Microsoft.NodejsTools.Jade
     /// allowing code that handles text changes to use <seealso cref="ITextProvider"/>
     /// rather than Visual Studio ITextBuffer or some other editor specific types.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     internal class TextChangeEventArgs : EventArgs
     {
         /// <summary>

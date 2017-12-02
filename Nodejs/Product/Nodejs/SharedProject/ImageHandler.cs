@@ -18,17 +18,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Initializes the <see cref="RDTListener"/> class.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static ImageHandler()
         {
             Mutex = new object();
-        }
-
-        /// <summary>
-        /// Builds an empty ImageHandler object.
-        /// </summary>
-        public ImageHandler()
-        {
         }
 
         /// <summary>

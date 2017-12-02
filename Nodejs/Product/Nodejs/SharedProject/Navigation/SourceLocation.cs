@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -53,7 +53,6 @@ namespace Microsoft.VisualStudioTools.Parsing
             return new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to {1}", p0, p1));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters")]
         private SourceLocation(int index, int line, int column, bool noChecks)
         {
             this._index = index;

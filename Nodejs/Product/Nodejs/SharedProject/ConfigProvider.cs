@@ -48,7 +48,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// they provide us with this data.
         /// Returns/sets the [(<propName, propCondition>) <propValue>] collection
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual List<KeyValuePair<KeyValuePair<string, string>, string>> NewConfigProperties { get; set; } = new List<KeyValuePair<KeyValuePair<string, string>, string>>();
 
         /// <summary>

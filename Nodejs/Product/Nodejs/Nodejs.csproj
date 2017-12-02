@@ -511,7 +511,6 @@
     <Compile Include="Project\NodejsProjectNodeProperties.cs" />
     <Compile Include="Project\NodejsProjectPackage.cs" />
     <Compile Include="Repl\NodejsReplEvaluator.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodejsPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Telemetry\TelemetryHelper.cs" />

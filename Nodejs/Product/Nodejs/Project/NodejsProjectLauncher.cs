@@ -20,7 +20,6 @@ using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;

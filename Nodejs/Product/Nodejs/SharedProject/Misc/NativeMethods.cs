@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -1006,13 +1005,11 @@ namespace Microsoft.VisualStudioTools.Project
         public class CREDUI_INFO
         {
             public int cbSize;
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
             public IntPtr hwndParentCERParent;
             [MarshalAs(UnmanagedType.LPWStr)]
             public string pszMessageText;
             [MarshalAs(UnmanagedType.LPWStr)]
             public string pszCaptionText;
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
             public IntPtr hbmBannerCERHandle;
         }
 
@@ -1079,7 +1076,6 @@ namespace Microsoft.VisualStudioTools.Project
             public string userName;
         };
 
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredReadW")]
         public static extern bool
         CredRead(
@@ -1092,7 +1088,6 @@ namespace Microsoft.VisualStudioTools.Project
             out IntPtr credential
             );
 
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredWriteW")]
         public static extern bool
         CredWrite(
@@ -1101,14 +1096,12 @@ namespace Microsoft.VisualStudioTools.Project
             uint flags
             );
 
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(advapi32Dll, SetLastError = true)]
         public static extern bool
         CredFree(
             IntPtr buffer
             );
 
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(credUIDll, EntryPoint = "CredUIPromptForCredentialsW", CharSet = CharSet.Unicode)]
         public static extern CredUIReturnCodes CredUIPromptForCredentials(
             CREDUI_INFO pUiInfo,  // Optional (one can pass null here)
@@ -1134,7 +1127,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// ERROR_INSUFFICIENT_BUFFER
         /// ERROR_INVALID_PARAMETER
         /// </returns>
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport(credUIDll, CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "CredUIParseUserNameW")]
         public static extern CredUIReturnCodes CredUIParseUserName(
             [MarshalAs(UnmanagedType.LPWStr)]

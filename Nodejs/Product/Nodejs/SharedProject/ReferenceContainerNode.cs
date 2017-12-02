@@ -39,7 +39,6 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectFileConstants.COMReference,
             ProjectFileConstants.WebPiReference
         };
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         protected virtual string[] SupportedReferenceTypes => supportedReferenceTypes;
         #endregion
 
