@@ -1326,10 +1326,13 @@
       </Item>
       <Item ItemId=";NodeExeArguments" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Arguments to Node.exe]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Node.exe options]]></Val>
+          <Tgt Cat="Text" Stat="Update" Orig="New">
             <Val><![CDATA[Argomenti di Node.exe]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Arguments to Node.exe]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1461,10 +1464,13 @@
       </Item>
       <Item ItemId=";NodejsPort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.js Port]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Application port]]></Val>
+          <Tgt Cat="Text" Stat="Update" Orig="New">
             <Val><![CDATA[Porta di Node.js]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Node.js Port]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2401,6 +2407,18 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";SaveInProjectFileToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[When checked the Node.js specific properties are saved per user]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SaveNodeSettingsInProjectFile" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[&Apply Node.js settings to all users (save in project file)]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ScriptArgumentsToolTip" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Specifies the arguments passed to the script on launch.]]></Val>
@@ -3323,7 +3341,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The item '{0}' cannot be found on disk, either because it has been renamed, deleted, or moved to a new location.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Impossibile trovare l'elemento '{0}' sul disco in quanto è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
+            <Val><![CDATA[L'elemento '{0}' non è stato trovato nel disco perché è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4396,6 +4414,33 @@
     </Item>
     <Item ItemId=";Menus.ctmenu" ItemType="0" PsrId="240" Leaf="false">
       <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" />
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16385" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16385" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Install Missing npm Packages...]]></Val>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16386" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16386" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Install New npm Packages...]]></Val>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16387" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16387" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Update npm Packages...]]></Val>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
       <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},512" ItemType="0" PsrId="240" Leaf="false">
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},512" ItemType=";Button" PsrId="240" Leaf="true">
@@ -5695,7 +5740,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11117.1]]></Val>
+        <Val><![CDATA[1.4.11202.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5722,7 +5767,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11117.1 commit:fe158169d473bb26b0c271c234e5ba1487f38447]]></Val>
+        <Val><![CDATA[1.4.11202.1 commit:7abdb9eef7887e90f1f475f8668c986b1c07d462]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
