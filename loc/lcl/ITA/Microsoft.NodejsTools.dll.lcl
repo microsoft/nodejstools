@@ -1327,8 +1327,8 @@
       <Item ItemId=";NodeExeArguments" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.exe options]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Argomenti di Node.exe]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Opzioni di Node.exe]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Arguments to Node.exe]]></Val>
@@ -1465,8 +1465,8 @@
       <Item ItemId=";NodejsPort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Application port]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Porta di Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Porta dell'applicazione]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Node.js Port]]></Val>
@@ -2410,12 +2410,18 @@
       <Item ItemId=";SaveInProjectFileToolTip" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[When checked the Node.js specific properties are saved per user]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Se è selezionata, le proprietà specifiche di Node.js vengono salvate per singolo utente]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";SaveNodeSettingsInProjectFile" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[&Apply Node.js settings to all users (save in project file)]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[&Applica impostazioni di Node.js a tutti gli utenti (salva nel file di progetto)]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -4419,6 +4425,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16385" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Install Missing npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Installa pacchetti npm mancanti...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4428,6 +4437,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16386" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Install New npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Installa nuovi pacchetti npm...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4437,6 +4449,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},16387" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Update npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Aggiorna pacchetti npm...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
