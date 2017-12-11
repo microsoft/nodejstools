@@ -1,2 +1,4 @@
 *.js, ignore js files
 *.vsman, ignore vsman files
+emptyxml.xml ignore xml template
+roletemplatedata.xml ignore azure template 
