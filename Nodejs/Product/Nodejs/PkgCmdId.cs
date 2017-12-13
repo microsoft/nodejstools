@@ -24,8 +24,12 @@ namespace Microsoft.NodejsTools
         public const int cmdidNpmOpenModuleHomepage = 0x306;
         public const int menuIdNpm = 0x3000;
 
-        public const int cmdidWorkSpaceNpmInstallMissing = 0x4001;
-        public const int cmdidWorkSpaceNpmInstallNew = 0x4002;
-        public const int cmdidWorkSpaceNpmUpdate = 0x4003;
+        public const int cmdidWorkSpaceNpmInstallMissing = 0x0200;
+        public const int cmdidWorkSpaceNpmInstallNew = 0x0201;
+        public const int cmdidWorkSpaceNpmUpdate = 0x0202;
+        public const int cmdidWorkSpaceNpmDynamicScript = 0x1000;
+
+        // only allow 100 scripts
+        public const int cmdidWorkSpaceNpmDynamicScriptMax = cmdidWorkSpaceNpmDynamicScript + 100;
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Telemetry;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -375,6 +377,67 @@ namespace Microsoft.NodejsTools.NpmUI
         public void Dispose()
         {
             this.commandQueue.CompleteAdding();
+        }
+
+        // TODO: This is duplicated from Npm project
+        // We should integrate this into the NpmCommander
+        internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
+            string pathToNpm,
+            string executionDirectory,
+            string[] arguments,
+            bool visible = false,
+            Redirector redirector = null)
+        {
+            IEnumerable<string> standardOutputLines = null;
+
+            using (var process = ProcessOutput.Run(
+                pathToNpm,
+                arguments,
+                executionDirectory,
+                /*env*/ null,
+                visible,
+                redirector,
+                quoteArgs: false,
+                outputEncoding: redirector == null ? null : Encoding.UTF8
+                ))
+            {
+                var whnd = process.WaitHandle;
+                if (whnd == null)
+                {
+                    // Process failed to start, and any exception message has
+                    // already been sent through the redirector
+                    if (redirector != null)
+                    {
+                        redirector.WriteErrorLine("Error - cannot start npm");
+                    }
+                }
+                else
+                {
+                    var i = await Task.Run(() => WaitHandle.WaitAny(new[] { whnd }));
+                    if (i == 0)
+                    {
+                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
+                        process.Wait();
+                        if (process.StandardOutputLines != null)
+                        {
+                            standardOutputLines = process.StandardOutputLines.ToList();
+                        }
+                    }
+                    else
+                    {
+                        process.Kill();
+                        if (redirector != null)
+                        {
+                            redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
+                            "\r\n===={0}====\r\n\r\n",
+                            "npm command cancelled"));
+                        }
+
+                        throw new OperationCanceledException();
+                    }
+                }
+            }
+            return standardOutputLines;
         }
 
         private sealed class QueuedNpmCommandInfo

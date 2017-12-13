@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
+using Microsoft.NodejsTools.NpmUI;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.InteractiveWindow;
@@ -170,12 +171,11 @@ namespace Microsoft.NodejsTools.Repl
             Debug.Assert(evaluator != null, "How did we end up with an evaluator that's not the nodetools evaluator?");
 
             var npmReplRedirector = new NpmReplRedirector(evaluator);
-            await ExecuteNpmCommandAsync(
-                npmReplRedirector,
+            await NpmWorker.ExecuteNpmCommandAsync(
                 npmPath,
                 projectDirectoryPath,
                 new[] { npmArguments },
-                null);
+                redirector: npmReplRedirector);
 
             if (npmReplRedirector.HasErrors)
             {
@@ -197,73 +197,6 @@ namespace Microsoft.NodejsTools.Repl
         public override string Description => Resources.NpmExecuteCommand;
 
         public override string Command => "npm";
-
-        // TODO: This is duplicated from Npm project
-        // We should consider using InternalsVisibleTo to avoid code duplication
-        internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
-            Redirector redirector,
-            string pathToNpm,
-            string executionDirectory,
-            string[] arguments,
-            ManualResetEvent cancellationResetEvent)
-        {
-            IEnumerable<string> standardOutputLines = null;
-
-            using (var process = ProcessOutput.Run(
-                pathToNpm,
-                arguments,
-                executionDirectory,
-                null,
-                false,
-                redirector,
-                quoteArgs: false,
-                outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
-                ))
-            {
-                var whnd = process.WaitHandle;
-                if (whnd == null)
-                {
-                    // Process failed to start, and any exception message has
-                    // already been sent through the redirector
-                    if (redirector != null)
-                    {
-                        redirector.WriteErrorLine("Error - cannot start npm");
-                    }
-                }
-                else
-                {
-                    var handles = cancellationResetEvent != null ? new[] { whnd, cancellationResetEvent } : new[] { whnd };
-                    var i = await Task.Run(() => WaitHandle.WaitAny(handles));
-                    if (i == 0)
-                    {
-                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
-                        process.Wait();
-                        if (process.StandardOutputLines != null)
-                        {
-                            standardOutputLines = process.StandardOutputLines.ToList();
-                        }
-                    }
-                    else
-                    {
-                        process.Kill();
-                        if (redirector != null)
-                        {
-                            redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
-                            "\r\n===={0}====\r\n\r\n",
-                            "npm command cancelled"));
-                        }
-
-                        if (cancellationResetEvent != null)
-                        {
-                            cancellationResetEvent.Reset();
-                        }
-
-                        throw new OperationCanceledException();
-                    }
-                }
-            }
-            return standardOutputLines;
-        }
 
         internal sealed class NpmReplRedirector : Redirector
         {

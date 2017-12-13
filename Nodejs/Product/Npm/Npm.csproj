@@ -48,6 +48,7 @@
     </Compile>
     <Compile Include="IHomepages.cs" />
     <Compile Include="IPackageCatalogFilter.cs" />
+    <Compile Include="IPackageJsonScript.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
     <Compile Include="NpmHelpers.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="SPI\NpmUpdateCommand.cs" />
     <Compile Include="SPI\Package.cs" />
     <Compile Include="SPI\PackageJson.cs" />
+    <Compile Include="SPI\PackageJsonScript.cs" />
     <Compile Include="SPI\PackageProxy.cs" />
     <Compile Include="SPI\Person.cs" />
     <Compile Include="SPI\PkgStringArray.cs" />
