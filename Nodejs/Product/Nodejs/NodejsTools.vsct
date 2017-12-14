@@ -47,8 +47,8 @@
       </Group>
 
       <!-- Group for Workspace context menu -->
-      <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idgWSE_ContextMenu_NodeToolsActions" priority="0x0350">
-        <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idgWSE_ContextMenu_BuildDebugActions"/>
+      <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm" priority="0x0350">
+        <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idmWSE_ContextMenu"/>
       </Group>
 
       <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_PackageCommands" priority="0x100">
@@ -321,7 +321,7 @@
     <!-- workspace -->
 
     <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm" priority="0x340">
-      <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idgWSE_ContextMenu_ShellActions"/>
+      <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idgWSE_ContextMenu_BuildDebugActions"/>
     </CommandPlacement>
 
     <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmInstallMissing" priority="0x100">
@@ -441,7 +441,6 @@
       <IDSymbol name="idgWSE_ContextMenu_ShellActions" value="0x015"/>
       <IDSymbol name="idgWSE_ContextMenu_ScopeActions" value="0x016"/>
       <IDSymbol name="idgWSE_ContextMenu_FileContextActions" value="0x017" />
-
     </GuidSymbol>
   </Symbols>
 
