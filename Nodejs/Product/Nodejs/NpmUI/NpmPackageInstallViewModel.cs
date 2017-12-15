@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace Microsoft.NodejsTools.NpmUI
 {
-    internal class NpmPackageInstallViewModel : INotifyPropertyChanged
+    internal class NpmPackageInstallViewModel : INotifyPropertyChanged, IDisposable
     {
         internal enum Indices
         {
@@ -45,6 +45,7 @@ namespace Microsoft.NodejsTools.NpmUI
         private string filterText = string.Empty;
         private string arguments = string.Empty;
         private bool saveToPackageJson = true;
+        private bool isExecutingCommand = false;
         private object selectedVersion;
 
         private readonly object filteredPackagesLock = new object();
@@ -52,6 +53,8 @@ namespace Microsoft.NodejsTools.NpmUI
         private readonly Timer filterTimer;
         private readonly Dispatcher dispatcher;
         private readonly NpmWorker npmWorker;
+
+        private bool disposed = false;
 
         public NpmPackageInstallViewModel(
             NpmWorker npmWorker,
@@ -61,7 +64,19 @@ namespace Microsoft.NodejsTools.NpmUI
             this.dispatcher = dispatcher;
 
             this.npmWorker = npmWorker;
+            this.npmWorker.CommandStarted += this.NpmWorker_CommandStarted;
+            this.npmWorker.CommandCompleted += this.NpmWorker_CommandCompleted;
             this.filterTimer = new Timer(this.FilterTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void NpmWorker_CommandStarted(object sender, EventArgs e)
+        {
+            this.IsExecutingCommand = true;
+        }
+
+        private void NpmWorker_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+        {
+            this.IsExecutingCommand = false;
         }
 
         public INpmController NpmController
@@ -69,13 +84,13 @@ namespace Microsoft.NodejsTools.NpmUI
             get { return this.npmController; }
             set
             {
-                if (null != this.npmController)
+                if (this.npmController != null)
                 {
                     this.npmController.FinishedRefresh -= this.NpmController_FinishedRefresh;
                 }
                 this.npmController = value;
                 OnPropertyChanged();
-                if (null != this.npmController)
+                if (this.npmController != null)
                 {
                     LoadCatalog();
                     this.npmController.FinishedRefresh += this.NpmController_FinishedRefresh;
@@ -218,16 +233,11 @@ namespace Microsoft.NodejsTools.NpmUI
 
             if (filtered.Any())
             {
-                IRootPackage rootPackage = null;
-                var controller = this.npmController;
-                if (controller != null)
-                {
-                    rootPackage = controller.RootPackage;
-                }
+                var rootPackage = this.npmController?.RootPackage;
 
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
-                    rootPackage != null ? rootPackage.Modules[package.Name] : null)));
+                    rootPackage?.Modules[package.Name])));
             }
 
             await this.dispatcher.BeginInvoke((Action)(() =>
@@ -357,17 +367,64 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
+        public bool IsExecutingCommand
+        {
+            get
+            {
+                return this.isExecutingCommand;
+            }
+            set
+            {
+                this.isExecutingCommand = value;
+
+                OnPropertyChanged();
+                OnPropertyChanged("ExecutionProgressVisibility");
+            }
+        }
+
+        public Visibility ExecutionProgressVisibility
+        {
+            get { return IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            var handler = this.PropertyChanged;
-            if (handler != null)
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                if (disposing)
+                {
+                    this.filterTimer?.Dispose();
+                }
+
+                var controller = this.npmController;
+                if (controller != null)
+                {
+                    this.npmController.FinishedRefresh -= this.NpmController_FinishedRefresh;
+                }
+                var worker = this.npmWorker;
+                if (worker != null)
+                {
+                    this.npmWorker.CommandStarted -= this.NpmWorker_CommandStarted;
+                    this.npmWorker.CommandCompleted -= this.NpmWorker_CommandCompleted;
+                }
+                disposed = true;
             }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
         }
     }
 }

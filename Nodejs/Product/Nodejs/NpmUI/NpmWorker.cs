@@ -28,6 +28,9 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private QueuedNpmCommandInfo currentCommand;
 
+        public event EventHandler CommandStarted;
+        public event EventHandler<NpmCommandCompletedEventArgs> CommandCompleted;
+
         public NpmWorker(INpmController controller)
         {
             this.npmController = controller;
@@ -67,6 +70,8 @@ namespace Microsoft.NodejsTools.NpmUI
             Debug.Assert(Thread.CurrentThread == this.worker, "The worked thread should be executing the NPM commands.");
 
             var cmdr = this.npmController.CreateNpmCommander();
+            cmdr.CommandStarted += Cmdr_CommandStarted;
+            cmdr.CommandCompleted += Cmdr_CommandCompleted;
             try
             {
                 cmdr.ExecuteNpmCommandAsync(info.Arguments).Wait();
@@ -76,6 +81,21 @@ namespace Microsoft.NodejsTools.NpmUI
                 // TaskCanceledException is not un-expected, 
                 // and should not tear down this thread.
                 // Other exceptions are handled higher up the stack.
+            }
+            finally
+            {
+                cmdr.CommandStarted -= Cmdr_CommandStarted;
+                cmdr.CommandCompleted -= Cmdr_CommandCompleted;
+            }
+
+            void Cmdr_CommandStarted(object sender, EventArgs e)
+            {
+                this.CommandStarted?.Invoke(this, e);
+            }
+
+            void Cmdr_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+            {
+                this.CommandCompleted?.Invoke(this, e);
             }
         }
 
