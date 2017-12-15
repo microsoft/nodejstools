@@ -1,2 +1,3 @@
 *.js, ignore js files
 *.vsman, ignore vsman files
+*.xml, ignore template files
