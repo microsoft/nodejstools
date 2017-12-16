@@ -46,9 +46,19 @@
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CSCD_PROJECT_ADD"/>
       </Group>
 
-      <Group guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup" priority="0x1000">
-        <Parent guid="guidWorkspaceExplorerToolWindowCmdSet" id="idmWSE_ContextMenu"/>
+      <!-- Group for Workspace context menu -->
+      <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm" priority="0x0350">
+        <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idmWSE_ContextMenu"/>
       </Group>
+
+      <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_PackageCommands" priority="0x100">
+        <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm"/>
+      </Group>
+
+      <Group guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_DynamicCommands" priority="0x200">
+        <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm"/>
+      </Group>
+
     </Groups>
 
     <Menus>
@@ -58,6 +68,18 @@
           <CommandName>&amp;Npm</CommandName>
         </Strings>
       </Menu>
+
+
+      <!-- workspace -->
+      <Menu guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm" priority="0x0100" type="Menu">
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Npm</ButtonText>
+          <CommandName>Npm</CommandName>
+        </Strings>
+      </Menu>
+      
+      
     </Menus>
 
     <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
@@ -225,8 +247,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmInstallMissing" priority="0x010" type="Button">
-        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+      <Button guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmInstallMissing" priority="0x010" type="Button">
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -234,8 +255,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmInstallNew" priority="0x011" type="Button">
-        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+      <Button guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmInstallNew" priority="0x011" type="Button">
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -243,14 +263,26 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsWorkspaceCmdSet" id="cmdidWorkSpaceNpmUpdate" priority="0x012" type="Button">
-        <Parent guid="guidNodeToolsWorkspaceCmdSet" id="WorkspaceGroup"/>
+      <Button guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmUpdate" priority="0x012" type="Button">
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Update npm Packages...</ButtonText>
         </Strings>
       </Button>
+      
+      <!-- workspace -->
+      <Button guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmDynamicScript" priority="0x0130" type="Button">
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <CommandFlag>NoShowOnMenuController</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Start Script</ButtonText>
+          <CommandName>StartScript</CommandName>
+        </Strings>
+      </Button>
+      
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -285,6 +317,29 @@
     <CommandPlacement guid="guidNodeToolsCmdSet" id="CodeFileGroup" priority="0x600">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_WEBITEMNODE"/>
     </CommandPlacement>
+    
+    <!-- workspace -->
+
+    <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm" priority="0x340">
+      <Parent guid="guidWorkspaceExplorerToolWindowPackageCmdSet" id="idgWSE_ContextMenu_BuildDebugActions"/>
+    </CommandPlacement>
+
+    <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmInstallMissing" priority="0x100">
+      <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_PackageCommands"/>
+    </CommandPlacement>
+
+    <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmInstallNew" priority="0x101">
+      <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_PackageCommands"/>
+    </CommandPlacement>
+
+    <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmUpdate" priority="0x102">
+      <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_PackageCommands"/>
+    </CommandPlacement>
+    
+    <CommandPlacement  guid="guidNodeToolsWseContextMenuCmdSet" id="cmdidWorkSpaceNpmDynamicScript" priority="0x1000">
+      <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idgNpm_DynamicCommands"/>
+    </CommandPlacement>
+    
   </CommandPlacements>
 
   <KeyBindings>
@@ -337,13 +392,6 @@
       <IDSymbol name="NpmMenu" value="0x3000"/>
     </GuidSymbol>
 
-    <GuidSymbol name="guidNodeToolsWorkspaceCmdSet" value="{0D701F33-94A3-421C-9865-6F65E7E4B689}">
-      <IDSymbol name="WorkspaceGroup" value="0x4000"/>
-      <IDSymbol name="cmdidWorkSpaceNpmInstallMissing" value="0x4001"/>
-      <IDSymbol name="cmdidWorkSpaceNpmInstallNew" value="0x4002"/>
-      <IDSymbol name="cmdidWorkSpaceNpmUpdate" value="0x4003"/>
-    </GuidSymbol>
-
     <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
     <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
 
@@ -354,6 +402,17 @@
       <IDSymbol name="bmpPicX" value="4" />
       <IDSymbol name="bmpPicArrows" value="5" />
       <IDSymbol name="nodeDebugRepl" value="6" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidNodeToolsWseContextMenuCmdSet" value="{985C4146-CE5D-4D56-912E-0EBBE2216FC1}">
+      <IDSymbol name="idgWSE_ContextMenu_NodeToolsActions" value="0x100" />
+      <IDSymbol name="idgNpm_PackageCommands" value="0x101"/>
+      <IDSymbol name="idgNpm_DynamicCommands" value="0x102"/>
+      <IDSymbol name="idmNpm" value="0x103"/>
+      <IDSymbol name="cmdidWorkSpaceNpmInstallMissing" value="0x0200"/>
+      <IDSymbol name="cmdidWorkSpaceNpmInstallNew" value="0x0201"/>
+      <IDSymbol name="cmdidWorkSpaceNpmUpdate" value="0x0202"/>
+      <IDSymbol name="cmdidWorkSpaceNpmDynamicScript" value="0x1000"/>
     </GuidSymbol>
 
     <GuidSymbol name="guidAzureExplorerCmdId" value="{2F32C14E-B908-42E6-AE7E-B8B3E2DED633}">
@@ -371,6 +430,18 @@
       <IDSymbol name="cmdidClearScreen" value="0x0108"/>
     </GuidSymbol>
 
+    <!-- This is the command set from the Anycode context menu. Let's us put our context menu inside theirs -->
+    <GuidSymbol name="guidWorkspaceExplorerToolWindowPackageCmdSet" value="{cfb400f1-5c60-4f3c-856e-180d28def0b7}">
+      <IDSymbol name="idmWSE_ContextMenu" value="0x0002"/>
+      <IDSymbol name="idgWSE_ContextMenu_ItemActions" value="0x0010"/>
+      <IDSymbol name="idgWSE_ContextMenu_CollectionActions" value="0x011"/>
+      <IDSymbol name="idgWSE_ContextMenu_Adding" value="0x012"/>
+      <IDSymbol name="idgWSE_ContextMenu_SccCommands" value="0x013"/>
+      <IDSymbol name="idgWSE_ContextMenu_BuildDebugActions" value="0x014"/>
+      <IDSymbol name="idgWSE_ContextMenu_ShellActions" value="0x015"/>
+      <IDSymbol name="idgWSE_ContextMenu_ScopeActions" value="0x016"/>
+      <IDSymbol name="idgWSE_ContextMenu_FileContextActions" value="0x017" />
+    </GuidSymbol>
   </Symbols>
 
 </CommandTable>

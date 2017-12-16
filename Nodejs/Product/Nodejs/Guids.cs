@@ -12,7 +12,7 @@ namespace Microsoft.NodejsTools
         public const string NodejsCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
         public const string NodejsNpmCmdSetString = "9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA";
-        public const string NodeToolsWorkspaceCmdSetString = "{0D701F33-94A3-421C-9865-6F65E7E4B689}";
+        public const string NodeToolsWorkspaceCmdSetString = "{985C4146-CE5D-4D56-912E-0EBBE2216FC1}";
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "4a0dddb5-7a95-4fbf-97cc-616d07737a77";

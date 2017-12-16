@@ -286,7 +286,7 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-    <Compile Include="Workspace\NpmActionProviderFactory.cs" />
+    <Compile Include="Workspace\ContextMenuProvider.cs" />
     <Compile Include="Workspace\PackageJsonContextProviderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
