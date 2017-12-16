@@ -4,7 +4,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -398,25 +397,23 @@ namespace Microsoft.NodejsTools.NpmUI
                 visible,
                 redirector,
                 quoteArgs: false,
-                outputEncoding: redirector == null ? null : Encoding.UTF8
-                ))
+                outputEncoding: redirector == null ? null : Encoding.UTF8))
             {
                 var whnd = process.WaitHandle;
                 if (whnd == null)
                 {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    if (redirector != null)
-                    {
-                        redirector.WriteErrorLine("Error - cannot start npm");
-                    }
+                    redirector?.WriteErrorLine("Error - cannot start npm");
                 }
                 else
                 {
-                    var i = await Task.Run(() => WaitHandle.WaitAny(new[] { whnd }));
-                    if (i == 0)
+                    var finished = await Task.Run(() => whnd.WaitOne());
+                    if (finished)
                     {
                         Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
+                        // there seems to be a case when we're signalled as completed, but the
+                        // process hasn't actually exited
                         process.Wait();
                         if (process.StandardOutputLines != null)
                         {
@@ -426,12 +423,7 @@ namespace Microsoft.NodejsTools.NpmUI
                     else
                     {
                         process.Kill();
-                        if (redirector != null)
-                        {
-                            redirector.WriteErrorLine(string.Format(CultureInfo.CurrentCulture,
-                            "\r\n===={0}====\r\n\r\n",
-                            "npm command cancelled"));
-                        }
+                        redirector?.WriteErrorLine("\r\n==== npm command cancelled ====\r\n\r\n");
 
                         throw new OperationCanceledException();
                     }

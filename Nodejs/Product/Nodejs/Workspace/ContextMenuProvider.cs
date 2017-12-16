@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
@@ -37,13 +38,18 @@ namespace Microsoft.NodejsTools.Workspace
 
         public IWorkspaceCommandHandler ProvideCommandHandler(WorkspaceVisualNodeBase parentNode)
         {
-            if (NpmCommandHandler.EnsurePackageJson(parentNode))
+            if (EnsurePackageJson(parentNode))
             {
                 this.outputPane.ShowWindow();
                 return this.npmHandler;
             }
 
             return null;
+        }
+
+        private static bool EnsurePackageJson(WorkspaceVisualNodeBase node)
+        {
+            return (node is IFileNode fileNode && StringComparer.OrdinalIgnoreCase.Equals(fileNode.FileName, "package.json"));
         }
 
         private sealed class NpmCommandHandler : IWorkspaceCommandHandler
@@ -86,7 +92,7 @@ namespace Microsoft.NodejsTools.Workspace
 
                     if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID < PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
                     {
-                        ExecDynammic(node, nCmdID);
+                        ExecDynamic(node, nCmdID);
                         return VSConstants.S_OK;
                     }
                 }
@@ -125,33 +131,27 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
-            private async void ExecDynammic(WorkspaceVisualNodeBase node, uint nCmdID)
+            private async void ExecDynamic(WorkspaceVisualNodeBase node, uint nCmdID)
             {
                 // Unfortunately the NpmController (and NpmCommander), used for the install, update commands
                 // doesn't support running arbitrary scripts. And changing that is outside
                 // the scope of these changes.
-
-                var index = nCmdID - PkgCmdId.cmdidWorkSpaceNpmDynamicScript;
-                var packageJson = PackageJsonFactory.Create(((IFileNode)node).FullPath);
-
-                Debug.Assert(packageJson != null, "Failed to create package.json");
-
-                var scripts = packageJson.Scripts;
-                if (index < scripts.Length)
+                var filePath = ((IFileNode)node).FullPath;
+                if (TryGetCommand(nCmdID, filePath, out var commandName))
                 {
                     var npmPath = NpmHelpers.GetPathToNpm();
 
                     await NpmWorker.ExecuteNpmCommandAsync(
                         npmPath,
-                        executionDirectory: node.Workspace.Location,
-                        arguments: new[] { "run-script", scripts[index].CommandName },
+                        executionDirectory: Path.GetDirectoryName(filePath),
+                        arguments: new[] { "run-script", commandName },
                         visible: true); // show the CMD window
                 }
             }
 
             public bool QueryStatus(List<WorkspaceVisualNodeBase> selection, Guid pguidCmdGroup, uint nCmdID, ref uint cmdf, ref string customTitle)
             {
-                if (selection.Count != 1 || !EnsurePackageJson(selection.First()))
+                if (selection.Count != 1 || !EnsurePackageJson(selection.Single()))
                 {
                     return false;
                 }
@@ -170,7 +170,7 @@ namespace Microsoft.NodejsTools.Workspace
 
                     // Each id we return true for, this method is called with id + 1
                     // this way we can add each script to the context menu
-                    if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID < PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
+                    if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID <= PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
                     {
                         var node = (IFileNode)selection.First();
 
@@ -187,6 +187,16 @@ namespace Microsoft.NodejsTools.Workspace
 
             private bool QueryDynamic(uint nCmdID, string filePath, ref string customTitle)
             {
+                if (TryGetCommand(nCmdID, filePath, out var commandName))
+                {
+                    customTitle = $"npm run-script {commandName}";
+                    return true;
+                }
+                return false;
+            }
+
+            private static bool TryGetCommand(uint nCmdID, string filePath, out string commandName)
+            {
                 var index = nCmdID - PkgCmdId.cmdidWorkSpaceNpmDynamicScript;
                 var packageJson = PackageJsonFactory.Create(filePath);
 
@@ -195,15 +205,12 @@ namespace Microsoft.NodejsTools.Workspace
                 var scripts = packageJson.Scripts;
                 if (index < scripts.Length)
                 {
-                    customTitle = $"npm run-script {scripts[index].CommandName}";
+                    commandName = packageJson.Scripts[index].CommandName;
                     return true;
                 }
-                return false;
-            }
 
-            internal static bool EnsurePackageJson(WorkspaceVisualNodeBase node)
-            {
-                return (node is IFileNode fileNode && StringComparer.OrdinalIgnoreCase.Equals(fileNode.FileName, "package.json"));
+                commandName = null;
+                return false;
             }
 
             private INpmController CreateController(IWorkspace workspace)
