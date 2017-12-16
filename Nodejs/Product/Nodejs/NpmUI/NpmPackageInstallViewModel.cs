@@ -233,11 +233,9 @@ namespace Microsoft.NodejsTools.NpmUI
 
             if (filtered.Any())
             {
-                var rootPackage = this.npmController?.RootPackage;
-
                 newItems.AddRange(filtered.Select(package => new ReadOnlyPackageCatalogEntryViewModel(
                     package,
-                    rootPackage?.Modules[package.Name])));
+                    this.npmController?.RootPackage?.Modules[package.Name])));
             }
 
             await this.dispatcher.BeginInvoke((Action)(() =>
@@ -375,10 +373,13 @@ namespace Microsoft.NodejsTools.NpmUI
             }
             set
             {
-                this.isExecutingCommand = value;
+                if (this.isExecutingCommand != value)
+                {
+                    this.isExecutingCommand = value;
 
-                OnPropertyChanged();
-                OnPropertyChanged("ExecutionProgressVisibility");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ExecutionProgressVisibility));
+                }
             }
         }
 
@@ -403,18 +404,18 @@ namespace Microsoft.NodejsTools.NpmUI
                 if (disposing)
                 {
                     this.filterTimer?.Dispose();
-                }
 
-                var controller = this.npmController;
-                if (controller != null)
-                {
-                    this.npmController.FinishedRefresh -= this.NpmController_FinishedRefresh;
-                }
-                var worker = this.npmWorker;
-                if (worker != null)
-                {
-                    this.npmWorker.CommandStarted -= this.NpmWorker_CommandStarted;
-                    this.npmWorker.CommandCompleted -= this.NpmWorker_CommandCompleted;
+                    var controller = this.npmController;
+                    if (controller != null)
+                    {
+                        controller.FinishedRefresh -= this.NpmController_FinishedRefresh;
+                    }
+                    var worker = this.npmWorker;
+                    if (worker != null)
+                    {
+                        worker.CommandStarted -= this.NpmWorker_CommandStarted;
+                        worker.CommandCompleted -= this.NpmWorker_CommandCompleted;
+                    }
                 }
                 disposed = true;
             }
