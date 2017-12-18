@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Globalization;
@@ -47,32 +47,32 @@ namespace Microsoft.NodejsTools.Debugger
         /// <summary>
         /// Gets the type name of the result of this evaluation or null if an exception was thrown.
         /// </summary>
-        public string TypeName { get; private set; }
+        public string TypeName { get; }
 
         /// <summary>
         /// Gets the expression text representation.
         /// </summary>
-        public string Expression { get; private set; }
+        public string Expression { get; }
 
         /// <summary>
         /// Gets the expression which was evaluated to return this object.
         /// </summary>
-        public string FullName { get; private set; }
+        public string FullName { get; }
 
         /// <summary>
         /// Gets a type metadata for the expression.
         /// </summary>
-        public NodeExpressionType Type { get; private set; }
+        public NodeExpressionType Type { get; }
 
         /// <summary>
         /// Returns the stack frame in which this expression was evaluated.
         /// </summary>
-        public NodeStackFrame Frame { get; private set; }
+        public NodeStackFrame Frame { get; }
 
         /// <summary>
         /// Returns the handle for this evaluation result.
         /// </summary>
-        public int Handle { get; private set; }
+        public int Handle { get; }
 
         /// <summary>
         /// Gets the list of children which this object contains.  The children can be either

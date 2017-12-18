@@ -1,8 +1,9 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Collections.Generic;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json.Linq;
 
@@ -28,16 +29,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.versionString = package.version;
             this.Description = package.description?.ToString();
             this.Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
+            this.Main = package.main?.ToString();
+            this.Scripts = LoadScripts(package);
         }
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe)
         {
             return new PackageJsonException(
-                string.Format(CultureInfo.CurrentCulture, @"Exception occurred retrieving {0} from package.json. The file may be invalid: you should edit it to correct an errors.
+                string.Format(CultureInfo.CurrentCulture, @"Exception occurred retrieving '{0}' from package.json. The file may be invalid: you should edit it to correct an errors.
 
 The following error occurred:
 
-{1}",
+'{1}'",
                         errorProperty,
                         rbe));
         }
@@ -151,6 +154,24 @@ The following error occurred:
             }
         }
 
+        private static IPackageJsonScript[] LoadScripts(dynamic package)
+        {
+            try
+            {
+                if (package["scripts"] is JObject scripts)
+                {
+                    return scripts.Properties().Select(s => new PackageJsonScript(s.Name, s.Value.ToString())).ToArray();
+                }
+
+                return Array.Empty<IPackageJsonScript>();
+            }
+            catch (RuntimeBinderException rbe)
+            {
+                System.Diagnostics.Debug.WriteLine(rbe);
+                throw WrapRuntimeBinderException("scripts", rbe);
+            }
+        }
+
         public string Name { get; }
 
         public SemverVersion Version
@@ -179,5 +200,7 @@ The following error occurred:
         public IDependencies OptionalDependencies { get; }
         public IDependencies AllDependencies { get; }
         public IEnumerable<string> RequiredBy { get; }
+        public string Main { get; }
+        public IPackageJsonScript[] Scripts { get; }
     }
 }

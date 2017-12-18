@@ -199,6 +199,159 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ClassificationBlack" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Black]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Nero]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationBlue" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Blue]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Blu]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationCyan" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Cyan]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Ciano]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkBlue" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Blue]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Blu scuro]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkCyan" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Cyan]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Verde acqua]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkGray" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Gray]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Grigio scuro]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkGreen" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Green]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Verde scuro]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkMagenta" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Magenta]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Magenta scuro]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkRed" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Red]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Rosso scuro]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationDarkYellow" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Dark Yellow]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Verde oliva]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Error]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Errore]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationGray" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Gray]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Grigio]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationGreen" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Green]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Verde]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationMagenta" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Magenta]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Magenta]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationRed" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Red]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Rosso]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationWhite" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - White]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Bianco]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ClassificationYellow" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Node.js Interactive - Yellow]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Finestra interattiva di Node.js - Giallo]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ConfigureProjectProperties" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Configure project properties]]></Val>
@@ -660,10 +813,13 @@
       </Item>
       <Item ItemId=";NodeExeArguments" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Arguments to Node.exe]]></Val>
+          <Val><![CDATA[Node.exe options]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Argomenti di Node.exe]]></Val>
+            <Val><![CDATA[Opzioni di Node.exe]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Arguments to Node.exe]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -795,10 +951,13 @@
       </Item>
       <Item ItemId=";NodejsPort" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.js Port]]></Val>
+          <Val><![CDATA[Application port]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Porta di Node.js]]></Val>
+            <Val><![CDATA[Porta dell'applicazione]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Node.js Port]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1671,10 +1830,13 @@
       </Item>
       <Item ItemId=";ReplSaveDescription" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Clears the contents of the REPL editor window.]]></Val>
+          <Val><![CDATA[Save the current REPL session to a file.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Cancella il contenuto della finestra dell'editor REPL.]]></Val>
+            <Val><![CDATA[Consente di salvare la sessione REPL corrente in un file.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Clears the contents of the REPL editor window.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1728,6 +1890,24 @@
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Nessuno]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SaveInProjectFileToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[When checked the Node.js specific properties are saved per user]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Se è selezionata, le proprietà specifiche di Node.js vengono salvate per singolo utente]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SaveNodeSettingsInProjectFile" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[&Apply Node.js settings to all users (save in project file)]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[&Applica impostazioni di Node.js a tutti gli utenti (salva nel file di progetto)]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2528,7 +2708,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The item '{0}' cannot be found on disk, either because it has been renamed, deleted, or moved to a new location.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Impossibile trovare l'elemento '{0}' sul disco in quanto è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
+            <Val><![CDATA[L'elemento '{0}' non è stato trovato nel disco perché è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3514,7 +3694,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11109.2]]></Val>
+        <Val><![CDATA[1.4.11202.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3541,7 +3721,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11109.2 commit:d3d338b1d8159435deb5acf014ec46ff1531f80c]]></Val>
+        <Val><![CDATA[1.4.11202.1 commit:7abdb9eef7887e90f1f475f8668c986b1c07d462]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

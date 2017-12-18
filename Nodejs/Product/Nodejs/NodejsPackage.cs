@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Debugger.Remote;
@@ -22,7 +21,6 @@ using Microsoft.VisualStudio.InteractiveWindow.Shell;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio;
@@ -18,9 +18,9 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
     internal class TestFileChangedEventArgs : EventArgs
     {
-        public IVsProject Project { get; private set; }
-        public string File { get; private set; }
-        public TestFileChangedReason ChangedReason { get; private set; }
+        public IVsProject Project { get; }
+        public string File { get; }
+        public TestFileChangedReason ChangedReason { get; }
 
         public TestFileChangedEventArgs(IVsProject project, string file, TestFileChangedReason reason)
         {

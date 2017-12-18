@@ -1,9 +1,8 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Microsoft.NodejsTools.Jade
@@ -48,7 +47,6 @@ namespace Microsoft.NodejsTools.Jade
         /// <typeparam name="T">Service type</typeparam>
         /// <param name="propertyOwner">Property owner</param>
         /// <returns>Service instance</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public static T GetService<T>(IPropertyOwner propertyOwner) where T : class
         {
             try
@@ -71,7 +69,6 @@ namespace Microsoft.NodejsTools.Jade
         /// <typeparam name="T">Service type</typeparam>
         /// <param name="propertyOwner">Property owner</param>
         /// <returns>Service instance</returns>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public static object GetService(IPropertyOwner propertyOwner, ref Guid serviceGuid)
         {
             try

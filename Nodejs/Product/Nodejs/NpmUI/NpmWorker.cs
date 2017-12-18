@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Telemetry;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -27,6 +28,9 @@ namespace Microsoft.NodejsTools.NpmUI
         private readonly Thread worker;
 
         private QueuedNpmCommandInfo currentCommand;
+
+        public event EventHandler CommandStarted;
+        public event EventHandler<NpmCommandCompletedEventArgs> CommandCompleted;
 
         public NpmWorker(INpmController controller)
         {
@@ -67,6 +71,8 @@ namespace Microsoft.NodejsTools.NpmUI
             Debug.Assert(Thread.CurrentThread == this.worker, "The worked thread should be executing the NPM commands.");
 
             var cmdr = this.npmController.CreateNpmCommander();
+            cmdr.CommandStarted += Cmdr_CommandStarted;
+            cmdr.CommandCompleted += Cmdr_CommandCompleted;
             try
             {
                 cmdr.ExecuteNpmCommandAsync(info.Arguments).Wait();
@@ -76,6 +82,21 @@ namespace Microsoft.NodejsTools.NpmUI
                 // TaskCanceledException is not un-expected, 
                 // and should not tear down this thread.
                 // Other exceptions are handled higher up the stack.
+            }
+            finally
+            {
+                cmdr.CommandStarted -= Cmdr_CommandStarted;
+                cmdr.CommandCompleted -= Cmdr_CommandCompleted;
+            }
+
+            void Cmdr_CommandStarted(object sender, EventArgs e)
+            {
+                this.CommandStarted?.Invoke(this, e);
+            }
+
+            void Cmdr_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+            {
+                this.CommandCompleted?.Invoke(this, e);
             }
         }
 
@@ -375,6 +396,60 @@ namespace Microsoft.NodejsTools.NpmUI
         public void Dispose()
         {
             this.commandQueue.CompleteAdding();
+        }
+
+        // TODO: This is duplicated from Npm project
+        // We should integrate this into the NpmCommander
+        internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
+            string pathToNpm,
+            string executionDirectory,
+            string[] arguments,
+            bool visible = false,
+            Redirector redirector = null)
+        {
+            IEnumerable<string> standardOutputLines = null;
+
+            using (var process = ProcessOutput.Run(
+                pathToNpm,
+                arguments,
+                executionDirectory,
+                /*env*/ null,
+                visible,
+                redirector,
+                quoteArgs: false,
+                outputEncoding: redirector == null ? null : Encoding.UTF8))
+            {
+                var whnd = process.WaitHandle;
+                if (whnd == null)
+                {
+                    // Process failed to start, and any exception message has
+                    // already been sent through the redirector
+                    redirector?.WriteErrorLine("Error - cannot start npm");
+                }
+                else
+                {
+                    var finished = await Task.Run(() => whnd.WaitOne());
+                    if (finished)
+                    {
+                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
+                        // there seems to be a case when we're signalled as completed, but the
+                        // process hasn't actually exited
+                        process.Wait();
+                        if (process.StandardOutputLines != null)
+                        {
+                            standardOutputLines = process.StandardOutputLines.ToList();
+                        }
+                    }
+                    else
+                    {
+                        process.Kill();
+                        redirector?.WriteErrorLine("\r\n==== npm command cancelled ====\r\n\r\n");
+
+                        throw new OperationCanceledException();
+                    }
+                }
+            }
+            return standardOutputLines;
         }
 
         private sealed class QueuedNpmCommandInfo

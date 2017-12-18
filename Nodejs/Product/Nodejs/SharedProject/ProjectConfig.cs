@@ -1022,7 +1022,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region helpers
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private bool NotifyBuildBegin()
         {
             var shouldContinue = 1;
@@ -1046,7 +1045,6 @@ namespace Microsoft.VisualStudioTools.Project
             return true;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void NotifyBuildEnd(MSBuildResult result, string buildTarget)
         {
             var success = ((result == MSBuildResult.Successful) ? 1 : 0);

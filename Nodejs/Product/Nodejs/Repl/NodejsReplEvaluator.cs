@@ -330,7 +330,6 @@ namespace Microsoft.NodejsTools.Repl
 
             Span span;
 
-
             while (escape >= 0)
             {
                 span = writer(text.Substring(start, escape - start));
@@ -359,7 +358,7 @@ namespace Microsoft.NodejsTools.Repl
 
         private static InteractiveWindowColor Change(InteractiveWindowColor? from, InteractiveWindowColor to)
         {
-            return ((from ?? InteractiveWindowColor.Black) & InteractiveWindowColor.DarkGray) | to;
+            return ((from ?? InteractiveWindowColor.Foreground) & InteractiveWindowColor.DarkGray) | to;
         }
 
         private static InteractiveWindowColor? GetColorFromEscape(string text, ref int start)
@@ -410,7 +409,7 @@ namespace Microsoft.NodejsTools.Repl
                     }
                     else
                     {
-                        for (int j = 0; j < codes.Count; j++)
+                        for (var j = 0; j < codes.Count; j++)
                         {
                             switch (codes[j])
                             {

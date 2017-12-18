@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -192,7 +192,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     IPackageJson json = null;
                     try
                     {
-                        json = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
+                        json = PackageJsonFactory.Create(Path.Combine(moduleDir, "package.json"));
                     }
                     catch (PackageJsonException)
                     {
@@ -214,7 +214,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IPackage Package { get; set; }
 
-        public IList<string> RequiredBy { get; set; }
+        public IList<string> RequiredBy { get; }
 
         internal ModuleInfo(int depth)
         {

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -28,9 +28,9 @@ namespace Microsoft.NodejsTools.Project
             this.PackagesDependencyType = dependencyType;
         }
 
-        public DependencyType PackagesDependencyType { get; private set; }
+        public DependencyType PackagesDependencyType { get; }
 
-        public string VirtualName { get; private set; }
+        public string VirtualName { get; }
 
         public override string Url => this.VirtualName;
         public override string Caption => this._caption;

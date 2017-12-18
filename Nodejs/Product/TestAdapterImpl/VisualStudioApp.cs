@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +11,6 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Project;
-using Newtonsoft.Json.Linq;
 using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools
@@ -66,7 +64,6 @@ namespace Microsoft.VisualStudioTools
 
         // Source from
         //  http://blogs.msdn.com/b/kirillosenkov/archive/2011/08/10/how-to-get-dte-from-visual-studio-process-id.aspx
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport("ole32.dll")]
         private static extern int CreateBindCtx(uint reserved, out IBindCtx ppbc);
 
@@ -337,7 +334,6 @@ namespace Microsoft.VisualStudioTools
         }
 
         // Implement the IOleMessageFilter interface.
-        [SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport("Ole32.dll")]
         private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
     }

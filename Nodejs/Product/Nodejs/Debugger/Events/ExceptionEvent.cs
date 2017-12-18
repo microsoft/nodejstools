@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -46,16 +46,16 @@ namespace Microsoft.NodejsTools.Debugger.Events
             }
         }
 
-        public string ExceptionName { get; private set; }
-        public int? ErrorNumber { get; private set; }
-        public int? Line { get; private set; }
-        public int? Column { get; private set; }
-        public string Description { get; private set; }
-        public int ExceptionId { get; private set; }
-        public string TypeName { get; private set; }
-        public bool Uncaught { get; private set; }
-        public NodeModule Module { get; private set; }
-        public bool Running { get; private set; }
+        public string ExceptionName { get; }
+        public int? ErrorNumber { get; }
+        public int? Line { get; }
+        public int? Column { get; }
+        public string Description { get; }
+        public int ExceptionId { get; }
+        public string TypeName { get; }
+        public bool Uncaught { get; }
+        public NodeModule Module { get; }
+        public bool Running { get; }
 
         private int? GetExceptionCodeRef(JToken body)
         {

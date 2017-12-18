@@ -4,7 +4,6 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -173,6 +172,8 @@ namespace Microsoft.VisualStudioTools.Project
         private bool useProvidedLogger;
 
         private MSBuild.Project buildProject;
+
+        private MSBuild.Project userBuildProject;
 
         private MSBuildExecution.ProjectInstance currentConfig;
 
@@ -557,7 +558,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Gets a service provider object provided by the IDE hosting the project
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
         public IServiceProvider Site => this.site;
 
         /// <summary>
@@ -716,6 +716,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected string FileName => this.filename;
 
+        protected string UserProjectFilename => this.FileName + PerUserFileExtension;
+
         /// <summary>
         /// Gets the configuration provider.
         /// </summary>
@@ -792,6 +794,10 @@ namespace Microsoft.VisualStudioTools.Project
                 this.buildEngine = value;
             }
         }
+
+        protected internal MSBuild.Project UserBuildProject => this.userBuildProject;
+
+        protected bool IsUserProjectFileDirty => this.userBuildProject?.Xml.HasUnsavedChanges == true;
 
         #endregion
 
@@ -1965,10 +1971,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         /// <summary>
         /// Return the value of a project property in it's unevalauted form.
-        /// 
-        /// New in 1.5.
         /// </summary>
-        /// <param name="propertyName">Name of the property to get</param>
+        /// <param name="propertyName">Name of the property to get, or null if the property doesn't exist</param>
         public virtual string GetUnevaluatedProperty(string propertyName)
         {
             this.Site.GetUIThread().MustBeCalledFromUIThread();
@@ -1982,23 +1986,62 @@ namespace Microsoft.VisualStudioTools.Project
             return null;
         }
 
+        public virtual void MovePropertyToProjectFile(string propertyName)
+        {
+            this.Site.GetUIThread().MustBeCalledFromUIThread();
+
+            var prop = this.userBuildProject.GetProperty(propertyName);
+            if (prop != null)
+            {
+                this.buildProject.SetProperty(prop.Name, prop.UnevaluatedValue);
+                this.userBuildProject.RemoveProperty(prop);
+            }
+        }
+
+        public virtual void MovePropertyToUserFile(string propertyName)
+        {
+            this.Site.GetUIThread().MustBeCalledFromUIThread();
+            this.EnsureUserProjectFile();
+
+            var prop = this.buildProject.GetProperty(propertyName);
+            if (prop != null)
+            {
+                this.userBuildProject.SetProperty(prop.Name, prop.UnevaluatedValue);
+                this.buildProject.RemoveProperty(prop);
+            }
+        }
+
         /// <summary>
         /// Set value of project property
         /// </summary>
         /// <param name="propertyName">Name of property</param>
         /// <param name="propertyValue">Value of property</param>
-        public virtual void SetProjectProperty(string propertyName, string propertyValue)
+        public virtual bool SetProjectProperty(string propertyName, string propertyValue)
         {
+            return this.SetProjectProperty(propertyName, propertyValue, userProjectFile: false);
+        }
+
+        /// <summary>
+        /// Set value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        /// <param name="propertyValue">Value of property</param>
+        public virtual bool SetUserProjectProperty(string propertyName, string propertyValue)
+        {
+            return this.SetProjectProperty(propertyName, propertyValue, userProjectFile: true);
+        }
+
+        private bool SetProjectProperty(string propertyName, string propertyValue, bool userProjectFile) {
             Utilities.ArgumentNotNull("propertyName", propertyName);
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
             var oldValue = GetUnevaluatedProperty(propertyName) ?? string.Empty;
             propertyValue = propertyValue ?? string.Empty;
 
-            if (oldValue.Equals(propertyValue, StringComparison.Ordinal))
+            if (StringComparer.Ordinal.Equals(oldValue, propertyValue))
             {
                 // Property is unchanged or unspecified, so don't set it.
-                return;
+                return false;
             }
 
             // Check out the project file.
@@ -2007,11 +2050,48 @@ namespace Microsoft.VisualStudioTools.Project
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
 
-            var newProp = this.buildProject.SetProperty(propertyName, propertyValue);
+            if (userProjectFile)
+            {
+                this.EnsureUserProjectFile();
+                this.UserBuildProject.SetProperty(propertyName, propertyValue);
+            }
+            else
+            {
+                var newProp = this.buildProject.SetProperty(propertyName, propertyValue);
+            }
             RaiseProjectPropertyChanged(propertyName, oldValue, propertyValue);
 
             // property cache will need to be updated
             this.currentConfig = null;
+            return true;
+        }
+
+        private void EnsureUserProjectFile()
+        {
+            if (this.userBuildProject == null)
+            {
+                // user project file doesn't exist yet, create it.
+                var root = Microsoft.Build.Construction.ProjectRootElement.Create(this.BuildProject.ProjectCollection);
+                this.userBuildProject = new MSBuild.Project(root, null, null, this.BuildProject.ProjectCollection);
+                this.userBuildProject.FullPath = this.FileName + PerUserFileExtension;
+            }
+        }
+
+        /// <summary>
+        /// Get value of user project property
+        /// </summary>
+        /// <param name="propertyName">Name of property</param>
+        public virtual string GetUserProjectProperty(string propertyName)
+        {
+            Utilities.ArgumentNotNull("propertyName", propertyName);
+
+            if (this.userBuildProject == null)
+            {
+                return null;
+            }
+
+            // If user project file exists during project load/reload userBuildProject is initiated 
+            return this.userBuildProject.GetPropertyValue(propertyName);
         }
 
         public virtual CompilerParameters GetProjectOptions(string config)
@@ -2292,19 +2372,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// List of Guids of the config independent property pages. It is called by the GetProperty for VSHPROPID_PropertyPagesCLSIDList property.
         /// </summary>
         /// <returns></returns>
-        protected virtual Guid[] GetConfigurationIndependentPropertyPages()
-        {
-            return new Guid[] { };
-        }
+        protected virtual Guid[] GetConfigurationIndependentPropertyPages() => Array.Empty<Guid>();
 
         /// <summary>
         /// Returns a list of Guids of the configuration dependent property pages. It is called by the GetProperty for VSHPROPID_CfgPropertyPagesCLSIDList property.
         /// </summary>
         /// <returns></returns>
-        protected virtual Guid[] GetConfigurationDependentPropertyPages()
-        {
-            return new Guid[] { };
-        }
+        protected virtual Guid[] GetConfigurationDependentPropertyPages() => Array.Empty<Guid>();
 
         /// <summary>
         /// An ordered list of guids of the prefered property pages. See <see cref="__VSHPROPID.VSHPROPID_PriorityPropertyPagesCLSIDList"/>
@@ -2510,6 +2584,11 @@ namespace Microsoft.VisualStudioTools.Project
                 this.eventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
 
                 SetBuildProject(Utilities.ReinitializeMsBuildProject(this.buildEngine, this.filename, this.buildProject));
+
+                if (File.Exists(this.UserProjectFilename))
+                {
+                    this.userBuildProject = this.BuildProject.ProjectCollection.LoadProject(this.UserProjectFilename);
+                }
 
                 // Load the guid
                 SetProjectGuidFromProjectFile();
@@ -3616,7 +3695,7 @@ namespace Microsoft.VisualStudioTools.Project
                         flags, // no per file flags
                         attributes, // no per file file attributes
                         out var verdict,
-                        out var moreInfo // ignore additional results
+                        out var _ // ignore additional results
                     );
 
                     var qer = (tagVSQueryEditResult)verdict;
@@ -3649,7 +3728,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         internal bool QueryEditProjectFile(bool suppressUI)
         {
-            return QueryEditFiles(suppressUI, this.filename);
+            return QueryEditFiles(suppressUI, this.filename, this.UserProjectFilename);
         }
 
         internal bool QueryFolderAdd(HierarchyNode targetFolder, string path)

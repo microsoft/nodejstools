@@ -82,8 +82,6 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     this.Node.ProjectMgr.Site.GetUIThread().Invoke(() =>
                     {
-
-
                         VsShellUtilities.IsDocumentOpen(this.Node.ProjectMgr.Site, this.Node.Url, VSConstants.LOGVIEWID_Any, out var hier, out var itemid, out var windowFrame);
 
                         if (windowFrame != null)

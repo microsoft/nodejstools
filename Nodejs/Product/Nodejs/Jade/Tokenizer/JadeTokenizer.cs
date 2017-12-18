@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio.Text;
@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.Text.Tagging;
 
 namespace Microsoft.NodejsTools.Jade
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer")]
     internal partial class JadeTokenizer : Tokenizer<JadeToken>
     {
         private bool _attributeState = false;
