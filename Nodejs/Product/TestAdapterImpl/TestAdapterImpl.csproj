@@ -130,7 +130,9 @@
     <Content Include="TestFrameworks\find_tests.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestFrameworks\Jasmine\jasmine.js" />
+    <Content Include="TestFrameworks\Jasmine\jasmine.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFrameworks\mocha\mocha.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
