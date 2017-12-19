@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -24,12 +24,12 @@ namespace Microsoft.NodejsTools.NpmUI
             IndexOptional = 2,
         }
 
-        internal enum FilterState
+        internal static class FilterState
         {
-            NoFilterText,
-            Filtering,
-            ResultsAvailable,
-            NoResults,
+            public const string NoFilterText = nameof(NoFilterText);
+            public const string Filtering = nameof(Filtering);
+            public const string ResultsAvailable = nameof(ResultsAvailable);
+            public const string NoResults = nameof(NoResults);
         }
 
         public static readonly ICommand InstallCommand = new RoutedCommand();
@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         #region Filtering
 
-        public FilterState PackageFilterState
+        public string PackageFilterState
         {
             get
             {
