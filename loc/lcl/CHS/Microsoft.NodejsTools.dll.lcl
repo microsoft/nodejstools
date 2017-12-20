@@ -4614,6 +4614,9 @@
         <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},259" ItemType=";Menu" PsrId="240" Leaf="true">
           <Str Cat="Menu Item">
             <Val><![CDATA[Npm]]></Val>
+            <Tgt Cat="Menu Item" Stat="Loc" Orig="New">
+              <Val><![CDATA[Npm]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4623,12 +4626,18 @@
         <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Start Script]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[启动脚本]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
         <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType=";CommandName" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[StartScript]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[StartScript]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -5779,7 +5788,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11216.2]]></Val>
+        <Val><![CDATA[1.4.11218.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5806,7 +5815,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11216.2 commit:17e3e2a0e909eb2060df1fe2f9181696a2ecc5f5]]></Val>
+        <Val><![CDATA[1.4.11218.1 commit:74f36c4e260bd666bbe99398b592285143a1c8b2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
