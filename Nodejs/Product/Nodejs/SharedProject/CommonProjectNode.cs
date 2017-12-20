@@ -507,7 +507,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 this._fileSystemChanges.Clear(); // none of the other changes matter now, we'll rescan the world
                 this._currentMerger = null;  // abort any current merge now that we have a new one
-                this._fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null, watcher: sender as FileWatcher));
+                this._fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, path: null));
                 TriggerIdle();
             }
         }
@@ -656,14 +656,12 @@ namespace Microsoft.VisualStudioTools.Project
             private readonly string _initialDir;
             private readonly Stack<DirState> _remainingDirs = new Stack<DirState>();
             private readonly CommonProjectNode _project;
-            private readonly FileWatcher _watcher;
 
-            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir, FileWatcher watcher = null)
+            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
             {
                 this._project = project;
                 this._initialDir = dir;
                 this._remainingDirs.Push(new DirState(dir, parent));
-                this._watcher = watcher;
             }
 
             /// <summary>
@@ -675,11 +673,8 @@ namespace Microsoft.VisualStudioTools.Project
             public bool ContinueMerge(bool hierarchyCreated = true)
             {
                 if (this._remainingDirs.Count == 0)
-                {   // all done
-                    if (this._watcher != null)
-                    {
-                        this._watcher.EnableRaisingEvents = true;
-                    }
+                {
+                    // all done
                     this._project.BoldStartupItem();
                     return false;
                 }
@@ -821,7 +816,7 @@ namespace Microsoft.VisualStudioTools.Project
                     uint pathLen = NativeMethods.MAX_PATH + 1;
                     uint res;
                     StringBuilder filePathBuilder;
-                    for (;;)
+                    for (; ; )
                     {
                         filePathBuilder = new StringBuilder(checked((int)pathLen));
                         res = NativeMethods.GetFinalPathNameByHandle(
@@ -1138,7 +1133,7 @@ namespace Microsoft.VisualStudioTools.Project
 #endif
                         if (change._type == WatcherChangeTypes.All)
                         {
-                            this._currentMerger = new DiskMerger(this, this, this.ProjectHome, change._watcher);
+                            this._currentMerger = new DiskMerger(this, this, this.ProjectHome);
                             continue;
                         }
                         else
@@ -1164,18 +1159,17 @@ namespace Microsoft.VisualStudioTools.Project
         private class FileSystemChange
         {
             private readonly CommonProjectNode _project;
-            internal readonly WatcherChangeTypes _type;
             private readonly string _path;
             private readonly bool _isRename;
-            internal readonly FileWatcher _watcher;
 
-            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false, FileWatcher watcher = null)
+            internal readonly WatcherChangeTypes _type;
+
+            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false)
             {
                 this._project = node;
                 this._type = changeType;
                 this._path = path;
                 this._isRename = isRename;
-                this._watcher = watcher;
             }
 
             public override string ToString()
@@ -1205,7 +1199,9 @@ namespace Microsoft.VisualStudioTools.Project
                     case WatcherChangeTypes.Deleted:
                         ChildDeleted(child);
                         break;
-                    case WatcherChangeTypes.Created: ChildCreated(child); break;
+                    case WatcherChangeTypes.Created:
+                        ChildCreated(child);
+                        break;
                     case WatcherChangeTypes.Changed:
                         // we only care about the attributes
                         if (this._project.IsFileHidden(this._path))
@@ -1338,7 +1334,8 @@ namespace Microsoft.VisualStudioTools.Project
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                     }
                     else if (File.Exists(this._path))
-                    { // rapid changes can arrive out of order, make sure the file still exists
+                    {
+                        // rapid changes can arrive out of order, make sure the file still exists
                         this._project.AddAllFilesFile(parent, this._path);
                         if (StringComparer.OrdinalIgnoreCase.Equals(this._project.GetStartupFile(), this._path))
                         {
@@ -1376,11 +1373,13 @@ namespace Microsoft.VisualStudioTools.Project
                 this._projectDocListenerForStartupFileUpdates.Dispose();
                 this._projectDocListenerForStartupFileUpdates = null;
             }
+
             var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
+
             if (this._watcher != null)
             {
                 this._watcher.EnableRaisingEvents = false;
@@ -1410,6 +1409,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
         {
             base.Load(filename, location, name, flags, ref iidProject, out canceled);
+
             var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
