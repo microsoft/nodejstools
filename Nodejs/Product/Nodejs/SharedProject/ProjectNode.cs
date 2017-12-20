@@ -310,11 +310,6 @@ namespace Microsoft.VisualStudioTools.Project
             get;
         }
 
-        internal abstract string IssueTrackerUrl
-        {
-            get;
-        }
-
         #endregion
 
         #region virtual properties
@@ -2254,7 +2249,7 @@ namespace Microsoft.VisualStudioTools.Project
             return false;
         }
 
-        public virtual string[] CodeFileExtensions => Array.Empty<string>();
+        public virtual IReadOnlyCollection<string> CodeFileExtensions => Array.Empty<string>();
 
         /// <summary>
         /// Determines whether the given file is a resource file (resx file).
