@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -143,12 +143,8 @@ namespace Microsoft.NodejsTools.Debugger.Communication
                             throw new SocketException();
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (!Microsoft.VisualStudioTools.ExceptionExtensions.IsCriticalException(ex))
                     {
-                        if (ex.IsCriticalException())
-                        {
-                            throw;
-                        }
                         LiveLogger.WriteLine("Connection attempt {0} failed with: {1}", connection_attempts, ex);
                         if (this._isClosed || connection_attempts >= MAX_ATTEMPTS)
                         {

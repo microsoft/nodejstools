@@ -3,6 +3,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -139,8 +140,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// List of output groups names and their associated target
         /// </summary>
-        private static KeyValuePair<string, string>[] outputGroupNames =
-        {                                      // Name                    ItemGroup (MSBuild)
+        private static readonly KeyValuePair<string, string>[] OutputGroupNames =
+        {
+            // Name                    ItemGroup (MSBuild)
             new KeyValuePair<string, string>("Built",                 "BuiltProjectOutputGroup"),
             new KeyValuePair<string, string>("ContentFiles",          "ContentFilesProjectOutputGroup"),
             new KeyValuePair<string, string>("LocalizedResourceDlls", "SatelliteDllsProjectOutputGroup"),
@@ -149,7 +151,8 @@ namespace Microsoft.VisualStudioTools.Project
             new KeyValuePair<string, string>("SourceFiles",           "SourceFilesProjectOutputGroup"),
             new KeyValuePair<string, string>("XmlSerializer",         "SGenFilesOutputGroup"),
         };
-        private EventSinkCollection _hierarchyEventSinks = new EventSinkCollection();
+
+        private readonly EventSinkCollection _hierarchyEventSinks = new EventSinkCollection();
 
         /// <summary>A project will only try to build if it can obtain a lock on this object</summary>
         private volatile static object BuildLock = new object();
@@ -343,7 +346,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// This is the project instance guid that is peristed in the project file
         /// </summary>
-        [System.ComponentModel.BrowsableAttribute(false)]
+        [Browsable(false)]
         public virtual Guid ProjectIDGuid
         {
             get
@@ -1897,7 +1900,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="key">Key to retrieve the target item from the subitems list</param>
         /// <returns>Newly added node</returns>
         /// <remarks>If the parent node was found we add the dependent item to it otherwise we add the item ignoring the "DependentUpon" metatdata</remarks>
-        protected virtual HierarchyNode AddDependentFileNode(IDictionary<String, MSBuild.ProjectItem> subitems, string key)
+        protected virtual HierarchyNode AddDependentFileNode(IDictionary<string, MSBuild.ProjectItem> subitems, string key)
         {
             Utilities.ArgumentNotNull("subitems", subitems);
 
@@ -2031,7 +2034,8 @@ namespace Microsoft.VisualStudioTools.Project
             return this.SetProjectProperty(propertyName, propertyValue, userProjectFile: true);
         }
 
-        private bool SetProjectProperty(string propertyName, string propertyValue, bool userProjectFile) {
+        private bool SetProjectProperty(string propertyName, string propertyValue, bool userProjectFile)
+        {
             Utilities.ArgumentNotNull("propertyName", propertyName);
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
@@ -2163,28 +2167,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             var warningLevel = GetProjectProperty("WarningLevel", resetCache: false);
-            if (warningLevel != null)
+            if (int.TryParse(warningLevel, out var newLevel))
             {
-                try
-                {
-                    options.WarningLevel = int.Parse(warningLevel, CultureInfo.InvariantCulture);
-                }
-                catch (ArgumentNullException e)
-                {
-                    Trace.WriteLine("Exception : " + e.Message);
-                }
-                catch (ArgumentException e)
-                {
-                    Trace.WriteLine("Exception : " + e.Message);
-                }
-                catch (FormatException e)
-                {
-                    Trace.WriteLine("Exception : " + e.Message);
-                }
-                catch (OverflowException e)
-                {
-                    Trace.WriteLine("Exception : " + e.Message);
-                }
+                options.WarningLevel = newLevel;
             }
 
             return options;
@@ -3218,7 +3203,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>List of output group name and corresponding MSBuild target</returns>
         protected internal virtual IList<KeyValuePair<string, string>> GetOutputGroupNames()
         {
-            return new List<KeyValuePair<string, string>>(outputGroupNames);
+            return new List<KeyValuePair<string, string>>(OutputGroupNames);
         }
 
         /// <summary>
@@ -3344,11 +3329,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected internal virtual void ProcessFiles()
         {
-            var subitemsKeys = new List<String>();
-            var subitems = new Dictionary<String, MSBuild.ProjectItem>();
+            var subitemsKeys = new List<string>();
+            var subitems = new Dictionary<string, MSBuild.ProjectItem>();
 
             // Define a set for our build items. The value does not really matter here.
-            var items = new Dictionary<String, MSBuild.ProjectItem>();
+            var items = new Dictionary<string, MSBuild.ProjectItem>();
 
             // Process Files
             foreach (var item in this.buildProject.Items.ToArray()) // copy the array, we could add folders while enumerating
@@ -3461,7 +3446,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <param name="subitemsKeys">List of sub item keys </param>
         /// <param name="subitems"></param>
-        protected internal virtual void ProcessDependentFileNodes(IList<String> subitemsKeys, Dictionary<String, MSBuild.ProjectItem> subitems)
+        protected internal virtual void ProcessDependentFileNodes(IList<string> subitemsKeys, Dictionary<string, MSBuild.ProjectItem> subitems)
         {
             if (subitemsKeys == null || subitems == null)
             {
@@ -4183,12 +4168,11 @@ namespace Microsoft.VisualStudioTools.Project
                     key = key.Remove(comma);
                 }
 
-                string value;
                 int hr;
                 switch (hr = parse.IsSwitchPresent(i))
                 {
                     case VSConstants.S_OK:
-                        ErrorHandler.ThrowOnFailure(parse.GetSwitchValue(i, out value));
+                        ErrorHandler.ThrowOnFailure(parse.GetSwitchValue(i, out var value));
                         res[key] = value;
                         break;
                     case VSConstants.S_FALSE:
@@ -4801,13 +4785,9 @@ namespace Microsoft.VisualStudioTools.Project
                                         fileInfo.Attributes &= ~FileAttributes.ReadOnly;
                                     }
                                 }
-                                catch (Exception ex)
+                                catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                                 {
                                     // Best-effort, but no big deal if this fails.
-                                    if (ex.IsCriticalException())
-                                    {
-                                        throw;
-                                    }
                                 }
                             }
                         }
@@ -5017,11 +4997,6 @@ If the files in the existing folder have the same names as files in the folder y
 
         protected virtual void LinkFileAdded(string filename)
         {
-        }
-
-        private static string GetIncrementedFileName(string newFileName, int count)
-        {
-            return CommonUtils.GetAbsoluteFilePath(Path.GetDirectoryName(newFileName), Path.GetFileNameWithoutExtension(newFileName) + " - Copy (" + count + ")" + Path.GetExtension(newFileName));
         }
 
         /// <summary>
@@ -6279,13 +6254,8 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.UnregisterLoggers(submission.SubmissionId));
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                 {
-                    if (ex.IsCriticalException())
-                    {
-                        throw;
-                    }
-
                     Trace.TraceError(ex.ToString());
                 }
 
@@ -6296,13 +6266,8 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.EndDesignTimeBuild());
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                 {
-                    if (ex.IsCriticalException())
-                    {
-                        throw;
-                    }
-
                     Trace.TraceError(ex.ToString());
                 }
 
@@ -6313,13 +6278,8 @@ If the files in the existing folder have the same names as files in the folder y
                         Marshal.ThrowExceptionForHR(accessor.ReleaseUIThreadForBuild());
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                 {
-                    if (ex.IsCriticalException())
-                    {
-                        throw;
-                    }
-
                     Trace.TraceError(ex.ToString());
                 }
             }

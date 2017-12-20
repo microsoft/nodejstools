@@ -1091,12 +1091,8 @@ namespace Microsoft.VisualStudioTools.Project
                             return null;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                     {
-                        if (e.IsCriticalException())
-                        {
-                            throw;
-                        }
                         return null;
                     }
                 }

@@ -140,13 +140,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // also force a refresh of the SolutionExplorer's node.
                 this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_Caption, 0);
             }
-            catch (Exception e)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (e.IsCriticalException())
-                {
-                    throw;
-                }
-                throw new InvalidOperationException(SR.GetString(SR.RenameFolder, e.Message));
+                throw new InvalidOperationException(SR.GetString(SR.RenameFolder, ex.Message));
             }
             return VSConstants.S_OK;
         }
