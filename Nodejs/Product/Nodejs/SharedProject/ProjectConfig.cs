@@ -1089,14 +1089,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 this.config.ProjectMgr.BuildAsync(options, this.config.ConfigName, output, target, (result, buildTarget) => this.NotifyBuildEnd(result, buildTarget));
             }
-            catch (Exception e)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (e.IsCriticalException())
-                {
-                    throw;
-                }
-                Trace.WriteLine("Exception : " + e.Message);
-                ErrorHandler.ThrowOnFailure(output.OutputStringThreadSafe("Unhandled Exception:" + e.Message + "\n"));
+                Trace.WriteLine("Exception : " + ex.Message);
+                ErrorHandler.ThrowOnFailure(output.OutputStringThreadSafe("Unhandled Exception:" + ex.Message + "\n"));
                 this.NotifyBuildEnd(MSBuildResult.Failed, target);
                 throw;
             }
