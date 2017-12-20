@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -53,13 +53,8 @@ namespace Microsoft.VisualStudioTools
             {
                 result = await task;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
-
                 var message = SR.GetUnhandledExceptionString(ex, callerType, callerFile, callerLineNumber, callerName);
                 // Send the message to the trace listener in case there is
                 // somebody out there listening.
@@ -135,13 +130,8 @@ namespace Microsoft.VisualStudioTools
             {
                 await task;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
-
                 var message = SR.GetUnhandledExceptionString(ex, callerType, callerFile, callerLineNumber, callerName);
                 // Send the message to the trace listener in case there is
                 // somebody out there listening.

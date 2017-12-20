@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     internal class FrameworkDiscover
     {
-        private readonly Dictionary<String, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
 
         public FrameworkDiscover()
         {

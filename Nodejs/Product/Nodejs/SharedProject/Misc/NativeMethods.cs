@@ -965,7 +965,7 @@ namespace Microsoft.VisualStudioTools.Project
         public static extern bool RemoveDirectory(string lpPathName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool MoveFile(String src, String dst);
+        internal static extern bool MoveFile(string src, string dst);
     }
 
     internal class CredUI

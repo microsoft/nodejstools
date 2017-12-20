@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             if (ErrorHandler.Succeeded(this.get_Property("TargetPath", out var variant)))
             {
-                var var = variant as String;
+                var var = variant as string;
 
                 if (var != null)
                 {
