@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudioTools
 
         public IdleManager(IServiceProvider serviceProvider)
         {
-            this.BserviceProvider = serviceProvider;
+            this.serviceProvider = serviceProvider;
         }
 
         private void EnsureInit()
