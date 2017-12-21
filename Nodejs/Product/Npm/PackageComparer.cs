@@ -5,8 +5,12 @@ using System.Collections.Generic;
 
 namespace Microsoft.NodejsTools.Npm
 {
-    public class PackageComparer : IComparer<IPackage>
+    public sealed class PackageComparer : IComparer<IPackage>
     {
+        public readonly static IComparer<IPackage> Instance = new PackageComparer();
+
+        private PackageComparer() { }
+
         public int Compare(IPackage x, IPackage y)
         {
             if (x == y)

@@ -1036,7 +1036,6 @@
     <Compile Include="SharedProject\CommonPropertyPage.cs" />
     <Compile Include="SharedProject\CommonReferenceContainerNode.cs" />
     <Compile Include="SharedProject\ConfigProvider.cs" />
-    <Compile Include="SharedProject\FileWatcher.cs" />
     <Compile Include="SharedProject\FlavoredProjectFactoryBase.cs" />
     <Compile Include="SharedProject\DataObject.cs" />
     <Compile Include="SharedProject\DependentFileNode.cs" />

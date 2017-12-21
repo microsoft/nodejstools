@@ -941,7 +941,7 @@ namespace Microsoft.VisualStudioTools.Project
                     try
                     {
                         var trimmedPath = CommonUtils.TrimEndSeparator(path);
-                        foreach (var dir in Directory.GetDirectories(Path.GetDirectoryName(trimmedPath), Path.GetFileName(trimmedPath)))
+                        foreach (var dir in Directory.EnumerateDirectories(Path.GetDirectoryName(trimmedPath), Path.GetFileName(trimmedPath)))
                         {
                             if (StringComparer.OrdinalIgnoreCase.Equals(dir, trimmedPath))
                             {
@@ -958,7 +958,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     try
                     {
-                        foreach (var file in Directory.GetFiles(Path.GetDirectoryName(path)))
+                        foreach (var file in Directory.EnumerateFiles(Path.GetDirectoryName(path)))
                         {
                             if (StringComparer.OrdinalIgnoreCase.Equals(file, path))
                             {
@@ -1981,14 +1981,14 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void AddExistingDirectory(HierarchyNode node, string path, List<KeyValuePair<HierarchyNode, HierarchyNode>> addedItems)
         {
-            foreach (var dir in Directory.GetDirectories(path))
+            foreach (var dir in Directory.EnumerateDirectories(path))
             {
                 var existingDir = GetOrAddDirectory(node, addedItems, dir);
 
                 AddExistingDirectory(existingDir, dir, addedItems);
             }
 
-            foreach (var file in Directory.GetFiles(path))
+            foreach (var file in Directory.EnumerateFiles(path))
             {
                 var existingFile = node.FindImmediateChildByName(Path.GetFileName(file));
                 if (existingFile == null)

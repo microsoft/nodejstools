@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections;
 using System.Collections.Generic;
@@ -7,33 +7,25 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal abstract class AbstractNodeModules : INodeModules
     {
-        protected readonly List<IPackage> _packagesSorted = new List<IPackage>();
-        private readonly IDictionary<string, IPackage> _packagesByName = new Dictionary<string, IPackage>();
+        protected readonly SortedSet<IPackage> SortedPackages = new SortedSet<IPackage>(PackageComparer.Instance);
+        private readonly IDictionary<string, IPackage> packagesByName = new Dictionary<string, IPackage>();
 
         protected virtual void AddModule(IPackage package)
         {
-            if (package.Name != null && !this._packagesByName.ContainsKey(package.Name))
+            if (package.Name != null && !this.packagesByName.ContainsKey(package.Name))
             {
-                this._packagesSorted.Add(package);
-                this._packagesByName[package.Name] = package;
+                this.SortedPackages.Add(package);
+                this.packagesByName[package.Name] = package;
             }
         }
 
-        public int Count
-        {
-            get { return this._packagesSorted.Count; }
-        }
-
-        public IPackage this[int index]
-        {
-            get { return this._packagesSorted[index]; }
-        }
+        public int Count => this.SortedPackages.Count;
 
         public IPackage this[string name]
         {
             get
             {
-                this._packagesByName.TryGetValue(name, out var pkg);
+                this.packagesByName.TryGetValue(name, out var pkg);
                 return pkg;
             }
         }
@@ -47,7 +39,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             get
             {
-                foreach (IPackage pkg in this)
+                foreach (var pkg in this)
                 {
                     if (pkg.IsMissing)
                     {
@@ -60,7 +52,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IEnumerator<IPackage> GetEnumerator()
         {
-            return this._packagesSorted.GetEnumerator();
+            return this.SortedPackages.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

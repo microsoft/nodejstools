@@ -15,24 +15,7 @@ namespace Microsoft.VisualStudioTools
             return ex is StackOverflowException ||
                 ex is OutOfMemoryException ||
                 ex is ThreadAbortException ||
-                ex is AccessViolationException ||
-                ex is CriticalException;
+                ex is AccessViolationException;
         }
-    }
-
-    /// <summary>
-    /// An exception that should not be silently handled and logged.
-    /// </summary>
-    [Serializable]
-    internal class CriticalException : Exception
-    {
-        public CriticalException() { }
-        public CriticalException(string message) : base(message) { }
-        public CriticalException(string message, Exception inner) : base(message, inner) { }
-        protected CriticalException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context)
-        { }
     }
 }

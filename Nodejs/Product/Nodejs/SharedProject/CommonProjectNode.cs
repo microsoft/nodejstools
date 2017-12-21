@@ -507,7 +507,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 this._fileSystemChanges.Clear(); // none of the other changes matter now, we'll rescan the world
                 this._currentMerger = null;  // abort any current merge now that we have a new one
-                this._fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, null, watcher: sender as FileWatcher));
+                this._fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, path: null));
                 TriggerIdle();
             }
         }
@@ -651,19 +651,15 @@ namespace Microsoft.VisualStudioTools.Project
         /// If there were changes which came in while the DiskMerger was processing then those changes will still need
         /// to be processed after the DiskMerger completes.
         /// </summary>
-        private class DiskMerger
+        private sealed class DiskMerger
         {
-            private readonly string _initialDir;
-            private readonly Stack<DirState> _remainingDirs = new Stack<DirState>();
-            private readonly CommonProjectNode _project;
-            private readonly FileWatcher _watcher;
+            private readonly Stack<DirState> remainingDirs = new Stack<DirState>();
+            private readonly CommonProjectNode project;
 
-            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir, FileWatcher watcher = null)
+            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
             {
-                this._project = project;
-                this._initialDir = dir;
-                this._remainingDirs.Push(new DirState(dir, parent));
-                this._watcher = watcher;
+                this.project = project;
+                this.remainingDirs.Push(new DirState(dir, parent));
             }
 
             /// <summary>
@@ -674,27 +670,45 @@ namespace Microsoft.VisualStudioTools.Project
             /// </summary>
             public bool ContinueMerge(bool hierarchyCreated = true)
             {
-                if (this._remainingDirs.Count == 0)
-                {   // all done
-                    if (this._watcher != null)
-                    {
-                        this._watcher.EnableRaisingEvents = true;
-                    }
-                    this._project.BoldStartupItem();
+                if (this.remainingDirs.Count == 0)
+                {
+                    // all done
+                    this.project.BoldStartupItem();
                     return false;
                 }
 
-                var dir = this._remainingDirs.Pop();
+                var dir = this.remainingDirs.Pop();
                 if (!Directory.Exists(dir.Name))
                 {
                     return true;
                 }
 
+                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
-                IEnumerable<string> dirs;
                 try
                 {
-                    dirs = Directory.EnumerateDirectories(dir.Name);
+                    foreach (var curDir in Directory.EnumerateDirectories(dir.Name))
+                    {
+                        if (this.project.IsFileHidden(curDir))
+                        {
+                            continue;
+                        }
+                        if (IsFileSymLink(curDir))
+                        {
+                            if (IsRecursiveSymLink(dir.Name, curDir))
+                            {
+                                // don't add recursive sym links
+                                continue;
+                            }
+
+                            // track symlinks, we won't get events on the directory
+                            this.project.CreateSymLinkWatcher(curDir);
+                        }
+
+                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
+                        missingChildren.Remove(existing);
+                        this.remainingDirs.Push(new DirState(curDir, existing));
+                    }
                 }
                 catch
                 {
@@ -702,34 +716,16 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
-                foreach (var curDir in dirs)
-                {
-                    if (this._project.IsFileHidden(curDir))
-                    {
-                        continue;
-                    }
-                    if (IsFileSymLink(curDir))
-                    {
-                        if (IsRecursiveSymLink(dir.Name, curDir))
-                        {
-                            // don't add recursive sym links
-                            continue;
-                        }
-
-                        // track symlinks, we won't get events on the directory
-                        this._project.CreateSymLinkWatcher(curDir);
-                    }
-
-                    var existing = this._project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                    missingChildren.Remove(existing);
-                    this._remainingDirs.Push(new DirState(curDir, existing));
-                }
-
-                IEnumerable<string> files;
                 try
                 {
-                    files = Directory.EnumerateFiles(dir.Name);
+                    foreach (var file in Directory.EnumerateFiles(dir.Name))
+                    {
+                        if (this.project.IsFileHidden(file))
+                        {
+                            continue;
+                        }
+                        missingChildren.Remove(this.project.AddAllFilesFile(dir.Parent, file));
+                    }
                 }
                 catch
                 {
@@ -744,21 +740,12 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                foreach (var file in files)
-                {
-                    if (this._project.IsFileHidden(file))
-                    {
-                        continue;
-                    }
-                    missingChildren.Remove(this._project.AddAllFilesFile(dir.Parent, file));
-                }
-
                 // remove the excluded children which are no longer there
                 foreach (var child in missingChildren)
                 {
                     if (child.ItemNode.IsExcluded)
                     {
-                        this._project.RemoveSubTree(child);
+                        this.project.RemoveSubTree(child);
                     }
                 }
 
@@ -770,7 +757,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            private class DirState
+            private struct DirState
             {
                 public readonly string Name;
                 public readonly HierarchyNode Parent;
@@ -821,7 +808,7 @@ namespace Microsoft.VisualStudioTools.Project
                     uint pathLen = NativeMethods.MAX_PATH + 1;
                     uint res;
                     StringBuilder filePathBuilder;
-                    for (;;)
+                    for (; ; )
                     {
                         filePathBuilder = new StringBuilder(checked((int)pathLen));
                         res = NativeMethods.GetFinalPathNameByHandle(
@@ -908,15 +895,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return (File.GetAttributes(path) & (FileAttributes.Hidden | FileAttributes.System)) != 0;
             }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                return false;
-            }
-            catch (FileNotFoundException)
+            catch (Exception exc) when (!(exc is IOException || exc is UnauthorizedAccessException))
             {
                 return false;
             }
@@ -1138,7 +1117,7 @@ namespace Microsoft.VisualStudioTools.Project
 #endif
                         if (change._type == WatcherChangeTypes.All)
                         {
-                            this._currentMerger = new DiskMerger(this, this, this.ProjectHome, change._watcher);
+                            this._currentMerger = new DiskMerger(this, this, this.ProjectHome);
                             continue;
                         }
                         else
@@ -1164,18 +1143,17 @@ namespace Microsoft.VisualStudioTools.Project
         private class FileSystemChange
         {
             private readonly CommonProjectNode _project;
-            internal readonly WatcherChangeTypes _type;
             private readonly string _path;
             private readonly bool _isRename;
-            internal readonly FileWatcher _watcher;
 
-            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false, FileWatcher watcher = null)
+            internal readonly WatcherChangeTypes _type;
+
+            public FileSystemChange(CommonProjectNode node, WatcherChangeTypes changeType, string path, bool isRename = false)
             {
                 this._project = node;
                 this._type = changeType;
                 this._path = path;
                 this._isRename = isRename;
-                this._watcher = watcher;
             }
 
             public override string ToString()
@@ -1205,7 +1183,9 @@ namespace Microsoft.VisualStudioTools.Project
                     case WatcherChangeTypes.Deleted:
                         ChildDeleted(child);
                         break;
-                    case WatcherChangeTypes.Created: ChildCreated(child); break;
+                    case WatcherChangeTypes.Created:
+                        ChildCreated(child);
+                        break;
                     case WatcherChangeTypes.Changed:
                         // we only care about the attributes
                         if (this._project.IsFileHidden(this._path))
@@ -1338,7 +1318,8 @@ namespace Microsoft.VisualStudioTools.Project
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                     }
                     else if (File.Exists(this._path))
-                    { // rapid changes can arrive out of order, make sure the file still exists
+                    {
+                        // rapid changes can arrive out of order, make sure the file still exists
                         this._project.AddAllFilesFile(parent, this._path);
                         if (StringComparer.OrdinalIgnoreCase.Equals(this._project.GetStartupFile(), this._path))
                         {
@@ -1376,11 +1357,13 @@ namespace Microsoft.VisualStudioTools.Project
                 this._projectDocListenerForStartupFileUpdates.Dispose();
                 this._projectDocListenerForStartupFileUpdates = null;
             }
+
             var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
+
             if (this._watcher != null)
             {
                 this._watcher.EnableRaisingEvents = false;
@@ -1410,6 +1393,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override void Load(string filename, string location, string name, uint flags, ref Guid iidProject, out int canceled)
         {
             base.Load(filename, location, name, flags, ref iidProject, out canceled);
+
             var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
             if (null != libraryManager)
             {
