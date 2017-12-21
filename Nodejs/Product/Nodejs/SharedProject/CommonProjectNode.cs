@@ -651,17 +651,15 @@ namespace Microsoft.VisualStudioTools.Project
         /// If there were changes which came in while the DiskMerger was processing then those changes will still need
         /// to be processed after the DiskMerger completes.
         /// </summary>
-        private class DiskMerger
+        private sealed class DiskMerger
         {
-            private readonly string _initialDir;
-            private readonly Stack<DirState> _remainingDirs = new Stack<DirState>();
-            private readonly CommonProjectNode _project;
+            private readonly Stack<DirState> remainingDirs = new Stack<DirState>();
+            private readonly CommonProjectNode project;
 
             public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
             {
-                this._project = project;
-                this._initialDir = dir;
-                this._remainingDirs.Push(new DirState(dir, parent));
+                this.project = project;
+                this.remainingDirs.Push(new DirState(dir, parent));
             }
 
             /// <summary>
@@ -672,24 +670,45 @@ namespace Microsoft.VisualStudioTools.Project
             /// </summary>
             public bool ContinueMerge(bool hierarchyCreated = true)
             {
-                if (this._remainingDirs.Count == 0)
+                if (this.remainingDirs.Count == 0)
                 {
                     // all done
-                    this._project.BoldStartupItem();
+                    this.project.BoldStartupItem();
                     return false;
                 }
 
-                var dir = this._remainingDirs.Pop();
+                var dir = this.remainingDirs.Pop();
                 if (!Directory.Exists(dir.Name))
                 {
                     return true;
                 }
 
+                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
-                IEnumerable<string> dirs;
                 try
                 {
-                    dirs = Directory.EnumerateDirectories(dir.Name);
+                    foreach (var curDir in Directory.EnumerateDirectories(dir.Name))
+                    {
+                        if (this.project.IsFileHidden(curDir))
+                        {
+                            continue;
+                        }
+                        if (IsFileSymLink(curDir))
+                        {
+                            if (IsRecursiveSymLink(dir.Name, curDir))
+                            {
+                                // don't add recursive sym links
+                                continue;
+                            }
+
+                            // track symlinks, we won't get events on the directory
+                            this.project.CreateSymLinkWatcher(curDir);
+                        }
+
+                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
+                        missingChildren.Remove(existing);
+                        this.remainingDirs.Push(new DirState(curDir, existing));
+                    }
                 }
                 catch
                 {
@@ -697,34 +716,16 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
-                foreach (var curDir in dirs)
-                {
-                    if (this._project.IsFileHidden(curDir))
-                    {
-                        continue;
-                    }
-                    if (IsFileSymLink(curDir))
-                    {
-                        if (IsRecursiveSymLink(dir.Name, curDir))
-                        {
-                            // don't add recursive sym links
-                            continue;
-                        }
-
-                        // track symlinks, we won't get events on the directory
-                        this._project.CreateSymLinkWatcher(curDir);
-                    }
-
-                    var existing = this._project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                    missingChildren.Remove(existing);
-                    this._remainingDirs.Push(new DirState(curDir, existing));
-                }
-
-                IEnumerable<string> files;
                 try
                 {
-                    files = Directory.EnumerateFiles(dir.Name);
+                    foreach (var file in Directory.EnumerateFiles(dir.Name))
+                    {
+                        if (this.project.IsFileHidden(file))
+                        {
+                            continue;
+                        }
+                        missingChildren.Remove(this.project.AddAllFilesFile(dir.Parent, file));
+                    }
                 }
                 catch
                 {
@@ -739,21 +740,12 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
-                foreach (var file in files)
-                {
-                    if (this._project.IsFileHidden(file))
-                    {
-                        continue;
-                    }
-                    missingChildren.Remove(this._project.AddAllFilesFile(dir.Parent, file));
-                }
-
                 // remove the excluded children which are no longer there
                 foreach (var child in missingChildren)
                 {
                     if (child.ItemNode.IsExcluded)
                     {
-                        this._project.RemoveSubTree(child);
+                        this.project.RemoveSubTree(child);
                     }
                 }
 
@@ -765,7 +757,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            private class DirState
+            private struct DirState
             {
                 public readonly string Name;
                 public readonly HierarchyNode Parent;
@@ -903,15 +895,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return (File.GetAttributes(path) & (FileAttributes.Hidden | FileAttributes.System)) != 0;
             }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
-            catch (DirectoryNotFoundException)
-            {
-                return false;
-            }
-            catch (FileNotFoundException)
+            catch (Exception exc) when (!(exc is IOException || exc is UnauthorizedAccessException))
             {
                 return false;
             }
