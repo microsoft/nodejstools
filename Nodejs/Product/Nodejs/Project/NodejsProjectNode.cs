@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private readonly static string[] _excludedAvailableItems = new[] {
+        private readonly static IReadOnlyCollection<string> ExcludedAvailableItems = new[] {
             "ApplicationDefinition",
             "Page",
             "Resource",
@@ -87,7 +87,7 @@ namespace Microsoft.NodejsTools.Project
         {
             // Remove a couple of available item names which show up from imports we
             // can't control out of Microsoft.Common.targets.
-            return base.GetAvailableItemNames().Except(_excludedAvailableItems);
+            return base.GetAvailableItemNames().Except(ExcludedAvailableItems);
         }
 
         public Dictionary<NodejsProjectImageName, int> ImageIndexFromNameDictionary => this._imageIndexFromNameDictionary;
@@ -105,7 +105,7 @@ namespace Microsoft.NodejsTools.Project
             AddProjectImage(NodejsProjectImageName.DependencyMissing, "Microsoft.VisualStudioTools.Resources.Icons.PackageWarning_16x.png");
         }
 
-        public bool IsTypeScriptProject => StringComparer.OrdinalIgnoreCase.Equals(GetProjectProperty(NodeProjectProperty.EnableTypeScript), "true");
+        public bool IsTypeScriptProject => StringComparer.OrdinalIgnoreCase.Equals(this.GetProjectProperty(NodeProjectProperty.EnableTypeScript, false), "true");
 
         protected override bool SupportsIconMonikers => true;
         protected override ImageMoniker GetIconMoniker(bool open)
@@ -123,13 +123,11 @@ namespace Microsoft.NodejsTools.Project
 
         public override Guid SharedCommandGuid => Guids.NodejsCmdSet;
 
-        internal override string IssueTrackerUrl => NodejsConstants.IssueTrackerUrl;
-
         protected override void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName)
         {
             base.AddNewFileNodeToHierarchy(parentNode, fileName);
 
-            if (IsProjectTypeScriptSourceFile(fileName) && !this.IsTypeScriptProject)
+            if (!this.IsTypeScriptProject && IsProjectTypeScriptSourceFile(fileName))
             {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
@@ -147,14 +145,6 @@ namespace Microsoft.NodejsTools.Project
             return TypeScriptHelpers.IsTypeScriptFile(path)
                 && !StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(path), NodejsConstants.TypeScriptDeclarationExtension)
                 && !NodejsConstants.ContainsNodeModulesOrBowerComponentsFolder(path);
-        }
-
-        internal static bool IsNodejsFile(string strFileName)
-        {
-            var ext = Path.GetExtension(strFileName);
-
-            return StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptExtension) ||
-                StringComparer.OrdinalIgnoreCase.Equals(ext, NodejsConstants.JavaScriptJsxExtension);
         }
 
         internal override string GetItemType(string filename)
@@ -227,14 +217,14 @@ namespace Microsoft.NodejsTools.Project
             return false;
         }
 
-        private static readonly string[] codeFileExtensions = new[] {
+        private static readonly IReadOnlyCollection<string> codeFileExtensions = new[] {
             NodejsConstants.JavaScriptExtension,
             NodejsConstants.JavaScriptJsxExtension,
             NodejsConstants.TypeScriptExtension,
             NodejsConstants.TypeScriptJsxExtension
         };
 
-        public override string[] CodeFileExtensions => codeFileExtensions;
+        public override IReadOnlyCollection<string> CodeFileExtensions => codeFileExtensions;
 
         protected internal override FolderNode CreateFolderNode(ProjectElement element)
         {
@@ -277,7 +267,7 @@ namespace Microsoft.NodejsTools.Project
             var res = base.GetConfigurationDependentPropertyPages();
 
             var enableTs = GetProjectProperty(NodeProjectProperty.EnableTypeScript, resetCache: false);
-            if (enableTs != null && Boolean.TryParse(enableTs, out var fEnableTs) && fEnableTs)
+            if (enableTs != null && bool.TryParse(enableTs, out var fEnableTs) && fEnableTs)
             {
                 var typeScriptPages = GetProjectProperty(NodeProjectProperty.TypeScriptCfgProperty);
                 if (typeScriptPages != null)

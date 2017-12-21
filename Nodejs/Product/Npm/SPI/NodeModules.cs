@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    internal class NodeModules : AbstractNodeModules
+    internal sealed class NodeModules : AbstractNodeModules
     {
-        private readonly Dictionary<string, ModuleInfo> _allModules;
-        private static readonly string[] _ignoredDirectories = { @"\.bin", @"\.staging" };
+        private readonly Dictionary<string, ModuleInfo> allModules;
+        private static readonly IReadOnlyCollection<string> IgnoredDirectories = new[] { @"\.bin", @"\.staging" };
 
-        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth = null, int depth = 0, int maxDepth = 1)
+        public NodeModules(IRootPackage parent, bool showMissingDevOptionalSubPackages, Dictionary<string, ModuleInfo> allModulesToDepth, int depth, int maxDepth)
         {
             if (depth >= maxDepth)
             {
@@ -22,13 +22,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             var modulesBase = Path.Combine(parent.Path, NodejsConstants.NodeModulesFolder);
 
-            this._allModules = allModulesToDepth ?? new Dictionary<string, ModuleInfo>();
+            this.allModules = allModulesToDepth ?? new Dictionary<string, ModuleInfo>();
 
             // This is the first time NodeModules is being created.
             // Iterate through directories to add everything that's known to be top-level.
             if (depth == 0)
             {
-                Debug.Assert(this._allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
+                Debug.Assert(this.allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
 
                 // Go through every directory in node_modules, and see if it's required as a top-level dependency
                 foreach (var topLevelDependency in GetTopLevelPackageDirectories(modulesBase))
@@ -81,8 +81,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     } while (moduleDir.Contains(NodejsConstants.NodeModulesFolder));
                 }
             }
-
-            this._packagesSorted.Sort(PackageComparer.Instance);
         }
 
         private void AddTopLevelModule(IRootPackage parent, bool showMissingDevOptionalSubPackages, string moduleDir, int depth, int maxDepth)
@@ -95,7 +93,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             depth++;
 
-            this._allModules.TryGetValue(moduleDir, out var moduleInfo);
+            this.allModules.TryGetValue(moduleDir, out var moduleInfo);
 
             if (moduleInfo != null)
             {
@@ -118,7 +116,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 // Top-level modules are always added so we can include missing modules.
                 moduleInfo = new ModuleInfo(depth);
-                this._allModules.Add(moduleDir, moduleInfo);
+                this.allModules.Add(moduleDir, moduleInfo);
             }
             else
             {
@@ -135,7 +133,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
                 moduleInfo.RequiredBy.Add(parent.Path);
 
-                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, this._allModules, depth, maxDepth);
+                var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, this.allModules, depth, maxDepth);
                 if (dependency != null)
                 {
                     pkg.RequestedVersionRange = dependency.VersionRangeText;
@@ -158,7 +156,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1, StringComparison.Ordinal);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
-            this._allModules.TryGetValue(directorySubString, out var value);
+            this.allModules.TryGetValue(directorySubString, out var value);
 
             var depth = value != null ? value.Depth : 0;
             Debug.WriteLine("Module Depth: {0} [{1}]", filepath, depth);
@@ -173,21 +171,18 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 try
                 {
-                    topLevelDirectories = Directory.EnumerateDirectories(modulesBase);
+                    topLevelDirectories = Directory.EnumerateDirectories(modulesBase, "*", SearchOption.TopDirectoryOnly);
                 }
-                catch (IOException)
+                catch (Exception ex) when (!(ex is IOException || ex is UnauthorizedAccessException))
                 {
                     // We want to handle DirectoryNotFound, DriveNotFound, PathTooLong
-                }
-                catch (UnauthorizedAccessException)
-                {
                 }
             }
 
             // Go through every directory in node_modules, and see if it's required as a top-level dependency
             foreach (var moduleDir in topLevelDirectories)
             {
-                if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !_ignoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore, StringComparison.Ordinal)))
+                if (moduleDir.Length < NativeMethods.MAX_FOLDER_PATH && !IgnoredDirectories.Any(toIgnore => moduleDir.EndsWith(toIgnore, StringComparison.Ordinal)))
                 {
                     IPackageJson json = null;
                     try
@@ -208,18 +203,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
         }
     }
 
-    internal class ModuleInfo
+    internal sealed class ModuleInfo
     {
         public int Depth { get; set; }
 
         public IPackage Package { get; set; }
 
-        public IList<string> RequiredBy { get; }
+        public IList<string> RequiredBy { get; } = new List<string>();
 
         internal ModuleInfo(int depth)
         {
             this.Depth = depth;
-            this.RequiredBy = new List<string>();
         }
     }
 }

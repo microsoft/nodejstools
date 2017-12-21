@@ -197,15 +197,16 @@ namespace Microsoft.VisualStudioTools.Project
 
         private bool projectOpened;
 
-        private string errorString;
+        private Lazy<string> errorString = new Lazy<string>(() => SR.GetString(SR.Error), isThreadSafe: true);
 
-        private string warningString;
+        private Lazy<string> warningString = new Lazy<string>(() => SR.GetString(SR.Warning), isThreadSafe: true);
 
         private ImageHandler imageHandler;
 
         private Guid projectIdGuid;
 
-        private bool isClosed, isClosing;
+        private bool isClosed;
+        private bool isClosing;
 
         private EventTriggering eventTriggeringFlag = EventTriggering.TriggerAll;
 
@@ -217,11 +218,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// The build dependency list passed to IVsDependencyProvider::EnumDependencies 
         /// </summary>
         private List<IVsBuildDependency> buildDependencyList = new List<IVsBuildDependency>();
-
-        /// <summary>
-        /// Defines if Project System supports Project Designer
-        /// </summary>
-        private bool supportsProjectDesigner;
 
         private bool showProjectInSolutionPage = true;
 
@@ -281,13 +277,6 @@ namespace Microsoft.VisualStudioTools.Project
         private int parentHierarchyItemId;
 
         private List<HierarchyNode> itemsDraggedOrCutOrCopied;
-        /// <summary>
-        /// Folder node in the process of being created.  First the hierarchy node
-        /// is added, then the label is edited, and when that completes/cancels
-        /// the folder gets created.
-        /// </summary>
-        private FolderNode _folderBeingCreated;
-
         private readonly ExtensibilityEventsDispatcher extensibilityEventsDispatcher;
 
         #endregion
@@ -309,11 +298,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <returns></returns>
         public abstract string ProjectType
-        {
-            get;
-        }
-
-        internal abstract string IssueTrackerUrl
         {
             get;
         }
@@ -377,26 +361,15 @@ namespace Microsoft.VisualStudioTools.Project
         internal ExtensibilityEventsDispatcher ExtensibilityEventsDispatcher => this.extensibilityEventsDispatcher;
 
         /// <summary>
-        /// Gets the folder node which is currently being added to the project via
-        /// Solution Explorer.
+        /// Folder node in the process of being created.  First the hierarchy node
+        /// is added, then the label is edited, and when that completes/cancels
+        /// the folder gets created.
         /// </summary>
-        internal FolderNode FolderBeingCreated
-        {
-            get
-            {
-                return this._folderBeingCreated;
-            }
-            set
-            {
-                this._folderBeingCreated = value;
-            }
-        }
+        internal FolderNode FolderBeingCreated { get; set; }
 
         internal IList<HierarchyNode> ItemsDraggedOrCutOrCopied => this.itemsDraggedOrCutOrCopied;
 
         public MSBuildExecution.ProjectInstance CurrentConfig => this.currentConfig;
-
-        public Dictionary<string, HierarchyNode> DiskNodes => this._diskNodes;
 
         #region overridden properties
 
@@ -454,31 +427,9 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region virtual properties
 
-        public virtual string ErrorString
-        {
-            get
-            {
-                if (this.errorString == null)
-                {
-                    this.errorString = SR.GetString(SR.Error);
-                }
+        public virtual string ErrorString => this.errorString.Value;
 
-                return this.errorString;
-            }
-        }
-
-        public virtual string WarningString
-        {
-            get
-            {
-                if (this.warningString == null)
-                {
-                    this.warningString = SR.GetString(SR.Warning);
-                }
-
-                return this.warningString;
-            }
-        }
+        public virtual string WarningString => this.warningString.Value;
 
         /// <summary>
         /// Override this property to specify when the project file is dirty.
@@ -501,17 +452,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// True if the project uses the Project Designer Editor instead of the property page frame to edit project properties.
         /// </summary>
-        protected bool SupportsProjectDesigner
-        {
-            get
-            {
-                return this.supportsProjectDesigner;
-            }
-            set
-            {
-                this.supportsProjectDesigner = value;
-            }
-        }
+        protected bool SupportsProjectDesigner { get; set; }
 
         protected virtual Guid ProjectDesignerEditor => VSConstants.GUID_ProjectDesignerEditor;
 
@@ -1137,7 +1078,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 this._diskNodes.Clear();
-                this._folderBeingCreated = null;
+                this.FolderBeingCreated = null;
             }
             finally
             {
@@ -2239,7 +2180,7 @@ namespace Microsoft.VisualStudioTools.Project
             return false;
         }
 
-        public virtual string[] CodeFileExtensions => Array.Empty<string>();
+        public virtual IReadOnlyCollection<string> CodeFileExtensions => Array.Empty<string>();
 
         /// <summary>
         /// Determines whether the given file is a resource file (resx file).

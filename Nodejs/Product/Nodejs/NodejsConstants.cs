@@ -20,8 +20,6 @@ namespace Microsoft.NodejsTools
         internal const string HTML = "HTML";
         internal const string Nodejs = "Node.js";
 
-        internal const string IssueTrackerUrl = "https://go.microsoft.com/fwlink/?LinkId=507637";
-
         internal const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
 
         internal const string NodeModulesFolder = "node_modules";

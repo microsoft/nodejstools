@@ -7,7 +7,7 @@ namespace Microsoft.NodejsTools.Npm
 {
     public sealed class PackageComparer : IComparer<IPackage>
     {
-        public static readonly PackageComparer Instance = new PackageComparer();
+        public readonly static IComparer<IPackage> Instance = new PackageComparer();
 
         private PackageComparer() { }
 
@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Npm
 
     public sealed class PackageEqualityComparer : EqualityComparer<IPackage>
     {
-        public static readonly PackageEqualityComparer Instance = new PackageEqualityComparer();
+        public static EqualityComparer<IPackage> Instance => new PackageEqualityComparer();
 
         private PackageEqualityComparer() { }
 

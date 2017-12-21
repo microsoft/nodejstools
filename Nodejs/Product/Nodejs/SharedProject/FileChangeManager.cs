@@ -13,7 +13,6 @@ namespace Microsoft.VisualStudioTools.Project
     /// </summary>
     internal class FileChangeManager : IVsFileChangeEvents
     {
-        #region nested objects
         /// <summary>
         /// Defines a data structure that can link a item moniker to the item and its file change cookie.
         /// </summary>
@@ -61,9 +60,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
         }
-        #endregion
 
-        #region Fields
         /// <summary>
         /// Event that is raised when one of the observed file names have changed on disk.
         /// </summary>
@@ -84,21 +81,17 @@ namespace Microsoft.VisualStudioTools.Project
         /// Has Disposed already been called?
         /// </summary>
         private bool disposed;
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Overloaded ctor.
         /// </summary>
         /// <param name="nodeParam">An instance of a project item.</param>
         internal FileChangeManager(IServiceProvider serviceProvider)
         {
-            #region input validation
             if (serviceProvider == null)
             {
                 throw new ArgumentNullException(nameof(serviceProvider));
             }
-            #endregion
 
             this.fileChangeService = (IVsFileChangeEx)serviceProvider.GetService(typeof(SVsFileChangeEx));
 
@@ -108,9 +101,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new InvalidOperationException();
             }
         }
-        #endregion
 
-        #region IDisposable Members
         /// <summary>
         /// Disposes resources.
         /// </summary>
@@ -133,9 +124,7 @@ namespace Microsoft.VisualStudioTools.Project
             // Clean the observerItems list
             this.observedItems.Clear();
         }
-        #endregion
 
-        #region IVsFileChangeEvents Members
         /// <summary>
         /// Called when one of the file have changed on disk.
         /// </summary>
@@ -155,16 +144,13 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentNullException(nameof(flags));
             }
 
-            if (this.FileChangedOnDisk != null)
+            for (var i = 0; i < numberOfFilesChanged; i++)
             {
-                for (var i = 0; i < numberOfFilesChanged; i++)
+                var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
+                if (this.observedItems.ContainsKey(fullFileName))
                 {
-                    var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
-                    if (this.observedItems.ContainsKey(fullFileName))
-                    {
-                        var info = this.observedItems[fullFileName];
-                        this.FileChangedOnDisk(this, new FileChangedOnDiskEventArgs(fullFileName, info.ItemID, (_VSFILECHANGEFLAGS)flags[i]));
-                    }
+                    var info = this.observedItems[fullFileName];
+                    this.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(fullFileName, info.ItemID, (_VSFILECHANGEFLAGS)flags[i]));
                 }
             }
 
@@ -180,9 +166,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             return VSConstants.S_OK;
         }
-        #endregion
 
-        #region helpers
         /// <summary>
         /// Observe when the given file is updated on disk. In this case we do not care about the item id that represents the file in the hierarchy.
         /// </summary>
@@ -199,12 +183,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="id">The item id of the item to observe.</param>
         internal void ObserveItem(string fileName, uint id)
         {
-            #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
-            #endregion
 
             var fullFileName = Utilities.CanonicalizeFileName(fileName);
             if (!this.observedItems.ContainsKey(fullFileName))
@@ -228,12 +210,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="ignore">Flag indicating whether or not to ignore changes (1 to ignore, 0 to stop ignoring).</param>
         internal void IgnoreItemChanges(string fileName, bool ignore)
         {
-            #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
-            #endregion
 
             var fullFileName = Utilities.CanonicalizeFileName(fileName);
             if (this.observedItems.ContainsKey(fullFileName))
@@ -249,12 +229,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="fileName">File to stop observing.</param>
         internal void StopObservingItem(string fileName)
         {
-            #region Input validation
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(fileName));
             }
-            #endregion
 
             var fullFileName = Utilities.CanonicalizeFileName(fileName);
 
@@ -272,6 +250,5 @@ namespace Microsoft.VisualStudioTools.Project
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseFileChange(itemInfo.FileChangeCookie));
             }
         }
-        #endregion
     }
 }
