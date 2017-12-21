@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Microsoft.NodejsTools.Npm.SPI;
 
@@ -14,9 +14,9 @@ namespace Microsoft.NodejsTools.Npm
             return new RootPackage(
                 fullPathToRootDirectory,
                 showMissingDevOptionalSubPackages,
-                null,
-                0,
-                maxDepth);
+                allModules: null,
+                depth: 0,
+                maxDepth: maxDepth);
         }
     }
 }

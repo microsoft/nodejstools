@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.Project
             // Include node_modules folder is generally unecessary and can cause VS to hang.
             // http://nodejstools.codeplex.com/workitem/1432
             // Check if the folder is node_modules, and warn the user to ensure they don't run into this issue or at least set expectations appropriately.
-            var nodeModulesPath = Path.Combine(this._project.FullPathToChildren, "node_modules");
+            var nodeModulesPath = Path.Combine(this._project.FullPathToChildren, NodejsConstants.NodeModulesFolder);
             if (CommonUtils.IsSameDirectory(nodeModulesPath, this.ItemNode.Url))
             {
                 Utilities.ShowMessageBox(

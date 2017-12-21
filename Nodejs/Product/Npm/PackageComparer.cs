@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.Npm
         }
     }
 
-    public class PackageEqualityComparer : EqualityComparer<IPackage>
+    public sealed class PackageEqualityComparer : EqualityComparer<IPackage>
     {
         public static EqualityComparer<IPackage> Instance => new PackageEqualityComparer();
 
