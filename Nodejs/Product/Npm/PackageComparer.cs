@@ -38,6 +38,15 @@ namespace Microsoft.NodejsTools.Npm
 
         public override bool Equals(IPackage p1, IPackage p2)
         {
+            if (p1 == p2)
+            {
+                return true;
+            }
+            if (p1 == null || p2 == null)
+            {
+                return false;
+            }
+
             return p1.Name == p2.Name
                 && p1.Version == p2.Version
                 && p1.IsBundledDependency == p2.IsBundledDependency
@@ -49,6 +58,11 @@ namespace Microsoft.NodejsTools.Npm
 
         public override int GetHashCode(IPackage obj)
         {
+            if(obj == null)
+            {
+                return 0;
+            }
+
             if (obj.Name == null || obj.Version == null)
             {
                 return obj.GetHashCode();

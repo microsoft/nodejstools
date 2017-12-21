@@ -1,9 +1,8 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Microsoft.NodejsTools.Jade
@@ -42,7 +41,7 @@ namespace Microsoft.NodejsTools.Jade
         public TextRange(int position)
         {
             this._start = position;
-            this._end = position < Int32.MaxValue ? position + 1 : position;
+            this._end = position < int.MaxValue ? position + 1 : position;
         }
 
         /// <summary>
@@ -54,7 +53,9 @@ namespace Microsoft.NodejsTools.Jade
         public TextRange(int start, int length)
         {
             if (length < 0)
-                throw new ArgumentException("Length must not be negative");
+            {
+                throw new ArgumentException("Length must not be negative", nameof(length));
+            }
 
             this._start = start;
             this._end = start + length;
@@ -155,7 +156,9 @@ namespace Microsoft.NodejsTools.Jade
         public virtual bool Contains(IEnumerable<ITextRange> ranges)
         {
             if (ranges == null)
+            {
                 return false;
+            }
 
             var contains = false;
 
@@ -183,14 +186,15 @@ namespace Microsoft.NodejsTools.Jade
         public void Expand(int startOffset, int endOffset)
         {
             if (this._start + startOffset > this._end + endOffset)
+            {
                 throw new ArgumentException("Combination of start and end offsets should not be making range invalid");
+            }
 
             this._start += startOffset;
             this._end += endOffset;
         }
         #endregion
 
-        [ExcludeFromCodeCoverage]
         public override string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, "[{0}...{1}]", this.Start, this.End);
@@ -206,11 +210,15 @@ namespace Microsoft.NodejsTools.Jade
         public static bool AreEqual(ITextRange left, ITextRange right)
         {
             if (Object.ReferenceEquals(left, right))
+            {
                 return true;
+            }
 
             // If one is null, but not both, return false.
             if (((object)left == null) || ((object)right == null))
+            {
                 return false;
+            }
 
             return (left.Start == right.Start) && (left.End == right.End);
         }
@@ -254,7 +262,9 @@ namespace Microsoft.NodejsTools.Jade
         public static bool Contains(int rangeStart, int rangeLength, int position)
         {
             if (rangeLength == 0 && position == rangeStart)
+            {
                 return true;
+            }
 
             return position >= rangeStart && position < rangeStart + rangeLength;
         }
@@ -297,13 +307,19 @@ namespace Microsoft.NodejsTools.Jade
             // Support intersection with empty ranges
 
             if (rangeLength1 == 0 && rangeLength2 == 0)
+            {
                 return rangeStart1 == rangeStart2;
+            }
 
             if (rangeLength1 == 0)
+            {
                 return Contains(rangeStart2, rangeLength2, rangeStart1);
+            }
 
             if (rangeLength2 == 0)
+            {
                 return Contains(rangeStart1, rangeLength1, rangeStart2);
+            }
 
             return rangeStart2 + rangeLength2 > rangeStart1 && rangeStart2 < rangeStart1 + rangeLength1;
         }
@@ -376,7 +392,9 @@ namespace Microsoft.NodejsTools.Jade
             var other = obj as TextRange;
 
             if (other == null)
+            {
                 return -1;
+            }
 
             return this.Start.CompareTo(other.Start);
         }
@@ -384,7 +402,9 @@ namespace Microsoft.NodejsTools.Jade
         public override bool Equals(object obj)
         {
             if (obj == null)
+            {
                 return false;
+            }
 
             return CompareTo(obj) == 0;
         }
@@ -397,10 +417,14 @@ namespace Microsoft.NodejsTools.Jade
         public static bool operator ==(TextRange range1, TextRange range2)
         {
             if ((object)range1 == null && (object)range2 == null)
+            {
                 return true;
+            }
 
             if ((object)range1 == null || (object)range2 == null)
+            {
                 return false;
+            }
 
             return range1.Equals(range2);
         }
@@ -413,7 +437,9 @@ namespace Microsoft.NodejsTools.Jade
         public static bool operator <(TextRange range1, TextRange range2)
         {
             if ((object)range1 == null || (object)range2 == null)
+            {
                 return false;
+            }
 
             return range1.CompareTo(range2) < 0;
         }
@@ -421,7 +447,9 @@ namespace Microsoft.NodejsTools.Jade
         public static bool operator >(TextRange range1, TextRange range2)
         {
             if ((object)range1 == null || (object)range2 == null)
+            {
                 return false;
+            }
 
             return range1.CompareTo(range2) > 0;
         }

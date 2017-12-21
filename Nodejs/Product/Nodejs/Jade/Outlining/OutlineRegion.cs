@@ -43,7 +43,9 @@ namespace Microsoft.NodejsTools.Jade
 
                     var text = this._textBuffer.CurrentSnapshot.GetText(this.Start, hoverTextLength);
                     if (hoverTextLength < this.Length)
+                    {
                         text += "...";
+                    }
 
                     return text;
                 }

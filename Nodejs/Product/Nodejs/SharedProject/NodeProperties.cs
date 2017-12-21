@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools.Project
 {
@@ -164,11 +163,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             // We do not check whether the supportsProjectDesigner is set to false on the ProjectNode.
             // We rely that the caller knows what to call on us.
-            Utilities.ArgumentNotNull("pages", pages);
+            Utilities.ArgumentNotNull(nameof(pages), pages);
 
             if (pages.Length == 0)
             {
-                throw new ArgumentException(SR.GetString(SR.InvalidParameter), "pages");
+                throw new ArgumentException(SR.GetString(SR.InvalidParameter), nameof(pages));
             }
 
             // Only the project should show the property page the rest should show the project properties.
@@ -178,8 +177,7 @@ namespace Microsoft.VisualStudioTools.Project
                 // Because a flavor could modify that list we must make sure we are calling the outer most implementation of IVsHierarchy
                 var guidsList = string.Empty;
                 var hierarchy = this.HierarchyNode.ProjectMgr.GetOuterInterface<IVsHierarchy>();
-                object variant = null;
-                ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out variant));
+                ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList, out var variant));
                 guidsList = (string)variant;
 
                 var guids = Utilities.GuidsArrayFromSemicolonDelimitedStringOfGuids(guidsList);
@@ -691,16 +689,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <param name="editorBaseType">Type of the editor</param>
         /// <returns>Editor</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The service provider is used by the PropertiesEditorLauncher")]
         public override object GetEditor(Type editorBaseType)
         {
             // Override the scenario where we are asked for a ComponentEditor
             // as this is how the Properties Browser calls us
             if (editorBaseType == typeof(ComponentEditor))
             {
-                IOleServiceProvider sp;
-                ErrorHandler.ThrowOnFailure(this.Node.ProjectMgr.GetSite(out sp));
+                ErrorHandler.ThrowOnFailure(this.Node.ProjectMgr.GetSite(out var sp));
                 return new PropertiesEditorLauncher(new ServiceProvider(sp));
             }
 
@@ -842,7 +837,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 var copyLocal = this.GetProperty(ProjectFileConstants.Private, "False");
                 if (copyLocal == null || copyLocal.Length == 0)
+                {
                     return true;
+                }
+
                 return bool.Parse(copyLocal);
             }
             set

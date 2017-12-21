@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Runtime.InteropServices;
 
@@ -9,9 +9,9 @@ namespace Microsoft.VisualStudioTools.Project
     [ComVisible(true)]
     internal class CommonProjectConfig : ProjectConfig
     {
-        private readonly CommonProjectNode/*!*/ _project;
+        private readonly CommonProjectNode _project;
 
-        public CommonProjectConfig(CommonProjectNode/*!*/ project, string configuration)
+        public CommonProjectConfig(CommonProjectNode project, string configuration)
             : base(project, configuration)
         {
             this._project = project;

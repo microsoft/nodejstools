@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Concurrent;
@@ -15,7 +15,6 @@ using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell.Settings;
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools.Project
 {
@@ -89,8 +88,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             Trace.WriteLineIf(Thread.CurrentThread.GetApartmentState() != ApartmentState.STA, "WARNING: IDEBuildLogger constructor running on the wrong thread.");
 
-            IOleServiceProvider site;
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hierarchy.GetSite(out site));
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hierarchy.GetSite(out var site));
 
             this.taskProvider = taskProvider;
             this.outputWindowPane = output;
@@ -360,9 +358,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal void FlushBuildOutput()
         {
-            OutputQueueEntry output;
 
-            while (this.outputQueue.TryDequeue(out output))
+            while (this.outputQueue.TryDequeue(out var output))
             {
                 ErrorHandler.ThrowOnFailure(output.Pane.OutputString(output.Message));
             }
@@ -445,9 +442,8 @@ namespace Microsoft.VisualStudioTools.Project
                 this.taskProvider.SuspendRefresh();
                 try
                 {
-                    Func<ErrorTask> taskFunc;
 
-                    while (this.taskQueue.TryDequeue(out taskFunc))
+                    while (this.taskQueue.TryDequeue(out var taskFunc))
                     {
                         // Create the error task
                         var task = taskFunc();
@@ -594,13 +590,8 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 action();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
-
                 ShowErrorMessage(serviceProvider, ex);
             }
         }

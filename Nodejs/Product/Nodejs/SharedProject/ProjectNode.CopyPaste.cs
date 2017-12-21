@@ -585,10 +585,7 @@ namespace Microsoft.VisualStudioTools.Project
                 Utilities.ArgumentNotNullOrEmpty(folderToAdd, "folderToAdd");
 
                 var targetFolderNode = this.TargetNode.GetDragTargetHandlerNode();
-
-                string folder;
-                IVsHierarchy sourceHierarchy;
-                GetPathAndHierarchy(folderToAdd, out folder, out sourceHierarchy);
+                GetPathAndHierarchy(folderToAdd, out var folder, out var sourceHierarchy);
 
                 // Ensure we don't end up in an endless recursion
                 if (Utilities.IsSameComObject(this.Project, sourceHierarchy))
@@ -679,8 +676,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 var additions = new List<Addition>();
-                uint folderId;
-                if (ErrorHandler.Failed(sourceHierarchy.ParseCanonicalName(folder, out folderId)))
+                if (ErrorHandler.Failed(sourceHierarchy.ParseCanonicalName(folder, out var folderId)))
                 {
                     // the folder may have been deleted between the copy & paste
                     ReportMissingItem(folder);
@@ -742,23 +738,20 @@ namespace Microsoft.VisualStudioTools.Project
                     object variant = null;
 
                     // Calculate the corresponding path in our project
-                    string source;
-                    ErrorHandler.ThrowOnFailure(((IVsProject)sourceHierarchy).GetMkDocument(itemId, out source));
+                    ErrorHandler.ThrowOnFailure(((IVsProject)sourceHierarchy).GetMkDocument(itemId, out var source));
                     if (name == null)
                     {
                         name = CommonUtils.GetFileOrDirectoryName(source);
                     }
 
-                    Guid guidType;
-                    ErrorHandler.ThrowOnFailure(sourceHierarchy.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid, out guidType));
+                    ErrorHandler.ThrowOnFailure(sourceHierarchy.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid, out var guidType));
 
                     var solution = this.Project.GetService(typeof(IVsSolution)) as IVsSolution;
                     if (solution != null)
                     {
                         if (guidType == VSConstants.GUID_ItemType_PhysicalFile)
                         {
-                            string projRef;
-                            ErrorHandler.ThrowOnFailure(solution.GetProjrefOfItem(sourceHierarchy, itemId, out projRef));
+                            ErrorHandler.ThrowOnFailure(solution.GetProjrefOfItem(sourceHierarchy, itemId, out var projRef));
                             var addition = CanAddFileFromProjectReference(projRef, targetPath);
                             if (addition == null)
                             {
@@ -940,9 +933,8 @@ namespace Microsoft.VisualStudioTools.Project
             /// <param name="sourceHierarchy"></param>
             private void GetPathAndHierarchy(string projectReference, out string path, out IVsHierarchy sourceHierarchy)
             {
-                Guid projectInstanceGuid;
 
-                GetPathAndProjectId(projectReference, out projectInstanceGuid, out path);
+                GetPathAndProjectId(projectReference, out var projectInstanceGuid, out path);
                 // normalize the casing in case the project system gave us casing different from the file system
                 if (CommonUtils.HasEndSeparator(path))
                 {
@@ -991,7 +983,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // Split the reference in its 3 parts
                 var index1 = Guid.Empty.ToString("B").Length;
                 if (index1 + 1 >= projectReference.Length)
-                    throw new ArgumentOutOfRangeException("folderToAdd");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(projectReference));
+                }
 
                 // Get the Guid
                 var guidString = projectReference.Substring(1, index1 - 2);
@@ -1000,7 +994,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // Get the project path
                 var index2 = projectReference.IndexOf('|', index1 + 1);
                 if (index2 < 0 || index2 + 1 >= projectReference.Length)
-                    throw new ArgumentOutOfRangeException("folderToAdd");
+                {
+                    throw new ArgumentOutOfRangeException(nameof(projectReference));
+                }
 
                 // Finally get the source path
                 folder = projectReference.Substring(index2 + 1);
@@ -1017,17 +1013,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                 var solution = this.Project.GetService(typeof(IVsSolution)) as IVsSolution;
                 Utilities.CheckNotNull(solution);
-
-                uint itemidLoc;
-                IVsHierarchy hierarchy;
-                string str;
                 var reason = new VSUPDATEPROJREFREASON[1];
-                if (ErrorHandler.Failed(solution.GetItemOfProjref(projectRef, out hierarchy, out itemidLoc, out str, reason)))
+                if (ErrorHandler.Failed(solution.GetItemOfProjref(projectRef, out var hierarchy, out var itemidLoc, out var str, reason)))
                 {
-                    // the file may have been deleted between the copy & paste
-                    string path;
-                    Guid projectGuid;
-                    GetPathAndProjectId(projectRef, out projectGuid, out path);
+                    GetPathAndProjectId(projectRef, out var projectGuid, out var path);
                     ReportMissingItem(path);
                     return null;
                 }
@@ -1036,9 +1025,8 @@ namespace Microsoft.VisualStudioTools.Project
 
                 // This will throw invalid cast exception if the hierrachy is not a project.
                 var project = (IVsProject)hierarchy;
-                object isLinkValue;
                 var isLink = false;
-                if (ErrorHandler.Succeeded(((IVsHierarchy)project).GetProperty(itemidLoc, (int)__VSHPROPID2.VSHPROPID_IsLinkFile, out isLinkValue)))
+                if (ErrorHandler.Succeeded(((IVsHierarchy)project).GetProperty(itemidLoc, (int)__VSHPROPID2.VSHPROPID_IsLinkFile, out var isLinkValue)))
                 {
                     if (isLinkValue is bool)
                     {
@@ -1046,8 +1034,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                 }
 
-                string moniker;
-                ErrorHandler.ThrowOnFailure(project.GetMkDocument(itemidLoc, out moniker));
+                ErrorHandler.ThrowOnFailure(project.GetMkDocument(itemidLoc, out var moniker));
 
                 if (this.DropEffect == DropEffect.Move && IsBadMove(targetFolder, moniker, true))
                 {
@@ -1104,12 +1091,8 @@ namespace Microsoft.VisualStudioTools.Project
                             return null;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
                     {
-                        if (e.IsCriticalException())
-                        {
-                            throw;
-                        }
                         return null;
                     }
                 }
@@ -1200,8 +1183,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                         if (overwrite == null)
                         {
-                            OverwriteFileDialog dialog;
-                            if (!PromptOverwriteFile(moniker, out dialog))
+                            if (!PromptOverwriteFile(moniker, out var dialog))
                             {
                                 return null;
                             }
@@ -1309,8 +1291,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             private bool IsOurProject(IVsProject project)
             {
-                string projectDoc;
-                project.GetMkDocument((uint)VSConstants.VSITEMID.Root, out projectDoc);
+                project.GetMkDocument((uint)VSConstants.VSITEMID.Root, out var projectDoc);
                 return projectDoc == this.Project.Url;
             }
 
@@ -1468,8 +1449,7 @@ namespace Microsoft.VisualStudioTools.Project
                             bool shouldOverwrite;
                             if (overwrite == null)
                             {
-                                OverwriteFileDialog dialog;
-                                if (!PromptOverwriteFile(Path.GetFileName(newPath), out dialog))
+                                if (!PromptOverwriteFile(Path.GetFileName(newPath), out var dialog))
                                 {
                                     // user cancelled
                                     fileNode.ExpandItem(EXPANDFLAGS.EXPF_UnCutHighlightItem);
@@ -1625,10 +1605,15 @@ namespace Microsoft.VisualStudioTools.Project
                 var result = new VSADDRESULT[1];
                 ErrorHandler.ThrowOnFailure(this.AddItem(parentNode.ID, VSADDITEMOPERATION.VSADDITEMOP_OPENFILE, name, 1, new string[] { targetPath }, IntPtr.Zero, result));
                 if (result[0] != VSADDRESULT.ADDRESULT_Success)
+                {
                     throw new Exception();
+                }
+
                 newNode = this.FindNodeByFullPath(targetPath);
                 if (newNode == null)
+                {
                     throw new Exception();
+                }
             }
             else if (Directory.Exists(targetPath))
             {
@@ -1788,11 +1773,15 @@ namespace Microsoft.VisualStudioTools.Project
                 // First see if this is a set of storage based items
                 var format = DragDropHelper.CreateFormatEtc((ushort)DragDropHelper.CF_VSSTGPROJECTITEMS);
                 if (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK)
+                {
                     return true;
+                }
                 // Try reference based items
                 format = DragDropHelper.CreateFormatEtc((ushort)DragDropHelper.CF_VSREFPROJECTITEMS);
                 if (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK)
+                {
                     return true;
+                }
                 // Try windows explorer files format
                 format = DragDropHelper.CreateFormatEtc((ushort)NativeMethods.CF_HDROP);
                 return (dataObject.QueryGetData(new FORMATETC[] { format }) == VSConstants.S_OK);
@@ -2089,11 +2078,15 @@ namespace Microsoft.VisualStudioTools.Project
 
             // CTRL
             if ((grfKeyState & NativeMethods.MK_CONTROL) != 0)
+            {
                 return DropEffect.Copy;
+            }
 
             // SHIFT
             if ((grfKeyState & NativeMethods.MK_SHIFT) != 0)
+            {
                 return DropEffect.Move;
+            }
 
             // no modifier
             if (this._dragging)
@@ -2203,7 +2196,9 @@ namespace Microsoft.VisualStudioTools.Project
             finally
             {
                 if (data != IntPtr.Zero)
+                {
                     UnsafeNativeMethods.GlobalUnLock(data);
+                }
             }
 
             return ptr;

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel.Design;
@@ -190,12 +190,8 @@ namespace Microsoft.VisualStudioTools
             {
                 tcs.TrySetCanceled();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
                 tcs.TrySetException(ex);
             }
         }
@@ -210,12 +206,8 @@ namespace Microsoft.VisualStudioTools
             {
                 tcs.TrySetCanceled();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
                 tcs.TrySetException(ex);
             }
         }
@@ -251,12 +243,8 @@ namespace Microsoft.VisualStudioTools
             {
                 tcs.TrySetCanceled();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
                 tcs.TrySetException(ex);
             }
         }

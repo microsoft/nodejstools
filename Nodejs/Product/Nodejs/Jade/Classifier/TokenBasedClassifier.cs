@@ -1,8 +1,7 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
@@ -18,18 +17,16 @@ namespace Microsoft.NodejsTools.Jade
         public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
 #pragma warning restore 67
 
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer", Justification = "Standard name of code that produces tokens")]
-        public ITokenizer<TTokenClass> Tokenizer { get; private set; }
+        public ITokenizer<TTokenClass> Tokenizer { get; }
         public TextRangeCollection<TTokenClass> Tokens { get; protected set; }
 
-        protected ITextBuffer TextBuffer { get; set; }
+        protected ITextBuffer TextBuffer { get; }
         protected bool LineBasedClassification { get; set; }
 
         private IClassificationContextNameProvider<TTokenClass> _classificationNameProvider;
 
         private int _lastValidPosition = 0;
 
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "tokenizer", Justification = "Standard name of code that produces tokens")]
         public TokenBasedClassifier(ITextBuffer textBuffer,
                                     ITokenizer<TTokenClass> tokenizer,
                                     IClassificationContextNameProvider<TTokenClass> classificationNameProvider)
@@ -55,8 +52,7 @@ namespace Microsoft.NodejsTools.Jade
 
         protected virtual void OnTextChanged(object sender, TextContentChangedEventArgs e)
         {
-            int start, oldLength, newLength;
-            TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
+            TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
             // check if change is still within current snapshot. the problem is that
             // change could have been calculated against projected buffer and then
@@ -73,8 +69,6 @@ namespace Microsoft.NodejsTools.Jade
             OnTextChanged(start, oldLength, newLength);
         }
 
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldLength", Justification = "It may be used in derived class and/or unit tests")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "newLength", Justification = "It may be used in derived class and/or unit tests")]
         protected virtual void OnTextChanged(int start, int oldLength, int newLength)
         {
             // Invalidate items starting from start of the change and onward
@@ -124,7 +118,9 @@ namespace Microsoft.NodejsTools.Jade
 
             this._lastValidPosition = Math.Min(this._lastValidPosition, start);
             if (this.Tokens.Count > 0)
+            {
                 this.Tokens.RemoveInRange(TextRange.FromBounds(this._lastValidPosition, this.Tokens[this.Tokens.Count - 1].End), true);
+            }
 
             // In line-based tokenizers like SaSS or Jade we need to start at the beginning 
             // of the line i.e. at 'anchor' position that is canculated depending on particular
@@ -157,7 +153,9 @@ namespace Microsoft.NodejsTools.Jade
             {
                 var ws = textSnapshot.GetText(span);
                 if (string.IsNullOrWhiteSpace(ws))
+                {
                     return classifications;
+                }
             }
 
             // Token collection at this point contains valid tokens at least to a point

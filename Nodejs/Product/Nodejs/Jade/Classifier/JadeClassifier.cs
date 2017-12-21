@@ -38,7 +38,9 @@ namespace Microsoft.NodejsTools.Jade
                 var end = tokens[tokens.Count - 1].End;
 
                 if (start < end)
+                {
                     tokens.RemoveInRange(TextRange.FromBounds(start, end), true);
+                }
             }
 
             base.RemoveSensitiveTokens(position, tokens);
@@ -54,7 +56,9 @@ namespace Microsoft.NodejsTools.Jade
 
                 var index = this.Tokens.GetFirstItemAfterPosition(line.Start);
                 if (index < 0)
+                {
                     index = this.Tokens.Count - 1;
+                }
 
                 for (var i = index; i >= 0; i--)
                 {

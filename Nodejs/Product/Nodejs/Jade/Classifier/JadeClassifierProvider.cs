@@ -57,7 +57,9 @@ namespace Microsoft.NodejsTools.Jade
             var classifier = ServiceManager.GetService<JadeClassifier>(textBuffer);
 
             if (classifier == null)
+            {
                 classifier = new JadeClassifier(textBuffer, this);
+            }
 
             return classifier;
         }

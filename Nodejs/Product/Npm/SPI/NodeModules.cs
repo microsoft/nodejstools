@@ -95,8 +95,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             depth++;
 
-            ModuleInfo moduleInfo;
-            this._allModules.TryGetValue(moduleDir, out moduleInfo);
+            this._allModules.TryGetValue(moduleDir, out var moduleInfo);
 
             if (moduleInfo != null)
             {
@@ -159,8 +158,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             var directoryToSearch = filepath.IndexOf("\\", lastNodeModules + NodejsConstants.NodeModulesFolder.Length + 1, StringComparison.Ordinal);
             var directorySubString = directoryToSearch == -1 ? filepath : filepath.Substring(0, directoryToSearch);
 
-            ModuleInfo value = null;
-            this._allModules.TryGetValue(directorySubString, out value);
+            this._allModules.TryGetValue(directorySubString, out var value);
 
             var depth = value != null ? value.Depth : 0;
             Debug.WriteLine("Module Depth: {0} [{1}]", filepath, depth);
@@ -194,7 +192,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     IPackageJson json = null;
                     try
                     {
-                        json = PackageJsonFactory.Create(new DirectoryPackageJsonSource(moduleDir));
+                        json = PackageJsonFactory.Create(Path.Combine(moduleDir, "package.json"));
                     }
                     catch (PackageJsonException)
                     {
@@ -216,7 +214,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public IPackage Package { get; set; }
 
-        public IList<string> RequiredBy { get; set; }
+        public IList<string> RequiredBy { get; }
 
         internal ModuleInfo(int depth)
         {

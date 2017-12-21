@@ -389,9 +389,15 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(this.ProjectMgr != null, " The project manager is null for the filenode");
             HierarchyNode handlerNode = this;
             while (handlerNode != null && !(handlerNode is ProjectNode || handlerNode is FolderNode))
+            {
                 handlerNode = handlerNode.Parent;
+            }
+
             if (handlerNode == null)
+            {
                 handlerNode = this.ProjectMgr;
+            }
+
             return handlerNode;
         }
 
@@ -594,7 +600,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 case __VSHPROPID.VSHPROPID_ItemDocCookie:
                     if (this.DocCookie != 0)
+                    {
                         return (IntPtr)this.DocCookie; //cast to IntPtr as some callers expect VT_INT
+                    }
+
                     break;
             }
             return base.GetProperty(propId);
@@ -823,11 +832,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             var pRDT = this.GetService(typeof(IVsRunningDocumentTable)) as IVsRunningDocumentTable;
             if (pRDT == null)
+            {
                 return false;
+            }
+
             var docData = IntPtr.Zero;
-            IVsHierarchy pIVsHierarchy;
-            uint itemId;
-            uint uiVsDocCookie;
 
             SuspendFileChanges sfc = null;
 
@@ -848,7 +857,7 @@ namespace Microsoft.VisualStudioTools.Project
                 //    The problem is that the item at the "add" time is only partly added to the project, since the msbuild part has not yet been copied over as mentioned in part 2 of the last step of the rename process.
                 //    The result is that the project re-evaluates itself wrongly.
                 var renameflag = VSRENAMEFILEFLAGS.VSRENAMEFILEFLAGS_NoFlags;
-                ErrorHandler.ThrowOnFailure(pRDT.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, oldName, out pIVsHierarchy, out itemId, out docData, out uiVsDocCookie));
+                ErrorHandler.ThrowOnFailure(pRDT.FindAndLockDocument((uint)_VSRDTFLAGS.RDT_NoLock, oldName, out var pIVsHierarchy, out var itemId, out docData, out var uiVsDocCookie));
 
                 if (pIVsHierarchy != null && !Utilities.IsSameComObject(pIVsHierarchy, this.ProjectMgr))
                 {

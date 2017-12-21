@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Microsoft.VisualStudio.PlatformUI;
 
 namespace Microsoft.VisualStudioTools.Project
 {

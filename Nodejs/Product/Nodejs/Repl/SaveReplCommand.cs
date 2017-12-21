@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -8,29 +8,26 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using System.Globalization;
+using Microsoft.VisualStudio.InteractiveWindow.Commands;
+using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.InteractiveWindow;
 
 namespace Microsoft.NodejsTools.Repl
 {
-#if INTERACTIVE_WINDOW
-    using IReplCommand = IInteractiveWindowCommand;
-    using IReplWindow = IInteractiveWindow;    
-#endif
-
-    [Export(typeof(IReplCommand))]
-    internal class SaveReplCommand : IReplCommand
+    [Export(typeof(IInteractiveWindowCommand))]
+    [ContentType(ReplConstants.ContentType)]
+    internal class SaveReplCommand : InteractiveWindowCommand
     {
-        #region IReplCommand Members
-
-        public Task<ExecutionResult> Execute(IReplWindow window, string arguments)
+        public override Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
         {
             if (string.IsNullOrWhiteSpace(arguments))
             {
-                window.WriteError("save requires a filename");
+                window.WriteError(Resources.ReplSaveNoFileName);
                 return ExecutionResult.Failed;
             }
             else if (arguments.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
-                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Invalid filename: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveInvalidFileName, arguments));
                 return ExecutionResult.Failed;
             }
 
@@ -63,24 +60,22 @@ namespace Microsoft.NodejsTools.Repl
             try
             {
                 File.WriteAllText(arguments, text.ToString());
-                window.WriteLine(string.Format(CultureInfo.CurrentCulture, "Session saved to: {0}", arguments));
+                window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveSucces, arguments));
             }
             catch
             {
-                window.WriteError(string.Format(CultureInfo.CurrentCulture, "Failed to save: {0}", arguments));
+                window.WriteError(string.Format(CultureInfo.CurrentCulture, Resources.ReplSaveFailed, arguments));
             }
             return ExecutionResult.Succeeded;
         }
 
-        public string Description => "Save the current REPL session to a file";
-        public string Command => "save";
+        public override string Description => Resources.ReplSaveDescription;
+
+        public override string Command => "save";
+
         private static bool IsJavaScriptBuffer(ITextBuffer buffer)
         {
             return buffer.ContentType.IsOfType(NodejsConstants.JavaScript);
         }
-
-        public object ButtonContent => null;
-
-        #endregion
     }
 }

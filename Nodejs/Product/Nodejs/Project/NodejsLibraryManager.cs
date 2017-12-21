@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -16,7 +16,7 @@ namespace Microsoft.NodejsTools.Project
     [Guid("1CCB584B-2876-4416-99B0-60C91B938147")]
     internal class NodejsLibraryManager : LibraryManager
     {
-        public NodejsLibraryManager(NodejsPackage/*!*/ package)
+        public NodejsLibraryManager(NodejsPackage package)
             : base(package)
         { }
 

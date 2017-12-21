@@ -1,23 +1,18 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Microsoft.NodejsTools.Jade
 {
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Tokenizer")]
     internal abstract class Tokenizer<T> : ITokenizer<T> where T : ITextRange
     {
         protected bool CComments { get; set; }
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool CppComments { get; set; }
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool MultilineCppComments { get; set; }
         protected bool SingleQuotedStrings { get; set; }
         protected bool DoubleQuotedStrings { get; set; }
 
-        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
         protected CharacterStream _cs { get; set; }
         protected TextRangeCollection<T> Tokens { get; set; }
 
@@ -50,7 +45,9 @@ namespace Microsoft.NodejsTools.Jade
                 AddNextToken();
 
                 if (this._cs.Position >= start + length)
+                {
                     break;
+                }
             }
 
             if (excludePartialTokens)
@@ -62,13 +59,17 @@ namespace Microsoft.NodejsTools.Jade
                 for (i = this.Tokens.Count - 1; i >= 0; i--)
                 {
                     if (this.Tokens[i].End <= end)
+                    {
                         break;
+                    }
                 }
 
                 i++;
 
                 if (i < this.Tokens.Count)
+                {
                     this.Tokens.RemoveRange(i, this.Tokens.Count - i);
+                }
             }
 
             var collection = new ReadOnlyTextRangeCollection<T>(this.Tokens);
@@ -85,7 +86,9 @@ namespace Microsoft.NodejsTools.Jade
             SkipWhiteSpace();
 
             if (this._cs.IsEndOfStream())
+            {
                 return true;
+            }
 
             switch (this._cs.CurrentChar)
             {
@@ -147,7 +150,6 @@ namespace Microsoft.NodejsTools.Jade
         /// <summary>
         /// Processes C++ style comments (//)
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool HandleCppComment()
         {
             return HandleCppComment(false);
@@ -157,7 +159,6 @@ namespace Microsoft.NodejsTools.Jade
         /// Processes C++ style comments (//)
         /// </summary>
         /// <returns>True if comment included new line characters</returns>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Cpp")]
         protected bool HandleCppComment(bool multiline = false)
         {
             // SaSS version can span more than one line like this (indented):
@@ -180,7 +181,9 @@ namespace Microsoft.NodejsTools.Jade
                     var ch = this._cs[i];
 
                     if (ch == '\r' || ch == '\n')
+                    {
                         break;
+                    }
 
                     if (!Char.IsWhiteSpace(ch))
                     {
@@ -209,7 +212,9 @@ namespace Microsoft.NodejsTools.Jade
 
                         // Skip '\n' 
                         if (this._cs.IsAtNewLine())
+                        {
                             this._cs.MoveToNextChar();
+                        }
 
                         SkipToNonWhiteSpaceOrEndOfLine();
                         if (this._cs.IsEndOfStream())
@@ -244,7 +249,9 @@ namespace Microsoft.NodejsTools.Jade
 
             var length = this._cs.Position - start;
             if (length > 0)
+            {
                 this.Tokens.Add(GetCommentToken(start, length));
+            }
 
             return true;
         }
@@ -273,7 +280,9 @@ namespace Microsoft.NodejsTools.Jade
             var length = this._cs.Position - start;
 
             if (length > 0)
+            {
                 this.Tokens.Add(GetCommentToken(start, length));
+            }
         }
 
         /// <summary>
@@ -306,7 +315,9 @@ namespace Microsoft.NodejsTools.Jade
 
             var range = TextRange.FromBounds(start, this._cs.Position);
             if (range.Length > 0)
+            {
                 this.Tokens.Add(GetStringToken(start, range.Length));
+            }
 
             return range;
         }
@@ -336,7 +347,9 @@ namespace Microsoft.NodejsTools.Jade
                 if (this._cs.CurrentChar == terminator && terminator != '\0')
                 {
                     if (inclusive)
+                    {
                         this._cs.MoveToNextChar();
+                    }
 
                     break;
                 }
@@ -361,7 +374,9 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream() && !this._cs.IsWhiteSpace())
             {
                 if (terminators.IndexOf(this._cs.CurrentChar) != -1)
+                {
                     return TextRange.FromBounds(start, this._cs.Position);
+                }
 
                 this._cs.MoveToNextChar();
             }
@@ -426,10 +441,14 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream())
             {
                 if (!this._cs.IsWhiteSpace())
+                {
                     break;
+                }
 
                 if (this._cs.IsAtNewLine())
+                {
                     newLine = true;
+                }
 
                 this._cs.MoveToNextChar();
             }
@@ -467,7 +486,9 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream())
             {
                 if (this._cs.IsWhiteSpace() || IsAtComment())
+                {
                     break;
+                }
 
                 this._cs.MoveToNextChar();
             }
@@ -481,7 +502,9 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream())
             {
                 if (this._cs.IsWhiteSpace())
+                {
                     break;
+                }
 
                 this._cs.MoveToNextChar();
             }
@@ -495,7 +518,9 @@ namespace Microsoft.NodejsTools.Jade
             while (!this._cs.IsEndOfStream())
             {
                 if (!this._cs.IsWhiteSpace() || this._cs.IsAtNewLine())
+                {
                     break;
+                }
 
                 this._cs.MoveToNextChar();
             }
@@ -529,7 +554,9 @@ namespace Microsoft.NodejsTools.Jade
                 var ch = this._cs[i];
 
                 if (ch == '\r' || ch == '\n')
+                {
                     break;
+                }
 
                 if (!Char.IsWhiteSpace(ch))
                 {

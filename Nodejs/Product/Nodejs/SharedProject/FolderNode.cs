@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -140,13 +140,9 @@ namespace Microsoft.VisualStudioTools.Project
                 // also force a refresh of the SolutionExplorer's node.
                 this.ProjectMgr.OnPropertyChanged(this, (int)__VSHPROPID.VSHPROPID_Caption, 0);
             }
-            catch (Exception e)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (e.IsCriticalException())
-                {
-                    throw;
-                }
-                throw new InvalidOperationException(SR.GetString(SR.RenameFolder, e.Message));
+                throw new InvalidOperationException(SR.GetString(SR.RenameFolder, ex.Message));
             }
             return VSConstants.S_OK;
         }
@@ -382,7 +378,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (string.IsNullOrEmpty(newName))
             {
-                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), "newName");
+                throw new ArgumentException(SR.GetString(SR.ParameterCannotBeNullOrEmpty), nameof(newName));
             }
 
             // on a new dir && enter, we get called with the same name (so do nothing if name is the same

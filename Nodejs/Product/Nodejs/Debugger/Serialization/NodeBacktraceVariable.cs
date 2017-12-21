@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudioTools.Project;
@@ -33,15 +33,15 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
             this.Type = NodePropertyType.Normal;
         }
 
-        public int Id { get; private set; }
-        public NodeEvaluationResult Parent { get; private set; }
-        public string Name { get; private set; }
-        public string TypeName { get; private set; }
-        public string Value { get; private set; }
-        public string Class { get; private set; }
-        public string Text { get; private set; }
-        public NodePropertyAttributes Attributes { get; private set; }
-        public NodePropertyType Type { get; private set; }
-        public NodeStackFrame StackFrame { get; private set; }
+        public int Id { get; }
+        public NodeEvaluationResult Parent { get; }
+        public string Name { get; }
+        public string TypeName { get; }
+        public string Value { get; }
+        public string Class { get; }
+        public string Text { get; }
+        public NodePropertyAttributes Attributes { get; }
+        public NodePropertyType Type { get; }
+        public NodeStackFrame StackFrame { get; }
     }
 }

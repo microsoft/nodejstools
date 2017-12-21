@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.Project
         public NodeModulesNode(NodejsProjectNode root)
             : base(root)
         {
-            this.NpmController = DefaultNpmController(this._projectNode.ProjectHome, new NpmPathProvider(this));
+            this.NpmController = DefaultNpmController(this.projectNode.ProjectHome, new NpmPathProvider(this));
             RegisterWithNpmController(this.NpmController);
 
             this._devModulesNode = new LocalModulesNode(root, this, "dev", "DevelopmentModules", DependencyType.Development);
@@ -177,7 +177,7 @@ namespace Microsoft.NodejsTools.Project
 
         #region Logging and status bar updates
 
-        private OutputWindowRedirector NpmOutputPane => this._projectNode.NpmOutputPane;
+        private OutputWindowRedirector NpmOutputPane => this.projectNode.NpmOutputPane;
 
         private void ForceUpdateStatusBarWithNpmActivity(string activity)
         {
@@ -191,7 +191,7 @@ namespace Microsoft.NodejsTools.Project
                 activity = string.Format(CultureInfo.CurrentCulture, "npm: {0}", activity);
             }
 
-            var statusBar = (IVsStatusbar)this._projectNode.GetService(typeof(SVsStatusbar));
+            var statusBar = (IVsStatusbar)this.projectNode.GetService(typeof(SVsStatusbar));
             if (null != statusBar)
             {
                 statusBar.SetText(activity);
@@ -287,7 +287,7 @@ namespace Microsoft.NodejsTools.Project
 
             StopNpmIdleTimer();
             this._npmIdleTimer = new Timer(
-                _ => this.ProjectMgr.Site.GetUIThread().Invoke(() => this._projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
+                _ => this.ProjectMgr.Site.GetUIThread().Invoke(() => this.projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
                 null, 1000, Timeout.Infinite);
         }
 
@@ -519,7 +519,7 @@ namespace Microsoft.NodejsTools.Project
             var packageJsonFileName = Path.Combine(rootPath, "package.json");
             var packageJsonLockFileName = Path.Combine(rootPath, "package-lock.json");
 
-            var queryEditService = (IVsQueryEditQuerySave2)this._projectNode.GetService(typeof(SVsQueryEditQuerySave));
+            var queryEditService = (IVsQueryEditQuerySave2)this.projectNode.GetService(typeof(SVsQueryEditQuerySave));
             var hr = queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out var _);
             return ErrorHandler.Succeeded(hr) && result == (uint)tagVSQueryEditResult.QER_EditOK;
         }
@@ -628,7 +628,7 @@ namespace Microsoft.NodejsTools.Project
 
         public void UpdateModules()
         {
-            var t = UpdateModules(this._projectNode.GetSelectedNodes());
+            var t = UpdateModules(this.projectNode.GetSelectedNodes());
         }
 
         public async System.Threading.Tasks.Task UpdateModule(DependencyNode node)
@@ -645,7 +645,7 @@ namespace Microsoft.NodejsTools.Project
 
         public System.Threading.Tasks.Task UninstallModules()
         {
-            var selected = this._projectNode.GetSelectedNodes();
+            var selected = this.projectNode.GetSelectedNodes();
             return RunNpmCommand(async commander =>
             {
                 foreach (var node in selected.OfType<DependencyNode>().Where(this.CheckValidCommandTarget))
@@ -681,21 +681,30 @@ namespace Microsoft.NodejsTools.Project
         private static IEnumerable<IPackage> GetDevPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package => package.IsDevDependency);
         }
 
         private static IEnumerable<IPackage> GetOptionalPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package => package.IsOptionalDependency);
         }
 
         private static IEnumerable<IPackage> GetRootPackages(INpmController controller)
         {
             if (controller == null || controller.RootPackage == null)
+            {
                 return Enumerable.Empty<IPackage>();
+            }
+
             return controller.RootPackage.Modules.Where(package =>
                 package.IsDependency || !package.IsListedInParentPackageJson);
         }

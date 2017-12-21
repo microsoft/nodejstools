@@ -51,7 +51,10 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             get
             {
                 if (this.events == null)
+                {
                     this.events = new OAVSProjectEvents(this);
+                }
+
                 return this.events;
             }
         }

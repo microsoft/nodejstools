@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.IO;
@@ -102,7 +102,10 @@ namespace Microsoft.VisualStudioTools.Project
                 var aggregateProjectFactory = (IVsCreateAggregateProject)this.Site.GetService(typeof(SVsCreateAggregateProject));
                 var hr = aggregateProjectFactory.CreateAggregateProject(guidsList, fileName, location, name, flags, ref projectGuid, out project);
                 if (hr == VSConstants.E_ABORT)
+                {
                     canceled = 1;
+                }
+
                 ErrorHandler.ThrowOnFailure(hr);
 
                 this.buildProject = null;
@@ -114,14 +117,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// initialization just yet.
         /// Delegate to CreateProject implemented by the derived class.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The global property handles is instantiated here and used in the project node that will Dispose it")]
         protected override object PreCreateForOuter(IntPtr outerProjectIUnknown)
         {
             Utilities.CheckNotNull(this.buildProject, "The build project should have been initialized before calling PreCreateForOuter.");
 
             // Please be very carefull what is initialized here on the ProjectNode. Normally this should only instantiate and return a project node.
-            // The reason why one should very carefully add state to the project node here is that at this point the aggregation has not yet been created and anything that would cause a CCW for the project to be created would cause the aggregation to fail
+            // The reason why one should very carefully add state to the project node here is that at this point the aggregation has not yet been created 
+            // and anything that would cause a CCW for the project to be created would cause the aggregation to fail.
             // Our reasoning is that there is no other place where state on the project node can be set that is known by the Factory and has to execute before the Load method.
             var node = this.CreateProject();
             Utilities.CheckNotNull(node, "The project failed to be created");
@@ -147,7 +149,9 @@ namespace Microsoft.VisualStudioTools.Project
             // Retrieve the list of GUIDs, if it is not specify, make it our GUID
             var guids = this.buildProject.GetPropertyValue(ProjectFileConstants.ProjectTypeGuids);
             if (string.IsNullOrEmpty(guids))
+            {
                 guids = this.GetType().GUID.ToString("B");
+            }
 
             return guids;
         }
@@ -167,9 +171,7 @@ namespace Microsoft.VisualStudioTools.Project
             var iid = typeof(IVsHierarchy).GUID;
             return VsTaskLibraryHelper.CreateAndStartTask(this.taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
             {
-                IntPtr project;
-                int cancelled;
-                CreateProject(filename, location, pszName, flags, ref iid, out project, out cancelled);
+                CreateProject(filename, location, pszName, flags, ref iid, out var project, out var cancelled);
                 if (cancelled != 0)
                 {
                     throw new OperationCanceledException();
@@ -303,13 +305,12 @@ namespace Microsoft.VisualStudioTools.Project
 
             // We first run (or re-run) the upgrade check and bail out early if
             // there is actually no need to upgrade.
-            uint dummy;
             var hr = ((IVsProjectUpgradeViaFactory)this).UpgradeProject_CheckOnly(
                 bstrFileName,
                 pLogger,
                 out pUpgradeRequired,
                 out pguidNewProjectFactory,
-                out dummy
+                out var dummy
             );
 
             if (!ErrorHandler.Succeeded(hr))
@@ -409,8 +410,6 @@ namespace Microsoft.VisualStudioTools.Project
                 var queryEdit = this.site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
                 if (queryEdit != null)
                 {
-                    uint editVerdict;
-                    uint queryEditMoreInfo;
                     var tagVSQueryEditFlags_QEF_AllowUnopenedProjects = (tagVSQueryEditFlags)0x80;
 
                     ErrorHandler.ThrowOnFailure(queryEdit.QueryEditFiles(
@@ -421,8 +420,8 @@ namespace Microsoft.VisualStudioTools.Project
                         new[] { bstrFileName },
                         null,
                         null,
-                        out editVerdict,
-                        out queryEditMoreInfo
+                        out var editVerdict,
+                        out var queryEditMoreInfo
                     ));
 
                     if (editVerdict != (uint)tagVSQueryEditResult.QER_EditOK)
@@ -514,13 +513,8 @@ namespace Microsoft.VisualStudioTools.Project
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_STATUSMSG, "Converted");
                 return VSConstants.S_OK;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
-
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try
                 {
@@ -576,12 +570,8 @@ namespace Microsoft.VisualStudioTools.Project
                     pUpgradeRequired = 1;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
                 // Log the error and don't attempt to upgrade the project.
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try
@@ -667,12 +657,8 @@ namespace Microsoft.VisualStudioTools.Project
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
                 // Log the error and don't attempt to upgrade the project.
                 logger.Log(__VSUL_ERRORLEVEL.VSUL_ERROR, SR.GetString(SR.UnexpectedUpgradeError, ex.Message));
                 try

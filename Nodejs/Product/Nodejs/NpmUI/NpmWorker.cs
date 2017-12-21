@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Concurrent;
@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.Telemetry;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -27,6 +28,9 @@ namespace Microsoft.NodejsTools.NpmUI
         private readonly Thread worker;
 
         private QueuedNpmCommandInfo currentCommand;
+
+        public event EventHandler CommandStarted;
+        public event EventHandler<NpmCommandCompletedEventArgs> CommandCompleted;
 
         public NpmWorker(INpmController controller)
         {
@@ -67,6 +71,8 @@ namespace Microsoft.NodejsTools.NpmUI
             Debug.Assert(Thread.CurrentThread == this.worker, "The worked thread should be executing the NPM commands.");
 
             var cmdr = this.npmController.CreateNpmCommander();
+            cmdr.CommandStarted += Cmdr_CommandStarted;
+            cmdr.CommandCompleted += Cmdr_CommandCompleted;
             try
             {
                 cmdr.ExecuteNpmCommandAsync(info.Arguments).Wait();
@@ -76,6 +82,21 @@ namespace Microsoft.NodejsTools.NpmUI
                 // TaskCanceledException is not un-expected, 
                 // and should not tear down this thread.
                 // Other exceptions are handled higher up the stack.
+            }
+            finally
+            {
+                cmdr.CommandStarted -= Cmdr_CommandStarted;
+                cmdr.CommandCompleted -= Cmdr_CommandCompleted;
+            }
+
+            void Cmdr_CommandStarted(object sender, EventArgs e)
+            {
+                this.CommandStarted?.Invoke(this, e);
+            }
+
+            void Cmdr_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
+            {
+                this.CommandCompleted?.Invoke(this, e);
             }
         }
 
@@ -106,11 +127,23 @@ namespace Microsoft.NodejsTools.NpmUI
 
             TelemetryHelper.LogSearchNpm();
 
-            var relativeUri = string.Format("/-/v1/search?text=\"{0}\"", WebUtility.UrlEncode(filterText));
-            var searchUri = new Uri(defaultRegistryUri, relativeUri);
+            if (filterText.Length == 1)
+            {
+                return await QueryNpmForSingleCharAsync(filterText);
+            }
+            else
+            {
+                return await QueryNpmAsync(filterText);
+            }
+        }
 
-            var request = WebRequest.Create(searchUri);
-            using (var response = await request.GetResponseAsync())
+        private async Task<IEnumerable<IPackage>> QueryNpmAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length > 1, $"Use {nameof(QueryNpmForSingleCharAsync)} for single character queries.");
+
+            var relativeUri = $"/-/v1/search?text={WebUtility.UrlEncode(filterText)}";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
             {
                 /* We expect the following response:
                  {
@@ -160,7 +193,7 @@ namespace Microsoft.NodejsTools.NpmUI
                     }
                 */
 
-                var reader = new StreamReader(response.GetResponseStream());
+                using (var reader = new StreamReader(response.GetResponseStream()))
                 using (var jsonReader = new JsonTextReader(reader))
                 {
                     while (jsonReader.Read())
@@ -181,6 +214,76 @@ namespace Microsoft.NodejsTools.NpmUI
 
             // should never get here
             throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private async Task<IEnumerable<IPackage>> QueryNpmForSingleCharAsync(string filterText)
+        {
+            Debug.Assert(filterText.Length == 1, $"Use {nameof(QueryNpmAsync)} for general queries when the search query has more than 1 character.");
+
+            // Special case since the search API won't return results for 
+            // single chararacter queries.
+            var relativeUri = $"/{WebUtility.UrlEncode(filterText)}/latest";
+
+            using (var response = await QueryNpmRegistryAsync(relativeUri))
+            {
+                /* We expect the following response
+                  {
+                    "name": "express",
+                    "scope": "unscoped",
+                    "version": "4.15.2",
+                    "description": "Fast, unopinionated, minimalist web framework",
+                    "keywords": [ "express", "framework", "sinatra", "web", "rest", "restful", "router", "app", "api" ],
+                    "date": "2017-03-06T13:42:44.853Z",
+                    "links": {
+                      "npm": "https://www.npmjs.com/package/express",
+                      "homepage": "http://expressjs.com/",
+                      "repository": "https://github.com/expressjs/express",
+                      "bugs": "https://github.com/expressjs/express/issues"
+                    },
+                    "author": {
+                      "name": "TJ Holowaychuk",
+                      "email": "tj@vision-media.ca"
+                    },
+                    "publisher": {
+                      "username": "dougwilson",
+                      "email": "doug@somethingdoug.com"
+                    },
+                    "maintainers": [
+                      {
+                        "username": "dougwilson",
+                        "email": "doug@somethingdoug.com"
+                      }
+                    ]
+                  }*/
+                using (var reader = new StreamReader(response.GetResponseStream()))
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    while (jsonReader.Read())
+                    {
+                        if (jsonReader.TokenType == JsonToken.StartObject)
+                        {
+                            var token = JToken.ReadFrom(jsonReader);
+                            var package = ReadPackage(token, new NodeModuleBuilder());
+                            if (package != null)
+                            {
+                                return new[] { package };
+                            }
+                        }
+
+                        throw new InvalidOperationException($"Unexpected json token. '{jsonReader.TokenType}'");
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("Unexpected json token.");
+        }
+
+        private static Task<WebResponse> QueryNpmRegistryAsync(string relativeUri)
+        {
+            var searchUri = new Uri(defaultRegistryUri, relativeUri);
+
+            var request = WebRequest.Create(searchUri);
+            return request.GetResponseAsync();
         }
 
         private IEnumerable<IPackage> ReadPackagesFromArray(JsonTextReader jsonReader)
@@ -293,6 +396,60 @@ namespace Microsoft.NodejsTools.NpmUI
         public void Dispose()
         {
             this.commandQueue.CompleteAdding();
+        }
+
+        // TODO: This is duplicated from Npm project
+        // We should integrate this into the NpmCommander
+        internal static async Task<IEnumerable<string>> ExecuteNpmCommandAsync(
+            string pathToNpm,
+            string executionDirectory,
+            string[] arguments,
+            bool visible = false,
+            Redirector redirector = null)
+        {
+            IEnumerable<string> standardOutputLines = null;
+
+            using (var process = ProcessOutput.Run(
+                pathToNpm,
+                arguments,
+                executionDirectory,
+                /*env*/ null,
+                visible,
+                redirector,
+                quoteArgs: false,
+                outputEncoding: redirector == null ? null : Encoding.UTF8))
+            {
+                var whnd = process.WaitHandle;
+                if (whnd == null)
+                {
+                    // Process failed to start, and any exception message has
+                    // already been sent through the redirector
+                    redirector?.WriteErrorLine("Error - cannot start npm");
+                }
+                else
+                {
+                    var finished = await Task.Run(() => whnd.WaitOne());
+                    if (finished)
+                    {
+                        Debug.Assert(process.ExitCode.HasValue, "npm process has not really exited");
+                        // there seems to be a case when we're signalled as completed, but the
+                        // process hasn't actually exited
+                        process.Wait();
+                        if (process.StandardOutputLines != null)
+                        {
+                            standardOutputLines = process.StandardOutputLines.ToList();
+                        }
+                    }
+                    else
+                    {
+                        process.Kill();
+                        redirector?.WriteErrorLine("\r\n==== npm command cancelled ====\r\n\r\n");
+
+                        throw new OperationCanceledException();
+                    }
+                }
+            }
+            return standardOutputLines;
         }
 
         private sealed class QueuedNpmCommandInfo

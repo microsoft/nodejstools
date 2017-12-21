@@ -49,9 +49,8 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public int Skip(uint celt)
         {
-            uint celtFetched;
 
-            return Move(celt, null, out celtFetched);
+            return Move(celt, null, out var celtFetched);
         }
 
         private int Move(uint celt, T[] rgelt, out uint celtFetched)

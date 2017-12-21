@@ -52,7 +52,9 @@ namespace Microsoft.NodejsTools.Jade
                     SkipWhiteSpace();
 
                     if (!this._cs.IsAtNewLine())
+                    {
                         OnTag();
+                    }
 
                     return;
                 }
@@ -121,7 +123,9 @@ namespace Microsoft.NodejsTools.Jade
                 }
 
                 if (this._cs.CurrentChar != '.' && this._cs.CurrentChar != '#' && this._cs.CurrentChar != '(')
+                {
                     break;
+                }
             }
 
             if (this._cs.CurrentChar == ':')
@@ -133,7 +137,9 @@ namespace Microsoft.NodejsTools.Jade
                 SkipWhiteSpace();
 
                 if (!this._cs.IsAtNewLine())
+                {
                     OnTag();
+                }
 
                 return;
             }
@@ -187,7 +193,9 @@ namespace Microsoft.NodejsTools.Jade
                 if (this._cs.CurrentChar == ':')
                 {
                     if (this._cs.NextChar != '_' && (this._cs.NextChar < 'A' || this._cs.NextChar > 'z'))
+                    {
                         break; // allow tags with namespaces
+                    }
                 }
 
                 this._cs.MoveToNextChar();

@@ -121,7 +121,7 @@
     <value>Specifies the URL to open in the browser.  If unspecified http://localhost:port is used.\r\nIf a port is specified, it needs to be specified here as well.</value>
   </data>
   <data name="NodeExeArguments" xml:space="preserve">
-    <value>Arguments to Node.exe</value>
+    <value>Node.exe options</value>
   </data>
   <data name="NodeExeArgumentsDescription" xml:space="preserve">
     <value>Specifies the options provided to node.exe, such as -e or -i.</value>
@@ -136,7 +136,7 @@
     <value>Specifies the path to the node.exe executable.</value>
   </data>
   <data name="NodejsPort" xml:space="preserve">
-    <value>Node.js Port</value>
+    <value>Application port</value>
   </data>
   <data name="NodejsNotInstalled" xml:space="preserve">
     <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.</value>
@@ -636,7 +636,7 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Launch &amp;URL:</value>
   </data>
   <data name="PropertiesNodePort" xml:space="preserve">
-    <value>Node.&amp;js port:</value>
+    <value>Applica&amp;tion port:</value>
   </data>
   <data name="PropertiesScript" xml:space="preserve">
     <value>&amp;Script (startup file):</value>
@@ -671,5 +671,130 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="NodejsNotInstalledAnyCode" xml:space="preserve">
     <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.</value>
     <comment>Template contains a filename, like launch.json</comment>
+  </data>
+  <data name="ReplClearDescription" xml:space="preserve">
+    <value>Resets the context object to an empty object and clears any multi-line expression.</value>
+  </data>
+  <data name="ReplSaveDescription" xml:space="preserve">
+    <value>Save the current REPL session to a file.</value>
+  </data>
+  <data name="ReplSaveFailed" xml:space="preserve">
+    <value>Failed to save: '{0}'.</value>
+  </data>
+  <data name="ReplSaveInvalidFileName" xml:space="preserve">
+    <value>Invalid filename: '{0}'.</value>
+  </data>
+  <data name="ReplSaveNoFileName" xml:space="preserve">
+    <value>Save requires a filename.</value>
+  </data>
+  <data name="ReplSaveSucces" xml:space="preserve">
+    <value>Session saved to: '{0}'.</value>
+  </data>
+  <data name="DebuggerAttachToDescription" xml:space="preserve">
+    <value>Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.</value>
+  </data>
+  <data name="JadeClassLiteral" xml:space="preserve">
+    <value>Jade Class Literal</value>
+  </data>
+  <data name="JadeFilter" xml:space="preserve">
+    <value>Jade Filter</value>
+  </data>
+  <data name="JadeIdLiteral" xml:space="preserve">
+    <value>Jade Id Literal</value>
+  </data>
+  <data name="JadeKeyword" xml:space="preserve">
+    <value>Jade Keyword</value>
+  </data>
+  <data name="JadeVariable" xml:space="preserve">
+    <value>Jade Variable</value>
+  </data>
+  <data name="ReplInfoDescription" xml:space="preserve">
+    <value>Show information about the current used Node.js executable.</value>
+  </data>
+  <data name="ReplNodeError" xml:space="preserve">
+    <value>Failed to retrieve Nodejs.exe information.</value>
+  </data>
+  <data name="ReplNodeInfo" xml:space="preserve">
+    <value>Using Node.js exe from: '{0}'</value>
+    <comment>template is substituted with a path.</comment>
+  </data>
+  <data name="ReplNodeVersion" xml:space="preserve">
+    <value>Node.js Version: {0}</value>
+    <comment>template is substituted with version info</comment>
+  </data>
+  <data name="ConfigureProjectProperties" xml:space="preserve">
+    <value>Configure project properties</value>
+  </data>
+  <data name="DownloadNodejs" xml:space="preserve">
+    <value>Download Node.js</value>
+  </data>
+  <data name="NodejsNotInstalledInfoBar" xml:space="preserve">
+    <value>Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page.</value>
+  </data>
+  <data name="NodeHeader" xml:space="preserve">
+    <value>Node</value>
+  </data>
+  <data name="StartActionHeader" xml:space="preserve">
+    <value>Start Action</value>
+  </data>
+  <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
+    <value>Select Working Dir</value>
+  </data>
+  <data name="ClassificationBlack" xml:space="preserve">
+    <value>Node.js Interactive - Black</value>
+  </data>
+  <data name="ClassificationBlue" xml:space="preserve">
+    <value>Node.js Interactive - Blue</value>
+  </data>
+  <data name="ClassificationCyan" xml:space="preserve">
+    <value>Node.js Interactive - Cyan</value>
+  </data>
+  <data name="ClassificationDarkBlue" xml:space="preserve">
+    <value>Node.js Interactive - Dark Blue</value>
+  </data>
+  <data name="ClassificationDarkCyan" xml:space="preserve">
+    <value>Node.js Interactive - Dark Cyan</value>
+  </data>
+  <data name="ClassificationDarkGray" xml:space="preserve">
+    <value>Node.js Interactive - Dark Gray</value>
+  </data>
+  <data name="ClassificationDarkGreen" xml:space="preserve">
+    <value>Node.js Interactive - Dark Green</value>
+  </data>
+  <data name="ClassificationDarkMagenta" xml:space="preserve">
+    <value>Node.js Interactive - Dark Magenta</value>
+  </data>
+  <data name="ClassificationDarkRed" xml:space="preserve">
+    <value>Node.js Interactive - Dark Red</value>
+  </data>
+  <data name="ClassificationDarkYellow" xml:space="preserve">
+    <value>Node.js Interactive - Dark Yellow</value>
+  </data>
+  <data name="ClassificationError" xml:space="preserve">
+    <value>Node.js Interactive - Error</value>
+  </data>
+  <data name="ClassificationGray" xml:space="preserve">
+    <value>Node.js Interactive - Gray</value>
+  </data>
+  <data name="ClassificationGreen" xml:space="preserve">
+    <value>Node.js Interactive - Green</value>
+  </data>
+  <data name="ClassificationMagenta" xml:space="preserve">
+    <value>Node.js Interactive - Magenta</value>
+  </data>
+  <data name="ClassificationRed" xml:space="preserve">
+    <value>Node.js Interactive - Red</value>
+  </data>
+  <data name="ClassificationWhite" xml:space="preserve">
+    <value>Node.js Interactive - White</value>
+  </data>
+  <data name="ClassificationYellow" xml:space="preserve">
+    <value>Node.js Interactive - Yellow</value>
+  </data>
+  <data name="SaveNodeSettingsInProjectFile" xml:space="preserve">
+    <value>&amp;Apply Node.js settings to all users (save in project file)</value>
+  </data>
+  <data name="SaveInProjectFileToolTip" xml:space="preserve">
+    <value>When checked the Node.js specific properties are saved per user</value>
   </data>
 </root>

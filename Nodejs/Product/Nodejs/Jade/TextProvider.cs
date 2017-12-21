@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio.Text;
@@ -30,7 +30,9 @@ namespace Microsoft.NodejsTools.Jade
         private void UpdateCachedBlock(int position, int length)
         {
             if (!this._partial && this._cachedBlock != null)
+            {
                 return;
+            }
 
             if (this._cachedBlock == null || position < this._basePosition || (this._basePosition + this._cachedBlock.Length < position + length))
             {
@@ -42,14 +44,16 @@ namespace Microsoft.NodejsTools.Jade
             }
         }
 
-        public int Length { get; private set; }
+        public int Length { get; }
 
         public char this[int position]
         {
             get
             {
                 if (position < 0 || position >= this.Length)
+                {
                     return '\0';
+                }
 
                 UpdateCachedBlock(position, 1);
                 return this._cachedBlock[position - this._basePosition];

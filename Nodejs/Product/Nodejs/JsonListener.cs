@@ -81,8 +81,7 @@ namespace Microsoft.NodejsTools
                         }
 
                         var body = string.Empty;
-                        string contentLen;
-                        if (headers.TryGetValue("Content-Length", out contentLen))
+                        if (headers.TryGetValue("Content-Length", out var contentLen))
                         {
                             var lengthRemaining = int.Parse(contentLen, CultureInfo.InvariantCulture);
                             if (lengthRemaining != 0)

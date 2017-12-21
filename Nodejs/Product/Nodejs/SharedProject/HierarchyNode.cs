@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -1099,36 +1099,29 @@ namespace Microsoft.VisualStudioTools.Project
 
             // We walk the RDT looking for all running documents attached to this hierarchy and itemid. There
             // are cases where there may be two different editors (not views) open on the same document.
-            IEnumRunningDocuments pEnumRdt;
             var pRdt = this.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
             Utilities.CheckNotNull(pRdt);
 
-            if (ErrorHandler.Succeeded(pRdt.GetRunningDocumentsEnum(out pEnumRdt)))
+            if (ErrorHandler.Succeeded(pRdt.GetRunningDocumentsEnum(out var pEnumRdt)))
             {
                 var cookie = new uint[1];
-                uint fetched;
                 var saveOptions = (uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_NoSave;
                 var srpOurHier = node.projectMgr as IVsHierarchy;
 
                 ErrorHandler.ThrowOnFailure(pEnumRdt.Reset());
-                while (VSConstants.S_OK == pEnumRdt.Next(1, cookie, out fetched))
+                while (VSConstants.S_OK == pEnumRdt.Next(1, cookie, out var fetched))
                 {
-                    // Note we can pass NULL for all parameters we don't care about
-                    uint empty;
-                    string emptyStr;
-                    IntPtr ppunkDocData;
-                    IVsHierarchy srpHier;
                     var itemid = VSConstants.VSITEMID_NIL;
 
                     ErrorHandler.ThrowOnFailure(pRdt.GetDocumentInfo(
                                          cookie[0],
-                                         out empty,
-                                         out empty,
-                                         out empty,
-                                         out emptyStr,
-                                         out srpHier,
+                                         out var _,
+                                         out var _,
+                                         out var _,
+                                         out var _,
+                                         out var srpHier,
                                          out itemid,
-                                         out ppunkDocData));
+                                         out var ppunkDocData));
 
                     // Is this one of our documents?
                     if (Utilities.IsSameComObject(srpOurHier, srpHier) && itemid == node.ID)
@@ -1191,8 +1184,7 @@ namespace Microsoft.VisualStudioTools.Project
             try
             {
                 // Generate a new folder name
-                string newFolderName;
-                ErrorHandler.ThrowOnFailure(this.projectMgr.GenerateUniqueItemName(this.hierarchyId, string.Empty, string.Empty, out newFolderName));
+                ErrorHandler.ThrowOnFailure(this.projectMgr.GenerateUniqueItemName(this.hierarchyId, string.Empty, string.Empty, out var newFolderName));
 
                 // create the folder node, this will add it to MS build but we won't have the directory created yet.
                 var folderNode = this.ProjectMgr.CreateFolderNode(Path.Combine(this.FullPathToChildren, newFolderName));
@@ -1226,7 +1218,6 @@ namespace Microsoft.VisualStudioTools.Project
             IVsAddProjectItemDlg addItemDialog;
 
             var strFilter = string.Empty;
-            int iDontShowAgain;
             uint uiFlags;
             var project = (IVsProject3)this.projectMgr;
 
@@ -1245,7 +1236,7 @@ namespace Microsoft.VisualStudioTools.Project
                 uiFlags = (uint)(__VSADDITEMFLAGS.VSADDITEM_AddExistingItems | __VSADDITEMFLAGS.VSADDITEM_ProjectHandlesLinks | __VSADDITEMFLAGS.VSADDITEM_AllowMultiSelect | __VSADDITEMFLAGS.VSADDITEM_AllowStickyFilter);
             }
 
-            return addItemDialog.AddProjectItemDlg(this.hierarchyId, ref projectGuid, project, uiFlags, null, null, ref strBrowseLocations, ref strFilter, out iDontShowAgain); /*&fDontShowAgain*/
+            return addItemDialog.AddProjectItemDlg(this.hierarchyId, ref projectGuid, project, uiFlags, null, null, ref strBrowseLocations, ref strFilter, out var iDontShowAgain); /*&fDontShowAgain*/
         }
 
         /// <summary>
@@ -1825,8 +1816,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            Utilities.ArgumentNotNull("files", files);
-            Utilities.ArgumentNotNull("flags", flags);
+            Utilities.ArgumentNotNull(nameof(files), files);
+            Utilities.ArgumentNotNull(nameof(flags), flags);
         }
 
         /// <summary>
@@ -1915,11 +1906,10 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
             }
 
-            uint state;
             if (ErrorHandler.Succeeded(windows.GetItemState(this.ProjectMgr.GetOuterInterface<IVsUIHierarchy>(),
                 this.ID,
                 (uint)__VSHIERARCHYITEMSTATE.HIS_Expanded,
-                out state)))
+                out var state)))
             {
                 return state != 0;
             }
@@ -2140,8 +2130,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         int IOleServiceProvider.QueryService(ref Guid guidService, ref Guid riid, out IntPtr ppvObject)
         {
-            object obj;
-            var hr = QueryService(ref guidService, out obj);
+            var hr = QueryService(ref guidService, out var obj);
             if (ErrorHandler.Succeeded(hr))
             {
                 if (riid.Equals(NativeMethods.IID_IUnknown))

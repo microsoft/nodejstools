@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +25,10 @@ namespace Microsoft.NodejsTools.Debugger.Events
                 : new List<int>();
         }
 
-        public List<int> Breakpoints { get; private set; }
-        public NodeModule Module { get; private set; }
-        public int Line { get; private set; }
-        public int Column { get; set; }
-        public bool Running { get; private set; }
+        public List<int> Breakpoints { get; }
+        public NodeModule Module { get; }
+        public int Line { get; }
+        public int Column { get; }
+        public bool Running { get; }
     }
 }

@@ -6,7 +6,7 @@
     "start": "node server"
   },
   "author": {
-    "name": "$username$"
+    "name": ""
   },
   "devDependencies": {
     "@types/node": "^6.0.87"

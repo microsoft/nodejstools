@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -134,13 +134,11 @@ namespace Microsoft.VisualStudioTools.Navigation
             ErrorHandler.ThrowOnFailure(frame.Show());
 
             // Get the code window from the window frame.
-            object docView;
-            ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out docView));
+            ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocView, out var docView));
             var codeWindow = docView as IVsCodeWindow;
             if (null == codeWindow)
             {
-                object docData;
-                ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out docData));
+                ErrorHandler.ThrowOnFailure(frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out var docData));
                 codeWindow = docData as IVsCodeWindow;
                 if (null == codeWindow)
                 {
@@ -149,8 +147,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
 
             // Get the primary view from the code window.
-            IVsTextView textView;
-            ErrorHandler.ThrowOnFailure(codeWindow.GetPrimaryView(out textView));
+            ErrorHandler.ThrowOnFailure(codeWindow.GetPrimaryView(out var textView));
 
             // Set the cursor at the beginning of the declaration.
             ErrorHandler.ThrowOnFailure(textView.SetCaretPos(this._sourceSpan.iStartLine, this._sourceSpan.iStartIndex));
@@ -192,25 +189,17 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
 
             // Get the enumeration of the running documents.
-            IEnumRunningDocuments documents;
-            ErrorHandler.ThrowOnFailure(rdt.GetRunningDocumentsEnum(out documents));
+            ErrorHandler.ThrowOnFailure(rdt.GetRunningDocumentsEnum(out var documents));
 
             var documentData = IntPtr.Zero;
             var docCookie = new uint[1];
-            uint fetched;
-            while ((VSConstants.S_OK == documents.Next(1, docCookie, out fetched)) && (1 == fetched))
+            while ((VSConstants.S_OK == documents.Next(1, docCookie, out var fetched)) && (1 == fetched))
             {
-                uint flags;
-                uint editLocks;
-                uint readLocks;
-                string moniker;
-                IVsHierarchy docHierarchy;
-                uint docId;
                 var docData = IntPtr.Zero;
                 try
                 {
                     ErrorHandler.ThrowOnFailure(
-                        rdt.GetDocumentInfo(docCookie[0], out flags, out readLocks, out editLocks, out moniker, out docHierarchy, out docId, out docData));
+                        rdt.GetDocumentInfo(docCookie[0], out var flags, out var readLocks, out var editLocks, out var moniker, out var docHierarchy, out var docId, out docData));
                     // Check if this document is the one we are looking for.
                     if ((docId == this._fileId) && (this._ownerHierarchy.Equals(docHierarchy)))
                     {

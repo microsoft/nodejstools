@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -162,9 +162,7 @@ namespace Microsoft.VisualStudioTools.Project
             var referencesFolder = this.ProjectMgr.GetReferenceContainer() as ReferenceContainerNode;
             Utilities.CheckNotNull(referencesFolder, "Could not find the References node");
 
-            CannotAddReferenceErrorMessage referenceErrorMessageHandler = null;
-
-            if (!this.CanAddReference(out referenceErrorMessageHandler))
+            if (!this.CanAddReference(out var referenceErrorMessageHandler))
             {
                 if (referenceErrorMessageHandler != null)
                 {

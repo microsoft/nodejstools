@@ -16,8 +16,7 @@ namespace Microsoft.VisualStudioTools
 
         public override IDataObject GetClipboard()
         {
-            IDataObject res;
-            ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleGetClipboard(out res));
+            ErrorHandler.ThrowOnFailure(UnsafeNativeMethods.OleGetClipboard(out var res));
             return res;
         }
 

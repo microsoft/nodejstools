@@ -31,15 +31,13 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                string canonicalName;
-                return ErrorHandler.Succeeded(get_CanonicalName(out canonicalName)) ? canonicalName : null;
+                return ErrorHandler.Succeeded(get_CanonicalName(out var canonicalName)) ? canonicalName : null;
             }
         }
 
         internal string GetMetadata(string name)
         {
-            object value;
-            return ErrorHandler.Succeeded(get_Property(name, out value)) ? value as string : null;
+            return ErrorHandler.Succeeded(get_Property(name, out var value)) ? value as string : null;
         }
 
         #region IVsOutput2 Members
@@ -124,12 +122,11 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             pbstrRelativePath = string.Empty;
-            object variant;
             // get the corresponding property
 
-            if (ErrorHandler.Succeeded(this.get_Property("TargetPath", out variant)))
+            if (ErrorHandler.Succeeded(this.get_Property("TargetPath", out var variant)))
             {
-                var var = variant as String;
+                var var = variant as string;
 
                 if (var != null)
                 {

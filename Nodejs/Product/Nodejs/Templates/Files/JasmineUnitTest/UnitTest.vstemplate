@@ -1,0 +1,20 @@
+﻿<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4005"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4006"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="403"/>
+    <ProjectType>Node.js</ProjectType>
+    <DefaultName>UnitTest.js</DefaultName>
+    <SortOrder>320</SortOrder>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="Code" TargetFileName="$fileinputname$.$fileinputextension$" ReplaceParameters="true">UnitTest.js</ProjectItem>
+    <CustomParameters>
+      <CustomParameter Name="TestFramework" Value="Jasmine"/>
+    </CustomParameters>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.UnitTestFileWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

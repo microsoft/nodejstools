@@ -1,8 +1,7 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Microsoft.NodejsTools.Jade
@@ -10,7 +9,6 @@ namespace Microsoft.NodejsTools.Jade
     /// <summary>
     /// Helper class that represents stream of characters for a parser or tokenizer
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     internal class CharacterStream
     {
         private char _currentChar;
@@ -99,7 +97,9 @@ namespace Microsoft.NodejsTools.Jade
             var pos = this.Position + offset;
 
             if (pos < 0 || pos >= this._text.Length)
+            {
                 return '\0';
+            }
 
             return this._text[pos];
         }
@@ -212,13 +212,17 @@ namespace Microsoft.NodejsTools.Jade
         private void CheckBounds()
         {
             if (this._position < 0)
+            {
                 this._position = 0;
+            }
 
             var maxPosition = Math.Min(this._text.Length, this._range.End);
 
             this._isEndOfStream = this._position >= maxPosition;
             if (this._isEndOfStream)
+            {
                 this._position = maxPosition;
+            }
 
             this._currentChar = this._isEndOfStream ? '\0' : this._text[this.Position];
         }
@@ -231,7 +235,6 @@ namespace Microsoft.NodejsTools.Jade
             return (character >= '0' && character <= '9');
         }
 
-        [ExcludeFromCodeCoverage]
         [DebuggerStepThrough]
         public override string ToString()
         {

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -39,7 +39,6 @@ namespace Microsoft.VisualStudioTools.Project
             ProjectFileConstants.COMReference,
             ProjectFileConstants.WebPiReference
         };
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         protected virtual string[] SupportedReferenceTypes => supportedReferenceTypes;
         #endregion
 
@@ -338,9 +337,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         protected virtual ReferenceNode CreateFileComponent(VSCOMPONENTSELECTORDATA selectorData)
         {
-            if (null == selectorData.bstrFile)
+            if (selectorData.bstrFile == null)
             {
-                throw new ArgumentNullException("selectorData");
+                throw new ArgumentNullException(nameof(selectorData));
             }
 
             // We have a path to a file, it could be anything

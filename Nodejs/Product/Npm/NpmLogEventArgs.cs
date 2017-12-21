@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
@@ -11,6 +11,6 @@ namespace Microsoft.NodejsTools.Npm
             this.LogText = logText;
         }
 
-        public string LogText { get; private set; }
+        public string LogText { get; }
     }
 }

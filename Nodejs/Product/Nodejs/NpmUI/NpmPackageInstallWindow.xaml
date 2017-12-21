@@ -1,11 +1,11 @@
-﻿<vsui1:DialogWindow
+﻿<vsui:DialogWindow
     x:Class="Microsoft.NodejsTools.NpmUI.NpmPackageInstallWindow"
     x:ClassModifier="public"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
-    xmlns:vsui1="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
@@ -21,6 +21,8 @@
     <!-- Theming -->
     <Window.Resources>
         <ResourceDictionary>
+            <npmUi:FilterStateVisibilityConverter x:Key="filterStateConverter" />
+
             <Geometry x:Key="SearchGeometry">F1 M 8.5,7.0 C 7.12,7.00 6.0,5.88 6.0,4.5 C 6.0,3.12 7.12,2.0 8.5,2.0 C 9.88,2.0 11.0,3.12 11.0,4.5 C 11.0,5.88 9.88,7.0 8.5,7.0 Z M 8.5,0.0 C 6.02,0.0 4.0,2.02 4.0,4.500 C 4.0,5.23 4.19,5.9 4.49,6.5 L 0.0,11.0 L 2.0,13.0 L 6.49,8.51 C 7.1,8.81 7.77,9.0 8.5,9.0 C 11.0,9.0 13.0,7.0 13.0,4.5 C 13.0,2.02 11.0,0.0 8.5,0.0 Z</Geometry>
             <Style x:Key="SearchStyle" TargetType="ContentControl">
                 <Setter Property="ContentTemplate">
@@ -31,7 +33,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
+            
+            <x:Array Type="ComboBoxItem" x:Key="LatestVersionComboItem">
+                <ComboBoxItem Content="{x:Static resx:NpmInstallWindowResources.LatestVersion }" />
+            </x:Array>
+            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -149,6 +155,13 @@
                                            Text="{x:Static resx:NpmInstallWindowResources.InstalledLocallyMessage}" />
 
                                 <TextBlock Grid.Column="1"
+                                           x:Name="LocalInstallMissingMessage"
+                                           Visibility="Collapsed"
+                                           FontWeight="Bold"
+                                           Foreground="Red"
+                                           Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
+                                
+                                <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
                                            FontWeight="Bold"
@@ -170,6 +183,9 @@
                         <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsInstalledLocally}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLocalInstallMissing}" Value="true">
+                                <Setter TargetName="LocalInstallMissingMessage" Property="Visibility" Value="Visible" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsLocalInstallOutOfDate}" Value="true">
                                 <Setter TargetName="LocalInstallMessage" Property="Visibility" Value="Collapsed" />
@@ -219,7 +235,10 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-
+            <ProgressBar Name="_progress"
+                             Height="4"
+                             IsIndeterminate="true"
+                             Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
             <Button x:Name="CloseButton"
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
@@ -283,21 +302,21 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
                           TabIndex="2" 
-                          Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.ResultsAvailable == b ? Visibility.Visible : Visibility.Hidden'}}" />
+                          Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=ResultsAvailable}" />
                 <Border BorderBrush="{Binding ElementName=packageList, Path=BorderBrush}"
                         BorderThickness="{Binding ElementName=packageList,Path=BorderThickness}">
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock HorizontalAlignment="Center"
-                                   Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoFilterText == b ? Visibility.Visible : Visibility.Hidden'}}"
+                                   Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=NoFilterText}"
                                    Text="{x:Static resx:NpmInstallWindowResources.SearchPromptMessage}" />
                         <ProgressBar 
                     HorizontalAlignment="Stretch"
                     IsEnabled="True" 
                     IsIndeterminate="True"
-                    Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.Filtering == b ? Visibility.Visible : Visibility.Hidden'}}"/>
+                    Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=Filtering}"/>
                         <TextBlock
                             HorizontalAlignment="Center"
-                            Visibility="{Binding PackageFilterState, Converter={wpf:Lambda '(NpmPackageInstallViewModel.FilterState b) => NpmPackageInstallViewModel.FilterState.NoResults == b ? Visibility.Visible : Visibility.Hidden'}}"
+                            Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=NoResults}"
                             Text="{x:Static resx:NpmInstallWindowResources.NoResultsFoundMessage}" />
                     </Grid>
                 </Border>
@@ -392,10 +411,12 @@
                             <ComboBox.Resources>
                                 <CollectionViewSource x:Key="AvailableVersionViewSource"
                                                       Source="{Binding Path=SelectedPackage.AvailableVersions, Mode=OneWay}"/>
+                                <CollectionViewSource x:Key="LatestVersionViewSource"
+                                                      Source="{StaticResource LatestVersionComboItem}"/>
                             </ComboBox.Resources>
                             <ComboBox.ItemsSource>
                                 <CompositeCollection>
-                                    <sys:String>(latest)</sys:String>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource LatestVersionViewSource}, Mode=OneWay}"/>
                                     <CollectionContainer Collection="{Binding Source={StaticResource AvailableVersionViewSource}, Mode=OneWay}"/>
                                 </CompositeCollection>
                             </ComboBox.ItemsSource>
@@ -419,4 +440,4 @@
         </Grid>
     </Grid>
 
-</vsui1:DialogWindow>
+</vsui:DialogWindow>

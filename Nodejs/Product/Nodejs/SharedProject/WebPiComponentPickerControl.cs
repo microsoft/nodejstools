@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -81,13 +81,8 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 await Task.Run(() => GetFeeds(feedSource));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
             {
-                if (ex.IsCriticalException())
-                {
-                    throw;
-                }
-
                 MessageBox.Show(SR.GetString(SR.WebPiFeedError, feedSource, ex.Message));
 
                 var fullMessage = SR.GetString(SR.WebPiFeedError, feedSource, ex);
@@ -206,9 +201,8 @@ namespace Microsoft.VisualStudioTools.Project
                 int? res = null;
                 if (this.Column == 1)
                 {
-                    DateTime dtX, dtY;
-                    if (DateTime.TryParse(itemX.SubItems[1].Text, out dtX) &&
-                        DateTime.TryParse(itemY.SubItems[1].Text, out dtY))
+                    if (DateTime.TryParse(itemX.SubItems[1].Text, out var dtX) &&
+                        DateTime.TryParse(itemY.SubItems[1].Text, out var dtY))
                     {
                         res = dtX.CompareTo(dtY);
                     }
@@ -293,11 +287,9 @@ namespace Microsoft.VisualStudioTools.Project
                     if (parentHwnd != IntPtr.Zero)
                     {
                         var grandParentHwnd = NativeMethods.GetParent(parentHwnd);
-
-                        User32RECT parentClientRect, grandParentClientRect;
                         if (grandParentHwnd != IntPtr.Zero &&
-                            NativeMethods.GetClientRect(parentHwnd, out parentClientRect) &&
-                                NativeMethods.GetClientRect(grandParentHwnd, out grandParentClientRect))
+                            NativeMethods.GetClientRect(parentHwnd, out var parentClientRect) &&
+                                NativeMethods.GetClientRect(grandParentHwnd, out var grandParentClientRect))
                         {
                             var width = grandParentClientRect.Width;
                             var height = grandParentClientRect.Height;

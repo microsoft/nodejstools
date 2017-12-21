@@ -26,7 +26,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public void Dispose()
         {
-            this.viewModel.NpmController = null;
+            this.viewModel.Dispose();
 
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.

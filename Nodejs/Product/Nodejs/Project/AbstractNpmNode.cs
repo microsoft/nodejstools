@@ -14,12 +14,12 @@ namespace Microsoft.NodejsTools.Project
 {
     internal abstract class AbstractNpmNode : HierarchyNode
     {
-        protected readonly NodejsProjectNode _projectNode;
+        protected readonly NodejsProjectNode projectNode;
 
         protected AbstractNpmNode(NodejsProjectNode root)
             : base(root)
         {
-            this._projectNode = root;
+            this.projectNode = root;
             this.ExcludeNodeFromScc = true;
         }
 
@@ -28,29 +28,21 @@ namespace Microsoft.NodejsTools.Project
         public override Guid ItemTypeGuid => VSConstants.GUID_ItemType_VirtualFolder;
         public override Guid MenuGroupId => Guids.NodejsNpmCmdSet;
         public override int MenuCommandId => PkgCmdId.menuIdNpm;
-        
+
         /// <summary>
         /// Disable inline editing of Caption.
         /// </summary>
-        public sealed override string GetEditLabel()
-        {
-            return null;
-        }
+        public sealed override string GetEditLabel() => null;
 
         protected override bool SupportsIconMonikers => true;
-        
+
         /// <summary>
         /// Returns the icon to use.
         /// </summary>
-        protected override ImageMoniker GetIconMoniker(bool open)
-        {
-            return KnownMonikers.Reference;
-        }
+        protected override ImageMoniker GetIconMoniker(bool open) => KnownMonikers.Reference;
 
-        protected override NodeProperties CreatePropertiesObject()
-        {
-            return new NpmNodeProperties(this);
-        }
+        protected override NodeProperties CreatePropertiesObject() => new NpmNodeProperties(this);
+
         #endregion
 
         public abstract void ManageNpmModules();
@@ -95,7 +87,7 @@ namespace Microsoft.NodejsTools.Project
                 }
                 else
                 {
-                    child = new DependencyNode(this._projectNode, parent as DependencyNode, package);
+                    child = new DependencyNode(this.projectNode, parent as DependencyNode, package);
                     parent.AddChild(child);
                     newModules.Add(package);
                 }

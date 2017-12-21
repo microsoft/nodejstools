@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pfOK = this._children[(int)index].CanDelete ? 1 : 0;
             return VSConstants.S_OK;
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pfOK = this._children[(int)index].CanGoToSource ? 1 : 0;
             return VSConstants.S_OK;
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pfOK = this._children[(int)index].CanRename ? 1 : 0;
             return VSConstants.S_OK;
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             this._children[(int)index].SourceItems(out ppHier, out pItemid, out pcItems);
             return VSConstants.S_OK;
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             this._children[(int)index].Delete();
             this._children.RemoveAt((int)index);
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             var dataObject = new OleDataObject(pDataObject);
             this._children[(int)index].DoDragDrop(dataObject, grfKeyState, pdwEffect);
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             this._children[(int)index].Rename(pszNewName, grfFlags);
             return VSConstants.S_OK;
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             var copied = this._children[(int)index].EnumClipboardFormats((_VSOBJCFFLAGS)grfFlags, rgcfFormats);
             if ((null != pcActual) && (pcActual.Length > 0))
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             this._children[(int)index].FillDescription((_VSOBJDESCOPTIONS)grfOptions, pobDesc);
             return VSConstants.S_OK;
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             ppdispBrowseObj = this._children[(int)index].BrowseObject;
             if (null == ppdispBrowseObj)
@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
             else
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             return VSConstants.S_OK;
         }
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             var commandId = this._children[(int)index].ContextMenuID;
             if (null == commandId)
@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pData[0] = this._children[(int)index].DisplayData;
             return VSConstants.S_OK;
@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // TODO: Use the flags and list type to actually filter the result.
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             ppIVsSimpleObjectList2 = this._children[(int)index].FilterView(ListType);
             return VSConstants.S_OK;
@@ -255,7 +255,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             ppNavInfo = this._children[(int)index] as IVsNavInfo;
             return ppNavInfo == null ? VSConstants.E_NOTIMPL : VSConstants.S_OK;
@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             ppNavInfoNode = this._children[(int)index] as IVsNavInfoNode;
             return VSConstants.S_OK;
@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // TODO: make use of the text option.
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pbstrText = this._children[(int)index].GetTextRepresentation(tto);
             return VSConstants.S_OK;
@@ -306,7 +306,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // TODO: Make use of the tooltip type.
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             pbstrText = this._children[(int)index].TooltipText;
             return VSConstants.S_OK;
@@ -322,7 +322,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if (index >= (uint)this._children.Count)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             this._children[(int)index].GotoSource(SrcType);
             return VSConstants.S_OK;
@@ -330,11 +330,10 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         int IVsSimpleObjectList2.LocateNavInfoNode(IVsNavInfoNode pNavInfoNode, out uint pulIndex)
         {
-            Utilities.ArgumentNotNull("pNavInfoNode", pNavInfoNode);
+            Utilities.ArgumentNotNull(nameof(pNavInfoNode), pNavInfoNode);
 
             pulIndex = NullIndex;
-            string nodeName;
-            ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out nodeName));
+            ErrorHandler.ThrowOnFailure(pNavInfoNode.get_Name(out var nodeName));
             for (var i = 0; i < this._children.Count; i++)
             {
                 if (StringComparer.OrdinalIgnoreCase.Equals(this._children[i].UniqueName, nodeName))

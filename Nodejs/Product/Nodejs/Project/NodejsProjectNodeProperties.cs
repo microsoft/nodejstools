@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,11 +20,11 @@ namespace Microsoft.NodejsTools.Project
         {
         }
 
-        [PropertyNameAttribute("WebApplication.AspNetDebugging")]
+        [PropertyName("WebApplication.AspNetDebugging")]
         [Browsable(false)]
         public bool AspNetDebugging => true;
 
-        [PropertyNameAttribute("WebApplication.NativeDebugging")]
+        [PropertyName("WebApplication.NativeDebugging")]
         [Browsable(false)]
         public bool NativeDebugging => false;
 
@@ -49,7 +49,14 @@ namespace Microsoft.NodejsTools.Project
             {
                 this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
+                    if (this.ShouldWriteNodeSettingsInProjectFile())
+                    {
+                        this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExePath, value);
+                    }
+                    else
+                    {
+                        this.Node.ProjectMgr.SetUserProjectProperty(NodeProjectProperty.NodeExePath, value);
+                    }
                 });
             }
         }
@@ -70,7 +77,14 @@ namespace Microsoft.NodejsTools.Project
             {
                 this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
+                    if (this.ShouldWriteNodeSettingsInProjectFile())
+                    {
+                        this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.NodeExeArguments, value);
+                    }
+                    else
+                    {
+                        this.Node.ProjectMgr.SetUserProjectProperty(NodeProjectProperty.NodeExeArguments, value);
+                    }
                 });
             }
         }
@@ -105,8 +119,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke((Func<int?>)(() =>
                 {
-                    int port;
-                    if (Int32.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out port))
+                    if (int.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.NodejsPort, true), out var port))
                     {
                         return port;
                     }
@@ -152,8 +165,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 return this.HierarchyNode.ProjectMgr.Site.GetUIThread().Invoke(() =>
                 {
-                    bool res;
-                    if (Boolean.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out res))
+                    if (bool.TryParse(this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.StartWebBrowser, true), out var res))
                     {
                         return res;
                     }
@@ -167,6 +179,13 @@ namespace Microsoft.NodejsTools.Project
                     this.Node.ProjectMgr.SetProjectProperty(NodeProjectProperty.StartWebBrowser, value.ToString());
                 });
             }
+        }
+
+        private bool ShouldWriteNodeSettingsInProjectFile()
+        {
+            var setting = this.Node.ProjectMgr.GetProjectProperty(NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
+
+            return bool.TryParse(setting, out var result) && result;
         }
 
         object EnvDTE80.IInternalExtenderProvider.GetExtender(string extenderCATID, string extenderName, object extendeeObject, EnvDTE.IExtenderSite extenderSite, int cookie)

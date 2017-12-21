@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Threading;
@@ -8,7 +8,6 @@ namespace Microsoft.NodejsTools.Jade
 {
     internal abstract class OutlineRegionBuilder : IDisposable
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
         public EventHandler<OutlineRegionsChangedEventArgs> RegionsChanged;
 
         protected OutlineRegionCollection CurrentRegions { get; set; }
@@ -38,10 +37,9 @@ namespace Microsoft.NodejsTools.Jade
 
             if (e.Changes.Count > 0)
             {
-                int start, oldLength, newLength;
-                TextUtility.CombineChanges(e, out start, out oldLength, out newLength);
+                TextUtility.CombineChanges(e, out var start, out var oldLength, out var newLength);
 
-                var changeStart = Int32.MaxValue;
+                var changeStart = int.MaxValue;
                 var changeEnd = 0;
 
                 lock (this._regionsLock)
@@ -76,14 +74,18 @@ namespace Microsoft.NodejsTools.Jade
                         changeEnd = Math.Max(changeEnd, region.End);
                     }
 
-                    if (changeStart < Int32.MaxValue)
+                    if (changeStart < int.MaxValue)
+                    {
                         this.CurrentRegions.TextBufferVersion = this.TextBuffer.CurrentSnapshot.Version.VersionNumber;
+                    }
                 }
 
-                if (changeStart < Int32.MaxValue)
+                if (changeStart < int.MaxValue)
                 {
                     if (this.RegionsChanged != null)
+                    {
                         this.RegionsChanged(this, new OutlineRegionsChangedEventArgs(this.CurrentRegions, TextRange.FromBounds(changeStart, changeEnd)));
+                    }
                 }
             }
         }

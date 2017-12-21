@@ -91,8 +91,7 @@ namespace Microsoft.VisualStudioTools.Project
         public int Open(bool newFile, bool openWith, WindowFrameShowAction windowFrameAction)
         {
             var logicalView = Guid.Empty;
-            IVsWindowFrame windowFrame = null;
-            return this.Open(newFile, openWith, logicalView, out windowFrame, windowFrameAction);
+            return this.Open(newFile, openWith, logicalView, out var windowFrame, windowFrameAction);
         }
 
         /// <summary>
@@ -116,16 +115,13 @@ namespace Microsoft.VisualStudioTools.Project
 
             // First we see if someone else has opened the requested view of the file.
             var flags = _VSRDTFLAGS.RDT_NoLock;
-            uint itemid;
             var docData = IntPtr.Zero;
-            IVsHierarchy ivsHierarchy;
-            uint docCookie;
             var path = this.GetFullPathForDocument();
             var returnValue = VSConstants.S_OK;
 
             try
             {
-                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)flags, path, out ivsHierarchy, out itemid, out docData, out docCookie));
+                ErrorHandler.ThrowOnFailure(rdt.FindAndLockDocument((uint)flags, path, out var ivsHierarchy, out var itemid, out docData, out var docCookie));
                 ErrorHandler.ThrowOnFailure(this.Open(newFile, openWith, ref logicalView, docData, out frame, windowFrameAction));
             }
             catch (COMException e)

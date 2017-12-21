@@ -12,6 +12,7 @@ namespace Microsoft.NodejsTools
         public const string NodejsCmdSetString = "695e37e2-c6df-4e0a-8833-f688e4c65f1f";
         public const string NodejsDebugLanguageString = "{65791609-BA29-49CF-A214-DBFF8AEC3BC2}";
         public const string NodejsNpmCmdSetString = "9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA";
+        public const string NodeToolsWorkspaceCmdSetString = "{985C4146-CE5D-4D56-912E-0EBBE2216FC1}";
         public const string NodejsProjectFactoryString = "3AF33F2E-1136-4D97-BBB7-1795711AC8B8";
         public const string NodejsBaseProjectFactoryString = "9092AA53-FB77-4645-B42D-1CCCA6BD08BD";
         public const string TypeScriptLanguageInfoString = "4a0dddb5-7a95-4fbf-97cc-616d07737a77";
@@ -35,6 +36,8 @@ namespace Microsoft.NodejsTools
         public static readonly Guid NodejsCmdSet = new Guid(NodejsCmdSetString);
         public static readonly Guid NodejsDebugLanguage = new Guid(NodejsDebugLanguageString);
         public static readonly Guid NodejsNpmCmdSet = new Guid(NodejsNpmCmdSetString);
+        public static readonly Guid NodeToolsWorkspaceCmdSet = new Guid(NodeToolsWorkspaceCmdSetString);
+
         public static readonly Guid TypeScriptLanguageInfo = new Guid(TypeScriptLanguageInfoString);
         public static readonly Guid TypeScriptDebugLanguage = new Guid(TypeScriptDebuggerLanguageInfoString);
 
@@ -58,5 +61,12 @@ namespace Microsoft.NodejsTools
 
         // UWP project flavor guid
         public const string NodejsUwpProjectFlavor = "00251F00-BA30-4CE4-96A2-B8A1085F37AA";
+
+        // Workspace guids
+        public const string PackageJsonContextTypeString = "{78F43160-2968-4FCA-8829-7E30E9B610CF}";
+        public readonly static Guid PackageJsonContextType = new Guid(PackageJsonContextTypeString);
+		
+        public const string NodejsInteractiveWindowString = "2153A414-267E-4731-B891-E875ADBA1993";
+        public static readonly Guid NodejsInteractiveWindow = new Guid(NodejsInteractiveWindowString);
     };
 }

@@ -40,14 +40,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InteractiveWindow\InteractiveWindow.csproj">
-      <Project>{24a3887f-da50-4989-8d6c-4a5b04d5d457}</Project>
-      <Name>InteractiveWindow</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-      <VSIXSubPath>.</VSIXSubPath>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Nodejs\Nodejs.csproj">
       <Project>{32ec5259-98da-40ca-9e2d-1b1b2e966f88}</Project>
       <Name>Nodejs</Name>

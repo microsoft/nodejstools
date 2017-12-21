@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
 {
@@ -27,8 +26,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.CheckNotNull(manager, "Could not get the FileDocumentManager");
 
             var viewGuid = Guid.Empty;
-            IVsWindowFrame frame;
-            manager.Open(false, false, viewGuid, out frame, WindowFrameShowAction.Show);
+            manager.Open(false, false, viewGuid, out var frame, WindowFrameShowAction.Show);
         }
     }
 }

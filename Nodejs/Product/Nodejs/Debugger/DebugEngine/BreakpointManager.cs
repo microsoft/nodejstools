@@ -63,8 +63,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public AD7BoundBreakpoint GetBoundBreakpoint(NodeBreakpointBinding breakpointBinding)
         {
-            AD7BoundBreakpoint boundBreakpoint;
-            return this._breakpointBindingMap.TryGetValue(breakpointBinding, out boundBreakpoint) ? boundBreakpoint : null;
+            return this._breakpointBindingMap.TryGetValue(breakpointBinding, out var boundBreakpoint) ? boundBreakpoint : null;
         }
     }
 }

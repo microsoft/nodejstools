@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -26,8 +26,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
         {
             ppPort = null;
 
-            string name;
-            pRequest.GetPortName(out name);
+            pRequest.GetPortName(out var name);
 
             // Support old-style 'hostname:port' format, as well.
             if (!name.Contains("://"))
@@ -100,11 +99,7 @@ namespace Microsoft.NodejsTools.Debugger.Remote
 
         public int GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText)
         {
-            pbstrText =
-                "Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). " +
-                "Related documentation can be found under the 'Tools\\Node.js Tool\\Remote Debug Proxy' menu. " +
-                "Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost:" + NodejsConstants.DefaultDebuggerPort + "'. " +
-                "This transport is not secure, and should not be used on a network that might have hostile traffic.";
+            pbstrText = string.Format(Resources.DebuggerAttachToDescription, NodejsConstants.DefaultDebuggerPort);
             return VSConstants.S_OK;
         }
     }

@@ -39,8 +39,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         public static int GetProcessId(IDebugProgram2 program)
         {
-            IDebugProcess2 process;
-            RequireOk(program.GetProcess(out process));
+            RequireOk(program.GetProcess(out var process));
 
             return GetProcessId(process);
         }

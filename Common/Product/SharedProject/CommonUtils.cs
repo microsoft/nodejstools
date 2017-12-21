@@ -129,10 +129,9 @@ namespace Microsoft.VisualStudioTools
                 return true;
             }
 
-            Uri uri1, uri2;
             return
-                TryMakeUri(path1, true, UriKind.Absolute, out uri1) &&
-                TryMakeUri(path2, true, UriKind.Absolute, out uri2) &&
+                TryMakeUri(path1, true, UriKind.Absolute, out Uri uri1) &&
+                TryMakeUri(path2, true, UriKind.Absolute, out Uri uri2) &&
                 uri1 == uri2;
         }
 
@@ -148,10 +147,9 @@ namespace Microsoft.VisualStudioTools
                 return true;
             }
 
-            Uri uri1, uri2;
             return
-                TryMakeUri(file1, false, UriKind.Absolute, out uri1) &&
-                TryMakeUri(file2, false, UriKind.Absolute, out uri2) &&
+                TryMakeUri(file1, false, UriKind.Absolute, out Uri uri1) &&
+                TryMakeUri(file2, false, UriKind.Absolute, out Uri uri2) &&
                 uri1 == uri2;
         }
 
