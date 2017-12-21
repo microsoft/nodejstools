@@ -4626,6 +4626,9 @@
         <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Start Script]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Iniciar script]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
