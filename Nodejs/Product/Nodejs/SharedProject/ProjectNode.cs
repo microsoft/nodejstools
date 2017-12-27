@@ -2,6 +2,7 @@
 
 using System;
 using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -152,7 +153,7 @@ namespace Microsoft.VisualStudioTools.Project
             new KeyValuePair<string, string>("XmlSerializer",         "SGenFilesOutputGroup"),
         };
 
-        private readonly EventSinkCollection _hierarchyEventSinks = new EventSinkCollection();
+        private readonly EventSinkCollection hierarchyEventSinks = new EventSinkCollection();
 
         /// <summary>A project will only try to build if it can obtain a lock on this object</summary>
         private volatile static object BuildLock = new object();
@@ -208,18 +209,10 @@ namespace Microsoft.VisualStudioTools.Project
         private bool isClosed;
         private bool isClosing;
 
-        private EventTriggering eventTriggeringFlag = EventTriggering.TriggerAll;
-
-        private bool canFileNodesHaveChilds;
-
-        private bool isProjectEventsListener = true;
-
         /// <summary>
         /// The build dependency list passed to IVsDependencyProvider::EnumDependencies 
         /// </summary>
         private List<IVsBuildDependency> buildDependencyList = new List<IVsBuildDependency>();
-
-        private bool showProjectInSolutionPage = true;
 
         private bool buildInProcess;
 
@@ -242,12 +235,6 @@ namespace Microsoft.VisualStudioTools.Project
         private bool disableQueryEdit;
 
         /// <summary>
-        /// Control if command with potential destructive behavior such as delete should
-        /// be enabled for nodes of this project.
-        /// </summary>
-        private bool canProjectDeleteItems;
-
-        /// <summary>
         /// Member to store output base relative path. Used by OutputBaseRelativePath property
         /// </summary>
         private string outputBaseRelativePath = "bin";
@@ -268,7 +255,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Mapping from item names to their hierarchy nodes for all disk-based nodes.
         /// </summary>
-        protected readonly Dictionary<string, HierarchyNode> _diskNodes = new Dictionary<string, HierarchyNode>(StringComparer.OrdinalIgnoreCase);
+        protected readonly ConcurrentDictionary<string, HierarchyNode> DiskNodes = new ConcurrentDictionary<string, HierarchyNode>(StringComparer.OrdinalIgnoreCase);
 
         // Has the object been disposed.
         private bool isDisposed;
@@ -459,17 +446,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Defines the flag that supports the VSHPROPID.ShowProjInSolutionPage
         /// </summary>
-        protected virtual bool ShowProjectInSolutionPage
-        {
-            get
-            {
-                return this.showProjectInSolutionPage;
-            }
-            set
-            {
-                this.showProjectInSolutionPage = value;
-            }
-        }
+        protected virtual bool ShowProjectInSolutionPage { get; set; } = true;
 
         /// <summary>
         /// A space separated list of the project's capabilities.
@@ -487,17 +464,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Gets or sets the ability of a project filenode to have child nodes (sub items).
         /// Example would be C#/VB forms having resx and designer files.
         /// </summary>
-        protected internal bool CanFileNodesHaveChilds
-        {
-            get
-            {
-                return this.canFileNodesHaveChilds;
-            }
-            set
-            {
-                this.canFileNodesHaveChilds = value;
-            }
-        }
+        protected internal bool CanFileNodesHaveChilds { get; set; }
 
         /// <summary>
         /// Gets a service provider object provided by the IDE hosting the project
@@ -682,32 +649,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// Gets or set whether items can be deleted for this project.
         /// Enabling this feature can have the potential destructive behavior such as deleting files from disk.
         /// </summary>
-        protected internal bool CanProjectDeleteItems
-        {
-            get
-            {
-                return this.canProjectDeleteItems;
-            }
-            set
-            {
-                this.canProjectDeleteItems = value;
-            }
-        }
+        protected internal bool CanProjectDeleteItems { get; set; }
 
         /// <summary>
         /// Gets or sets event triggering flags.
         /// </summary>
-        internal EventTriggering EventTriggeringFlag
-        {
-            get
-            {
-                return this.eventTriggeringFlag;
-            }
-            set
-            {
-                this.eventTriggeringFlag = value;
-            }
-        }
+        internal EventTriggering EventTriggeringFlag { get; set; } = EventTriggering.TriggerAll;
 
         /// <summary>
         /// Defines the build project that has loaded the project file.
@@ -1077,7 +1024,7 @@ namespace Microsoft.VisualStudioTools.Project
                     this.imageHandler = null;
                 }
 
-                this._diskNodes.Clear();
+                this.DiskNodes.Clear();
                 this.FolderBeingCreated = null;
             }
             finally
@@ -1616,7 +1563,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             using (new DebugTimer("ProjectLoad"))
             {
-                this._diskNodes.Clear();
+                this.DiskNodes.Clear();
                 var successful = false;
                 try
                 {
@@ -1726,7 +1673,7 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         this.filename = fileName;
                     }
-                    this._diskNodes[this.filename] = this;
+                    this.DiskNodes[this.filename] = this;
 
                     // now reload to fix up references
                     this.Reload();
@@ -2507,7 +2454,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.disableQueryEdit = true;
 
                 this.isClosed = false;
-                this.eventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
+                this.EventTriggeringFlag = ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents | ProjectNode.EventTriggering.DoNotTriggerTrackerEvents;
 
                 SetBuildProject(Utilities.ReinitializeMsBuildProject(this.buildEngine, this.filename, this.buildProject));
 
@@ -2534,7 +2481,7 @@ namespace Microsoft.VisualStudioTools.Project
             finally
             {
                 this.isDirty = false;
-                this.eventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
+                this.EventTriggeringFlag = ProjectNode.EventTriggering.TriggerAll;
                 this.disableQueryEdit = false;
             }
         }
@@ -2968,9 +2915,9 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.buildProject.FullPath = newFileName;
 
-            this._diskNodes.Remove(this.filename);
+            this.DiskNodes.TryRemove(this.filename, out var _);
             this.filename = newFileName;
-            this._diskNodes[this.filename] = this;
+            this.DiskNodes[this.filename] = this;
 
             var newFileNameWithoutExtension = Path.GetFileNameWithoutExtension(newFileName);
 
@@ -3086,7 +3033,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             // In the case of subitem, we want to create dependent file node
             // and set the DependentUpon property
-            if (this.canFileNodesHaveChilds && (parentNode is FileNode || parentNode is DependentFileNode))
+            if (this.CanFileNodesHaveChilds && (parentNode is FileNode || parentNode is DependentFileNode))
             {
                 child = this.CreateDependentFileNode(fileName);
                 child.ItemNode.SetMetadata(ProjectFileConstants.DependentUpon, parentNode.ItemNode.GetMetadata(ProjectFileConstants.Include));
@@ -5547,11 +5494,7 @@ If the files in the existing folder have the same names as files in the folder y
         #endregion
 
         #region IProjectEventsListener Members
-        public bool IsProjectEventsListener
-        {
-            get { return this.isProjectEventsListener; }
-            set { this.isProjectEventsListener = value; }
-        }
+        public bool IsProjectEventsListener { get; set; } = true;
         #endregion
 
         #region IVsAggregatableProject Members
@@ -5837,7 +5780,7 @@ If the files in the existing folder have the same names as files in the folder y
             }
             else
             {
-                if (this._diskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(this.ProjectHome, strPath)) + "\\", out var parent))
+                if (this.DiskNodes.TryGetValue(Path.GetDirectoryName(Path.Combine(this.ProjectHome, strPath)) + "\\", out var parent))
                 {
                     // fast path, filename is normalized, and the folder already exists
                     return parent;
@@ -6309,7 +6252,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             Debug.Assert(Path.IsPathRooted(name));
 
-            this._diskNodes.TryGetValue(name, out var node);
+            this.DiskNodes.TryGetValue(name, out var node);
             return node;
         }
 
@@ -6357,7 +6300,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         public virtual int AdviseHierarchyEvents(IVsHierarchyEvents sink, out uint cookie)
         {
-            cookie = this._hierarchyEventSinks.Add(sink) + 1;
+            cookie = this.hierarchyEventSinks.Add(sink) + 1;
             return VSConstants.S_OK;
         }
 
@@ -6525,7 +6468,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         public virtual int UnadviseHierarchyEvents(uint cookie)
         {
-            this._hierarchyEventSinks.RemoveAt(cookie - 1);
+            this.hierarchyEventSinks.RemoveAt(cookie - 1);
             return VSConstants.S_OK;
         }
 
@@ -6568,7 +6511,7 @@ If the files in the existing folder have the same names as files in the folder y
             var diskNode = child as IDiskBasedNode;
             if (diskNode != null)
             {
-                this._diskNodes[diskNode.Url] = child;
+                this.DiskNodes[diskNode.Url] = child;
             }
 
             if ((this.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0)
@@ -6580,7 +6523,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             var prev = previousVisible ?? child.PreviousVisibleSibling;
             var prevId = (prev != null) ? prev.HierarchyId : VSConstants.VSITEMID_NIL;
-            foreach (IVsHierarchyEvents sink in this._hierarchyEventSinks)
+            foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = sink.OnItemAdded(parent.HierarchyId, prevId, child.HierarchyId);
                 if (ErrorHandler.Failed(result) && result != VSConstants.E_NOTIMPL)
@@ -6597,10 +6540,10 @@ If the files in the existing folder have the same names as files in the folder y
             var diskNode = deletedItem as IDiskBasedNode;
             if (diskNode != null)
             {
-                this._diskNodes.Remove(diskNode.Url);
+                this.DiskNodes.TryRemove(diskNode.Url, out var _);
             }
 
-            RaiseItemDeleted(deletedItem);
+            this.RaiseItemDeleted(deletedItem);
         }
 
         internal void RaiseItemDeleted(HierarchyNode deletedItem)
@@ -6612,14 +6555,14 @@ If the files in the existing folder have the same names as files in the folder y
 
             this.ExtensibilityEventsDispatcher.FireItemRemoved(deletedItem);
 
-            if (this._hierarchyEventSinks.Count > 0)
+            if (this.hierarchyEventSinks.Count > 0)
             {
                 // Note that in some cases (deletion of project node for example), an Advise
                 // may be removed while we are iterating over it. To get around this problem we
                 // take a snapshot of the advise list and walk that.
                 var clonedSink = new List<IVsHierarchyEvents>();
 
-                foreach (IVsHierarchyEvents anEvent in this._hierarchyEventSinks)
+                foreach (IVsHierarchyEvents anEvent in this.hierarchyEventSinks)
                 {
                     clonedSink.Add(anEvent);
                 }
@@ -6644,7 +6587,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return;
             }
 
-            foreach (IVsHierarchyEvents sink in this._hierarchyEventSinks)
+            foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = sink.OnItemsAppended(parent.HierarchyId);
 
@@ -6664,7 +6607,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return;
             }
 
-            foreach (IVsHierarchyEvents sink in this._hierarchyEventSinks)
+            foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = sink.OnPropertyChanged(node.HierarchyId, propid, flags);
 
@@ -6686,7 +6629,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             var wasExpanded = this.ParentHierarchy != null && parent.GetIsExpanded();
 
-            foreach (IVsHierarchyEvents sink in this._hierarchyEventSinks)
+            foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = sink.OnInvalidateItems(parent.HierarchyId);
 
@@ -6708,7 +6651,7 @@ If the files in the existing folder have the same names as files in the folder y
         /// <param name="element">Used by the hierarchy to decide which element to redraw</param>
         internal void ReDrawNode(HierarchyNode node, UIHierarchyElement element)
         {
-            foreach (IVsHierarchyEvents sink in this._hierarchyEventSinks)
+            foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 int result;
                 if ((element & UIHierarchyElement.Icon) != 0)
@@ -6972,10 +6915,10 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int IgnoreItemFileChanges(uint itemId, int ignoreFlag)
         {
-            var n = this.NodeFromItemId(itemId);
-            if (n != null)
+            var node = this.NodeFromItemId(itemId);
+            if (node != null)
             {
-                n.IgnoreItemFileChanges(ignoreFlag == 0 ? false : true);
+                node.IgnoreItemFileChanges(ignoreFlag == 0 ? false : true);
             }
 
             return VSConstants.S_OK;
@@ -6991,10 +6934,10 @@ If the files in the existing folder have the same names as files in the folder y
         {
             isReloadable = 0;
 
-            var n = this.NodeFromItemId(itemId);
-            if (n != null)
+            var node = this.NodeFromItemId(itemId);
+            if (node != null)
             {
-                isReloadable = (n.IsItemReloadable()) ? 1 : 0;
+                isReloadable = (node.IsItemReloadable()) ? 1 : 0;
             }
 
             return VSConstants.S_OK;
@@ -7008,10 +6951,10 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
         public virtual int ReloadItem(uint itemId, uint reserved)
         {
-            var n = this.NodeFromItemId(itemId);
-            if (n != null)
+            var node = this.NodeFromItemId(itemId);
+            if (node != null)
             {
-                n.ReloadItem(reserved);
+                node.ReloadItem(reserved);
             }
 
             return VSConstants.S_OK;
@@ -7023,9 +6966,10 @@ If the files in the existing folder have the same names as files in the folder y
         {
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            var existing = this._diskNodes[oldPath];
-            this._diskNodes.Remove(oldPath);
-            this._diskNodes.Add(newPath, existing);
+            if (this.DiskNodes.TryRemove(oldPath, out var existing))
+            {
+                this.DiskNodes.TryAdd(newPath, existing);
+            }
         }
 
         public IVsHierarchy ParentHierarchy => this.parentHierarchy;

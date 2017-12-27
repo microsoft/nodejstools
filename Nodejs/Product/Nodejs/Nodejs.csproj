@@ -272,6 +272,7 @@
     <Compile Include="Repl\ReplOutputClassificationFormatDefinitions.cs" />
     <Compile Include="Repl\ReplOutputClassifier.cs" />
     <Compile Include="Repl\ReplOutputClassifierProvider.cs" />
+    <Compile Include="SharedProject\CommonProjectNode.FileSystemChange.cs" />
     <Compile Include="SharedProject\OutputWindowWrapper.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
@@ -615,6 +616,7 @@
     <ZipItem Include="Templates\Files\EmptyJson\EmptyJson.json" />
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
+    <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
