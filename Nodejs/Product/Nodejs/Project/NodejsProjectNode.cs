@@ -326,7 +326,12 @@ namespace Microsoft.NodejsTools.Project
 
                 base.Reload();
 
-                SyncFileSystem();
+                if (this.IsShowingAllFiles)
+                {
+                    // We only need to sync the files on load if we're actually showing them
+                    // otherwise we'll sync on idle.
+                    this.SyncFileSystem();
+                }
 
                 this.ModulesNode.ReloadHierarchySafe();
             }
