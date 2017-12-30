@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
@@ -22,13 +25,13 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private sealed class DiskMerger
         {
-            private readonly Stack<DirState> remainingDirs = new Stack<DirState>();
+            private readonly ConcurrentStack<(string Name, HierarchyNode Parent)> remainingDirs = new ConcurrentStack<(string, HierarchyNode)>();
             private readonly CommonProjectNode project;
 
             public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
             {
                 this.project = project;
-                this.remainingDirs.Push(new DirState(dir, parent));
+                this.remainingDirs.Push((dir, parent));
             }
 
             /// <summary>
@@ -37,17 +40,16 @@ namespace Microsoft.VisualStudioTools.Project
             /// 
             /// Returns true if the merge needs to continue, or false if the merge has completed.
             /// </summary>
-            public bool ContinueMerge(bool hierarchyCreated)
+            public async Task<bool> ContinueMergeAsync(bool hierarchyCreated)
             {
                 if (this.remainingDirs.Count == 0)
                 {
                     // all done
-                    this.project.BoldStartupItem();
+                    await this.InvokeOnUIThread(this.project.BoldStartupItem);
                     return false;
                 }
 
-                var dir = this.remainingDirs.Pop();
-                if (!Directory.Exists(dir.Name))
+                if (!this.remainingDirs.TryPop(out var dir) || !Directory.Exists(dir.Name))
                 {
                     return true;
                 }
@@ -74,9 +76,16 @@ namespace Microsoft.VisualStudioTools.Project
                             this.project.CreateSymLinkWatcher(curDir);
                         }
 
-                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                        missingChildren.Remove(existing);
-                        this.remainingDirs.Push(new DirState(curDir, existing));
+                        var existing = this.project.FindNodeByFullPath(curDir);
+                        if (existing == null)
+                        {
+                            existing = await this.InvokeOnUIThread(() => this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated));
+                        }
+                        else
+                        {
+                            missingChildren.Remove(existing);
+                        }
+                        this.remainingDirs.Push((curDir, existing));
                     }
                 }
                 catch
@@ -93,7 +102,17 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             continue;
                         }
-                        missingChildren.Remove(this.project.AddAllFilesFile(dir.Parent, file));
+
+                        // todo: batch files
+                        var existing = this.project.FindNodeByFullPath(file);
+                        if (existing == null)
+                        {
+                            existing = await this.InvokeOnUIThread(() => this.project.AddAllFilesFile(dir.Parent, file));
+                        }
+                        else
+                        {
+                            missingChildren.Remove(existing);
+                        }
                     }
                 }
                 catch
@@ -114,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     if (child.ItemNode.IsExcluded)
                     {
-                        this.project.RemoveSubTree(child);
+                        await this.InvokeOnUIThread(() => this.project.RemoveSubTree(child));
                     }
                 }
 
@@ -126,16 +145,14 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            private struct DirState
+            private Task InvokeOnUIThread(Action action)
             {
-                public readonly string Name;
-                public readonly HierarchyNode Parent;
+                return this.project.Site.GetUIThread().InvokeAsync(action);
+            }
 
-                public DirState(string name, HierarchyNode parent)
-                {
-                    this.Name = name;
-                    this.Parent = parent;
-                }
+            private Task<T> InvokeOnUIThread<T>(Func<T> func)
+            {
+                return this.project.Site.GetUIThread().InvokeAsync(func);
             }
         }
     }

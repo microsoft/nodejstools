@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Navigation;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
+using TPL = System.Threading.Tasks;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
 
@@ -39,8 +40,9 @@ namespace Microsoft.VisualStudioTools.Project
         private Guid mruPageGuid = new Guid(CommonConstants.AddReferenceMRUPageGuid);
         private VSLangProj.VSProject vsProject = null;
         private ProjectDocumentsListenerForStartupFileUpdates projectDocListenerForStartupFileUpdates;
-        private FileSystemWatcher watcher;
-        private FileSystemWatcher attributesWatcher;
+
+        private readonly FileChangeManager fileWatcher;
+
         private int suppressFileWatcherCount;
         private bool isShowingAllFiles;
         private object automationObject;
@@ -78,6 +80,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.idleManager = new IdleManager(this.Site);
             this.idleManager.OnIdle += this.OnIdle;
+
+            this.fileWatcher = new FileChangeManager(serviceProvider);
         }
 
         public override int QueryService(ref Guid guidService, out object result)
@@ -379,13 +383,6 @@ namespace Microsoft.VisualStudioTools.Project
 
             OnProjectPropertyChanged += this.CommonProjectNode_OnProjectPropertyChanged;
 
-            // track file creation/deletes and update our glyphs when files start/stop existing for files in the project.
-            if (this.watcher != null)
-            {
-                this.watcher.EnableRaisingEvents = false;
-                this.watcher.Dispose();
-            }
-
             bool? showAllFiles = null;
             if (this.UserBuildProject != null)
             {
@@ -396,8 +393,8 @@ namespace Microsoft.VisualStudioTools.Project
                 GetShowAllFilesSetting(this.BuildProject.GetPropertyValue(CommonConstants.ProjectView)) ??
                 false;
 
-            this.watcher = CreateFileSystemWatcher(this.ProjectHome);
-            this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
+            this.CreateFileSystemWatcher();
+            //    this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
 
             this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
         }
@@ -412,9 +409,9 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
             }
-            while (this.currentMerger.ContinueMerge(this.ParentHierarchy != null))
-            {
-            }
+            //while (this.currentMerger.ContinueMerge(this.ParentHierarchy != null))
+            //{
+            //}
             this.currentMerger = null;
         }
 
@@ -431,26 +428,19 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        private FileSystemWatcher CreateFileSystemWatcher(string dir)
+        private void CreateFileSystemWatcher()
         {
-            var watcher = new FileSystemWatcher(dir)
-            {
-                InternalBufferSize = 1024 * 4,  // 4k is minimum buffer size
-                IncludeSubdirectories = true
-                // don't need to set NotifyFilters, 
-                // since the default (LastWrite, FileName, and DirectoryName) works for us
-            };
+            this.StopWatchingFiles();
 
-            // Set Event Handlers
-            watcher.Created += this.FileExistanceChanged;
-            watcher.Deleted += this.FileExistanceChanged;
-            watcher.Renamed += this.FileNameChanged;
-            watcher.Error += this.WatcherError;
+            this.fileWatcher.ObserveFolder(this.ProjectHome);
+            this.fileWatcher.FolderChangedOnDisk += this.FolderChangedOnDisk;
+        }
 
-            // Delay setting EnableRaisingEvents until everything else is initialized.
-            watcher.EnableRaisingEvents = true;
-
-            return watcher;
+        private void StopWatchingFiles()
+        {
+            // stop watching old dir
+            // track file creation/deletes and update our glyphs when files start/stop existing for files in the project.
+            this.fileWatcher.StopObservingFolder(this.ProjectHome);
         }
 
         private FileSystemWatcher CreateAttributesWatcher(string dir)
@@ -613,10 +603,10 @@ namespace Microsoft.VisualStudioTools.Project
             return showAllFiles;
         }
 
-        private void MergeDiskNodes(HierarchyNode curParent, string dir)
+        private async TPL.Task MergeDiskNodes(HierarchyNode curParent, string dir)
         {
             var merger = new DiskMerger(this, curParent, dir);
-            while (merger.ContinueMerge(this.ParentHierarchy != null))
+            while (await merger.ContinueMergeAsync(this.ParentHierarchy != null))
             {
             }
         }
@@ -801,6 +791,20 @@ namespace Microsoft.VisualStudioTools.Project
             return new CommonReferenceContainerNode(this);
         }
 
+        private void FolderChangedOnDisk(object sender, FolderChangedEventArgs e)
+        {
+            // todo: does this make sense
+            var file = e.FileName;
+            if (File.Exists(file))
+            {
+                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Changed, file));
+            }
+            else
+            {
+                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Deleted, file));
+            }
+        }
+
         private void FileNameChanged(object sender, RenamedEventArgs e)
         {
             // we just generate a delete and creation here - we're just updating the hierarchy
@@ -862,7 +866,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 curDir = curDir + Path.DirectorySeparatorChar;
             }
-            this.symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
+            //         this.symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
         }
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child)
@@ -877,7 +881,7 @@ namespace Microsoft.VisualStudioTools.Project
             return false;
         }
 
-        private void OnIdle(object sender, ComponentManagerEventArgs e)
+        private async void OnIdle(object sender, ComponentManagerEventArgs e)
         {
             Interlocked.Exchange(ref this.idleTriggered, 0);
             do
@@ -904,7 +908,7 @@ namespace Microsoft.VisualStudioTools.Project
                     {
                         // we have more file merges to process, do this
                         // before reflecting any other pending updates...
-                        if (!merger.ContinueMerge(this.ParentHierarchy != null))
+                        if (!(await merger.ContinueMergeAsync(this.ParentHierarchy != null)))
                         {
                             this.currentMerger = null;
                         }
@@ -921,7 +925,7 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                         else
                         {
-                            change.ProcessChange();
+                            await change.ProcessChangeAsync();
                         }
 #if DEBUG
                     }
@@ -967,19 +971,14 @@ namespace Microsoft.VisualStudioTools.Project
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
 
-            if (this.watcher != null)
-            {
-                this.watcher.EnableRaisingEvents = false;
-                this.watcher.Dispose();
-                this.watcher = null;
-            }
+            this.StopWatchingFiles();
 
-            if (this.attributesWatcher != null)
-            {
-                this.attributesWatcher.EnableRaisingEvents = false;
-                this.attributesWatcher.Dispose();
-                this.attributesWatcher = null;
-            }
+            //if (this.attributesWatcher != null)
+            //{
+            //    this.attributesWatcher.EnableRaisingEvents = false;
+            //    this.attributesWatcher.Dispose();
+            //    this.attributesWatcher = null;
+            //}
 
             foreach (var pair in this.symlinkWatchers)
             {
@@ -1474,8 +1473,7 @@ namespace Microsoft.VisualStudioTools.Project
                 return VSConstants.OLE_E_PROMPTSAVECANCELLED;
             }
 
-            this.watcher.EnableRaisingEvents = false;
-            this.watcher.Dispose();
+            this.StopWatchingFiles();
 
             // we don't use RenameProjectFile because it sends the OnAfterRenameProject event too soon
             // and causes VS to think the solution has changed on disk.  We need to send it after all 
@@ -1520,8 +1518,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             shell.RefreshPropertyBrowser(0);
 
-            this.watcher = CreateFileSystemWatcher(this.ProjectHome);
-            this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
+            CreateFileSystemWatcher();
+            //       this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
 
             return VSConstants.S_OK;
         }
@@ -1557,17 +1555,17 @@ namespace Microsoft.VisualStudioTools.Project
 
         #endregion
 
-        internal void SuppressFileChangeNotifications()
+        internal void SuppressFileChangeNotifications(string folder)
         {
-            this.watcher.EnableRaisingEvents = false;
+            this.fileWatcher.IgnoreItemChanges(folder, ignore: true);
             this.suppressFileWatcherCount++;
         }
 
-        internal void RestoreFileChangeNotifications()
+        internal void RestoreFileChangeNotifications(string folder)
         {
             if (--this.suppressFileWatcherCount == 0)
             {
-                this.watcher.EnableRaisingEvents = true;
+                this.fileWatcher.IgnoreItemChanges(folder, ignore: false);
             }
         }
     }

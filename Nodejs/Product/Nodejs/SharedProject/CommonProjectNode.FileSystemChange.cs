@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
@@ -40,7 +41,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            public void ProcessChange()
+            public async Task ProcessChangeAsync()
             {
                 var child = this.project.FindNodeByFullPath(this.path);
                 if ((this.Type == WatcherChangeTypes.Deleted || this.Type == WatcherChangeTypes.Changed) && child == null)
@@ -50,10 +51,10 @@ namespace Microsoft.VisualStudioTools.Project
                 switch (this.Type)
                 {
                     case WatcherChangeTypes.Deleted:
-                        ChildDeleted(child);
+                       await ChildDeletedAsync(child);
                         break;
                     case WatcherChangeTypes.Created:
-                        ChildCreated(child);
+                       await ChildCreatedAsync(child);
                         break;
                     case WatcherChangeTypes.Changed:
                         // we only care about the attributes
@@ -62,7 +63,7 @@ namespace Microsoft.VisualStudioTools.Project
                             if (child != null)
                             {
                                 // attributes must have changed to hidden, remove the file
-                                ChildDeleted(child);
+                               await ChildDeletedAsync(child);
                             }
                         }
                         else
@@ -70,7 +71,7 @@ namespace Microsoft.VisualStudioTools.Project
                             if (child == null)
                             {
                                 // attributes must have changed from hidden, add the file
-                                ChildCreated(child);
+                               await ChildCreatedAsync(child);
                             }
                         }
                         break;
@@ -95,7 +96,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            private void ChildDeleted(HierarchyNode child)
+            private async Task ChildDeletedAsync(HierarchyNode child)
             {
                 if (child != null)
                 {
@@ -134,7 +135,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            private void ChildCreated(HierarchyNode child)
+            private async Task ChildCreatedAsync(HierarchyNode child)
             {
                 if (child != null)
                 {
