@@ -179,9 +179,6 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
       <Link>SharedProject\CommonUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\Common\Product\SharedProject\ExceptionExtensions.cs">
-      <Link>SharedProject\ExceptionExtensions.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
       <Link>SharedProject\ProcessOutput.cs</Link>
     </Compile>
@@ -273,6 +270,7 @@
     <Compile Include="Repl\ReplOutputClassifier.cs" />
     <Compile Include="Repl\ReplOutputClassifierProvider.cs" />
     <Compile Include="SharedProject\CommonProjectNode.FileSystemChange.cs" />
+    <Compile Include="SharedProject\ExceptionExtensions.cs" />
     <Compile Include="SharedProject\OutputWindowWrapper.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
