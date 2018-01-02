@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             if (child != null)
                             {
-                                // attributes must of changed to hidden, remove the file
+                                // attributes must have changed to hidden, remove the file
                                 ChildDeleted(child);
                             }
                         }
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             if (child == null)
                             {
-                                // attributes must of changed from hidden, add the file
+                                // attributes must have changed from hidden, add the file
                                 ChildCreated(child);
                             }
                         }
