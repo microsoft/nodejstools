@@ -2,7 +2,7 @@
   "name": "$npmsafeprojectname$",
   "version": "0.0.0",
   "description": "$projectname$",
-  "main": "app.js",
+  "main": "server.js",
   "author": {
     "name": ""
   },
