@@ -437,7 +437,8 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 InternalBufferSize = 1024 * 4,  // 4k is minimum buffer size
                 IncludeSubdirectories = true
-                /* don't need to set NotifyFilters, since default LastWrite, FileName, and DirectoryName works for us */
+                // don't need to set NotifyFilters, 
+                // since the default (LastWrite, FileName, and DirectoryName) works for us
             };
 
             // Set Event Handlers
