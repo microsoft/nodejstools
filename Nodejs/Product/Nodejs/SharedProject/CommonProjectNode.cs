@@ -44,7 +44,6 @@ namespace Microsoft.VisualStudioTools.Project
         private int suppressFileWatcherCount;
         private bool isShowingAllFiles;
         private object automationObject;
-        private readonly Dictionary<string, FileSystemEventHandler> fileChangedHandlers = new Dictionary<string, FileSystemEventHandler>();
         private ConcurrentQueue<FileSystemChange> fileSystemChanges = new ConcurrentQueue<FileSystemChange>();
 
         private readonly Dictionary<string, FileSystemWatcher> symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
@@ -438,13 +437,13 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 InternalBufferSize = 1024 * 4,  // 4k is minimum buffer size
                 IncludeSubdirectories = true
+                // don't need to set NotifyFilters, 
+                // since the default (LastWrite, FileName, and DirectoryName) works for us
             };
 
             // Set Event Handlers
             watcher.Created += this.FileExistanceChanged;
             watcher.Deleted += this.FileExistanceChanged;
-            watcher.Changed += this.FileContentsChanged;
-            watcher.Renamed += this.FileContentsChanged;
             watcher.Renamed += this.FileNameChanged;
             watcher.Error += this.WatcherError;
 
@@ -783,19 +782,6 @@ namespace Microsoft.VisualStudioTools.Project
             parent.AddChild(newNode);
         }
 
-        private void FileContentsChanged(object sender, FileSystemEventArgs e)
-        {
-            if (this.IsClosed)
-            {
-                return;
-            }
-
-            if (this.fileChangedHandlers.TryGetValue(e.FullPath, out var handler))
-            {
-                handler(sender, e);
-            }
-        }
-
         private void FileAttributesChanged(object sender, FileSystemEventArgs e)
         {
             if (NoPendingFileSystemRescan())
@@ -808,16 +794,6 @@ namespace Microsoft.VisualStudioTools.Project
         private bool NoPendingFileSystemRescan()
         {
             return !this.fileSystemChanges.TryPeek(out var change) || change.Type != WatcherChangeTypes.All;
-        }
-
-        internal void RegisterFileChangeNotification(FileNode node, FileSystemEventHandler handler)
-        {
-            this.fileChangedHandlers[node.Url] = handler;
-        }
-
-        internal void UnregisterFileChangeNotification(FileNode node)
-        {
-            this.fileChangedHandlers.Remove(node.Url);
         }
 
         protected override ReferenceContainerNode CreateReferenceContainerNode()
@@ -1004,8 +980,6 @@ namespace Microsoft.VisualStudioTools.Project
                 this.attributesWatcher.Dispose();
                 this.attributesWatcher = null;
             }
-
-            this.fileChangedHandlers.Clear();
 
             foreach (var pair in this.symlinkWatchers)
             {
