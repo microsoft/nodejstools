@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Logging;
-using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 

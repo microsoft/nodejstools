@@ -6508,8 +6508,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            var diskNode = child as IDiskBasedNode;
-            if (diskNode != null)
+            if (child is IDiskBasedNode diskNode)
             {
                 this.DiskNodes[diskNode.Url] = child;
             }
@@ -6537,8 +6536,7 @@ If the files in the existing folder have the same names as files in the folder y
         {
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            var diskNode = deletedItem as IDiskBasedNode;
-            if (diskNode != null)
+            if (deletedItem is IDiskBasedNode diskNode)
             {
                 this.DiskNodes.TryRemove(diskNode.Url, out var _);
             }
