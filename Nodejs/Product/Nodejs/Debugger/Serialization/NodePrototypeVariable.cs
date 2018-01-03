@@ -10,8 +10,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
     {
         public NodePrototypeVariable(NodeEvaluationResult parent, JToken prototype, Dictionary<int, JToken> references)
         {
-            Utilities.ArgumentNotNull("prototype", prototype);
-            Utilities.ArgumentNotNull("references", references);
+            Utilities.ArgumentNotNull(nameof(prototype), prototype);
+            Utilities.ArgumentNotNull(nameof(references), references);
 
             this.Id = (int)prototype["ref"];
             if (!references.TryGetValue(this.Id, out var reference))

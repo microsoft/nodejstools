@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
         /// <returns>Result.</returns>
         public NodeEvaluationResult Create(INodeVariable variable)
         {
-            Utilities.ArgumentNotNull("variable", variable);
+            Utilities.ArgumentNotNull(nameof(variable), variable);
 
             var id = variable.Id;
             var stackFrame = variable.StackFrame;

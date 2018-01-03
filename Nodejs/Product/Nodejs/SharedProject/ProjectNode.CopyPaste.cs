@@ -475,9 +475,9 @@ namespace Microsoft.VisualStudioTools.Project
 
             public ProjectReferenceFileAdder(ProjectNode project, HierarchyNode targetNode, string[] projectReferences, bool mouseDropping, DropEffect dropEffect)
             {
-                Utilities.ArgumentNotNull("targetNode", targetNode);
-                Utilities.ArgumentNotNull("project", project);
-                Utilities.ArgumentNotNull("projectReferences", projectReferences);
+                Utilities.ArgumentNotNull(nameof(targetNode), targetNode);
+                Utilities.ArgumentNotNull(nameof(project), project);
+                Utilities.ArgumentNotNull(nameof(projectReferences), projectReferences);
 
                 this.TargetNode = targetNode;
                 this.Project = project;
@@ -582,7 +582,7 @@ namespace Microsoft.VisualStudioTools.Project
             /// <param name="targetNode">Node to add the new folder to</param>
             private Addition CanAddFolderFromProjectReference(string folderToAdd)
             {
-                Utilities.ArgumentNotNullOrEmpty(folderToAdd, "folderToAdd");
+                Utilities.ArgumentNotNullOrEmpty(nameof(folderToAdd), folderToAdd);
 
                 var targetFolderNode = this.TargetNode.GetDragTargetHandlerNode();
                 GetPathAndHierarchy(folderToAdd, out var folder, out var sourceHierarchy);
@@ -730,7 +730,7 @@ namespace Microsoft.VisualStudioTools.Project
             /// <param name="addSibblings">Typically false on first call and true after that</param>
             private bool WalkSourceProjectAndAdd(IVsHierarchy sourceHierarchy, uint itemId, string targetPath, bool addSiblings, List<Addition> additions, string name = null)
             {
-                Utilities.ArgumentNotNull("sourceHierarchy", sourceHierarchy);
+                Utilities.ArgumentNotNull(nameof(sourceHierarchy), sourceHierarchy);
 
                 if (itemId != VSConstants.VSITEMID_NIL)
                 {
@@ -1009,7 +1009,7 @@ namespace Microsoft.VisualStudioTools.Project
             /// <param name="targetNode"></param>
             private Addition CanAddFileFromProjectReference(string projectRef, string targetFolder, bool fromFolder = false)
             {
-                Utilities.ArgumentNotNullOrEmpty("projectRef", projectRef);
+                Utilities.ArgumentNotNullOrEmpty(nameof(projectRef), projectRef);
 
                 var solution = this.Project.GetService(typeof(IVsSolution)) as IVsSolution;
                 Utilities.CheckNotNull(solution);
@@ -1829,7 +1829,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <remarks>The targetNode is set if the method is called from a drop operation, otherwise it is null</remarks>
         internal DropDataType ProcessSelectionDataObject(IOleDataObject dataObject, HierarchyNode targetNode, bool drop, DropEffect dropEffect)
         {
-            Utilities.ArgumentNotNull("targetNode", targetNode);
+            Utilities.ArgumentNotNull(nameof(targetNode), targetNode);
 
             var dropDataType = DropDataType.None;
             var isWindowsFormat = false;
@@ -2111,7 +2111,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal bool AddFilesFromProjectReferences(HierarchyNode targetNode, string[] projectReferences, bool mouseDropping, DropEffect dropEffect)
         {
             //Validate input
-            Utilities.ArgumentNotNull("projectReferences", projectReferences);
+            Utilities.ArgumentNotNull(nameof(projectReferences), projectReferences);
             Utilities.CheckNotNull(targetNode);
 
             if (!QueryEditProjectFile(false))

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <returns>An Extender object. </returns>
         public virtual object get_Extender(string name)
         {
-            Utilities.ArgumentNotNull("name", name);
+            Utilities.ArgumentNotNull(nameof(name), name);
 
             return this.DTE.ObjectExtenders.GetExtender(this.project.NodeProperties.ExtenderCATID.ToUpper(), name, this.project.NodeProperties);
         }
@@ -298,7 +298,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <param name="fileName">The name of the project file.</param>        
         private void DoSave(bool isCalledFromSaveAs, string fileName)
         {
-            Utilities.ArgumentNotNull("fileName", fileName);
+            Utilities.ArgumentNotNull(nameof(fileName), fileName);
 
             CheckProjectIsValid();
 

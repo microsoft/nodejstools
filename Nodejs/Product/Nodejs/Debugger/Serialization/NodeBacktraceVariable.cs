@@ -10,8 +10,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
     {
         public NodeBacktraceVariable(NodeStackFrame stackFrame, JToken parameter)
         {
-            Utilities.ArgumentNotNull("stackFrame", stackFrame);
-            Utilities.ArgumentNotNull("parameter", parameter);
+            Utilities.ArgumentNotNull(nameof(stackFrame), stackFrame);
+            Utilities.ArgumentNotNull(nameof(parameter), parameter);
 
             var value = parameter["value"];
             this.Id = (int)value["ref"];

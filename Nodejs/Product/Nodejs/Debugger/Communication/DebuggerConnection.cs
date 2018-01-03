@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
 
         public DebuggerConnection(INetworkClientFactory networkClientFactory)
         {
-            Utilities.ArgumentNotNull("networkClientFactory", networkClientFactory);
+            Utilities.ArgumentNotNull(nameof(networkClientFactory), networkClientFactory);
 
             this._networkClientFactory = networkClientFactory;
         }
@@ -61,7 +61,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <param name="message">Message.</param>
         public void SendMessage(string message)
         {
-            Utilities.ArgumentNotNullOrEmpty("message", message);
+            Utilities.ArgumentNotNullOrEmpty(nameof(message), message);
 
             if (!this.Connected)
             {
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.Debugger.Communication
         /// <param name="uri">URI identifying the endpoint to connect to.</param>
         public void Connect(Uri uri)
         {
-            Utilities.ArgumentNotNull("uri", uri);
+            Utilities.ArgumentNotNull(nameof(uri), uri);
             LiveLogger.WriteLine("Debugger connecting to URI: {0}", uri);
 
             Close();

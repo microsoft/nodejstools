@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using Microsoft.VisualStudio;
@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public EnumDependencies(IList<IVsDependency> dependencyList)
         {
-            Utilities.ArgumentNotNull("dependencyList", dependencyList);
+            Utilities.ArgumentNotNull(nameof(dependencyList), dependencyList);
 
             foreach (var dependency in dependencyList)
             {
@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public EnumDependencies(IList<IVsBuildDependency> dependencyList)
         {
-            Utilities.ArgumentNotNull("dependencyList", dependencyList);
+            Utilities.ArgumentNotNull(nameof(dependencyList), dependencyList);
 
             foreach (var dependency in dependencyList)
             {
@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudioTools.Project
         public int Next(uint elements, IVsDependency[] dependencies, out uint elementsFetched)
         {
             elementsFetched = 0;
-            Utilities.ArgumentNotNull("dependencies", dependencies);
+            Utilities.ArgumentNotNull(nameof(dependencies), dependencies);
 
             uint fetched = 0;
             var count = this.dependencyList.Count;

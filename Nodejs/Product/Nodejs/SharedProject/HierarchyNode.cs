@@ -508,7 +508,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected HierarchyNode(ProjectNode root, ProjectElement element)
         {
-            Utilities.ArgumentNotNull("root", root);
+            Utilities.ArgumentNotNull(nameof(root), root);
             root.Site.GetUIThread().MustBeCalledFromUIThread();
 
             this.projectMgr = root;
@@ -523,7 +523,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="root"></param>
         protected HierarchyNode(ProjectNode root)
         {
-            Utilities.ArgumentNotNull("root", root);
+            Utilities.ArgumentNotNull(nameof(root), root);
             root.Site.GetUIThread().MustBeCalledFromUIThread();
 
             this.projectMgr = root;
@@ -571,7 +571,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="node">The node to remove.</param>
         public virtual void RemoveChild(HierarchyNode node)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
             this.projectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
             this.projectMgr.ItemIdMap.Remove(node);
 
@@ -1095,7 +1095,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary> 
         protected void CloseDocumentWindow(HierarchyNode node)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
 
             // We walk the RDT looking for all running documents attached to this hierarchy and itemid. There
             // are cases where there may be two different editors (not views) open on the same document.
@@ -1793,8 +1793,8 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 return;
             }
-            Utilities.ArgumentNotNull("files", files);
-            Utilities.ArgumentNotNull("flags", flags);
+            Utilities.ArgumentNotNull(nameof(files), files);
+            Utilities.ArgumentNotNull(nameof(flags), flags);
 
             files.Add(this.GetMkDocument());
 
@@ -1922,7 +1922,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="node">The node to add.</param>
         public virtual void AddChild(HierarchyNode node)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
 
             Debug.Assert(this.ProjectMgr.ItemIdMap[node.hierarchyId] == null || this.ProjectMgr.ItemIdMap[node.hierarchyId] == node);
 
@@ -1981,7 +1981,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public object GetService(Type type)
         {
-            Utilities.ArgumentNotNull("type", type);
+            Utilities.ArgumentNotNull(nameof(type), type);
 
             if (this.projectMgr == null || this.projectMgr.Site == null)
             {

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -479,9 +479,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns></returns>
         internal override int AfterSaveItemAs(IntPtr docData, string newFilePath)
         {
-            Utilities.ArgumentNotNullOrEmpty("newFilePath", newFilePath);
-
-            var returnCode = VSConstants.S_OK;
+            Utilities.ArgumentNotNullOrEmpty(nameof(newFilePath), newFilePath);
             newFilePath = newFilePath.Trim();
 
             //Identify if Path or FileName are the same for old and new file
@@ -576,7 +574,7 @@ namespace Microsoft.VisualStudioTools.Project
                 sfc.Resume();
             }
 
-            return returnCode;
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -812,8 +810,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            Utilities.ArgumentNotNull("files", files);
-            Utilities.ArgumentNotNull("flags", flags);
+            Utilities.ArgumentNotNull(nameof(files), files);
+            Utilities.ArgumentNotNull(nameof(flags), flags);
 
             foreach (var node in this.GetChildNodes())
             {
