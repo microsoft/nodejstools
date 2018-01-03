@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio;
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region ctors
         protected ProjectDocumentsListener(System.IServiceProvider serviceProviderParameter)
         {
-            Utilities.ArgumentNotNull("serviceProviderParameter", serviceProviderParameter);
+            Utilities.ArgumentNotNull(nameof(serviceProviderParameter), serviceProviderParameter);
 
             this.serviceProvider = serviceProviderParameter;
             this.projectDocTracker = this.serviceProvider.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;

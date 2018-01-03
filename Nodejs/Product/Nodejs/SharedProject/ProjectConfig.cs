@@ -126,9 +126,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             var flavoredCfgProvider = this.ProjectMgr.GetOuterInterface<IVsProjectFlavorCfgProvider>();
-            Utilities.ArgumentNotNull("flavoredCfgProvider", flavoredCfgProvider);
+            Utilities.ArgumentNotNull(nameof(flavoredCfgProvider), flavoredCfgProvider);
             ErrorHandler.ThrowOnFailure(flavoredCfgProvider.CreateProjectFlavorCfg(this, out this.flavoredCfg));
-            Utilities.ArgumentNotNull("flavoredCfg", this.flavoredCfg);
+            Utilities.ArgumentNotNull(nameof(flavoredCfg), this.flavoredCfg);
 
             // if the flavored object support XML fragment, initialize it
             var persistXML = this.flavoredCfg as IPersistXMLFragment;
@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public virtual int get_UpdateSequenceNumber(ULARGE_INTEGER[] li)
         {
-            Utilities.ArgumentNotNull("li", li);
+            Utilities.ArgumentNotNull(nameof(li), li);
 
             li[0] = new ULARGE_INTEGER();
             li[0].QuadPart = 0;

@@ -1201,8 +1201,8 @@ namespace Microsoft.VisualStudioTools.Project
             Debug.Assert(!string.IsNullOrEmpty(itemName), "The Add item dialog was passing in a null or empty item to be added to the hierrachy.");
             Debug.Assert(!string.IsNullOrEmpty(this.ProjectHome), "ProjectHome is not specified for this project.");
 
-            Utilities.ArgumentNotNull("parentNode", parentNode);
-            Utilities.ArgumentNotNullOrEmpty("itemName", itemName);
+            Utilities.ArgumentNotNull(nameof(parentNode), parentNode);
+            Utilities.ArgumentNotNullOrEmpty(nameof(itemName), itemName);
 
             // We just validate for length, since we assume other validation has been performed by the dlgOwner.
             if (CommonUtils.GetAbsoluteFilePath(this.ProjectHome, itemName).Length >= NativeMethods.MAX_PATH)
@@ -1738,8 +1738,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="target">Full path of file once added to the project</param>
         public virtual void AddFileFromTemplate(string source, string target)
         {
-            Utilities.ArgumentNotNullOrEmpty("source", source);
-            Utilities.ArgumentNotNullOrEmpty("target", target);
+            Utilities.ArgumentNotNullOrEmpty(nameof(source), source);
+            Utilities.ArgumentNotNullOrEmpty(nameof(target), target);
 
             try
             {
@@ -1790,7 +1790,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <remarks>If the parent node was found we add the dependent item to it otherwise we add the item ignoring the "DependentUpon" metatdata</remarks>
         protected virtual HierarchyNode AddDependentFileNode(IDictionary<string, MSBuild.ProjectItem> subitems, string key)
         {
-            Utilities.ArgumentNotNull("subitems", subitems);
+            Utilities.ArgumentNotNull(nameof(subitems), subitems);
 
             var item = subitems[key];
             subitems.Remove(key);
@@ -1924,7 +1924,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         private bool SetProjectProperty(string propertyName, string propertyValue, bool userProjectFile)
         {
-            Utilities.ArgumentNotNull("propertyName", propertyName);
+            Utilities.ArgumentNotNull(nameof(propertyName), propertyName);
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
             var oldValue = GetUnevaluatedProperty(propertyName) ?? string.Empty;
@@ -1975,7 +1975,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="propertyName">Name of property</param>
         public virtual string GetUserProjectProperty(string propertyName)
         {
-            Utilities.ArgumentNotNull("propertyName", propertyName);
+            Utilities.ArgumentNotNull(nameof(propertyName), propertyName);
 
             if (this.userBuildProject == null)
             {
@@ -2807,7 +2807,7 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual int SaveAs(string newFileName)
         {
             Debug.Assert(!string.IsNullOrEmpty(newFileName), "Cannot save project file for an empty or null file name");
-            Utilities.ArgumentNotNullOrEmpty(newFileName, "newFileName");
+            Utilities.ArgumentNotNullOrEmpty(nameof(newFileName), newFileName);
 
             newFileName = newFileName.Trim();
 
@@ -3027,7 +3027,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="fileName">The file name</param>
         protected virtual void AddNewFileNodeToHierarchy(HierarchyNode parentNode, string fileName)
         {
-            Utilities.ArgumentNotNull("parentNode", parentNode);
+            Utilities.ArgumentNotNull(nameof(parentNode), parentNode);
 
             HierarchyNode child;
 
@@ -3156,7 +3156,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="config">Configuration name</param>
         protected internal virtual void SetConfiguration(string config)
         {
-            Utilities.ArgumentNotNull("config", config);
+            Utilities.ArgumentNotNull(nameof(config), config);
 
             // Can't ask for the active config until the project is opened, so do nothing in that scenario
             if (!this.IsProjectOpened)
@@ -3807,7 +3807,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>CATID</returns>
         protected internal Guid GetCATIDForType(Type type)
         {
-            Utilities.ArgumentNotNull("type", type);
+            Utilities.ArgumentNotNull(nameof(type), type);
 
             if (this.catidMapping == null)
             {
@@ -3850,7 +3850,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="platformName">Name of the platform being initialized, null is ok</param>
         protected internal void LoadXmlFragment(IPersistXMLFragment persistXmlFragment, string configName, string platformName)
         {
-            Utilities.ArgumentNotNull("persistXmlFragment", persistXmlFragment);
+            Utilities.ArgumentNotNull(nameof(persistXmlFragment), persistXmlFragment);
 
             if (this.xmlFragments == null)
             {
@@ -5390,10 +5390,10 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public virtual int SetSccLocation(string sccProjectName, string sccAuxPath, string sccLocalPath, string sccProvider)
         {
-            Utilities.ArgumentNotNull("sccProjectName", sccProjectName);
-            Utilities.ArgumentNotNull("sccAuxPath", sccAuxPath);
-            Utilities.ArgumentNotNull("sccLocalPath", sccLocalPath);
-            Utilities.ArgumentNotNull("sccProvider", sccProvider);
+            Utilities.ArgumentNotNull(nameof(sccProjectName), sccProjectName);
+            Utilities.ArgumentNotNull(nameof(sccAuxPath), sccAuxPath);
+            Utilities.ArgumentNotNull(nameof(sccLocalPath), sccLocalPath);
+            Utilities.ArgumentNotNull(nameof(sccProvider), sccProvider);
 
             // Save our settings (returns true if something changed)
             if (!SetSccSettings(sccProjectName, sccLocalPath, sccAuxPath, sccProvider))
@@ -6503,8 +6503,8 @@ If the files in the existing folder have the same names as files in the folder y
 
         internal void OnItemAdded(HierarchyNode parent, HierarchyNode child, HierarchyNode previousVisible = null)
         {
-            Utilities.ArgumentNotNull("parent", parent);
-            Utilities.ArgumentNotNull("child", child);
+            Utilities.ArgumentNotNull(nameof(parent), parent);
+            Utilities.ArgumentNotNull(nameof(child), child);
 
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
@@ -6578,7 +6578,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         internal void OnItemsAppended(HierarchyNode parent)
         {
-            Utilities.ArgumentNotNull("parent", parent);
+            Utilities.ArgumentNotNull(nameof(parent), parent);
 
             if ((this.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0)
             {
@@ -6598,7 +6598,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         internal void OnPropertyChanged(HierarchyNode node, int propid, uint flags)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
 
             if ((this.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0)
             {
@@ -6618,7 +6618,7 @@ If the files in the existing folder have the same names as files in the folder y
 
         internal void OnInvalidateItems(HierarchyNode parent)
         {
-            Utilities.ArgumentNotNull("parent", parent);
+            Utilities.ArgumentNotNull(nameof(parent), parent);
 
             if ((this.EventTriggeringFlag & ProjectNode.EventTriggering.DoNotTriggerHierarchyEvents) != 0)
             {

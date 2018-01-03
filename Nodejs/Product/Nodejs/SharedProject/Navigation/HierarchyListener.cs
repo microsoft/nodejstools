@@ -37,8 +37,8 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             public HierarchyListener(IVsHierarchy hierarchy, LibraryManager manager)
             {
-                Utilities.ArgumentNotNull("hierarchy", hierarchy);
-                Utilities.ArgumentNotNull("manager", manager);
+                Utilities.ArgumentNotNull(nameof(hierarchy), hierarchy);
+                Utilities.ArgumentNotNull(nameof(manager), manager);
 
                 this._hierarchy = hierarchy;
                 this._manager = manager;

@@ -10,8 +10,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
     {
         public NodeLookupVariable(NodeEvaluationResult parent, JToken property, Dictionary<int, JToken> references)
         {
-            Utilities.ArgumentNotNull("property", property);
-            Utilities.ArgumentNotNull("references", references);
+            Utilities.ArgumentNotNull(nameof(property), property);
+            Utilities.ArgumentNotNull(nameof(references), references);
 
             this.Id = (int)property["ref"];
             if (!references.TryGetValue(this.Id, out var reference))

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using Microsoft.NodejsTools.Debugger.Serialization;
@@ -17,9 +17,9 @@ namespace Microsoft.NodejsTools.Debugger.Commands
         public SetVariableValueCommand(int id, IEvaluationResultFactory resultFactory, NodeStackFrame stackFrame, string name, int handle)
             : base(id, "setVariableValue")
         {
-            Utilities.ArgumentNotNull("resultFactory", resultFactory);
-            Utilities.ArgumentNotNull("stackFrame", stackFrame);
-            Utilities.ArgumentNotNullOrEmpty("name", name);
+            Utilities.ArgumentNotNull(nameof(resultFactory), resultFactory);
+            Utilities.ArgumentNotNull(nameof(stackFrame), stackFrame);
+            Utilities.ArgumentNotNullOrEmpty(nameof(name), name);
 
             this._resultFactory = resultFactory;
             this._stackFrame = stackFrame;

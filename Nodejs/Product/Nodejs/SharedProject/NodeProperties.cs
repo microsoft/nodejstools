@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region ctors
         internal NodeProperties(HierarchyNode node)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
             this.node = node;
         }
         #endregion

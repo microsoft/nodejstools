@@ -9,8 +9,8 @@ namespace Microsoft.NodejsTools.Debugger.Serialization
     {
         public NodeEvaluationVariable(NodeStackFrame stackFrame, string name, JToken message)
         {
-            Utilities.ArgumentNotNull("name", name);
-            Utilities.ArgumentNotNull("message", message);
+            Utilities.ArgumentNotNull(nameof(name), name);
+            Utilities.ArgumentNotNull(nameof(message), message);
 
             this.Id = (int)message["handle"];
             this.Parent = null;

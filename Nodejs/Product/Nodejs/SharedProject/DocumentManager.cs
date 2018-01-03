@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region ctors
         protected DocumentManager(HierarchyNode node)
         {
-            Utilities.ArgumentNotNull("node", node);
+            Utilities.ArgumentNotNull(nameof(node), node);
             this.node = node;
         }
         #endregion
@@ -297,7 +297,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="docData">The IUnknown interface to a document data object associated with a registered document.</param>
         public static void UpdateCaption(IServiceProvider site, string caption, IntPtr docData)
         {
-            Utilities.ArgumentNotNull("site", site);
+            Utilities.ArgumentNotNull(nameof(site), site);
 
             if (string.IsNullOrEmpty(caption))
             {
@@ -340,7 +340,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="newItemId">The new item id of the document</param>
         public static void RenameDocument(IServiceProvider site, string oldName, string newName, uint newItemId)
         {
-            Utilities.ArgumentNotNull("site", site);
+            Utilities.ArgumentNotNull(nameof(site), site);
 
             if (string.IsNullOrEmpty(oldName))
             {

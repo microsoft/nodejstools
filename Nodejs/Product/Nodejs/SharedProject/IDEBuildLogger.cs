@@ -83,8 +83,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public IDEBuildLogger(IVsOutputWindowPane output, TaskProvider taskProvider, IVsHierarchy hierarchy)
         {
-            Utilities.ArgumentNotNull("taskProvider", taskProvider);
-            Utilities.ArgumentNotNull("hierarchy", hierarchy);
+            Utilities.ArgumentNotNull(nameof(taskProvider), taskProvider);
+            Utilities.ArgumentNotNull(nameof(hierarchy), hierarchy);
 
             Trace.WriteLineIf(Thread.CurrentThread.GetApartmentState() != ApartmentState.STA, "WARNING: IDEBuildLogger constructor running on the wrong thread.");
 
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override void Initialize(IEventSource eventSource)
         {
-            Utilities.ArgumentNotNull("eventSource", eventSource);
+            Utilities.ArgumentNotNull(nameof(eventSource), eventSource);
 
             this.taskQueue = new ConcurrentQueue<Func<ErrorTask>>();
             this.outputQueue = new ConcurrentQueue<OutputQueueEntry>();

@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <param name="fileName">The name of the project file.</param>        
         private void DoSave(bool isCalledFromSaveAs, string fileName)
         {
-            Utilities.ArgumentNotNull("fileName", fileName);
+            Utilities.ArgumentNotNull(nameof(fileName), fileName);
 
             CheckProjectIsValid();
 

@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
 
         public OAProperties(NodeProperties target)
         {
-            Utilities.ArgumentNotNull("target", target);
+            Utilities.ArgumentNotNull(nameof(target), target);
 
             this.target = target;
             this.AddPropertiesFromType(target.GetType());
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
         /// <param name="targetType">The type of NodeProperties the we should filter on</param>
         private void AddPropertiesFromType(Type targetType)
         {
-            Utilities.ArgumentNotNull("targetType", targetType);
+            Utilities.ArgumentNotNull(nameof(targetType), targetType);
 
             // If the type is not COM visible, we do not expose any of the properties
             if (!IsComVisible(targetType))

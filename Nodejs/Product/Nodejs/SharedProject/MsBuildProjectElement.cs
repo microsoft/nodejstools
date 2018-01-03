@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -23,8 +23,8 @@ namespace Microsoft.VisualStudioTools.Project
         internal MsBuildProjectElement(ProjectNode project, string itemPath, string itemType)
             : base(project)
         {
-            Utilities.ArgumentNotNullOrEmpty("itemPath", itemPath);
-            Utilities.ArgumentNotNullOrEmpty("itemType", itemType);
+            Utilities.ArgumentNotNullOrEmpty(nameof(itemPath), itemPath);
+            Utilities.ArgumentNotNullOrEmpty(nameof(itemType), itemType);
 
             // create and add the item to the project
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudioTools.Project
         internal MsBuildProjectElement(ProjectNode project, MSBuild.ProjectItem existingItem)
             : base(project)
         {
-            Utilities.ArgumentNotNull("existingItem", existingItem);
+            Utilities.ArgumentNotNull(nameof(existingItem), existingItem);
 
             // Keep a reference to project and item
             this._item = existingItem;

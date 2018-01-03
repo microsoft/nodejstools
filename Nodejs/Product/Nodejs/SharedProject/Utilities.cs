@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>true if visual studio is in design mode</returns>
         public static bool IsVisualStudioInDesignMode(IServiceProvider site)
         {
-            Utilities.ArgumentNotNull("site", site);
+            Utilities.ArgumentNotNull(nameof(site), site);
 
             var selectionMonitor = site.GetService(typeof(IVsMonitorSelection)) as IVsMonitorSelection;
             var designContext = VSConstants.UICONTEXT_DesignMode;
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>true if the extensiblity object is executing an automation function.</returns>
         public static bool IsInAutomationFunction(IServiceProvider serviceProvider)
         {
-            Utilities.ArgumentNotNull("serviceProvider", serviceProvider);
+            Utilities.ArgumentNotNull(nameof(serviceProvider), serviceProvider);
 
             var extensibility = serviceProvider.GetService(typeof(EnvDTE.IVsExtensibility)) as IVsExtensibility3;
 
@@ -329,7 +329,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>The name of the active configuartion.</returns>
         internal static string GetActiveConfigurationName(EnvDTE.Project automationObject)
         {
-            Utilities.ArgumentNotNull("automationObject", automationObject);
+            Utilities.ArgumentNotNull(nameof(automationObject), automationObject);
 
             var currentConfigName = string.Empty;
             if (automationObject.ConfigurationManager != null)
@@ -523,7 +523,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>A loaded msbuild project.</returns>
         internal static MSBuild.Project InitializeMsBuildProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath)
         {
-            Utilities.ArgumentNotNullOrEmpty("fullProjectPath", fullProjectPath);
+            Utilities.ArgumentNotNullOrEmpty(nameof(fullProjectPath), fullProjectPath);
 
             // Call GetFullPath to expand any relative path passed into this method.
             fullProjectPath = CommonUtils.NormalizePath(fullProjectPath);

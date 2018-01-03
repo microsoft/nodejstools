@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudioTools.Project
         #region IDataObject methods
         int IDataObject.DAdvise(FORMATETC[] e, uint adv, IAdviseSink sink, out uint cookie)
         {
-            Utilities.ArgumentNotNull("e", e);
+            Utilities.ArgumentNotNull(nameof(e), e);
 
             var sdata = new STATDATA();
 

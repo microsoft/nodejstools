@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public ExtensibilityEventsDispatcher(ProjectNode project)
         {
-            Utilities.ArgumentNotNull("project", project);
+            Utilities.ArgumentNotNull(nameof(project), project);
 
             this._project = project;
         }

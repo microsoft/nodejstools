@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -31,10 +31,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="configuration">Configuration that produce this output</param>
         public OutputGroup(string outputName, string msBuildTargetName, ProjectNode projectManager, ProjectConfig configuration)
         {
-            Utilities.ArgumentNotNull("outputName", outputName);
-            Utilities.ArgumentNotNull("msBuildTargetName", msBuildTargetName);
-            Utilities.ArgumentNotNull("projectManager", projectManager);
-            Utilities.ArgumentNotNull("configuration", configuration);
+            Utilities.ArgumentNotNull(nameof(outputName), outputName);
+            Utilities.ArgumentNotNull(nameof(msBuildTargetName), msBuildTargetName);
+            Utilities.ArgumentNotNull(nameof(projectManager), projectManager);
+            Utilities.ArgumentNotNull(nameof(configuration), configuration);
 
             this._name = outputName;
             this._targetName = msBuildTargetName;
