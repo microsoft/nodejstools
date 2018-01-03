@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -66,7 +65,8 @@ namespace Microsoft.VisualStudioTools
             const string MdhaPrefix = "mdha:";
 
             // webkit debugger prepends with 'mdha'
-            if (path.StartsWith(MdhaPrefix, StringComparison.OrdinalIgnoreCase)) {
+            if (path.StartsWith(MdhaPrefix, StringComparison.OrdinalIgnoreCase))
+            {
                 path = path.Substring(MdhaPrefix.Length);
             }
 
