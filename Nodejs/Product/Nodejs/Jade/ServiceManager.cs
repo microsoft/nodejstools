@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Jade
 
         private Dictionary<Type, object> _servicesByType = new Dictionary<Type, object>();
         private Dictionary<Guid, object> _servicesByGuid = new Dictionary<Guid, object>();
-        private Dictionary<Tuple<Type, string>, object> _servicesByContentType = new Dictionary<Tuple<Type, string>, object>();
+        private Dictionary<(Type, string), object> _servicesByContentType = new Dictionary<(Type, string), object>();
 
         private ServiceManager(IPropertyOwner propertyOwner)
         {
@@ -210,7 +210,7 @@ namespace Microsoft.NodejsTools.Jade
             lock (this._lock)
             {
 
-                this._servicesByContentType.TryGetValue(Tuple.Create(typeof(T), contentType.TypeName), out var service);
+                this._servicesByContentType.TryGetValue((typeof(T), contentType.TypeName), out var service);
                 if (service != null)
                 {
                     return service as T;
@@ -304,7 +304,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 if (GetService<T>(contentType) == null)
                 {
-                    this._servicesByContentType.Add(Tuple.Create(typeof(T), contentType.TypeName), serviceInstance);
+                    this._servicesByContentType.Add((typeof(T), contentType.TypeName), serviceInstance);
                 }
             }
         }
@@ -329,7 +329,7 @@ namespace Microsoft.NodejsTools.Jade
         {
             lock (this._lock)
             {
-                this._servicesByContentType.Remove(Tuple.Create(typeof(T), contentType.TypeName));
+                this._servicesByContentType.Remove((typeof(T), contentType.TypeName));
             }
         }
 
