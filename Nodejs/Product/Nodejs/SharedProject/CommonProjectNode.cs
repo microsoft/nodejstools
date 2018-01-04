@@ -53,6 +53,7 @@ namespace Microsoft.VisualStudioTools.Project
         private IVsHierarchyItemManager hierarchyManager;
         private Dictionary<uint, bool> needBolding;
         private int idleTriggered;
+        private bool isDisposed;
 
         public CommonProjectNode(IServiceProvider serviceProvider, ImageList imageList)
             : base(serviceProvider)
@@ -421,6 +422,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void BoldStartupItem()
         {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
             var startupPath = GetStartupFile();
             if (!string.IsNullOrEmpty(startupPath))
             {
@@ -509,6 +515,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         protected override void Dispose(bool disposing)
         {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
             if (disposing)
             {
                 this.HierarchyManager = null;
@@ -534,6 +545,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     this.diskMerger.Dispose();
                 }
+                this.isDisposed = true;
             }
 
             base.Dispose(disposing);
