@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     case VsCommands2K.SHOWALLFILES:
                         handled = true;
-                        return this.ShowAllFiles();
+                        return this.ToggleShowAllFiles();
                     case VsCommands2K.ADDREFERENCE:
                         handled = true;
                         return this.AddProjectReference();

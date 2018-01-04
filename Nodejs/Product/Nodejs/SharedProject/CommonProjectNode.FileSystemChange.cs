@@ -45,8 +45,10 @@ namespace Microsoft.VisualStudioTools.Project
                 var child = this.project.FindNodeByFullPath(this.path);
                 if ((this.Type == WatcherChangeTypes.Deleted || this.Type == WatcherChangeTypes.Changed) && child == null)
                 {
+                    // see if it's a folder, which we store with a directory separator
                     child = this.project.FindNodeByFullPath(this.path + Path.DirectorySeparatorChar);
                 }
+
                 switch (this.Type)
                 {
                     case WatcherChangeTypes.Deleted:

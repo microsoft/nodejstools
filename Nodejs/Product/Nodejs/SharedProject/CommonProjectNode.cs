@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools.Navigation;
 using Microsoft.VisualStudioTools.Project.Automation;
 using MSBuild = Microsoft.Build.Evaluation;
+using TPL = System.Threading.Tasks;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 using VSConstants = Microsoft.VisualStudio.VSConstants;
 
@@ -36,7 +37,7 @@ namespace Microsoft.VisualStudioTools.Project
 
     internal abstract partial class CommonProjectNode : ProjectNode, IVsProjectSpecificEditorMap2, IVsDeferredSaveProject
     {
-        private Guid mruPageGuid = new Guid(CommonConstants.AddReferenceMRUPageGuid);
+        private readonly Guid mruPageGuid = new Guid(CommonConstants.AddReferenceMRUPageGuid);
         private VSLangProj.VSProject vsProject = null;
         private ProjectDocumentsListenerForStartupFileUpdates projectDocListenerForStartupFileUpdates;
         private FileSystemWatcher watcher;
@@ -47,8 +48,8 @@ namespace Microsoft.VisualStudioTools.Project
         private ConcurrentQueue<FileSystemChange> fileSystemChanges = new ConcurrentQueue<FileSystemChange>();
 
         private readonly Dictionary<string, FileSystemWatcher> symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
-        private DiskMerger currentMerger;
-        private IdleManager idleManager;
+        private readonly DiskMerger diskMerger;
+        private readonly IdleManager idleManager;
         private IVsHierarchyItemManager hierarchyManager;
         private Dictionary<uint, bool> needBolding;
         private int idleTriggered;
@@ -78,6 +79,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.idleManager = new IdleManager(this.Site);
             this.idleManager.OnIdle += this.OnIdle;
+
+            this.diskMerger = new DiskMerger(this);
         }
 
         public override int QueryService(ref Guid guidService, out object result)
@@ -399,23 +402,21 @@ namespace Microsoft.VisualStudioTools.Project
             this.watcher = CreateFileSystemWatcher(this.ProjectHome);
             this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
 
-            this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
+            this.diskMerger.Clear();
+            this.diskMerger.AddDir(this, this.ProjectHome);
+            this.diskMerger.Start();
         }
 
         /// <summary>
         /// Called to ensure that the hierarchy's show all files nodes are in
         /// sync with the file system.
         /// </summary>
-        protected void SyncFileSystem()
+        protected void WaitForSyncFileSystem()
         {
-            if (this.currentMerger == null)
-            {
-                this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
-            }
-            while (this.currentMerger.ContinueMerge(this.ParentHierarchy != null))
-            {
-            }
-            this.currentMerger = null;
+            // ensure the merge is started, and wait for completion
+            // this blocks the UI thread
+            this.diskMerger.Start();
+            this.diskMerger.Wait();
         }
 
         private void BoldStartupItem()
@@ -481,7 +482,7 @@ namespace Microsoft.VisualStudioTools.Project
             var newFileSystemQueue = new ConcurrentQueue<FileSystemChange>();
 
             this.fileSystemChanges = newFileSystemQueue; // none of the other changes matter now, we'll rescan the world
-            this.currentMerger = null;  // abort any current merge now that we have a new one
+            this.diskMerger.Clear();
             this.fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, path: null));
             TriggerIdle();
         }
@@ -528,12 +529,17 @@ namespace Microsoft.VisualStudioTools.Project
                     this.idleManager.OnIdle -= this.OnIdle;
                     this.idleManager.Dispose();
                 }
+
+                if (this.diskMerger != null)
+                {
+                    this.diskMerger.Dispose();
+                }
             }
 
             base.Dispose(disposing);
         }
 
-        protected internal override int ShowAllFiles()
+        protected internal override int ToggleShowAllFiles()
         {
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
@@ -548,6 +554,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
+                this.WaitForSyncFileSystem();
                 UpdateShowAllFiles(this, enabled: true);
                 ExpandItem(EXPANDFLAGS.EXPF_ExpandFolder);
             }
@@ -613,12 +620,9 @@ namespace Microsoft.VisualStudioTools.Project
             return showAllFiles;
         }
 
-        private void MergeDiskNodes(HierarchyNode curParent, string dir)
+        internal void MergeDiskNodes(HierarchyNode parent, string path)
         {
-            var merger = new DiskMerger(this, curParent, dir);
-            while (merger.ContinueMerge(this.ParentHierarchy != null))
-            {
-            }
+            this.diskMerger.AddDir(parent, path);
         }
 
         private void RemoveSubTree(HierarchyNode node)
@@ -858,11 +862,11 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal void CreateSymLinkWatcher(string curDir)
         {
-            if (!CommonUtils.HasEndSeparator(curDir))
+            curDir = CommonUtils.EnsureEndSeparator(curDir);
+            if (!this.symlinkWatchers.ContainsKey(curDir))
             {
-                curDir = curDir + Path.DirectorySeparatorChar;
+                this.symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
             }
-            this.symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
         }
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child)
@@ -877,7 +881,7 @@ namespace Microsoft.VisualStudioTools.Project
             return false;
         }
 
-        private void OnIdle(object sender, ComponentManagerEventArgs e)
+        private async void OnIdle(object sender, ComponentManagerEventArgs e)
         {
             Interlocked.Exchange(ref this.idleTriggered, 0);
             do
@@ -891,8 +895,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                     FileSystemChange change = null;
 
-                    var merger = this.currentMerger;
-                    if (merger == null)
+                    if (this.diskMerger.CompletedMerge)
                     {
                         if (!this.fileSystemChanges.TryDequeue(out change))
                         {
@@ -900,14 +903,9 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                     }
 
-                    if (merger != null)
+                    if (!this.diskMerger.CompletedMerge)
                     {
-                        // we have more file merges to process, do this
-                        // before reflecting any other pending updates...
-                        if (!merger.ContinueMerge(this.ParentHierarchy != null))
-                        {
-                            this.currentMerger = null;
-                        }
+                        await TPL.Task.Run(() => this.diskMerger.Wait());
                         continue;
                     }
 #if DEBUG
@@ -916,7 +914,8 @@ namespace Microsoft.VisualStudioTools.Project
 #endif
                         if (change.Type == WatcherChangeTypes.All)
                         {
-                            this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
+                            this.diskMerger.Clear();
+                            this.diskMerger.AddDir(this, this.ProjectHome);
                             continue;
                         }
                         else
@@ -1163,7 +1162,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="item">The msbuild item to be analyzed</param>
         public override FileNode CreateFileNode(ProjectElement item)
         {
-            Utilities.ArgumentNotNull("item", item);
+            Utilities.ArgumentNotNull(nameof(item), item);
 
             var url = item.Url;
             CommonFileNode newNode;
