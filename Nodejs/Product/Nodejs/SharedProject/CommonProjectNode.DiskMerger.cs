@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
@@ -12,128 +15,226 @@ namespace Microsoft.VisualStudioTools.Project
         /// Performs merging of the file system state with the current project hierarchy, bringing them
         /// back into sync.
         /// 
-        /// The class can be created, and ContinueMerge should be called until it returns false, at which
-        /// point the file system has been merged.  
+        /// The worker thread runs continuously to sync the files on disk with the DiskNodes collection of 
+        /// the project.
         /// 
-        /// You can wait between calls to ContinueMerge to enable not blocking the UI.
+        /// Callers can call the Wait method to blocking wait on the completion of the merge, i.e. till the collection 
+        /// is empty.
         /// 
-        /// If there were changes which came in while the DiskMerger was processing then those changes will still need
-        /// to be processed after the DiskMerger completes.
+        /// Checks for IsDisposed should be done before calling any of the methods of the BlockingCollection, which could
+        /// throw ObjectDisposed exceptions otherwise.
         /// </summary>
-        private sealed class DiskMerger
+        private sealed class DiskMerger : IDisposable
         {
-            private readonly Stack<DirState> remainingDirs = new Stack<DirState>();
+            private readonly BlockingCollection<DirState> dirs = new BlockingCollection<DirState>(new ConcurrentStack<DirState>());
+
             private readonly CommonProjectNode project;
 
-            public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
+            private readonly Thread worker;
+
+            private readonly ManualResetEventSlim processingDirsEvent = new ManualResetEventSlim(initialState: true);
+
+            private bool isDisposed = false;
+
+            public DiskMerger(CommonProjectNode project)
             {
                 this.project = project;
-                this.remainingDirs.Push(new DirState(dir, parent));
+
+                this.worker = new Thread(this.Merge)
+                {
+                    Name = "NodeTools Project Disk Sync",
+                    IsBackground = true,
+                };
             }
 
-            /// <summary>
-            /// Continues processing the merge request, performing a portion of the full merge possibly
-            /// returning before the merge has completed.
-            /// 
-            /// Returns true if the merge needs to continue, or false if the merge has completed.
-            /// </summary>
-            public bool ContinueMerge(bool hierarchyCreated)
+            public void Start()
             {
-                if (this.remainingDirs.Count == 0)
+                if (this.isDisposed || this.dirs.IsAddingCompleted)
                 {
-                    // all done
-                    this.project.BoldStartupItem();
-                    return false;
+                    throw new ObjectDisposedException(nameof(DiskMerger));
                 }
 
-                var dir = this.remainingDirs.Pop();
-                if (!Directory.Exists(dir.Name))
+                if (!this.worker.IsAlive)
                 {
-                    return true;
+                    this.worker.Start();
                 }
+            }
 
-                var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
-                var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
-                try
+            public void AddDir(HierarchyNode parent, string folderPath)
+            {
+                if (this.isDisposed || this.dirs.IsAddingCompleted)
                 {
-                    foreach (var curDir in Directory.EnumerateDirectories(dir.Name))
+                    throw new ObjectDisposedException(nameof(DiskMerger));
+                }
+                this.dirs.Add(new DirState(folderPath, parent));
+            }
+
+            public bool CompletedMerge => this.dirs.Count == 0;
+
+            public void Wait()
+            {
+                if (!this.isDisposed)
+                {
+                    this.processingDirsEvent.Wait();
+                }
+            }
+
+            private void Merge()
+            {
+                while (!this.isDisposed && !this.dirs.IsCompleted)
+                {
+                    if (this.dirs.TryTake(out var dir, Timeout.Infinite))
                     {
-                        if (this.project.IsFileHidden(curDir))
+                        if (string.IsNullOrEmpty(dir.Path) || !Directory.Exists(dir.Path))
                         {
                             continue;
                         }
-                        if (IsFileSymLink(curDir))
+
+                        // Signal we're processing the dirs so anybody interested and calling Wait is blocked
+                        this.processingDirsEvent.Reset();
+
+                        var hierarchyCreated = this.project.ParentHierarchy != null;
+
+                        var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
+                        try
                         {
-                            if (IsRecursiveSymLink(dir.Name, curDir))
+                            foreach (var curDir in Directory.EnumerateDirectories(dir.Path))
                             {
-                                // don't add recursive sym links
-                                continue;
+                                if (this.project.IsFileHidden(curDir))
+                                {
+                                    continue;
+                                }
+                                if (IsFileSymLink(curDir))
+                                {
+                                    if (IsRecursiveSymLink(dir.Path, curDir))
+                                    {
+                                        // don't add recursive sym links
+                                        continue;
+                                    }
+
+                                    // track symlinks, we won't get events on the directory
+                                    this.project.CreateSymLinkWatcher(curDir);
+                                }
+
+                                var folderNode = this.project.FindNodeByFullPath(CommonUtils.EnsureEndSeparator(curDir));
+                                if (folderNode == null)
+                                {
+                                    folderNode = this.InvokeOnUIThread(() => this.project.AddAllFilesFolder(dir.Parent, CommonUtils.EnsureEndSeparator(curDir), hierarchyCreated));
+                                }
+                                else
+                                {
+                                    missingChildren.Remove(folderNode);
+                                }
+                                this.dirs.Add(new DirState(curDir, folderNode));
                             }
-
-                            // track symlinks, we won't get events on the directory
-                            this.project.CreateSymLinkWatcher(curDir);
                         }
-
-                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                        missingChildren.Remove(existing);
-                        this.remainingDirs.Push(new DirState(curDir, existing));
-                    }
-                }
-                catch
-                {
-                    // directory was deleted, we don't have access, etc...
-                    return true;
-                }
-
-                try
-                {
-                    foreach (var file in Directory.EnumerateFiles(dir.Name))
-                    {
-                        if (this.project.IsFileHidden(file))
+                        catch (Exception exc) when (IsExpectedException(exc))
                         {
-                            continue;
+                            // directory was deleted, we don't have access, etc...
                         }
-                        missingChildren.Remove(this.project.AddAllFilesFile(dir.Parent, file));
-                    }
-                }
-                catch
-                {
-                    // directory was deleted, we don't have access, etc...
 
-                    // We are about to return and some of the previous operations may have affect the Parent's Expanded
-                    // state.  Set it back to what it was
-                    if (hierarchyCreated)
+                        var wasExpanded = this.project.ParentHierarchy != null ? dir.Parent.GetIsExpanded() : false;
+                        try
+                        {
+                            foreach (var file in Directory.EnumerateFiles(dir.Path))
+                            {
+                                if (this.project.IsFileHidden(file))
+                                {
+                                    continue;
+                                }
+                                var fileNode = this.project.FindNodeByFullPath(file);
+                                if (fileNode == null)
+                                {
+                                    fileNode = this.InvokeOnUIThread(() => this.project.AddAllFilesFile(dir.Parent, file));
+                                }
+                                else
+                                {
+                                    missingChildren.Remove(fileNode);
+                                }
+                            }
+                        }
+                        catch (Exception exc) when (IsExpectedException(exc))
+                        {
+                            // directory was deleted, we don't have access, etc...
+
+                            // We are about to return and some of the previous operations may have affect the Parent's Expanded
+                            // state.  Set it back to what it was
+                            if (hierarchyCreated)
+                            {
+                                dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                            }
+                        }
+
+                        // remove the excluded children which are no longer there
+                        foreach (var child in missingChildren)
+                        {
+                            if (child.ItemNode.IsExcluded)
+                            {
+                                this.InvokeOnUIThread(() => this.project.RemoveSubTree(child));
+                            }
+                        }
+
+                        if (hierarchyCreated)
+                        {
+                            dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                        }
+                    }
+                    if (!this.isDisposed && this.CompletedMerge)
                     {
-                        dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
-                    }
-                    return true;
-                }
-
-                // remove the excluded children which are no longer there
-                foreach (var child in missingChildren)
-                {
-                    if (child.ItemNode.IsExcluded)
-                    {
-                        this.project.RemoveSubTree(child);
+                        InvokeOnUIThread(this.project.BoldStartupItem);
+                        // raise completed event, and unblock anybody waiting
+                        this.processingDirsEvent.Set();
                     }
                 }
 
-                if (hierarchyCreated)
+                bool IsExpectedException(Exception exc)
                 {
-                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    return exc is UnauthorizedAccessException || exc is IOException;
                 }
+            }
 
-                return true;
+            private void InvokeOnUIThread(Action action)
+            {
+                this.project.Site.GetUIThread().Invoke(action);
+            }
+
+            private T InvokeOnUIThread<T>(Func<T> func)
+            {
+                return this.project.Site.GetUIThread().Invoke(func);
+            }
+
+            public void Clear()
+            {
+                // BlockingCollection has no clear method
+                // use TryTake, to prevent race condition with worker thread
+                while (this.dirs.TryTake(out var _))
+                {
+                }
+            }
+
+            public void Dispose()
+            {
+                if (!this.isDisposed)
+                {
+                    this.dirs.CompleteAdding();
+                    this.Clear();
+                    this.dirs.Dispose();
+
+                    this.processingDirsEvent.Set();
+                    this.processingDirsEvent.Dispose();
+
+                    this.isDisposed = true;
+                }
             }
 
             private struct DirState
             {
-                public readonly string Name;
+                public readonly string Path;
                 public readonly HierarchyNode Parent;
 
-                public DirState(string name, HierarchyNode parent)
+                public DirState(string path, HierarchyNode parent)
                 {
-                    this.Name = name;
+                    this.Path = path;
                     this.Parent = parent;
                 }
             }

@@ -22,7 +22,7 @@ using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage
+    internal sealed class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage
     {
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
@@ -317,7 +317,7 @@ namespace Microsoft.NodejsTools.Project
 
         protected override void Reload()
         {
-            using (new DebugTimer("Project Load"))
+            using (new DebugTimer("NodeJs Project Load"))
             {
                 // Populate values from project properties before we do anything else.
                 // Otherwise we run into race conditions where, for instance, _analysisIgnoredDirectories
@@ -330,7 +330,7 @@ namespace Microsoft.NodejsTools.Project
                 {
                     // We only need to sync the files on load if we're actually showing them
                     // otherwise we'll sync on idle.
-                    this.SyncFileSystem();
+                    this.WaitForSyncFileSystem();
                 }
 
                 this.ModulesNode.ReloadHierarchySafe();

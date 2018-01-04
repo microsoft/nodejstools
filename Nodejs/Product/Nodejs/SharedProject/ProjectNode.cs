@@ -2419,7 +2419,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Handles the shows all objects command.
         /// </summary>
         /// <returns></returns>
-        protected internal virtual int ShowAllFiles()
+        protected internal virtual int ToggleShowAllFiles()
         {
             return (int)OleConstants.OLECMDERR_E_NOTSUPPORTED;
         }
@@ -6248,8 +6248,6 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name)
         {
-            this.Site.GetUIThread().MustBeCalledFromUIThread();
-
             Debug.Assert(Path.IsPathRooted(name));
 
             this.DiskNodes.TryGetValue(name, out var node);
