@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             bool? publish = null;
             var pubValue = item.GetMetadataValue("Publish");
-            if (!string.IsNullOrWhiteSpace(pubValue) && Boolean.TryParse(pubValue, out var pubSetting))
+            if (!string.IsNullOrWhiteSpace(pubValue) && bool.TryParse(pubValue, out var pubSetting))
             {
                 publish = pubSetting;
             }

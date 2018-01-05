@@ -317,7 +317,7 @@ namespace Microsoft.NodejsTools.Project
 
         protected override void Reload()
         {
-            using (new DebugTimer("Project Load"))
+            using (new DebugTimer($"{nameof(NodejsProjectNode)}:Project Load"))
             {
                 // Populate values from project properties before we do anything else.
                 // Otherwise we run into race conditions where, for instance, _analysisIgnoredDirectories
@@ -397,8 +397,7 @@ namespace Microsoft.NodejsTools.Project
                         propPage.LaunchUrl = newValue;
                         break;
                     case NodeProjectProperty.StartWebBrowser:
-                        bool value;
-                        if (Boolean.TryParse(newValue, out value))
+                        if (bool.TryParse(newValue, out var value))
                         {
                             propPage.StartWebBrowser = value;
                         }

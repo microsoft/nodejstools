@@ -583,7 +583,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var startBrowser = this._project.GetProjectProperty(NodeProjectProperty.StartWebBrowser);
             if (!string.IsNullOrEmpty(startBrowser) &&
-                Boolean.TryParse(startBrowser, out var fStartBrowser))
+                bool.TryParse(startBrowser, out var fStartBrowser))
             {
                 return fStartBrowser;
             }
