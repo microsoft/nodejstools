@@ -37,9 +37,8 @@ namespace Microsoft.VisualStudioTools.Project
             /// <summary>
             /// Continues processing the merge request, performing a portion of the full merge possibly
             /// returning before the merge has completed.
-            /// 
-            /// Returns true if the merge needs to continue, or false if the merge has completed.
             /// </summary>
+            /// <returns>Returns true if the merge needs to continue, or false if the merge has completed.</returns>
             public async Task<bool> ContinueMergeAsync(bool hierarchyCreated)
             {
                 if (this.remainingDirs.Count == 0)
@@ -96,6 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 try
                 {
+                    var newFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var file in Directory.EnumerateFiles(dir.Name))
                     {
                         if (this.project.IsFileHidden(file))
@@ -103,17 +103,18 @@ namespace Microsoft.VisualStudioTools.Project
                             continue;
                         }
 
-                        // todo: batch files
                         var existing = this.project.FindNodeByFullPath(file);
                         if (existing == null)
                         {
-                            existing = await this.InvokeOnUIThread(() => this.project.AddAllFilesFile(dir.Parent, file));
+                            newFiles.Add(file);
                         }
                         else
                         {
                             missingChildren.Remove(existing);
                         }
                     }
+
+                    await this.InvokeOnUIThread(() => AddNewFilesAsync(dir.Parent, newFiles));
                 }
                 catch
                 {
@@ -143,6 +144,16 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 return true;
+            }
+
+            private void AddNewFilesAsync(HierarchyNode parent, HashSet<string> newFiles)
+            {
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+
+                foreach (var file in newFiles)
+                {
+                    this.project.AddAllFilesFile(parent, file);
+                }
             }
 
             private Task InvokeOnUIThread(Action action)

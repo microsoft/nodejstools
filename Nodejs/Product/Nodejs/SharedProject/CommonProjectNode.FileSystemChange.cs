@@ -51,11 +51,9 @@ namespace Microsoft.VisualStudioTools.Project
                 switch (this.Type)
                 {
                     case WatcherChangeTypes.Deleted:
-                       await ChildDeletedAsync(child);
+                        await ChildDeletedAsync(child);
                         break;
                     case WatcherChangeTypes.Created:
-                       await ChildCreatedAsync(child);
-                        break;
                     case WatcherChangeTypes.Changed:
                         // we only care about the attributes
                         if (this.project.IsFileHidden(this.path))
@@ -63,16 +61,14 @@ namespace Microsoft.VisualStudioTools.Project
                             if (child != null)
                             {
                                 // attributes must have changed to hidden, remove the file
-                               await ChildDeletedAsync(child);
+                                await ChildDeletedAsync(child);
                             }
                         }
                         else
                         {
-                            if (child == null)
-                            {
-                                // attributes must have changed from hidden, add the file
-                               await ChildCreatedAsync(child);
-                            }
+                            // either a new or attributes have changed
+                            // add the file
+                            await ChildCreatedAsync(child);
                         }
                         break;
                 }
@@ -101,7 +97,6 @@ namespace Microsoft.VisualStudioTools.Project
                 if (child != null)
                 {
                     this.project.TryDeactivateSymLinkWatcher(child);
-                    this.project.Site.GetUIThread().MustBeCalledFromUIThread();
 
                     // rapid changes can arrive out of order, if the file or directory 
                     // actually exists ignore the event.
@@ -117,11 +112,14 @@ namespace Microsoft.VisualStudioTools.Project
 
                         if (child.ItemNode.IsExcluded)
                         {
-                            this.RemoveAllFilesChildren(child);
-                            // deleting a show all files item, remove the node.
-                            this.project.OnItemDeleted(child);
-                            child.Parent.RemoveChild(child);
-                            child.Close();
+                            await this.InvokeOnUIThread(() =>
+                            {
+                                this.RemoveAllFilesChildren(child);
+                                // deleting a show all files item, remove the node.
+                                this.project.OnItemDeleted(child);
+                                child.Parent.RemoveChild(child);
+                                child.Close();
+                            });
                         }
                         else
                         {
@@ -129,7 +127,7 @@ namespace Microsoft.VisualStudioTools.Project
                             // deleting an item in the project, fix the icon, also
                             // fix the icon of all children which we may have not
                             // received delete notifications for
-                            this.RedrawIcon(child);
+                            await this.InvokeOnUIThread(() => this.RedrawIcon(child));
                         }
                     }
                 }
@@ -182,7 +180,7 @@ namespace Microsoft.VisualStudioTools.Project
                         var folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
-                        this.project.MergeDiskNodes(folderNode, this.path);
+                        await this.project.MergeDiskNodesAsync(folderNode, this.path);
                         this.project.OnInvalidateItems(folderNode);
 
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
@@ -199,6 +197,16 @@ namespace Microsoft.VisualStudioTools.Project
 
                     parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                 }
+            }
+
+            private Task InvokeOnUIThread(Action action)
+            {
+                return this.project.Site.GetUIThread().InvokeAsync(action);
+            }
+
+            private Task<T> InvokeOnUIThread<T>(Func<T> func)
+            {
+                return this.project.Site.GetUIThread().InvokeAsync(func);
             }
         }
     }

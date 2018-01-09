@@ -82,6 +82,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.idleManager.OnIdle += this.OnIdle;
 
             this.fileWatcher = new FileChangeManager(serviceProvider);
+            this.fileWatcher.FolderChangedOnDisk += this.FolderChangedOnDisk;
         }
 
         public override int QueryService(ref Guid guidService, out object result)
@@ -394,25 +395,8 @@ namespace Microsoft.VisualStudioTools.Project
                 false;
 
             this.CreateFileSystemWatcher();
-            //    this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
 
             this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
-        }
-
-        /// <summary>
-        /// Called to ensure that the hierarchy's show all files nodes are in
-        /// sync with the file system.
-        /// </summary>
-        protected void SyncFileSystem()
-        {
-            if (this.currentMerger == null)
-            {
-                this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
-            }
-            //while (this.currentMerger.ContinueMerge(this.ParentHierarchy != null))
-            //{
-            //}
-            this.currentMerger = null;
         }
 
         private void BoldStartupItem()
@@ -433,7 +417,6 @@ namespace Microsoft.VisualStudioTools.Project
             this.StopWatchingFiles();
 
             this.fileWatcher.ObserveFolder(this.ProjectHome);
-            this.fileWatcher.FolderChangedOnDisk += this.FolderChangedOnDisk;
         }
 
         private void StopWatchingFiles()
@@ -441,39 +424,6 @@ namespace Microsoft.VisualStudioTools.Project
             // stop watching old dir
             // track file creation/deletes and update our glyphs when files start/stop existing for files in the project.
             this.fileWatcher.StopObservingFolder(this.ProjectHome);
-        }
-
-        private FileSystemWatcher CreateAttributesWatcher(string dir)
-        {
-            var watcher = new FileSystemWatcher(dir)
-            {
-                IncludeSubdirectories = true,
-                NotifyFilter = NotifyFilters.Attributes,
-                InternalBufferSize = 1024 * 4, // 4k is minimum buffer size
-            };
-
-            // Set Event Handlers
-            watcher.Changed += this.FileAttributesChanged;
-            watcher.Error += this.WatcherError;
-
-            // Delay setting EnableRaisingEvents until everything else is initialized.
-            watcher.EnableRaisingEvents = true;
-
-            return watcher;
-        }
-
-        /// <summary>
-        /// When the file system watcher buffer overflows we need to scan the entire 
-        /// directory for changes.
-        /// </summary>
-        private void WatcherError(object sender, ErrorEventArgs e)
-        {
-            var newFileSystemQueue = new ConcurrentQueue<FileSystemChange>();
-
-            this.fileSystemChanges = newFileSystemQueue; // none of the other changes matter now, we'll rescan the world
-            this.currentMerger = null;  // abort any current merge now that we have a new one
-            this.fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.All, path: null));
-            TriggerIdle();
         }
 
         protected override void SaveMSBuildProjectFileAs(string newFileName)
@@ -517,6 +467,12 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     this.idleManager.OnIdle -= this.OnIdle;
                     this.idleManager.Dispose();
+                }
+
+                if (this.fileWatcher != null)
+                {
+                    this.fileWatcher.FolderChangedOnDisk -= this.FolderChangedOnDisk;
+                    this.fileWatcher.Dispose();
                 }
             }
 
@@ -603,7 +559,7 @@ namespace Microsoft.VisualStudioTools.Project
             return showAllFiles;
         }
 
-        private async TPL.Task MergeDiskNodes(HierarchyNode curParent, string dir)
+        private async TPL.Task MergeDiskNodesAsync(HierarchyNode curParent, string dir)
         {
             var merger = new DiskMerger(this, curParent, dir);
             while (await merger.ContinueMergeAsync(this.ParentHierarchy != null))
@@ -793,9 +749,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void FolderChangedOnDisk(object sender, FolderChangedEventArgs e)
         {
-            // todo: does this make sense
             var file = e.FileName;
-            if (File.Exists(file))
+            if (File.Exists(file) || Directory.Exists(file))
             {
                 this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Changed, file));
             }
@@ -803,22 +758,6 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Deleted, file));
             }
-        }
-
-        private void FileNameChanged(object sender, RenamedEventArgs e)
-        {
-            // we just generate a delete and creation here - we're just updating the hierarchy
-            // either changing icons or updating the non-project elements, so we don't need to
-            // generate rename events or anything like that.  This saves us from having to 
-            // handle updating the hierarchy in a special way for renames.
-            this.QueueFileSystemChanges(
-                new FileSystemChange(this, WatcherChangeTypes.Deleted, e.OldFullPath, isRename: true),
-                new FileSystemChange(this, WatcherChangeTypes.Created, e.FullPath, isRename: true));
-        }
-
-        private void FileExistanceChanged(object sender, FileSystemEventArgs e)
-        {
-            this.QueueFileSystemChanges(new FileSystemChange(this, e.ChangeType, e.FullPath));
         }
 
         private void QueueFileSystemChanges(params FileSystemChange[] changes)
@@ -1190,8 +1129,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public override FileNode CreateFileNode(string absFileName)
         {
-            // Avoid adding files to the project multiple times.  Ultimately           
-            // we should not use project items and instead should have virtual items.       
+            // Avoid adding files to the project multiple times.  Ultimately
+            // we should not use project items and instead should have virtual items.
 
             var path = CommonUtils.GetRelativeFilePath(this.ProjectHome, absFileName);
             return CreateFileNode(new MsBuildProjectElement(this, path, GetItemType(path)));
@@ -1400,7 +1339,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentException("Was null or empty", nameof(mkDocument));
             }
 
-            // Make sure that the document moniker passed to us is part of this project
+            // Make sure that the document moniker passed to us is part of this project    
             // We also don't care if it is not a dynamic language file node
             int hr;
             if (ErrorHandler.Failed(hr = ParseCanonicalName(mkDocument, out var itemid)))
