@@ -48,7 +48,6 @@ namespace Microsoft.VisualStudioTools.Project
         private object automationObject;
         private ConcurrentQueue<FileSystemChange> fileSystemChanges = new ConcurrentQueue<FileSystemChange>();
 
-        private readonly Dictionary<string, FileSystemWatcher> symlinkWatchers = new Dictionary<string, FileSystemWatcher>();
         private DiskMerger currentMerger;
         private IdleManager idleManager;
         private IVsHierarchyItemManager hierarchyManager;
@@ -394,7 +393,7 @@ namespace Microsoft.VisualStudioTools.Project
                 GetShowAllFilesSetting(this.BuildProject.GetPropertyValue(CommonConstants.ProjectView)) ??
                 false;
 
-            this.CreateFileSystemWatcher();
+            this.StartWatchingFiles();
 
             this.currentMerger = new DiskMerger(this, this, this.ProjectHome);
         }
@@ -412,7 +411,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        private void CreateFileSystemWatcher()
+        private void StartWatchingFiles()
         {
             this.StopWatchingFiles();
 
@@ -422,7 +421,6 @@ namespace Microsoft.VisualStudioTools.Project
         private void StopWatchingFiles()
         {
             // stop watching old dir
-            // track file creation/deletes and update our glyphs when files start/stop existing for files in the project.
             this.fileWatcher.StopObservingFolder(this.ProjectHome);
         }
 
@@ -728,15 +726,6 @@ namespace Microsoft.VisualStudioTools.Project
             parent.AddChild(newNode);
         }
 
-        private void FileAttributesChanged(object sender, FileSystemEventArgs e)
-        {
-            if (NoPendingFileSystemRescan())
-            {
-                this.fileSystemChanges.Enqueue(new FileSystemChange(this, WatcherChangeTypes.Changed, e.FullPath));
-                TriggerIdle();
-            }
-        }
-
         private bool NoPendingFileSystemRescan()
         {
             return !this.fileSystemChanges.TryPeek(out var change) || change.Type != WatcherChangeTypes.All;
@@ -801,25 +790,19 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal void CreateSymLinkWatcher(string curDir)
         {
-            if (!CommonUtils.HasEndSeparator(curDir))
-            {
-                curDir = curDir + Path.DirectorySeparatorChar;
-            }
-            //         this.symlinkWatchers[curDir] = CreateFileSystemWatcher(curDir);
+            curDir = CommonUtils.EnsureEndSeparator(curDir);
+            this.fileWatcher.ObserveFolder(curDir);
         }
 
         internal bool TryDeactivateSymLinkWatcher(HierarchyNode child)
         {
-            if (this.symlinkWatchers.TryGetValue(child.Url, out var watcher))
-            {
-                this.symlinkWatchers.Remove(child.Url);
-                watcher.EnableRaisingEvents = false;
-                watcher.Dispose();
-                return true;
-            }
-            return false;
+            var dir = CommonUtils.EnsureEndSeparator(child.Url);
+            return this.fileWatcher.StopObservingFolder(dir);
         }
 
+        /// <summary>
+        /// Handles the Idle event, this is raised on the UI thread
+        /// </summary>
         private async void OnIdle(object sender, ComponentManagerEventArgs e)
         {
             Interlocked.Exchange(ref this.idleTriggered, 0);
@@ -898,7 +881,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override void Close()
         {
-            if (null != this.projectDocListenerForStartupFileUpdates)
+            if (this.projectDocListenerForStartupFileUpdates != null)
             {
                 this.projectDocListenerForStartupFileUpdates.Dispose();
                 this.projectDocListenerForStartupFileUpdates = null;
@@ -910,20 +893,8 @@ namespace Microsoft.VisualStudioTools.Project
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
 
-            this.StopWatchingFiles();
+            this.fileWatcher.Dispose();
 
-            //if (this.attributesWatcher != null)
-            //{
-            //    this.attributesWatcher.EnableRaisingEvents = false;
-            //    this.attributesWatcher.Dispose();
-            //    this.attributesWatcher = null;
-            //}
-
-            foreach (var pair in this.symlinkWatchers)
-            {
-                pair.Value.Dispose();
-            }
-            this.symlinkWatchers.Clear();
             this.needBolding = null;
 
             base.Close();
@@ -1457,8 +1428,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             shell.RefreshPropertyBrowser(0);
 
-            CreateFileSystemWatcher();
-            //       this.attributesWatcher = CreateAttributesWatcher(this.ProjectHome);
+            this.StartWatchingFiles();
 
             return VSConstants.S_OK;
         }
@@ -1493,19 +1463,5 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         #endregion
-
-        internal void SuppressFileChangeNotifications(string folder)
-        {
-            this.fileWatcher.IgnoreItemChanges(folder, ignore: true);
-            this.suppressFileWatcherCount++;
-        }
-
-        internal void RestoreFileChangeNotifications(string folder)
-        {
-            if (--this.suppressFileWatcherCount == 0)
-            {
-                this.fileWatcher.IgnoreItemChanges(folder, ignore: false);
-            }
-        }
     }
 }

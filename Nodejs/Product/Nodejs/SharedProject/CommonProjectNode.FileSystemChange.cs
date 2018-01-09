@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Represents an individual change to the file system.  We process these in bulk on the
         /// UI thread.
         /// </summary>
-        [DebuggerDisplay("{nameof(FileSystemChange)}: {isRename} {Type} {path}")]
+        [DebuggerDisplay("FileSystemChange: {isRename} {Type} {path}")]
         private sealed class FileSystemChange
         {
             private readonly CommonProjectNode project;
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudioTools.Project
                         var folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
-                        await this.project.MergeDiskNodesAsync(folderNode, this.path);
+                        await this.project.MergeDiskNodesAsync(folderNode, this.path).ConfigureAwait(true);
                         this.project.OnInvalidateItems(folderNode);
 
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);

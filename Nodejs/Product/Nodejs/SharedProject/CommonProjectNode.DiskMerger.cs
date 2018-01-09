@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                     }
 
-                    await this.InvokeOnUIThread(() => AddNewFilesAsync(dir.Parent, newFiles));
+                    await this.InvokeOnUIThread(() => AddNewFiles(dir.Parent, newFiles));
                 }
                 catch
                 {
@@ -124,29 +124,36 @@ namespace Microsoft.VisualStudioTools.Project
                     // state.  Set it back to what it was
                     if (hierarchyCreated)
                     {
-                        dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                        await this.InvokeOnUIThread(() => dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder));
                     }
                     return true;
                 }
 
                 // remove the excluded children which are no longer there
-                foreach (var child in missingChildren)
-                {
-                    if (child.ItemNode.IsExcluded)
-                    {
-                        await this.InvokeOnUIThread(() => this.project.RemoveSubTree(child));
-                    }
-                }
+                await this.InvokeOnUIThread(() => this.RemoveMissingChildren(missingChildren));
 
                 if (hierarchyCreated)
                 {
-                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
+                    await this.InvokeOnUIThread(() => dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder));
                 }
 
                 return true;
             }
 
-            private void AddNewFilesAsync(HierarchyNode parent, HashSet<string> newFiles)
+            private void RemoveMissingChildren(HashSet<HierarchyNode> children)
+            {
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+
+                foreach (var child in children)
+                {
+                    if (child.ItemNode.IsExcluded)
+                    {
+                        this.project.RemoveSubTree(child);
+                    }
+                }
+            }
+
+            private void AddNewFiles(HierarchyNode parent, HashSet<string> newFiles)
             {
                 this.project.Site.GetUIThread().MustBeCalledFromUIThread();
 

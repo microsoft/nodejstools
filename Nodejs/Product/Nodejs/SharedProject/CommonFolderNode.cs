@@ -227,15 +227,7 @@ namespace Microsoft.VisualStudioTools.Project
         public override void RenameFolder(string newName)
         {
             var oldName = this.Url;
-//            this._project.SuppressFileChangeNotifications();
-            try
-            {
-                base.RenameFolder(newName);
-            }
-            finally
-            {
- //               this._project.RestoreFileChangeNotifications();
-            }
+            base.RenameFolder(newName);
 
             if (this.ProjectMgr.TryDeactivateSymLinkWatcher(this))
             {

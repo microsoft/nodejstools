@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Project
     }
 
     /// <summary>
-    /// This object is in charge of reloading nodes that have file monikers that can be listened to changes
+    /// This object is in charge of watching for changes to files and folders.
     /// </summary>
     internal sealed class FileChangeManager
     {
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(pszFile));
                 }
 
-                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile, (_VSFILECHANGEFLAGS)0));
+                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile, (_VSFILECHANGEFLAGS)0 /* default for now, untill VS implements API that returns actual change */));
 
                 return VSConstants.S_OK;
             }
@@ -290,7 +290,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        public void StopObservingFolder(string folderName)
+        public bool StopObservingFolder(string folderName)
         {
             this.CheckDisposed();
 
@@ -304,8 +304,9 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.observedFolders.TryRemove(fullFolderName, out var cookie))
             {
                 // Stop observing the file
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseDirChange(cookie));
+                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseDirChange(cookie));
             }
+            return false;
         }
 
         private void CheckDisposed()
