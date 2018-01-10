@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudioTools.Project
             private readonly string path;
             private readonly bool isRename;
 
-            internal readonly WatcherChangeTypes Type;
+            public readonly WatcherChangeTypes Type;
 
             public FileSystemChange(CommonProjectNode project, WatcherChangeTypes changeType, string path, bool isRename = false)
             {

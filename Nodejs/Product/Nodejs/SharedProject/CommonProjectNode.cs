@@ -42,14 +42,13 @@ namespace Microsoft.VisualStudioTools.Project
         private ProjectDocumentsListenerForStartupFileUpdates projectDocListenerForStartupFileUpdates;
 
         private readonly FileChangeManager fileWatcher;
+        private readonly IdleManager idleManager;
 
-        private int suppressFileWatcherCount;
         private bool isShowingAllFiles;
         private object automationObject;
         private ConcurrentQueue<FileSystemChange> fileSystemChanges = new ConcurrentQueue<FileSystemChange>();
 
         private DiskMerger currentMerger;
-        private IdleManager idleManager;
         private IVsHierarchyItemManager hierarchyManager;
         private Dictionary<uint, bool> needBolding;
         private int idleTriggered;
@@ -413,8 +412,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void StartWatchingFiles()
         {
-            this.StopWatchingFiles();
-
             this.fileWatcher.ObserveFolder(this.ProjectHome);
         }
 
@@ -461,17 +458,12 @@ namespace Microsoft.VisualStudioTools.Project
                 {
                     this.UserBuildProject.ProjectCollection.UnloadProject(this.UserBuildProject);
                 }
-                if (this.idleManager != null)
-                {
-                    this.idleManager.OnIdle -= this.OnIdle;
-                    this.idleManager.Dispose();
-                }
 
-                if (this.fileWatcher != null)
-                {
-                    this.fileWatcher.FolderChangedOnDisk -= this.FolderChangedOnDisk;
-                    this.fileWatcher.Dispose();
-                }
+                this.idleManager.OnIdle -= this.OnIdle;
+                this.idleManager.Dispose();
+
+                this.fileWatcher.FolderChangedOnDisk -= this.FolderChangedOnDisk;
+                this.fileWatcher.Dispose();
             }
 
             base.Dispose(disposing);
@@ -893,8 +885,6 @@ namespace Microsoft.VisualStudioTools.Project
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
 
-            this.fileWatcher.Dispose();
-
             this.needBolding = null;
 
             base.Close();
@@ -1310,7 +1300,7 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentException("Was null or empty", nameof(mkDocument));
             }
 
-            // Make sure that the document moniker passed to us is part of this project    
+            // Make sure that the document moniker passed to us is part of this project
             // We also don't care if it is not a dynamic language file node
             int hr;
             if (ErrorHandler.Failed(hr = ParseCanonicalName(mkDocument, out var itemid)))

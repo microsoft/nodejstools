@@ -174,9 +174,9 @@ namespace Microsoft.VisualStudioTools.Project
             foreach (var (ItemID, FileChangeCookie) in this.observedFiles.Values)
             {
                 var hr = this.fileChangeService.UnadviseFileChange(FileChangeCookie);
-                if (ErrorHandler.Failed(hr)) { break; }
                 // don't want to crash VS during cleanup
                 Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
+                if (ErrorHandler.Failed(hr)) { break; }
             }
 
             // Clean the observerItems list
@@ -186,9 +186,9 @@ namespace Microsoft.VisualStudioTools.Project
             foreach (var folderCookie in this.observedFolders.Values)
             {
                 var hr = this.fileChangeService.UnadviseDirChange(folderCookie);
-                if (ErrorHandler.Failed(hr)) { break; }
                 // don't want to crash VS during cleanup
                 Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
+                if (ErrorHandler.Failed(hr)) { break; }
             }
 
             // Clean the observerItems list
