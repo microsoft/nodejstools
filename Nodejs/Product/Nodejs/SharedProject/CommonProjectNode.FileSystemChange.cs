@@ -43,6 +43,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             public async Task ProcessChangeAsync()
             {
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+
                 var child = this.project.FindNodeByFullPath(this.path);
                 if ((this.Type == WatcherChangeTypes.Deleted || this.Type == WatcherChangeTypes.Changed) && child == null)
                 {
@@ -51,7 +53,7 @@ namespace Microsoft.VisualStudioTools.Project
                 switch (this.Type)
                 {
                     case WatcherChangeTypes.Deleted:
-                        await ChildDeletedAsync(child);
+                        ChildDeleted(child);
                         break;
                     case WatcherChangeTypes.Created:
                     case WatcherChangeTypes.Changed:
@@ -61,7 +63,7 @@ namespace Microsoft.VisualStudioTools.Project
                             if (child != null)
                             {
                                 // attributes must have changed to hidden, remove the file
-                                await ChildDeletedAsync(child);
+                                ChildDeleted(child);
                             }
                         }
                         else
@@ -92,7 +94,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            private async Task ChildDeletedAsync(HierarchyNode child)
+            private void ChildDeleted(HierarchyNode child)
             {
                 if (child != null)
                 {
@@ -112,14 +114,11 @@ namespace Microsoft.VisualStudioTools.Project
 
                         if (child.ItemNode.IsExcluded)
                         {
-                            await this.InvokeOnUIThread(() =>
-                            {
-                                this.RemoveAllFilesChildren(child);
-                                // deleting a show all files item, remove the node.
-                                this.project.OnItemDeleted(child);
-                                child.Parent.RemoveChild(child);
-                                child.Close();
-                            });
+                            this.RemoveAllFilesChildren(child);
+                            // deleting a show all files item, remove the node.
+                            this.project.OnItemDeleted(child);
+                            child.Parent.RemoveChild(child);
+                            child.Close();
                         }
                         else
                         {
@@ -127,7 +126,7 @@ namespace Microsoft.VisualStudioTools.Project
                             // deleting an item in the project, fix the icon, also
                             // fix the icon of all children which we may have not
                             // received delete notifications for
-                            await this.InvokeOnUIThread(() => this.RedrawIcon(child));
+                            this.RedrawIcon(child);
                         }
                     }
                 }
@@ -181,6 +180,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                         // then add the folder nodes
                         await this.project.MergeDiskNodesAsync(folderNode, this.path).ConfigureAwait(true);
+
+                        // Assert we're back on the UI thread
+                        this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+                        
                         this.project.OnInvalidateItems(folderNode);
 
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
@@ -197,16 +200,6 @@ namespace Microsoft.VisualStudioTools.Project
 
                     parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                 }
-            }
-
-            private Task InvokeOnUIThread(Action action)
-            {
-                return this.project.Site.GetUIThread().InvokeAsync(action);
-            }
-
-            private Task<T> InvokeOnUIThread<T>(Func<T> func)
-            {
-                return this.project.Site.GetUIThread().InvokeAsync(func);
             }
         }
     }

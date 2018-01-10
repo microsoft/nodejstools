@@ -53,11 +53,28 @@ namespace Microsoft.VisualStudioTools.Project
                     return true;
                 }
 
+                return await this.InvokeOnUIThread(() => this.ContinueMergeAsyncWorker(dir, hierarchyCreated));
+            }
+
+            private async Task<bool> ContinueMergeAsyncWorker((string Name, HierarchyNode Parent) dir, bool hierarchyCreated)
+            {
                 var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
+
+                var thread = this.project.Site.GetUIThread();
+
                 try
                 {
-                    foreach (var curDir in Directory.EnumerateDirectories(dir.Name))
+                    // enumerate disk on worker thread 
+                    var folders = await Task.Run(() =>
+                    {
+                        thread.MustNotBeCalledFromUIThread();
+                        return Directory.GetDirectories(dir.Name, "*", SearchOption.TopDirectoryOnly);
+                    }).ConfigureAwait(true);
+
+                    thread.MustBeCalledFromUIThread();
+
+                    foreach (var curDir in folders)
                     {
                         if (this.project.IsFileHidden(curDir))
                         {
@@ -78,7 +95,7 @@ namespace Microsoft.VisualStudioTools.Project
                         var existing = this.project.FindNodeByFullPath(curDir);
                         if (existing == null)
                         {
-                            existing = await this.InvokeOnUIThread(() => this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated));
+                            existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
                         }
                         else
                         {
@@ -96,7 +113,16 @@ namespace Microsoft.VisualStudioTools.Project
                 try
                 {
                     var newFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var file in Directory.EnumerateFiles(dir.Name))
+
+                    var files = await Task.Run(() =>
+                    {
+                        thread.MustNotBeCalledFromUIThread();
+                        return Directory.GetFiles(dir.Name, "*", SearchOption.TopDirectoryOnly);
+                    }).ConfigureAwait(true);
+
+                    thread.MustBeCalledFromUIThread();
+
+                    foreach (var file in files)
                     {
                         if (this.project.IsFileHidden(file))
                         {
@@ -114,7 +140,7 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                     }
 
-                    await this.InvokeOnUIThread(() => AddNewFiles(dir.Parent, newFiles));
+                    AddNewFiles(dir.Parent, newFiles);
                 }
                 catch
                 {
@@ -124,17 +150,17 @@ namespace Microsoft.VisualStudioTools.Project
                     // state.  Set it back to what it was
                     if (hierarchyCreated)
                     {
-                        await this.InvokeOnUIThread(() => dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder));
+                        dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                     }
                     return true;
                 }
 
                 // remove the excluded children which are no longer there
-                await this.InvokeOnUIThread(() => this.RemoveMissingChildren(missingChildren));
+                this.RemoveMissingChildren(missingChildren);
 
                 if (hierarchyCreated)
                 {
-                    await this.InvokeOnUIThread(() => dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder));
+                    dir.Parent.ExpandItem(wasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);
                 }
 
                 return true;
@@ -168,9 +194,9 @@ namespace Microsoft.VisualStudioTools.Project
                 return this.project.Site.GetUIThread().InvokeAsync(action);
             }
 
-            private Task<T> InvokeOnUIThread<T>(Func<T> func)
+            private Task<T> InvokeOnUIThread<T>(Func<Task<T>> func)
             {
-                return this.project.Site.GetUIThread().InvokeAsync(func);
+                return this.project.Site.GetUIThread().InvokeTask(func);
             }
         }
     }

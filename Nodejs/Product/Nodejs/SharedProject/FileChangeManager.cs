@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using IServiceProvider = System.IServiceProvider;
@@ -90,17 +91,21 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(pszFile));
                 }
 
-                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile, (_VSFILECHANGEFLAGS)0 /* default for now, untill VS implements API that returns actual change */));
+                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile,
+                    (_VSFILECHANGEFLAGS)0 /* default for now, until VS implements API that returns actual change */));
 
                 return VSConstants.S_OK;
             }
         }
 
         /// <summary>
-        /// Event that is raised when one of the observed file names have changed on disk.
+        /// Event that is raised when one of the observed files have changed on disk.
         /// </summary>
         public event EventHandler<FileChangedOnDiskEventArgs> FileChangedOnDisk;
 
+        /// <summary>
+        /// Event that is raised when one of the observed folders have changed on disk.
+        /// </summary>
         public event EventHandler<FolderChangedEventArgs> FolderChangedOnDisk;
 
         /// <summary>
@@ -168,7 +173,10 @@ namespace Microsoft.VisualStudioTools.Project
             // Unsubscribe from the observed source files.
             foreach (var (ItemID, FileChangeCookie) in this.observedFiles.Values)
             {
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseFileChange(FileChangeCookie));
+                var hr = this.fileChangeService.UnadviseFileChange(FileChangeCookie);
+                if (ErrorHandler.Failed(hr)) { break; }
+                // don't want to crash VS during cleanup
+                Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
             }
 
             // Clean the observerItems list
@@ -177,7 +185,10 @@ namespace Microsoft.VisualStudioTools.Project
             // Unsubscribe from the observed source files.
             foreach (var folderCookie in this.observedFolders.Values)
             {
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseDirChange(folderCookie));
+                var hr = this.fileChangeService.UnadviseDirChange(folderCookie);
+                if (ErrorHandler.Failed(hr)) { break; }
+                // don't want to crash VS during cleanup
+                Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
             }
 
             // Clean the observerItems list
