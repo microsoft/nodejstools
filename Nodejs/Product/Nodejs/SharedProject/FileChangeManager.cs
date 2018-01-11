@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Stop observing when the file is updated on disk.
         /// </summary>
         /// <param name="fileName">File to stop observing.</param>
-        public void StopObservingFile(string fileName)
+        public bool StopObservingFile(string fileName)
         {
             this.CheckDisposed();
 
@@ -297,8 +297,9 @@ namespace Microsoft.VisualStudioTools.Project
                 var (ItemID, FileChangeCookie) = value;
 
                 // Stop observing the file
-                ErrorHandler.ThrowOnFailure(this.fileChangeService.UnadviseFileChange(FileChangeCookie));
+                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseFileChange(FileChangeCookie));
             }
+            return false;
         }
 
         public bool StopObservingFolder(string folderName)
