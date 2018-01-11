@@ -6248,8 +6248,6 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         internal HierarchyNode FindNodeByFullPath(string name)
         {
-            this.Site.GetUIThread().MustBeCalledFromUIThread();
-
             Debug.Assert(Path.IsPathRooted(name));
 
             this.DiskNodes.TryGetValue(name, out var node);
