@@ -8,6 +8,12 @@
     "target": "es5"
   },
   "exclude": [
-    "node_modules"
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms",
+    "**/wwwroot/lib"
   ]
 }

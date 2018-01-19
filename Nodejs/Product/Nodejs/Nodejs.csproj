@@ -615,6 +615,7 @@
     <ZipItem Include="Templates\Files\EmptyLess\EmptyLess.less" />
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
     <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
+    <ZipItem Include="Templates\Files\TypeScriptTsConfig\jsconfig.json" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -839,6 +840,9 @@
       <SubType>Designer</SubType>
     </ZipItem>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.vstemplate">
+      <SubType>Designer</SubType>
+    </ZipItem>
+    <ZipItem Include="Templates\Files\TypeScriptTsConfig\jsconfig.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
     <Content Include="VSTemplateStore.pkgdef">
