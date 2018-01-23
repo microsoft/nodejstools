@@ -7,7 +7,7 @@
     <DefaultName>jsconfig.json</DefaultName>
     <TemplateID>Node.jsconfig</TemplateID>
     <ProjectType>Node.js</ProjectType>
-    <SortOrder>370</SortOrder>
+    <SortOrder>371</SortOrder>
   </TemplateData>
   <TemplateContent>
     <ProjectItem SubType="Code" ReplaceParameters="true">jsconfig.json</ProjectItem>
