@@ -1,7 +1,7 @@
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="4009" />
-    <Description Package="{2ffe45c4-5c73-493c-b187-f2e955ff875e}" ID="4010" />
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4009" />
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4010" />
     <!-- pulled from the asp.net v5 package -->
     <Icon Package="{AAB75614-2F8F-4DA6-B0A6-763C6DBB2969}" ID="2200"/>
     <DefaultName>jsconfig.json</DefaultName>
