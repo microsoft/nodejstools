@@ -5,7 +5,6 @@
     "**/jspm_packages",
     "**/node_modules",
     "**/obj",
-    "**/platforms",
-    "**/wwwroot/lib"
+    "**/platforms"
   ]
 }
