@@ -25,7 +25,7 @@
                            HelpText="{x:Static resx:ImportWizardResources.F5FileSelectHelpText}"
                            Grid.Row="0">
             <ListView Name="listView"
-                      ItemsSource="{Binding TopLevelJavaScriptFiles}"
+                      ItemsSource="{Binding TopLevelScriptFiles}"
                       SelectionMode="Single"
                       SelectedItem="{Binding StartupFile,Mode=TwoWay}"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"

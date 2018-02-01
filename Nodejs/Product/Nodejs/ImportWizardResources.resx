@@ -130,13 +130,19 @@
     <value>Choose which file to run when F5 is pressed.</value>
   </data>
   <data name="FileFilterHelpText" xml:space="preserve">
-    <value>Files with the .js extension are always included.</value>
+    <value>Files with these extensions are included in the project.</value>
   </data>
   <data name="FileFilterTitle" xml:space="preserve">
     <value>Enter the filter for files to include</value>
   </data>
   <data name="FinishButtonLabel" xml:space="preserve">
     <value>_Finish</value>
+  </data>
+  <data name="JavaScriptHelpText" xml:space="preserve">
+    <value>Files with a '.js', or a '.jsx' extension, and 'jsconfig.json' are automatically included.</value>
+  </data>
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>Select the language this project primarily uses</value>
   </data>
   <data name="NextButtonLabel" xml:space="preserve">
     <value>_Next</value>
@@ -158,6 +164,12 @@
   </data>
   <data name="SourceFilesPageTitle" xml:space="preserve">
     <value>Source Files</value>
+  </data>
+  <data name="StartupPageTitle" xml:space="preserve">
+    <value>Source Files</value>
+  </data>
+  <data name="TypeScriptHelpText" xml:space="preserve">
+    <value>Files with a '.ts', or a '.tsx' extension, and 'tsconfig.json' are automatically included.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to the Create New Project from Existing Node.js Code Wizard</value>

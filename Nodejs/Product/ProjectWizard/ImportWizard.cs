@@ -12,8 +12,39 @@ using Microsoft.NodejsTools.Project;
 
 namespace Microsoft.NodejsTools.ProjectWizard
 {
-    public sealed class NewProjectFromExistingWizard : IWizard
+    public enum ProjectLanguage
     {
+        JavaScript,
+        TypeScript,
+    }
+
+    public sealed class NewProjectFromExistingJavaScriptWizard : NewProjectFromExistingWizard
+    {
+        public NewProjectFromExistingJavaScriptWizard()
+            : base(ProjectLanguage.JavaScript)
+        {
+            // ...
+        }
+    }
+
+    public sealed class NewProjectFromExistingTypeScriptWizard : NewProjectFromExistingWizard
+    {
+        public NewProjectFromExistingTypeScriptWizard()
+            : base(ProjectLanguage.TypeScript)
+        {
+            // ...
+        }
+    }
+
+    public abstract class NewProjectFromExistingWizard : IWizard
+    {
+        protected NewProjectFromExistingWizard(ProjectLanguage language)
+        {
+            this.projectLanguage = language;
+        }
+
+        private ProjectLanguage projectLanguage;
+
         public static bool IsAddNewProjectCmd { get; set; }
         public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) { }
         public void ProjectFinishedGenerating(EnvDTE.Project project) { }
@@ -58,7 +89,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
 
                 var context = IsAddNewProjectCmd ? (int)VSConstants.VSStd97CmdID.AddExistingProject : (int)VSConstants.VSStd97CmdID.OpenProject;
 
-                object inObj = projName + "|" + directory + "|" + context;
+                object inObj = projName + "|" + directory + "|" + context + "|" + (int)this.projectLanguage;
                 var guid = Guids.NodejsCmdSet;
                 hr = uiShell.PostExecCommand(ref guid, (uint)PkgCmdId.cmdidImportWizard, 0, ref inObj);
                 if (ErrorHandler.Failed(hr))

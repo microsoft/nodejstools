@@ -9,14 +9,15 @@
       xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
-      Title="Source Files"
+      Title="{x:Static resx:ImportWizardResources.StartupPageTitle}"
       FocusManager.FocusedElement="{Binding ElementName=SourcePathTextBox}">
     <Page.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
     </Page.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition />
@@ -28,7 +29,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -38,9 +39,30 @@
             </Grid>
         </wpf:LabelledControl>
 
+        <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.LanguageTitle}"
+                             Grid.Row="1">
+            <StackPanel Margin="3">
+                <RadioButton Name="JavaScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}">
+                    <StackPanel>
+                        <TextBlock>JavaScript</TextBlock>
+                        <TextBlock Text="{x:Static resx:ImportWizardResources.JavaScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton Name="TypeScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}">
+                    <StackPanel>
+                        <TextBlock>TypeScriptScript</TextBlock>
+                        <TextBlock Text="{x:Static resx:ImportWizardResources.TypeScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+        </wpf:LabelledControl>
+
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.FileFilterTitle}"
                            HelpText="{x:Static resx:ImportWizardResources.FileFilterHelpText}"
-                           Grid.Row="1">
+                           Grid.Row="2">
             <TextBox Text="{Binding Path=Filters,Mode=TwoWay}" />
         </wpf:LabelledControl>
     </Grid>

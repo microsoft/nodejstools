@@ -1,12 +1,14 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.NodejsTools.Project;
+using Microsoft.NodejsTools.ProjectWizard;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
@@ -23,26 +25,31 @@ namespace Microsoft.NodejsTools.Commands
             var statusBar = (IVsStatusbar)CommonPackage.GetGlobalService(typeof(SVsStatusbar));
             statusBar.SetText(Resources.ImportingProjectStatusText);
 
-            var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
+            var dlg = new Project.ImportWizard.ImportWizard();
             var commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
 
-            var oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
-            if (oleArgs != null)
+            if (args is VisualStudio.Shell.OleMenuCmdEventArgs oleArgs)
             {
-                var projectArgs = oleArgs.InValue as string;
-                if (projectArgs != null)
+                if (oleArgs.InValue is string projectArgs)
                 {
                     var argItems = projectArgs.Split('|');
-                    if (argItems.Length == 3)
+                    Debug.Assert(argItems.Length == 4, "expected 4 arguments");
+
+                    dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
+                        argItems[1],
+                        argItems[0],
+                        ".njsproj"
+                    );
+
+                    var projectLanguage = ProjectLanguage.JavaScript;
+                    if (int.TryParse(argItems[3], out var langId))
                     {
-                        dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
-                            argItems[1],
-                            argItems[0],
-                            ".njsproj"
-                        );
-                        dlg.ImportSettings.SourcePath = argItems[1];
-                        commandIdToRaise = int.Parse(argItems[2], CultureInfo.InvariantCulture);
+                        projectLanguage = (ProjectLanguage)langId;
                     }
+
+                    dlg.ImportSettings.SourcePath = argItems[1];
+                    dlg.ImportSettings.ProjectLanguage = projectLanguage;
+                    commandIdToRaise = int.Parse(argItems[2], CultureInfo.InvariantCulture);
                 }
             }
 
