@@ -151,7 +151,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We won&apos;t move any files, and you can use Save As to move the project file later..
+        ///   Looks up a localized string similar to The project file will be saved in the root of the folder that contains your Node.js code..
         /// </summary>
         public static string SaveFileLocationHelpText {
             get {
@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select where to save your project file.
+        ///   Looks up a localized string similar to Enter the name for your project.
         /// </summary>
         public static string SaveFileLocationTitle {
             get {

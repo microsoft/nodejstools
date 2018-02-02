@@ -35,11 +35,7 @@ namespace Microsoft.NodejsTools.Commands
                     var argItems = projectArgs.Split('|');
                     Debug.Assert(argItems.Length == 4, "expected 4 arguments");
 
-                    dlg.ImportSettings.ProjectPath = CommonUtils.GetAvailableFilename(
-                        argItems[1],
-                        argItems[0],
-                        ".njsproj"
-                    );
+                    dlg.ImportSettings.ProjectName = argItems[0];
 
                     var projectLanguage = ProjectLanguage.JavaScript;
                     if (int.TryParse(argItems[3], out var langId))

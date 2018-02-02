@@ -148,10 +148,10 @@
     <value>_Next</value>
   </data>
   <data name="SaveFileLocationHelpText" xml:space="preserve">
-    <value>We won't move any files, and you can use Save As to move the project file later.</value>
+    <value>The project file will be saved in the root of the folder that contains your Node.js code.</value>
   </data>
   <data name="SaveFileLocationTitle" xml:space="preserve">
-    <value>Select where to save your project file</value>
+    <value>Enter the name for your project</value>
   </data>
   <data name="SaveProjectPageTitle" xml:space="preserve">
     <value>Save Project</value>
