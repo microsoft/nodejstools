@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -8,20 +8,20 @@ namespace Microsoft.VisualStudioTools.Project
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     internal sealed class SRDisplayNameAttribute : DisplayNameAttribute
     {
-        private string _name;
+        private readonly string name;
 
         public SRDisplayNameAttribute(string name)
         {
-            this._name = name;
+            this.name = name;
         }
 
-        public override string DisplayName => SR.GetString(this._name);
+        public override string DisplayName => SR.GetString(this.name);
     }
 
     [AttributeUsage(AttributeTargets.All)]
     internal sealed class SRDescriptionAttribute : DescriptionAttribute
     {
-        private bool _replaced;
+        private bool replaced;
 
         public SRDescriptionAttribute(string description)
             : base(description)
@@ -32,9 +32,9 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                if (!this._replaced)
+                if (!this.replaced)
                 {
-                    this._replaced = true;
+                    this.replaced = true;
                     this.DescriptionValue = SR.GetString(base.Description);
                 }
                 return base.Description;

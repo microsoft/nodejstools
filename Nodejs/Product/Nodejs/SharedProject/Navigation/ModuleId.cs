@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -10,25 +10,22 @@ namespace Microsoft.VisualStudioTools.Navigation
     /// </summary>
     public sealed class ModuleId
     {
-        private IVsHierarchy _ownerHierarchy;
-        private uint _itemId;
-
         public ModuleId(IVsHierarchy owner, uint id)
         {
-            this._ownerHierarchy = owner;
-            this._itemId = id;
+            this.Hierarchy = owner;
+            this.ItemId = id;
         }
 
-        public IVsHierarchy Hierarchy => this._ownerHierarchy;
-        public uint ItemID => this._itemId;
+        public IVsHierarchy Hierarchy { get; }
+        public uint ItemId { get; }
         public override int GetHashCode()
         {
             var hash = 0;
-            if (null != this._ownerHierarchy)
+            if (null != this.Hierarchy)
             {
-                hash = this._ownerHierarchy.GetHashCode();
+                hash = this.Hierarchy.GetHashCode();
             }
-            hash = hash ^ (int)this._itemId;
+            hash = hash ^ (int)this.ItemId;
             return hash;
         }
 
@@ -39,11 +36,11 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return false;
             }
-            if (!this._ownerHierarchy.Equals(other._ownerHierarchy))
+            if (!this.Hierarchy.Equals(other.Hierarchy))
             {
                 return false;
             }
-            return (this._itemId == other._itemId);
+            return (this.ItemId == other.ItemId);
         }
     }
 }
