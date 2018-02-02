@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudioTools.Project
     public enum HierarchyAddType
     {
         AddNewItem,
-        AddExistingItem
+        AddExistingItem,
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudioTools.Project
     public enum CommandOrigin
     {
         UiHierarchy,
-        OleCommandTarget
+        OleCommandTarget,
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Project
         None,
         Shell,
         VsStg,
-        VsRef
+        VsRef,
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// This will be translated to VSHPROPID_OverlayIconIndex
         /// </summary>
-        OverlayIcon = 8
+        OverlayIcon = 8,
     }
 
     /// <summary>
@@ -237,92 +237,74 @@ namespace Microsoft.VisualStudioTools.Project
     }
     #endregion
 
-    public class AfterProjectFileOpenedEventArgs : EventArgs
+    public sealed class AfterProjectFileOpenedEventArgs : EventArgs
     {
     }
 
-    public class BeforeProjectFileClosedEventArgs : EventArgs
+    public sealed class BeforeProjectFileClosedEventArgs : EventArgs
     {
-        #region fields
-        private bool _removed;
-        private IVsHierarchy _hierarchy;
-        #endregion
-
-        #region properties
         /// <summary>
         /// true if the project was removed from the solution before the solution was closed. false if the project was removed from the solution while the solution was being closed.
         /// </summary>
-        internal bool Removed => this._removed;
-        internal IVsHierarchy Hierarchy => this._hierarchy;
+        internal readonly bool Removed;
+        internal readonly IVsHierarchy Hierarchy;
 
-        #endregion
-
-        #region ctor
         internal BeforeProjectFileClosedEventArgs(IVsHierarchy hierarchy, bool removed)
         {
-            this._removed = removed;
-            this._hierarchy = hierarchy;
+            this.Removed = removed;
+            this.Hierarchy = hierarchy;
         }
-        #endregion
     }
 
     /// <summary>
     /// Argument of the event raised when a project property is changed.
     /// </summary>
-    public class ProjectPropertyChangedArgs : EventArgs
+    public sealed class ProjectPropertyChangedArgs : EventArgs
     {
-        private string propertyName;
-        private string oldValue;
-        private string newValue;
-
         internal ProjectPropertyChangedArgs(string propertyName, string oldValue, string newValue)
         {
-            this.propertyName = propertyName;
-            this.oldValue = oldValue;
-            this.newValue = newValue;
+            this.PropertyName = propertyName;
+            this.OldValue = oldValue;
+            this.NewValue = newValue;
         }
 
-        public string NewValue => this.newValue;
-        public string OldValue => this.oldValue;
-        public string PropertyName => this.propertyName;
+        public readonly string NewValue;
+        public readonly string OldValue;
+        public readonly string PropertyName;
     }
 
     /// <summary>
     /// This class is used for the events raised by a HierarchyNode object.
     /// </summary>
-    internal class HierarchyNodeEventArgs : EventArgs
+    internal sealed class HierarchyNodeEventArgs : EventArgs
     {
-        private HierarchyNode child;
+        public readonly HierarchyNode Child;
 
         internal HierarchyNodeEventArgs(HierarchyNode child)
         {
-            this.child = child;
+            this.Child = child;
         }
-
-        public HierarchyNode Child => this.child;
     }
 
     /// <summary>
     /// Event args class for triggering file change event arguments.
     /// </summary>
-    public class FileChangedOnDiskEventArgs : EventArgs
+    public sealed class FileChangedOnDiskEventArgs : EventArgs
     {
-        #region Private fields
         /// <summary>
         /// File name that was changed on disk.
         /// </summary>
-        private string fileName;
+        public readonly string FileName;
 
         /// <summary>
         /// The item ide of the file that has changed.
         /// </summary>
-        private uint itemID;
+        public readonly uint ItemID;
 
         /// <summary>
         /// The reason the file has changed on disk.
         /// </summary>
-        private _VSFILECHANGEFLAGS fileChangeFlag;
-        #endregion
+        public readonly _VSFILECHANGEFLAGS FileChangeFlag;
 
         /// <summary>
         /// Constructs a new event args.
@@ -331,27 +313,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="id">The item id of the file that was changed on disk.</param>
         internal FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
         {
-            this.fileName = fileName;
-            this.itemID = id;
-            this.fileChangeFlag = flag;
+            this.FileName = fileName;
+            this.ItemID = id;
+            this.FileChangeFlag = flag;
         }
-
-        /// <summary>
-        /// Gets the file name that was changed on disk.
-        /// </summary>
-        /// <value>The file that was changed on disk.</value>
-        public string FileName => this.fileName;
-
-        /// <summary>
-        /// Gets item id of the file that has changed
-        /// </summary>
-        /// <value>The file that was changed on disk.</value>
-        internal uint ItemID => this.itemID;
-
-        /// <summary>
-        /// The reason while the file has chnaged on disk.
-        /// </summary>
-        /// <value>The reason while the file has chnaged on disk.</value>
-        public _VSFILECHANGEFLAGS FileChangeFlag => this.fileChangeFlag;
     }
 }

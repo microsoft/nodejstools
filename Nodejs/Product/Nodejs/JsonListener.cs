@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -16,13 +16,14 @@ namespace Microsoft.NodejsTools
     /// </summary>
     internal abstract class JsonListener
     {
-        private readonly byte[] _socketBuffer = new byte[4096];
-        private Socket _socket;
+        private readonly byte[] socketBuffer = new byte[4096];
 
         protected void StartListenerThread()
         {
-            var debuggerThread = new Thread(this.ListenerThread);
-            debuggerThread.Name = GetType().Name + " Thread";
+            var debuggerThread = new Thread(this.ListenerThread)
+            {
+                Name = GetType().Name + " Thread"
+            };
             debuggerThread.Start();
         }
 
@@ -33,22 +34,22 @@ namespace Microsoft.NodejsTools
 
             // Use a local for Socket to keep nulling of _socket field (on non listener thread)
             // from causing spurious null dereferences
-            var socket = this._socket;
+            var socket = this.Socket;
 
             try
             {
                 if (socket != null && socket.Connected)
                 {
                     // _socket == null || !_socket.Connected effectively stops listening and associated packet processing
-                    while (this._socket != null && socket.Connected)
+                    while (this.Socket != null && socket.Connected)
                     {
                         if (pos >= text.Length)
                         {
-                            ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
+                            ReadMoreData(socket.Receive(this.socketBuffer), ref text, ref pos);
                         }
 
                         var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        while (this._socket != null && socket.Connected)
+                        while (this.Socket != null && socket.Connected)
                         {
                             var newPos = text.FirstNewLine(pos);
                             if (newPos == pos)
@@ -60,7 +61,7 @@ namespace Microsoft.NodejsTools
                             else if (newPos == -1)
                             {
                                 // we need to get more data...
-                                ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
+                                ReadMoreData(socket.Receive(this.socketBuffer), ref text, ref pos);
                             }
                             else
                             {
@@ -88,7 +89,7 @@ namespace Microsoft.NodejsTools
                             {
                                 var bodyBuilder = new StringBuilder();
 
-                                while (this._socket != null && socket.Connected)
+                                while (this.Socket != null && socket.Connected)
                                 {
                                     var len = Math.Min(text.Length - pos, lengthRemaining);
                                     bodyBuilder.Append(Encoding.UTF8.GetString(text.Substring(pos, len)));
@@ -101,13 +102,13 @@ namespace Microsoft.NodejsTools
                                         break;
                                     }
 
-                                    ReadMoreData(socket.Receive(this._socketBuffer), ref text, ref pos);
+                                    ReadMoreData(socket.Receive(this.socketBuffer), ref text, ref pos);
                                 }
                                 body = bodyBuilder.ToString();
                             }
                         }
 
-                        if (this._socket != null && socket.Connected)
+                        if (this.Socket != null && socket.Connected)
                         {
                             try
                             {
@@ -126,7 +127,7 @@ namespace Microsoft.NodejsTools
             }
             finally
             {
-                Debug.Assert(this._socket == null || !this._socket.Connected);
+                Debug.Assert(this.Socket == null || !this.Socket.Connected);
                 if (socket != null && socket.Connected)
                 {
                     socket.Disconnect(false);
@@ -142,22 +143,12 @@ namespace Microsoft.NodejsTools
         {
             var combinedText = new byte[bytesRead + text.Length - pos];
             Buffer.BlockCopy(text, pos, combinedText, 0, text.Length - pos);
-            Buffer.BlockCopy(this._socketBuffer, 0, combinedText, text.Length - pos, bytesRead);
+            Buffer.BlockCopy(this.socketBuffer, 0, combinedText, text.Length - pos, bytesRead);
             text = combinedText;
             pos = 0;
         }
 
-        protected Socket Socket
-        {
-            get
-            {
-                return this._socket;
-            }
-            set
-            {
-                this._socket = value;
-            }
-        }
+        protected Socket Socket { get; set; }
     }
 
     internal static class ByteExtensions

@@ -541,13 +541,13 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                         {
                             case WaitOnAbnormalExitSetting:
                                 bool value;
-                                if (Boolean.TryParse(setting[1], out value) && value)
+                                if (bool.TryParse(setting[1], out value) && value)
                                 {
                                     debugOptions |= NodeDebugOptions.WaitOnAbnormalExit;
                                 }
                                 break;
                             case WaitOnNormalExitSetting:
-                                if (Boolean.TryParse(setting[1], out value) && value)
+                                if (bool.TryParse(setting[1], out value) && value)
                                 {
                                     debugOptions |= NodeDebugOptions.WaitOnNormalExit;
                                 }
