@@ -25,7 +25,9 @@
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.SaveFileLocationTitle}"
                            HelpText="{x:Static resx:ImportWizardResources.SaveFileLocationHelpText}"
                            Grid.Row="0">
-            <TextBox Grid.Column="0" Text="{Binding Path=ProjectName,Mode=TwoWay}" Name="ProjectNameTextBox" />
+            <TextBox Grid.Column="0" Text="{Binding Path=ProjectName,Mode=TwoWay}" Name="ProjectNameTextBox" 
+                     AutomationProperties.Name="{x:Static resx:ImportWizardResources.SaveFileLocationTitle}" 
+                     AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.SaveFileLocationHelpText}" />
         </wpf:LabelledControl>
     </Grid>
 </Page>

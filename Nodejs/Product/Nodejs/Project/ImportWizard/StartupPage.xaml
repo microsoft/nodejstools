@@ -34,26 +34,29 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding Path=SourcePath,Mode=TwoWay}" Name="SourcePathTextBox" />
-                <Button Grid.Column="1" Style="{StaticResource BrowseFolderButton}" CommandTarget="{Binding ElementName=SourcePathTextBox}" />
+                <TextBox Grid.Column="0" Text="{Binding Path=SourcePath,Mode=TwoWay}" Name="SourcePathTextBox" 
+                         AutomationProperties.Name="{x:Static resx:ImportWizardResources.SelectNodeCodeTitle}" 
+                         AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.SelectNodeCodeHelpText}"/>
+                <Button Grid.Column="1" Style="{StaticResource BrowseFolderButton}" CommandTarget="{Binding ElementName=SourcePathTextBox}" 
+                        AutomationProperties.Name="{x:Static resx:ImportWizardResources.BrowseNodeCodeAccessibleName}"/>
             </Grid>
         </wpf:LabelledControl>
 
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.LanguageTitle}"
                              Grid.Row="1">
-            <StackPanel Margin="3">
+            <StackPanel Margin="3" AutomationProperties.Name="{x:Static resx:ImportWizardResources.LanguageTitle}">
                 <RadioButton Name="JavaScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
-                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}">
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}" AutomationProperties.LabeledBy="{Binding ElementName=JavaScriptLabel}">
                     <StackPanel>
-                        <TextBlock>JavaScript</TextBlock>
+                        <TextBlock Name="JavaScriptLabel">JavaScript</TextBlock>
                         <TextBlock Text="{x:Static resx:ImportWizardResources.JavaScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
                     </StackPanel>
                 </RadioButton>
 
                 <RadioButton Name="TypeScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
-                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}">
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}" AutomationProperties.LabeledBy="{Binding ElementName=TypeScriptLabel}">
                     <StackPanel>
-                        <TextBlock>TypeScriptScript</TextBlock>
+                        <TextBlock Name="TypeScriptLabel">TypeScript</TextBlock>
                         <TextBlock Text="{x:Static resx:ImportWizardResources.TypeScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
                     </StackPanel>
                 </RadioButton>
@@ -63,7 +66,9 @@
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.FileFilterTitle}"
                            HelpText="{x:Static resx:ImportWizardResources.FileFilterHelpText}"
                            Grid.Row="2">
-            <TextBox Text="{Binding Path=Filters,Mode=TwoWay}" />
+            <TextBox Text="{Binding Path=Filters,Mode=TwoWay}" 
+                     AutomationProperties.Name="{x:Static resx:ImportWizardResources.FileFilterTitle}" 
+                     AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.FileFilterHelpText}" />
         </wpf:LabelledControl>
     </Grid>
 </Page>

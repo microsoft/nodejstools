@@ -70,6 +70,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse to the folder containing your Node.js code.
+        /// </summary>
+        public static string BrowseNodeCodeAccessibleName {
+            get {
+                return ResourceManager.GetString("BrowseNodeCodeAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Cancel.
         /// </summary>
         public static string CancelButtonLabel {

@@ -120,6 +120,9 @@
   <data name="BackButtonLabel" xml:space="preserve">
     <value>_Back</value>
   </data>
+  <data name="BrowseNodeCodeAccessibleName" xml:space="preserve">
+    <value>Browse to the folder containing your Node.js code</value>
+  </data>
   <data name="CancelButtonLabel" xml:space="preserve">
     <value>_Cancel</value>
   </data>

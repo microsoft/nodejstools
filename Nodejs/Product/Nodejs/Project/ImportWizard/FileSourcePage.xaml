@@ -9,12 +9,11 @@
       xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
-      Title="{x:Static resx:ImportWizardResources.SourceFilesPageTitle}"
-      FocusManager.FocusedElement="{Binding ElementName=SourcePathTextBox}">
+      Title="{x:Static resx:ImportWizardResources.SourceFilesPageTitle}">
     <Page.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
     </Page.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -29,7 +28,9 @@
                       SelectionMode="Single"
                       SelectedItem="{Binding StartupFile,Mode=TwoWay}"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      AutomationProperties.Name="{x:Static resx:ImportWizardResources.F5FileSelectTitle}"
+                      AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.F5FileSelectHelpText}">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Vertical" />
