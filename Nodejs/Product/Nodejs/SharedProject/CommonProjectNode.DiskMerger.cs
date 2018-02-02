@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
@@ -22,41 +25,56 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private sealed class DiskMerger
         {
-            private readonly Stack<DirState> remainingDirs = new Stack<DirState>();
+            private readonly ConcurrentStack<(string Name, HierarchyNode Parent)> remainingDirs = new ConcurrentStack<(string, HierarchyNode)>();
             private readonly CommonProjectNode project;
 
             public DiskMerger(CommonProjectNode project, HierarchyNode parent, string dir)
             {
                 this.project = project;
-                this.remainingDirs.Push(new DirState(dir, parent));
+                this.remainingDirs.Push((dir, parent));
             }
 
             /// <summary>
             /// Continues processing the merge request, performing a portion of the full merge possibly
             /// returning before the merge has completed.
-            /// 
-            /// Returns true if the merge needs to continue, or false if the merge has completed.
             /// </summary>
-            public bool ContinueMerge(bool hierarchyCreated)
+            /// <returns>Returns true if the merge needs to continue, or false if the merge has completed.</returns>
+            public async Task<bool> ContinueMergeAsync(bool hierarchyCreated)
             {
                 if (this.remainingDirs.Count == 0)
                 {
                     // all done
-                    this.project.BoldStartupItem();
+                    await this.InvokeOnUIThread(this.project.BoldStartupItem);
                     return false;
                 }
 
-                var dir = this.remainingDirs.Pop();
-                if (!Directory.Exists(dir.Name))
+                if (!this.remainingDirs.TryPop(out var dir) || !Directory.Exists(dir.Name))
                 {
                     return true;
                 }
 
+                return await this.InvokeOnUIThread(() => this.ContinueMergeAsyncWorker(dir, hierarchyCreated));
+            }
+
+            private async Task<bool> ContinueMergeAsyncWorker((string Name, HierarchyNode Parent) dir, bool hierarchyCreated)
+            {
                 var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
                 var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
+
+                var thread = this.project.Site.GetUIThread();
+
                 try
                 {
-                    foreach (var curDir in Directory.EnumerateDirectories(dir.Name))
+                    // enumerate disk on worker thread 
+                    var folders = await Task.Run(() =>
+                    {
+                        thread.MustNotBeCalledFromUIThread();
+                        return Directory.GetDirectories(dir.Name, "*", SearchOption.TopDirectoryOnly);
+                    }).ConfigureAwait(true);
+
+                    thread.MustBeCalledFromUIThread();
+
+                    foreach (var curDir in folders)
                     {
                         if (this.project.IsFileHidden(curDir))
                         {
@@ -74,9 +92,16 @@ namespace Microsoft.VisualStudioTools.Project
                             this.project.CreateSymLinkWatcher(curDir);
                         }
 
-                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                        missingChildren.Remove(existing);
-                        this.remainingDirs.Push(new DirState(curDir, existing));
+                        var existing = this.project.FindNodeByFullPath(curDir);
+                        if (existing == null)
+                        {
+                            existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
+                        }
+                        else
+                        {
+                            missingChildren.Remove(existing);
+                        }
+                        this.remainingDirs.Push((curDir, existing));
                     }
                 }
                 catch
@@ -87,14 +112,35 @@ namespace Microsoft.VisualStudioTools.Project
 
                 try
                 {
-                    foreach (var file in Directory.EnumerateFiles(dir.Name))
+                    var newFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    var files = await Task.Run(() =>
+                    {
+                        thread.MustNotBeCalledFromUIThread();
+                        return Directory.GetFiles(dir.Name, "*", SearchOption.TopDirectoryOnly);
+                    }).ConfigureAwait(true);
+
+                    thread.MustBeCalledFromUIThread();
+
+                    foreach (var file in files)
                     {
                         if (this.project.IsFileHidden(file))
                         {
                             continue;
                         }
-                        missingChildren.Remove(this.project.AddAllFilesFile(dir.Parent, file));
+
+                        var existing = this.project.FindNodeByFullPath(file);
+                        if (existing == null)
+                        {
+                            newFiles.Add(file);
+                        }
+                        else
+                        {
+                            missingChildren.Remove(existing);
+                        }
                     }
+
+                    AddNewFiles(dir.Parent, newFiles);
                 }
                 catch
                 {
@@ -110,13 +156,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 // remove the excluded children which are no longer there
-                foreach (var child in missingChildren)
-                {
-                    if (child.ItemNode.IsExcluded)
-                    {
-                        this.project.RemoveSubTree(child);
-                    }
-                }
+                this.RemoveMissingChildren(missingChildren);
 
                 if (hierarchyCreated)
                 {
@@ -126,16 +166,37 @@ namespace Microsoft.VisualStudioTools.Project
                 return true;
             }
 
-            private struct DirState
+            private void RemoveMissingChildren(HashSet<HierarchyNode> children)
             {
-                public readonly string Name;
-                public readonly HierarchyNode Parent;
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
 
-                public DirState(string name, HierarchyNode parent)
+                foreach (var child in children)
                 {
-                    this.Name = name;
-                    this.Parent = parent;
+                    if (child.ItemNode.IsExcluded)
+                    {
+                        this.project.RemoveSubTree(child);
+                    }
                 }
+            }
+
+            private void AddNewFiles(HierarchyNode parent, HashSet<string> newFiles)
+            {
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+
+                foreach (var file in newFiles)
+                {
+                    this.project.AddAllFilesFile(parent, file);
+                }
+            }
+
+            private Task InvokeOnUIThread(Action action)
+            {
+                return this.project.Site.GetUIThread().InvokeAsync(action);
+            }
+
+            private Task<T> InvokeOnUIThread<T>(Func<Task<T>> func)
+            {
+                return this.project.Site.GetUIThread().InvokeTask(func);
             }
         }
     }

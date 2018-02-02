@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudioTools.Project
@@ -13,14 +14,14 @@ namespace Microsoft.VisualStudioTools.Project
         /// Represents an individual change to the file system.  We process these in bulk on the
         /// UI thread.
         /// </summary>
-        [DebuggerDisplay("{nameof(FileSystemChange)}: {isRename} {Type} {path}")]
+        [DebuggerDisplay("FileSystemChange: {isRename} {Type} {path}")]
         private sealed class FileSystemChange
         {
             private readonly CommonProjectNode project;
             private readonly string path;
             private readonly bool isRename;
 
-            internal readonly WatcherChangeTypes Type;
+            public readonly WatcherChangeTypes Type;
 
             public FileSystemChange(CommonProjectNode project, WatcherChangeTypes changeType, string path, bool isRename = false)
             {
@@ -40,8 +41,10 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            public void ProcessChange()
+            public async Task ProcessChangeAsync()
             {
+                this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+
                 var child = this.project.FindNodeByFullPath(this.path);
                 if ((this.Type == WatcherChangeTypes.Deleted || this.Type == WatcherChangeTypes.Changed) && child == null)
                 {
@@ -53,8 +56,6 @@ namespace Microsoft.VisualStudioTools.Project
                         ChildDeleted(child);
                         break;
                     case WatcherChangeTypes.Created:
-                        ChildCreated(child);
-                        break;
                     case WatcherChangeTypes.Changed:
                         // we only care about the attributes
                         if (this.project.IsFileHidden(this.path))
@@ -67,11 +68,9 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                         else
                         {
-                            if (child == null)
-                            {
-                                // attributes must have changed from hidden, add the file
-                                ChildCreated(child);
-                            }
+                            // either a new or attributes have changed
+                            // add the file
+                            await ChildCreatedAsync(child);
                         }
                         break;
                 }
@@ -100,7 +99,6 @@ namespace Microsoft.VisualStudioTools.Project
                 if (child != null)
                 {
                     this.project.TryDeactivateSymLinkWatcher(child);
-                    this.project.Site.GetUIThread().MustBeCalledFromUIThread();
 
                     // rapid changes can arrive out of order, if the file or directory 
                     // actually exists ignore the event.
@@ -134,7 +132,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 
-            private void ChildCreated(HierarchyNode child)
+            private async Task ChildCreatedAsync(HierarchyNode child)
             {
                 if (child != null)
                 {
@@ -181,7 +179,11 @@ namespace Microsoft.VisualStudioTools.Project
                         var folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                         // then add the folder nodes
-                        this.project.MergeDiskNodes(folderNode, this.path);
+                        await this.project.MergeDiskNodesAsync(folderNode, this.path).ConfigureAwait(true);
+
+                        // Assert we're back on the UI thread
+                        this.project.Site.GetUIThread().MustBeCalledFromUIThread();
+                        
                         this.project.OnInvalidateItems(folderNode);
 
                         folderNode.ExpandItem(folderNodeWasExpanded ? EXPANDFLAGS.EXPF_ExpandFolder : EXPANDFLAGS.EXPF_CollapseFolder);

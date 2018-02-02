@@ -498,4 +498,10 @@
   <data name="4008" xml:space="preserve">
     <value>A TypeScript Jasmine UnitTest file</value>
   </data>
+  <data name="4009" xml:space="preserve">
+    <value>JavaScript JSON Configuration File</value>
+  </data>
+  <data name="4010" xml:space="preserve">
+    <value>JSON configuration file for the JavaScript Language Service</value>
+  </data>
 </root>
