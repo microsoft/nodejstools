@@ -86,8 +86,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var hierarchy = new IVsHierarchy[1];
             while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out var fetched)) && fetched == 1)
             {
-                var project = hierarchy[0] as IVsProject;
-                if (project != null)
+                if (hierarchy[0] is IVsProject project)
                 {
                     yield return project;
                 }

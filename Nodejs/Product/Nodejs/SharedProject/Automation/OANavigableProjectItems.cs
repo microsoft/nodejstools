@@ -161,8 +161,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                         {
                             continue;
                         }
-                        var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                        if (item != null)
+                        if (child.GetAutomationObject() is EnvDTE.ProjectItem item)
                         {
                             if (realIndex == 0)
                             {
@@ -182,8 +181,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     {
                         continue;
                     }
-                    var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                    if (item != null && StringComparer.OrdinalIgnoreCase.Equals(item.Name, name))
+                    if (child.GetAutomationObject() is EnvDTE.ProjectItem item && StringComparer.OrdinalIgnoreCase.Equals(item.Name, name))
                     {
                         return item;
                     }
@@ -204,8 +202,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     continue;
                 }
-                var item = child.GetAutomationObject() as EnvDTE.ProjectItem;
-                if (item != null)
+                if (child.GetAutomationObject() is EnvDTE.ProjectItem item)
                 {
                     yield return item;
                 }

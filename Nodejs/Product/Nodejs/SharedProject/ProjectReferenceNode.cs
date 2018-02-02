@@ -453,8 +453,7 @@ namespace Microsoft.VisualStudioTools.Project
             // TODO: This has got to be wrong, it doesn't work w/ other project types.
             var hierarchy = VsShellUtilities.GetHierarchy(this.ProjectMgr.Site, projectGuid);
 
-            var provider = hierarchy.GetProject().GetCommonProject() as IReferenceContainerProvider;
-            if (provider != null)
+            if (hierarchy.GetProject().GetCommonProject() is IReferenceContainerProvider provider)
             {
                 var referenceContainer = provider.GetReferenceContainer();
 
@@ -462,8 +461,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                 foreach (var refNode in referenceContainer.EnumReferences())
                 {
-                    var projRefNode = refNode as ProjectReferenceNode;
-                    if (projRefNode != null)
+                    if (refNode is ProjectReferenceNode projRefNode)
                     {
                         if (projRefNode.ReferencedProjectGuid == this.ProjectMgr.ProjectIDGuid)
                         {

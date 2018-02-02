@@ -67,8 +67,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return;
             }
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 // Do not throw here in case of error, simply skip the registration.
                 rdt.AdviseRunningDocTableEvents(this, out this._runningDocTableCookie);
@@ -81,8 +80,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return;
             }
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 // Do not throw in case of error.
                 rdt.UnadviseRunningDocTableEvents(this._runningDocTableCookie);
@@ -377,8 +375,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if ((grfAttribs & (uint)(__VSRDTATTRIB.RDTA_MkDocument)) == (uint)__VSRDTATTRIB.RDTA_MkDocument)
             {
-                var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-                if (rdt != null)
+                if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
                 {
                     var docData = IntPtr.Zero;
                     int hr;
@@ -425,8 +422,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 return VSConstants.S_OK;
             }
             // Get the information about this document from the RDT.
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 var hr = rdt.GetDocumentInfo(docCookie, out var flags, out var readLocks, out var writeLoks,
                                              out var documentMoniker, out var hierarchy, out var itemId, out var unkDocData);
@@ -532,8 +528,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Remove this library from the object manager.
             if (0 != this._objectManagerCookie)
             {
-                var mgr = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
-                if (null != mgr)
+                if (GetPackageService(typeof(SVsObjectManager)) is IVsObjectManager2 mgr)
                 {
                     mgr.UnregisterLibrary(this._objectManagerCookie);
                 }

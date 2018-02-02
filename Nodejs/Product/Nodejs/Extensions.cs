@@ -35,8 +35,7 @@ namespace Microsoft.NodejsTools
             var hierarchy = new IVsHierarchy[1];
             while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out var fetched)) && fetched == 1)
             {
-                var project = hierarchy[0] as IVsProject;
-                if (project != null)
+                if (hierarchy[0] is IVsProject project)
                 {
                     yield return project;
                 }
@@ -45,9 +44,8 @@ namespace Microsoft.NodejsTools
 
         internal static IEnumerable<uint> EnumerateProjectItems(this IVsProject project)
         {
-            var enumHierarchyItemsFactory = Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) as IVsEnumHierarchyItemsFactory;
             var hierarchy = (IVsHierarchy)project;
-            if (enumHierarchyItemsFactory != null && project != null)
+            if (Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) is IVsEnumHierarchyItemsFactory enumHierarchyItemsFactory && project != null)
             {
                 if (ErrorHandler.Succeeded(
                     enumHierarchyItemsFactory.EnumHierarchyItems(

@@ -26,11 +26,9 @@ namespace Microsoft.NodejsTools.Commands
             var dlg = new Microsoft.NodejsTools.Project.ImportWizard.ImportWizard();
             var commandIdToRaise = (int)VSConstants.VSStd97CmdID.OpenProject;
 
-            var oleArgs = args as Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs;
-            if (oleArgs != null)
+            if (args is Microsoft.VisualStudio.Shell.OleMenuCmdEventArgs oleArgs)
             {
-                var projectArgs = oleArgs.InValue as string;
-                if (projectArgs != null)
+                if (oleArgs.InValue is string projectArgs)
                 {
                     var argItems = projectArgs.Split('|');
                     if (argItems.Length == 3)

@@ -36,9 +36,8 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             var uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-            var serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
 
-            if (serviceProvider != null && uiShellOpenDocument != null)
+            if (this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) is IOleServiceProvider serviceProvider && uiShellOpenDocument != null)
             {
                 var fullPath = this.GetFullPathForDocument();
                 var caption = this.GetOwnerCaption();

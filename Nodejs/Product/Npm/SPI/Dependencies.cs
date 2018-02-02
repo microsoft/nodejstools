@@ -16,8 +16,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this._dependencyProperties = new List<Dependency>();
             foreach (var propertyName in dependencyPropertyNames)
             {
-                var dependencies = package[propertyName] as JObject;
-                if (dependencies != null)
+                if (package[propertyName] is JObject dependencies)
                 {
                     foreach (var property in dependencies.Properties())
                     {

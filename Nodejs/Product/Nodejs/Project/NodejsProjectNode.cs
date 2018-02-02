@@ -432,8 +432,7 @@ namespace Microsoft.NodejsTools.Project
 
         protected override bool IncludeNonMemberItemInProject(HierarchyNode node)
         {
-            var fileNode = node as NodejsFileNode;
-            if (fileNode != null)
+            if (node is NodejsFileNode fileNode)
             {
                 return IncludeNodejsFile(fileNode);
             }

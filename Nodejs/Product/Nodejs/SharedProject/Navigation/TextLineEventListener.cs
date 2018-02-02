@@ -21,8 +21,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             this._buffer = buffer;
             this._fileId = id;
             this._fileName = fileName;
-            var container = buffer as IConnectionPointContainer;
-            if (null != container)
+            if (buffer is IConnectionPointContainer container)
             {
                 var eventsGuid = typeof(IVsTextLinesEvents).GUID;
                 container.FindConnectionPoint(ref eventsGuid, out this._connectionPoint);

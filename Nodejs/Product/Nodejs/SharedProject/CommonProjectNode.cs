@@ -879,8 +879,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.projectDocListenerForStartupFileUpdates = null;
             }
 
-            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
-            if (null != libraryManager)
+            if (this.Site.GetService(GetLibraryManagerType()) is LibraryManager libraryManager)
             {
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
@@ -894,8 +893,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             base.Load(filename, location, name, flags, ref iidProject, out canceled);
 
-            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
-            if (null != libraryManager)
+            if (this.Site.GetService(GetLibraryManagerType()) is LibraryManager libraryManager)
             {
                 libraryManager.RegisterHierarchy(this.InteropSafeHierarchy);
             }
@@ -1441,8 +1439,7 @@ namespace Microsoft.VisualStudioTools.Project
                         );
                     }
 
-                    var diskNode = child as IDiskBasedNode;
-                    if (diskNode != null)
+                    if (child is IDiskBasedNode diskNode)
                     {
                         diskNode.RenameForDeferredSave(basePath, baseNewPath);
                     }

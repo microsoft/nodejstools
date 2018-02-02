@@ -175,8 +175,7 @@ namespace Microsoft.VisualStudioTools.Project
             var refs = new List<ReferenceNode>();
             for (var node = this.FirstChild; node != null; node = node.NextSibling)
             {
-                var refNode = node as ReferenceNode;
-                if (refNode != null)
+                if (node is ReferenceNode refNode)
                 {
                     refs.Add(refNode);
                 }

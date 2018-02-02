@@ -131,8 +131,7 @@ namespace Microsoft.VisualStudioTools.Project
             Utilities.ArgumentNotNull(nameof(flavoredCfg), this.flavoredCfg);
 
             // if the flavored object support XML fragment, initialize it
-            var persistXML = this.flavoredCfg as IPersistXMLFragment;
-            if (null != persistXML)
+            if (this.flavoredCfg is IPersistXMLFragment persistXML)
             {
                 this.project.LoadXmlFragment(persistXML, this.configName, this.platformName);
             }

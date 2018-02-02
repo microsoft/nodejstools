@@ -20,8 +20,7 @@ namespace Microsoft.VisualStudioTools.Project
             // If this is our project, notify it that it has been opened.
             if (hierarchy.GetProject() != null)
             {
-                var oaProject = hierarchy.GetProject() as OAProject;
-                if (oaProject != null && oaProject.Project is ProjectNode)
+                if (hierarchy.GetProject() is OAProject oaProject && oaProject.Project is ProjectNode)
                 {
                     ((ProjectNode)oaProject.Project).OnAfterProjectOpen();
                 }

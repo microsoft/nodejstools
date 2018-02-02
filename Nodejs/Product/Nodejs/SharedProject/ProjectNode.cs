@@ -1001,9 +1001,8 @@ namespace Microsoft.VisualStudioTools.Project
                     SetBuildProject(null);
                 }
 
-                var logger = this.BuildLogger as IDisposable;
                 this.BuildLogger = null;
-                if (logger != null)
+                if (this.BuildLogger is IDisposable logger)
                 {
                     logger.Dispose();
                 }
@@ -1314,8 +1313,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>S_OK if succeeded. Failure otherwise</returns>
         public int AddProjectReference()
         {
-            var referenceManager = this.GetService(typeof(SVsReferenceManager)) as IVsReferenceManager;
-            if (referenceManager != null)
+            if (this.GetService(typeof(SVsReferenceManager)) is IVsReferenceManager referenceManager)
             {
                 var contextGuids = new[] {
                     VSConstants.ProjectReferenceProvider_Guid,
@@ -1700,8 +1698,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.taskProvider.Tasks.Clear();
             }
 
-            var autoObject = GetAutomationObject() as Automation.OAProject;
-            if (autoObject != null)
+            if (GetAutomationObject() is Automation.OAProject autoObject)
             {
                 autoObject.Dispose();
             }
@@ -2198,8 +2195,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (ErrorHandler.Succeeded(ParseCanonicalName(strFullPath, out var uiItemId)) &&
                 uiItemId != 0)
             {
-                var folder = this.NodeFromItemId(uiItemId) as FolderNode;
-                if (folder != null)
+                if (this.NodeFromItemId(uiItemId) is FolderNode folder)
                 {
                     // found the folder, return immediately
                     return folder;
@@ -2587,9 +2583,8 @@ namespace Microsoft.VisualStudioTools.Project
                 var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
                 logger.ErrorString = this.ErrorString;
                 logger.WarningString = this.WarningString;
-                var oldLogger = this.BuildLogger as IDisposable;
                 this.BuildLogger = logger;
-                if (oldLogger != null)
+                if (this.BuildLogger is IDisposable oldLogger)
                 {
                     oldLogger.Dispose();
                 }
@@ -3544,8 +3539,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                var queryEditQuerySave = this.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
-                if (queryEditQuerySave != null)
+                if (this.GetService(typeof(SVsQueryEditQuerySave)) is IVsQueryEditQuerySave2 queryEditQuerySave)
                 {
                     var qef = tagVSQueryEditFlags.QEF_AllowInMemoryEdits;
                     if (suppressUI)
@@ -3608,8 +3602,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (!this.disableQueryEdit)
             {
-                var queryTrack = this.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
-                if (queryTrack != null)
+                if (this.GetService(typeof(SVsTrackProjectDocuments)) is IVsTrackProjectDocuments2 queryTrack)
                 {
                     var res = new VSQUERYADDDIRECTORYRESULTS[1];
                     ErrorHandler.ThrowOnFailure(
@@ -3636,8 +3629,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (!this.disableQueryEdit)
             {
-                var queryTrack = this.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
-                if (queryTrack != null)
+                if (this.GetService(typeof(SVsTrackProjectDocuments)) is IVsTrackProjectDocuments2 queryTrack)
                 {
                     var res = new VSQUERYREMOVEDIRECTORYRESULTS[1];
                     ErrorHandler.ThrowOnFailure(
@@ -3771,9 +3763,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            var sccManager = this.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
 
-            if (sccManager != null)
+            if (this.Site.GetService(typeof(SVsSccManager)) is IVsSccManager2 sccManager)
             {
                 ErrorHandler.ThrowOnFailure(sccManager.RegisterSccProject(this, this.sccProjectName, this.sccAuxPath, this.sccLocalPath, this.sccProvider));
 
@@ -3791,9 +3782,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            var sccManager = this.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
 
-            if (sccManager != null)
+            if (this.Site.GetService(typeof(SVsSccManager)) is IVsSccManager2 sccManager)
             {
                 ErrorHandler.ThrowOnFailure(sccManager.UnregisterSccProject(this));
                 this.isRegisteredWithScc = false;
@@ -4910,8 +4900,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return VSConstants.E_FAIL;
             }
 
-            var parentProject = parent as ProjectNode;
-            var destDirectory = parentProject != null ? parentProject.ProjectHome : parent.Url;
+            var destDirectory = parent is ProjectNode parentProject ? parentProject.ProjectHome : parent.Url;
 
             for (var count = 1; count < int.MaxValue; ++count)
             {
@@ -5981,8 +5970,7 @@ If the files in the existing folder have the same names as files in the folder y
             string solutionFile = null;
             string userOptionsFile = null;
 
-            var solution = this.Site.GetService(typeof(SVsSolution)) as IVsSolution;
-            if (solution != null)
+            if (this.Site.GetService(typeof(SVsSolution)) is IVsSolution solution)
             {
                 // We do not want to throw. If we cannot set the solution related constants we set them to empty string.
                 solution.GetSolutionInfo(out solutionDirectory, out solutionFile, out userOptionsFile);
@@ -6016,8 +6004,7 @@ If the files in the existing folder have the same names as files in the folder y
             // DevEnvDir property
             object installDirAsObject = null;
 
-            var shell = this.Site.GetService(typeof(SVsShell)) as IVsShell;
-            if (shell != null)
+            if (this.Site.GetService(typeof(SVsShell)) is IVsShell shell)
             {
                 // We do not want to throw. If we cannot set the solution related constants we set them to empty string.
                 shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
