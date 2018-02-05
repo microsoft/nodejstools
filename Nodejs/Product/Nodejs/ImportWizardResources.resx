@@ -141,6 +141,12 @@
   <data name="FinishButtonLabel" xml:space="preserve">
     <value>_Finish</value>
   </data>
+  <data name="FromExistingJavaScriptAccessibleName" xml:space="preserve">
+    <value>Created project targets JavaScript.</value>
+  </data>
+  <data name="FromExistingTypeScriptAccessibleName" xml:space="preserve">
+    <value>Created project targets TypeScript.</value>
+  </data>
   <data name="JavaScriptHelpText" xml:space="preserve">
     <value>Files with a '.js', or a '.jsx' extension, and 'jsconfig.json' are automatically included.</value>
   </data>

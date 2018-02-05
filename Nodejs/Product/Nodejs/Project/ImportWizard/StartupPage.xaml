@@ -42,11 +42,12 @@
             </Grid>
         </wpf:LabelledControl>
 
-        <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.LanguageTitle}"
-                             Grid.Row="1">
-            <StackPanel Margin="3" AutomationProperties.Name="{x:Static resx:ImportWizardResources.LanguageTitle}">
+        <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.LanguageTitle}" Grid.Row="1">
+            <StackPanel Margin="3">
                 <RadioButton Name="JavaScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
-                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}" AutomationProperties.LabeledBy="{Binding ElementName=JavaScriptLabel}">
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}" 
+                             AutomationProperties.Name="{x:Static resx:ImportWizardResources.FromExistingJavaScriptAccessibleName}"
+                             AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.JavaScriptHelpText}">
                     <StackPanel>
                         <TextBlock Name="JavaScriptLabel">JavaScript</TextBlock>
                         <TextBlock Text="{x:Static resx:ImportWizardResources.JavaScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
@@ -54,7 +55,9 @@
                 </RadioButton>
 
                 <RadioButton Name="TypeScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
-                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}" AutomationProperties.LabeledBy="{Binding ElementName=TypeScriptLabel}">
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}" 
+                             AutomationProperties.Name="{x:Static resx:ImportWizardResources.FromExistingTypeScriptAccessibleName}"
+                             AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.TypeScriptHelpText}">
                     <StackPanel>
                         <TextBlock Name="TypeScriptLabel">TypeScript</TextBlock>
                         <TextBlock Text="{x:Static resx:ImportWizardResources.TypeScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />

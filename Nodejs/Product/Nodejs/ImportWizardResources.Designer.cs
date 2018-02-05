@@ -133,6 +133,24 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created project targets JavaScript..
+        /// </summary>
+        public static string FromExistingJavaScriptAccessibleName {
+            get {
+                return ResourceManager.GetString("FromExistingJavaScriptAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created project targets TypeScript..
+        /// </summary>
+        public static string FromExistingTypeScriptAccessibleName {
+            get {
+                return ResourceManager.GetString("FromExistingTypeScriptAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Files with a &apos;.js&apos;, or a &apos;.jsx&apos; extension, and &apos;jsconfig.json&apos; are automatically included..
         /// </summary>
         public static string JavaScriptHelpText {
