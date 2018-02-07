@@ -1881,7 +1881,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
-            var prop = this.userBuildProject.GetProperty(propertyName);
+            var prop = this.userBuildProject?.GetProperty(propertyName);
             if (prop != null)
             {
                 this.buildProject.SetProperty(prop.Name, prop.UnevaluatedValue);
