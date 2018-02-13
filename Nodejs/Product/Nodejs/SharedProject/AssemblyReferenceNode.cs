@@ -209,8 +209,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             for (var n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
             {
-                var assemblyRefererenceNode = n as AssemblyReferenceNode;
-                if (null != assemblyRefererenceNode)
+                if (n is AssemblyReferenceNode assemblyRefererenceNode)
                 {
                     // We will check if the full assemblynames are the same or if the Url of the assemblies is the same.
                     if (StringComparer.OrdinalIgnoreCase.Equals(assemblyRefererenceNode.AssemblyName.FullName, this.assemblyName.FullName) ||

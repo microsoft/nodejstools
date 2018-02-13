@@ -120,9 +120,8 @@ namespace Microsoft.NodejsTools.Jade
         {
             if (!IsDisposed())
             {
-                var result = backgroundProcessingResult as OutlineRegionsChange;
 
-                if (result != null && TextRange.IsValid(result.ChangedRange))
+                if (backgroundProcessingResult is OutlineRegionsChange result && TextRange.IsValid(result.ChangedRange))
                 {
                     lock (this._regionsLock)
                     {

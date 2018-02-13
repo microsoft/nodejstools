@@ -91,12 +91,10 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            var vsExtensibility = this._project.GetService(typeof(IVsExtensibility)) as IVsExtensibility3;
-            if (vsExtensibility != null)
+            if (this._project.GetService(typeof(IVsExtensibility)) is IVsExtensibility3 vsExtensibility)
             {
                 var obj = node.GetAutomationObject();
-                var item = obj as ProjectItem;
-                if (item != null)
+                if (obj is ProjectItem item)
                 {
                     fire(vsExtensibility, item);
                 }

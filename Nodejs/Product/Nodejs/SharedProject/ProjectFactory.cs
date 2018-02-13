@@ -407,8 +407,7 @@ namespace Microsoft.VisualStudioTools.Project
                     //}
                 }
 
-                var queryEdit = this.site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
-                if (queryEdit != null)
+                if (this.site.GetService(typeof(SVsQueryEditQuerySave)) is IVsQueryEditQuerySave2 queryEdit)
                 {
                     var tagVSQueryEditFlags_QEF_AllowUnopenedProjects = (tagVSQueryEditFlags)0x80;
 

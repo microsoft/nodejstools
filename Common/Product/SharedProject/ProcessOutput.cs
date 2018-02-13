@@ -843,8 +843,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     this.process.Dispose();
                 }
-                var disp = this.redirector as IDisposable;
-                if (disp != null)
+                if (this.redirector is IDisposable disp)
                 {
                     disp.Dispose();
                 }

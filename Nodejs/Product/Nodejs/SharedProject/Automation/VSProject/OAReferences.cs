@@ -194,8 +194,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 {
                     continue;
                 }
-                Reference reference = refNode.Object as Reference;
-                if (null != reference)
+                if (refNode.Object is Reference reference)
                 {
                     references.Add(reference);
                 }
@@ -210,8 +209,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            string stringIndex = index as string;
-            if (null != stringIndex)
+            if (index is string stringIndex)
             {
                 return FindByName(stringIndex);
             }
@@ -271,8 +269,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
 
             // Check that the removed item implements the Reference interface.
-            Reference reference = args.Child.Object as Reference;
-            if (null != reference)
+            if (args.Child.Object is Reference reference)
             {
                 ReferenceAdded(reference);
             }
@@ -294,8 +291,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
             }
 
             // Check that the removed item implements the Reference interface.
-            Reference reference = args.Child.Object as Reference;
-            if (null != reference)
+            if (args.Child.Object is Reference reference)
             {
                 ReferenceRemoved(reference);
             }

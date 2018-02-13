@@ -724,8 +724,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>Whether succeeded</returns>
         public static bool SaveDirtyFiles()
         {
-            var rdt = ServiceProvider.GlobalProvider.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (rdt != null)
+            if (ServiceProvider.GlobalProvider.GetService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 // Consider using (uint)(__VSRDTSAVEOPTIONS.RDTSAVEOPT_SaveIfDirty | __VSRDTSAVEOPTIONS.RDTSAVEOPT_PromptSave)
                 // when VS settings include prompt for save on build

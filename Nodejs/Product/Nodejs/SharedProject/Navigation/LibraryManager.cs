@@ -48,7 +48,6 @@ namespace Microsoft.VisualStudioTools.Navigation
             RegisterLibrary();
         }
 
-        public Library Library => this._library;
         protected abstract LibraryNode CreateLibraryNode(LibraryNode parent, IScopeNode subItem, string namePrefix, IVsHierarchy hierarchy, uint itemid);
 
         public virtual LibraryNode CreateFileLibraryNode(LibraryNode parent, HierarchyNode hierarchy, string name, string filename, LibraryNodeType libraryNodeType)
@@ -67,8 +66,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return;
             }
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 // Do not throw here in case of error, simply skip the registration.
                 rdt.AdviseRunningDocTableEvents(this, out this._runningDocTableCookie);
@@ -81,8 +79,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             {
                 return;
             }
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 // Do not throw in case of error.
                 rdt.UnadviseRunningDocTableEvents(this._runningDocTableCookie);
@@ -205,10 +202,10 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             try
             {
-                var project = task.ModuleID.Hierarchy.GetProject().GetCommonProject();
+                var project = task.ModuleId.Hierarchy.GetProject().GetCommonProject();
 
-                HierarchyNode fileNode = fileNode = project.NodeFromItemId(task.ModuleID.ItemID);
-                if (fileNode == null || !this._hierarchies.TryGetValue(task.ModuleID.Hierarchy, out var parent))
+                HierarchyNode fileNode = fileNode = project.NodeFromItemId(task.ModuleId.ItemId);
+                if (fileNode == null || !this._hierarchies.TryGetValue(task.ModuleId.Hierarchy, out var parent))
                 {
                     return;
                 }
@@ -227,26 +224,26 @@ namespace Microsoft.VisualStudioTools.Navigation
                 // finer grained and only update the changed nodes.  But then we
                 // need to make sure we're not mutating lists which are handed out.
 
-                CreateModuleTree(module, scope, task.FileName + ":", task.ModuleID);
-                if (null != task.ModuleID)
+                CreateModuleTree(module, scope, task.FileName + ":", task.ModuleId);
+                if (null != task.ModuleId)
                 {
                     LibraryNode previousItem = null;
                     lock (this._files)
                     {
-                        if (this._files.TryGetValue(task.ModuleID, out previousItem))
+                        if (this._files.TryGetValue(task.ModuleId, out previousItem))
                         {
-                            this._files.Remove(task.ModuleID);
+                            this._files.Remove(task.ModuleId);
                             parent.ProjectLibraryNode.RemoveNode(previousItem);
                         }
                     }
                 }
                 parent.ProjectLibraryNode.AddNode(module);
                 this._library.Update();
-                if (null != task.ModuleID)
+                if (null != task.ModuleId)
                 {
                     lock (this._files)
                     {
-                        this._files.Add(task.ModuleID, module);
+                        this._files.Add(task.ModuleId, module);
                     }
                 }
             }
@@ -265,7 +262,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
             foreach (var subItem in scope.NestedScopes)
             {
-                var newNode = CreateLibraryNode(current, subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemID);
+                var newNode = CreateLibraryNode(current, subItem, namePrefix, moduleId.Hierarchy, moduleId.ItemId);
                 var newNamePrefix = namePrefix;
 
                 current.AddNode(newNode);
@@ -377,8 +374,7 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             if ((grfAttribs & (uint)(__VSRDTATTRIB.RDTA_MkDocument)) == (uint)__VSRDTATTRIB.RDTA_MkDocument)
             {
-                var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-                if (rdt != null)
+                if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
                 {
                     var docData = IntPtr.Zero;
                     int hr;
@@ -425,8 +421,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 return VSConstants.S_OK;
             }
             // Get the information about this document from the RDT.
-            var rdt = GetPackageService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (null != rdt)
+            if (GetPackageService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 var hr = rdt.GetDocumentInfo(docCookie, out var flags, out var readLocks, out var writeLoks,
                                              out var documentMoniker, out var hierarchy, out var itemId, out var unkDocData);
@@ -491,7 +486,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                 // Now make sure that the information about this file are up to date (e.g. it is
                 // possible that Class View shows something strange if the file was closed without
                 // saving the changes).
-                var args = new HierarchyEventArgs(listener.FileID.ItemID, listener.FileName);
+                var args = new HierarchyEventArgs(listener.FileID.ItemId, listener.FileName);
                 OnNewFile(listener.FileID.Hierarchy, args);
             }
             return VSConstants.S_OK;
@@ -532,8 +527,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Remove this library from the object manager.
             if (0 != this._objectManagerCookie)
             {
-                var mgr = GetPackageService(typeof(SVsObjectManager)) as IVsObjectManager2;
-                if (null != mgr)
+                if (GetPackageService(typeof(SVsObjectManager)) is IVsObjectManager2 mgr)
                 {
                     mgr.UnregisterLibrary(this._objectManagerCookie);
                 }
@@ -546,7 +540,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         #endregion
 
-        private class HierarchyInfo
+        private sealed class HierarchyInfo
         {
             public readonly HierarchyListener Listener;
             public readonly ProjectLibraryNode ProjectLibraryNode;

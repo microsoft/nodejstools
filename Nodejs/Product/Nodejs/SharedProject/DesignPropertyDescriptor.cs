@@ -155,9 +155,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.property = prop;
 
-            var attr = prop.Attributes[typeof(DisplayNameAttribute)] as DisplayNameAttribute;
 
-            if (attr != null)
+            if (prop.Attributes[typeof(DisplayNameAttribute)] is DisplayNameAttribute attr)
             {
                 this.displayName = attr.DisplayName;
             }

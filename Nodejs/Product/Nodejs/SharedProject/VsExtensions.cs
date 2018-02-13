@@ -36,11 +36,9 @@ namespace Microsoft.VisualStudioTools
 
         public static CommonProjectNode GetCommonProject(this EnvDTE.Project project)
         {
-            var oaProj = project as OAProject;
-            if (oaProj != null)
+            if (project is OAProject oaProj)
             {
-                var common = oaProj.Project as CommonProjectNode;
-                if (common != null)
+                if (oaProj.Project is CommonProjectNode common)
                 {
                     return common;
                 }

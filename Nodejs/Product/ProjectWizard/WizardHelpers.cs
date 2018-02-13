@@ -12,8 +12,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
     {
         public static IServiceProvider GetProvider(object automationObject)
         {
-            var oleProvider = automationObject as IOleServiceProvider;
-            if (oleProvider != null)
+            if (automationObject is IOleServiceProvider oleProvider)
             {
                 return new ServiceProvider(oleProvider);
             }

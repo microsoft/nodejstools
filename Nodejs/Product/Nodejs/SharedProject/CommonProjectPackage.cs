@@ -80,8 +80,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this._componentID != 0)
                 {
-                    var mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
-                    if (mgr != null)
+                    if (GetService(typeof(SOleComponentManager)) is IOleComponentManager mgr)
                     {
                         mgr.FRevokeComponent(this._componentID);
                     }

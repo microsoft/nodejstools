@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Threading;
@@ -13,41 +13,37 @@ namespace Microsoft.VisualStudioTools.Navigation
     /// </summary>
     internal class Library : IVsSimpleLibrary2
     {
-        private Guid _guid;
-        private _LIB_FLAGS2 _capabilities;
-        private LibraryNode _root;
-        private uint _updateCount;
+        private readonly Guid guid;
+        private readonly object syncLock = new object();
+        private LibraryNode root;
+        private uint updateCount;
 
         public Library(Guid libraryGuid)
         {
-            this._guid = libraryGuid;
-            this._root = new LibraryNode(null, string.Empty, string.Empty, LibraryNodeType.Package);
+            this.guid = libraryGuid;
+            this.root = new LibraryNode(null, string.Empty, string.Empty, LibraryNodeType.Package);
         }
 
-        public _LIB_FLAGS2 LibraryCapabilities
-        {
-            get { return this._capabilities; }
-            set { this._capabilities = value; }
-        }
+        public _LIB_FLAGS2 LibraryCapabilities { get; set; }
 
         internal void AddNode(LibraryNode node)
         {
-            lock (this)
+            lock (syncLock)
             {
                 // re-create root node here because we may have handed out the node before and don't want to mutate it's list.
-                this._root = this._root.Clone();
-                this._root.AddNode(node);
-                this._updateCount++;
+                this.root = this.root.Clone();
+                this.root.AddNode(node);
+                this.updateCount++;
             }
         }
 
         internal void RemoveNode(LibraryNode node)
         {
-            lock (this)
+            lock (syncLock)
             {
-                this._root = this._root.Clone();
-                this._root.RemoveNode(node);
-                this._updateCount++;
+                this.root = this.root.Clone();
+                this.root.RemoveNode(node);
+                this.updateCount++;
             }
         }
 
@@ -72,7 +68,7 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public int GetGuid(out Guid pguidLib)
         {
-            pguidLib = this._guid;
+            pguidLib = this.guid;
             return VSConstants.S_OK;
         }
 
@@ -115,7 +111,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                         if ((colonIndex = srchText.LastIndexOf(':')) != -1)
                         {
                             var filename = srchText.Substring(0, srchText.LastIndexOf(':'));
-                            foreach (var project in this._root.Children)
+                            foreach (var project in this.root.Children)
                             {
                                 foreach (var item in project.Children)
                                 {
@@ -137,7 +133,7 @@ namespace Microsoft.VisualStudioTools.Navigation
                     else if (pobSrch[0].eSrchType == VSOBSEARCHTYPE.SO_SUBSTRING && ListType == (uint)_LIB_LISTTYPE.LLT_NAMESPACES)
                     {
                         var lib = new LibraryNode(null, "Search results " + pobSrch[0].szName, "Search results " + pobSrch[0].szName, LibraryNodeType.Package);
-                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), this._root).Children)
+                        foreach (var item in SearchNodes(pobSrch[0], new SimpleObjectList<LibraryNode>(), this.root).Children)
                         {
                             lib.Children.Add(item);
                         }
@@ -153,7 +149,7 @@ namespace Microsoft.VisualStudioTools.Navigation
             }
             else
             {
-                ppIVsSimpleObjectList2 = this._root as IVsSimpleObjectList2;
+                ppIVsSimpleObjectList2 = this.root as IVsSimpleObjectList2;
             }
             return VSConstants.S_OK;
         }
@@ -174,9 +170,9 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public void VisitNodes(ILibraryNodeVisitor visitor, CancellationToken ct = default(CancellationToken))
         {
-            lock (this)
+            lock (syncLock)
             {
-                this._root.Visit(visitor, ct);
+                this.root.Visit(visitor, ct);
             }
         }
 
@@ -209,14 +205,14 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         public int UpdateCounter(out uint pCurUpdate)
         {
-            pCurUpdate = this._updateCount;
+            pCurUpdate = this.updateCount;
             return VSConstants.S_OK;
         }
 
         public void Update()
         {
-            this._updateCount++;
-            this._root.Update();
+            this.updateCount++;
+            this.root.Update();
         }
         #endregion
     }

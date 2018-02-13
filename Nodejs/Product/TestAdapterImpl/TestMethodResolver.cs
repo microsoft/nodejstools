@@ -61,9 +61,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     (uint)_VSRDTFLAGS.RDT_NoLock,
                     filePath,
                     out hierarchy,
-                    out var _,
+                    out _,
                     out docData,
-                    out var _);
+                    out _);
                 ErrorHandler.ThrowOnFailure(hr);
             }
             finally

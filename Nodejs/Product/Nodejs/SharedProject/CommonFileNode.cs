@@ -157,8 +157,7 @@ namespace Microsoft.VisualStudioTools.Project
             var model = GetService(typeof(SComponentModel)) as IComponentModel;
             var adapter = model.GetService<IVsEditorAdaptersFactoryService>();
 
-            var rdt = this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) as IVsRunningDocumentTable;
-            if (rdt != null)
+            if (this.ProjectMgr.GetService(typeof(SVsRunningDocumentTable)) is IVsRunningDocumentTable rdt)
             {
                 IVsPersistDocData persistDocData;
                 uint cookie;
@@ -196,8 +195,7 @@ namespace Microsoft.VisualStudioTools.Project
                 if (srpTextLines == null)
                 {
                     // Try getting a text buffer provider first
-                    var srpTextBufferProvider = persistDocData as IVsTextBufferProvider;
-                    if (srpTextBufferProvider != null)
+                    if (persistDocData is IVsTextBufferProvider srpTextBufferProvider)
                     {
                         hr = srpTextBufferProvider.GetTextBuffer(out srpTextLines);
                     }

@@ -70,8 +70,7 @@ namespace Microsoft.VisualStudioTools.Project
         public OutputWindowRedirector(IServiceProvider provider, Guid paneGuid)
         {
             this._serviceProvider = provider;
-            var shell = provider.GetService(typeof(SVsUIShell)) as IVsUIShell;
-            if (shell != null)
+            if (provider.GetService(typeof(SVsUIShell)) is IVsUIShell shell)
             {
                 // Ignore errors - we just won't support opening the window if
                 // we don't find it.

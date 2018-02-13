@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Repl
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-            if (this.site.TryGetStartupFileAndDirectory(out var _, out var directory))
+            if (this.site.TryGetStartupFileAndDirectory(out _, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;

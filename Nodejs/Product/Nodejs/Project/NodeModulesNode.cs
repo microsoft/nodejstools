@@ -520,7 +520,7 @@ namespace Microsoft.NodejsTools.Project
             var packageJsonLockFileName = Path.Combine(rootPath, "package-lock.json");
 
             var queryEditService = (IVsQueryEditQuerySave2)this.projectNode.GetService(typeof(SVsQueryEditQuerySave));
-            var hr = queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out var _);
+            var hr = queryEditService.QueryEditFiles((uint)tagVSQueryEditFlags.QEF_DisallowInMemoryEdits, 1, new[] { packageJsonFileName, packageJsonLockFileName }, null, null, out var result, out _);
             return ErrorHandler.Succeeded(hr) && result == (uint)tagVSQueryEditResult.QER_EditOK;
         }
 

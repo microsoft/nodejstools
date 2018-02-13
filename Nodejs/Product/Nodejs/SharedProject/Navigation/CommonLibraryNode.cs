@@ -152,11 +152,13 @@ namespace Microsoft.VisualStudioTools.Navigation
             // Set the cursor at the beginning of the declaration.
             ErrorHandler.ThrowOnFailure(textView.SetCaretPos(this._sourceSpan.iStartLine, this._sourceSpan.iStartIndex));
             // Make sure that the text is visible.
-            var visibleSpan = new TextSpan();
-            visibleSpan.iStartLine = this._sourceSpan.iStartLine;
-            visibleSpan.iStartIndex = this._sourceSpan.iStartIndex;
-            visibleSpan.iEndLine = this._sourceSpan.iStartLine;
-            visibleSpan.iEndIndex = this._sourceSpan.iStartIndex + 1;
+            var visibleSpan = new TextSpan
+            {
+                iStartLine = this._sourceSpan.iStartLine,
+                iStartIndex = this._sourceSpan.iStartIndex,
+                iEndLine = this._sourceSpan.iStartLine,
+                iEndIndex = this._sourceSpan.iStartIndex + 1
+            };
             ErrorHandler.ThrowOnFailure(textView.EnsureSpanVisible(visibleSpan));
         }
 

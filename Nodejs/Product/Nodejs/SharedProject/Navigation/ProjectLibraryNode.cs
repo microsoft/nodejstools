@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -9,12 +9,9 @@ namespace Microsoft.VisualStudioTools.Navigation
 {
     internal class ProjectLibraryNode : LibraryNode
     {
-        private readonly CommonProjectNode _project;
-
         public ProjectLibraryNode(CommonProjectNode project)
             : base(null, project.Caption, project.Caption, LibraryNodeType.PhysicalContainer)
         {
-            this._project = project;
         }
 
         public override uint CategoryField(LIB_CATEGORY category)
@@ -31,10 +28,13 @@ namespace Microsoft.VisualStudioTools.Navigation
         {
             get
             {
-                var res = new VSTREEDISPLAYDATA();
-                // Use the default Reference icon for projects
-                res.hImageList = IntPtr.Zero;
-                res.Image = res.SelectedImage = 192;
+                var res = new VSTREEDISPLAYDATA
+                {
+                    // Use the default Reference icon for projects
+                    hImageList = IntPtr.Zero,
+                    Image = 192,
+                    SelectedImage = 192
+                };
                 return res;
             }
         }

@@ -105,8 +105,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
                 if (dependency != null)
                 {
-                    var existingPackage = this[dependency.Name] as Package;
-                    if (existingPackage != null)
+                    if (this[dependency.Name] is Package existingPackage)
                     {
                         existingPackage.RequestedVersionRange = dependency.VersionRangeText;
                     }
