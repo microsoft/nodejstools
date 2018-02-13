@@ -1114,10 +1114,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                     ErrorHandler.ThrowOnFailure(pRdt.GetDocumentInfo(
                                          cookie[0],
-                                         out var _,
-                                         out var _,
-                                         out var _,
-                                         out var _,
+                                         out _,
+                                         out _,
+                                         out _,
+                                         out _,
                                          out var srpHier,
                                          out itemid,
                                          out var ppunkDocData));

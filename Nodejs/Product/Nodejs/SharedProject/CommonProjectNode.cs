@@ -565,7 +565,7 @@ namespace Microsoft.VisualStudioTools.Project
                 RemoveSubTree(child);
             }
             node.Parent.RemoveChild(node);
-            this.DiskNodes.TryRemove(node.Url, out var _);
+            this.DiskNodes.TryRemove(node.Url, out _);
         }
 
         private static string GetFinalPathName(string dir)

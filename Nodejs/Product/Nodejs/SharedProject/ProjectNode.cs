@@ -2910,7 +2910,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.buildProject.FullPath = newFileName;
 
-            this.DiskNodes.TryRemove(this.filename, out var _);
+            this.DiskNodes.TryRemove(this.filename, out _);
             this.filename = newFileName;
             this.DiskNodes[this.filename] = this;
 
@@ -3562,7 +3562,7 @@ namespace Microsoft.VisualStudioTools.Project
                         flags, // no per file flags
                         attributes, // no per file file attributes
                         out var verdict,
-                        out var _ // ignore additional results
+                        out _ // ignore additional results
                     );
 
                     var qer = (tagVSQueryEditResult)verdict;
@@ -6523,7 +6523,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             if (deletedItem is IDiskBasedNode diskNode)
             {
-                this.DiskNodes.TryRemove(diskNode.Url, out var _);
+                this.DiskNodes.TryRemove(diskNode.Url, out _);
             }
 
             this.RaiseItemDeleted(deletedItem);
