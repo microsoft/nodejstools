@@ -42,8 +42,9 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                 Jade.JadeContentTypeDefinition.PugFileExtension
             }.Select(x => "*" + x));
 
-        private const string TypeScriptExtensions = ";*.ts;*.tsx";
-        private const string JavaScriptExtensions = ";*.js;*.jsx";
+        // prepend ';' since this is appended to the DefaultLanguageExtensionsFilter
+        private const string TypeScriptFilters = ";*.ts;*.tsx";
+        private const string JavaScriptFilters = ";*.js;*.jsx";
 
         private string ProjectPath => Path.Combine(this.SourcePath, this.ProjectName) + ".njsproj";
 
@@ -168,7 +169,10 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                             fileList = EnumerateTopLevelFiles("*.ts");
                             break;
                         case ProjectLanguage.JavaScript:
+                            fileList = EnumerateTopLevelFiles("*.js");
+                            break;
                         default:
+                            Debug.Assert(true, "unexpected language selected.");
                             fileList = EnumerateTopLevelFiles("*.js");
                             break;
                     }
@@ -219,7 +223,7 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
             string[] EnumerateTopLevelFiles(string extension)
             {
                 var files = Directory.EnumerateFiles(sourcePath, extension, SearchOption.TopDirectoryOnly);
-                return files.Select(f => Path.GetFileName(f)).ToArray();
+                return files.Select(Path.GetFileName).ToArray();
             }
         }
 
@@ -438,11 +442,11 @@ $@"{{
             switch (projectLanguage)
             {
                 case ProjectLanguage.TypeScript:
-                    projectFileFilters = filters + TypeScriptExtensions;
+                    projectFileFilters = filters + TypeScriptFilters;
                     break;
                 case ProjectLanguage.JavaScript:
                 default:
-                    projectFileFilters = filters + JavaScriptExtensions;
+                    projectFileFilters = filters + JavaScriptFilters;
                     break;
             }
 
@@ -545,7 +549,7 @@ $@"{{
                     .Where(dirName => ShouldIncludeDirectory(CommonUtils.TrimEndSeparator(CommonUtils.GetRelativeDirectoryPath(source, dirName))))
                 );
             }
-            catch (UnauthorizedAccessException)
+            catch (Exception exc) when (exc is UnauthorizedAccessException || exc is IOException)
             {
             }
 
@@ -568,17 +572,17 @@ $@"{{
             }
 
             var res = files
-                .Where(path => path.StartsWith(source, StringComparison.Ordinal))
-                .Select(path => path.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
-                .Distinct(StringComparer.OrdinalIgnoreCase);
+                .Where(path => path.StartsWith(source, StringComparison.OrdinalIgnoreCase))
+                .Select(path => path.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
 
+            // We only want to include the language specific config file by default, since the user can always add other files later
             switch (language)
             {
                 case ProjectLanguage.TypeScript:
-                    return res.SkipWhile(f => f.EndsWith("jsconfig.json"));
+                    return res.Where(f => !f.EndsWith("jsconfig.json"));
                 case ProjectLanguage.JavaScript:
                 default:
-                    return res.SkipWhile(f => f.EndsWith("tsconfig.json"));
+                    return res.Where(f => !f.EndsWith("tsconfig.json"));
             }
         }
 
@@ -588,14 +592,14 @@ $@"{{
         {
             var setupCompositionService = (IVsSetupCompositionService)CommonPackage.GetGlobalService(typeof(SVsSetupCompositionService));
 
-            // Populate the package status
+            // figure out the size of required array
             setupCompositionService.GetSetupPackagesInfo(0, null, out var sizeNeeded);
 
             if (sizeNeeded > 0)
             {
                 var packages = new IVsSetupPackageInfo[sizeNeeded];
                 var count = sizeNeeded;
-                setupCompositionService.GetSetupPackagesInfo(count, packages, out var _);
+                setupCompositionService.GetSetupPackagesInfo(count, packages, out _);
 
                 return packages.Where(p => (__VsSetupPackageState)p.CurrentState == __VsSetupPackageState.INSTALL_PACKAGE_PRESENT)
                     .Select(p => p.PackageId)

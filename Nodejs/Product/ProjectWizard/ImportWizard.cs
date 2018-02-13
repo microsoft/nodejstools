@@ -43,7 +43,7 @@ namespace Microsoft.NodejsTools.ProjectWizard
             this.projectLanguage = language;
         }
 
-        private ProjectLanguage projectLanguage;
+        private readonly ProjectLanguage projectLanguage;
 
         public static bool IsAddNewProjectCmd { get; set; }
         public void BeforeOpeningFile(EnvDTE.ProjectItem projectItem) { }
