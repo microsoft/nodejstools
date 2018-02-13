@@ -10,12 +10,12 @@
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
       Title="{x:Static resx:ImportWizardResources.SaveProjectPageTitle}"
-      FocusManager.FocusedElement="{Binding ElementName=ProjectPathTextBox}">
+      FocusManager.FocusedElement="{Binding ElementName=ProjectNameTextBox}">
 
     <Page.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
     </Page.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -25,19 +25,9 @@
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.SaveFileLocationTitle}"
                            HelpText="{x:Static resx:ImportWizardResources.SaveFileLocationHelpText}"
                            Grid.Row="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding Path=ProjectPath,Mode=TwoWay}" Name="ProjectPathTextBox" />
-                <Button Grid.Column="1" Style="{StaticResource BrowseSaveFileButton}"
-                        CommandParameter="Node.js Project Files (*.njsproj)|*.njsproj|All Files (*.*)|*.*"
-                        CommandTarget="{Binding ElementName=ProjectPathTextBox}" />
-            </Grid>
+            <TextBox Grid.Column="0" Text="{Binding Path=ProjectName,Mode=TwoWay}" Name="ProjectNameTextBox" 
+                     AutomationProperties.Name="{x:Static resx:ImportWizardResources.SaveFileLocationTitle}" 
+                     AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.SaveFileLocationHelpText}" />
         </wpf:LabelledControl>
     </Grid>
 </Page>

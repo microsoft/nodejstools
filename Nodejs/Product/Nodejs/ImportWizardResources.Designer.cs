@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class ImportWizardResources {
@@ -70,6 +70,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse to the folder containing your Node.js code.
+        /// </summary>
+        public static string BrowseNodeCodeAccessibleName {
+            get {
+                return ResourceManager.GetString("BrowseNodeCodeAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Cancel.
         /// </summary>
         public static string CancelButtonLabel {
@@ -97,7 +106,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Files with the .js extension are always included..
+        ///   Looks up a localized string similar to Files with these extensions are included in the project..
         /// </summary>
         public static string FileFilterHelpText {
             get {
@@ -124,6 +133,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created project targets JavaScript..
+        /// </summary>
+        public static string FromExistingJavaScriptAccessibleName {
+            get {
+                return ResourceManager.GetString("FromExistingJavaScriptAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created project targets TypeScript..
+        /// </summary>
+        public static string FromExistingTypeScriptAccessibleName {
+            get {
+                return ResourceManager.GetString("FromExistingTypeScriptAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files with a &apos;.js&apos;, or a &apos;.jsx&apos; extension, and &apos;jsconfig.json&apos; are automatically included..
+        /// </summary>
+        public static string JavaScriptHelpText {
+            get {
+                return ResourceManager.GetString("JavaScriptHelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the language this project primarily uses.
+        /// </summary>
+        public static string LanguageTitle {
+            get {
+                return ResourceManager.GetString("LanguageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Next.
         /// </summary>
         public static string NextButtonLabel {
@@ -133,7 +178,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to We won&apos;t move any files, and you can use Save As to move the project file later..
+        ///   Looks up a localized string similar to The project file will be saved in the root of the folder that contains your Node.js code..
         /// </summary>
         public static string SaveFileLocationHelpText {
             get {
@@ -142,7 +187,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select where to save your project file.
+        ///   Looks up a localized string similar to Enter the name for your project.
         /// </summary>
         public static string SaveFileLocationTitle {
             get {
@@ -183,6 +228,24 @@ namespace Microsoft.NodejsTools {
         public static string SourceFilesPageTitle {
             get {
                 return ResourceManager.GetString("SourceFilesPageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source Files.
+        /// </summary>
+        public static string StartupPageTitle {
+            get {
+                return ResourceManager.GetString("StartupPageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files with a &apos;.ts&apos;, or a &apos;.tsx&apos; extension, and &apos;tsconfig.json&apos; are automatically included..
+        /// </summary>
+        public static string TypeScriptHelpText {
+            get {
+                return ResourceManager.GetString("TypeScriptHelpText", resourceCulture);
             }
         }
         
