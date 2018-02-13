@@ -16,6 +16,7 @@
             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                 <Setter Property="FontFamily" Value="Consolas" />
             </Style>
+            <l:ProjectLanguageBoolConverter x:Key="projectLanguageBoolConverter" />
         </ResourceDictionary>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

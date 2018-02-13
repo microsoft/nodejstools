@@ -5761,6 +5761,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";4009" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript JSON Configuration File]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Fichier config JSON JavaScript]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4010" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JSON configuration file for the JavaScript Language Service]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Fichier config JSON de JavaScript Language Service]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
     </Item>
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
@@ -5788,7 +5806,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11221.3]]></Val>
+        <Val><![CDATA[1.4.20201.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5815,7 +5833,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11221.3 commit:fb64a4b762be6eef74229468f55f5d2b6c1cd7f7]]></Val>
+        <Val><![CDATA[1.4.20201.2 commit:7ff76fdfd063ab88ec56b9329c06fa058302e8d1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
