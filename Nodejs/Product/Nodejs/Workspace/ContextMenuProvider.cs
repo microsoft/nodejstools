@@ -6,11 +6,13 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Workspace;
+using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.VSIntegration.UI;
 using Microsoft.VisualStudioTools.Project;
 
@@ -40,16 +42,16 @@ namespace Microsoft.NodejsTools.Workspace
         {
             if (EnsurePackageJson(parentNode))
             {
-                this.outputPane.ShowWindow();
                 return this.npmHandler;
             }
 
+            // we only have a command handler for 'package.json' files
             return null;
         }
 
         private static bool EnsurePackageJson(WorkspaceVisualNodeBase node)
         {
-            return (node is IFileNode fileNode && StringComparer.OrdinalIgnoreCase.Equals(fileNode.FileName, "package.json"));
+            return (node is IFileNode fileNode && PackageJsonFactory.IsPackageJsonFile(fileNode.FileName));
         }
 
         private sealed class NpmCommandHandler : IWorkspaceCommandHandler
@@ -67,14 +69,17 @@ namespace Microsoft.NodejsTools.Workspace
 
             public int Exec(List<WorkspaceVisualNodeBase> selection, Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
             {
-                var node = selection.FirstOrDefault();
-                if (selection.Count != 1 || !EnsurePackageJson(node))
+                if (selection.Count != 1 || !EnsurePackageJson(selection.Single()))
                 {
                     return (int)Constants.OLECMDERR_E_NOTSUPPORTED;
                 }
 
+                var node = selection.Single();
+
                 if (pguidCmdGroup == Guids.NodeToolsWorkspaceCmdSet)
                 {
+                    this.outputPane.ShowWindow();
+
                     switch (nCmdID)
                     {
                         case PkgCmdId.cmdidWorkSpaceNpmInstallMissing:
@@ -94,6 +99,17 @@ namespace Microsoft.NodejsTools.Workspace
                     {
                         ExecDynamic(node, nCmdID);
                         return VSConstants.S_OK;
+                    }
+                }
+
+                if (pguidCmdGroup == Guids.WorkspaceExplorerDebugActionCmdSet)
+                {
+                    switch (nCmdID)
+                    {
+                        // for package.json we only support Debug
+                        case PkgCmdId.cmdid_DebugActionContext:
+                            ExecDebugAsync(node);
+                            return VSConstants.S_OK;
                     }
                 }
 
@@ -133,7 +149,7 @@ namespace Microsoft.NodejsTools.Workspace
 
             private async void ExecDynamic(WorkspaceVisualNodeBase node, uint nCmdID)
             {
-                // Unfortunately the NpmController (and NpmCommander), used for the install, update commands
+                // Unfortunately the NpmController (and NpmCommander), used for the install and update commands
                 // doesn't support running arbitrary scripts. And changing that is outside
                 // the scope of these changes.
                 var filePath = ((IFileNode)node).FullPath;
@@ -149,12 +165,29 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
+            private async void ExecDebugAsync(WorkspaceVisualNodeBase node)
+            {
+                var workspace = node.Workspace;
+                var packageJson = PackageJsonFactory.Create(((IFileNode)node).FullPath);
+
+                //invoke debuglaunchtargetprovider on this file
+                var fileContextActions = await node.Workspace.GetFileContextActionsAsync(packageJson.Main, new[] { DebugLaunchActionContext.ContextTypeGuid });
+                if (fileContextActions.Any())
+                {
+                    var action = fileContextActions.First().FirstOrDefault();
+                    Debug.Assert(action != null, "Why is action null, when we did get a fileContextActions?");
+                    await action.ExecuteAsync(new BuildProgressUpdater(), CancellationToken.None);
+                }
+            }
+
             public bool QueryStatus(List<WorkspaceVisualNodeBase> selection, Guid pguidCmdGroup, uint nCmdID, ref uint cmdf, ref string customTitle)
             {
                 if (selection.Count != 1 || !EnsurePackageJson(selection.Single()))
                 {
                     return false;
                 }
+
+                var node = (IFileNode)selection.Single();
 
                 if (pguidCmdGroup == Guids.NodeToolsWorkspaceCmdSet)
                 {
@@ -172,13 +205,28 @@ namespace Microsoft.NodejsTools.Workspace
                     // this way we can add each script to the context menu
                     if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID <= PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
                     {
-                        var node = (IFileNode)selection.First();
-
                         if (QueryDynamic(nCmdID, node.FullPath, ref customTitle))
                         {
                             cmdf = (uint)(OLECMDF.OLECMDF_SUPPORTED | OLECMDF.OLECMDF_ENABLED);
                             return true;
                         }
+                    }
+                }
+
+                if (pguidCmdGroup == Guids.WorkspaceExplorerDebugActionCmdSet)
+                {
+                    switch (nCmdID)
+                    {
+                        // for package.json we only support Debug
+                        case PkgCmdId.cmdid_DebugActionContext:
+                            if (QueryDebug(node.FullPath))
+                            {
+                                cmdf = (uint)(OLECMDF.OLECMDF_SUPPORTED | OLECMDF.OLECMDF_ENABLED);
+                                return true;
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
 
@@ -193,6 +241,13 @@ namespace Microsoft.NodejsTools.Workspace
                     return true;
                 }
                 return false;
+            }
+
+            private bool QueryDebug(string filePath)
+            {
+                var packageJson = PackageJsonFactory.Create(filePath);
+
+                return !string.IsNullOrEmpty(packageJson.Main);
             }
 
             private static bool TryGetCommand(uint nCmdID, string filePath, out string commandName)
@@ -238,6 +293,14 @@ namespace Microsoft.NodejsTools.Workspace
                 if (!string.IsNullOrWhiteSpace(e.LogText))
                 {
                     this.outputPane.WriteLine(e.LogText.TrimEnd('\r', '\n'));
+                }
+            }
+
+            private struct BuildProgressUpdater : IProgress<IFileContextActionProgressUpdate>
+            {
+                void IProgress<IFileContextActionProgressUpdate>.Report(IFileContextActionProgressUpdate value)
+                {
+                    // Should this be outputting? It doesn't seem be called
                 }
             }
         }

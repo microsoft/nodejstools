@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudioTools.Project
                     var hr = outputWindow.GetPane(VSPackageManagerPaneGuid, out this.lazyOutputPane);
 
                     // If the workspace pane has not been registered before, create it
-                    if (this.lazyOutputPane == null || hr != VSConstants.S_OK)
+                    if (this.lazyOutputPane == null || ErrorHandler.Failed(hr))
                     {
                         if (ErrorHandler.Failed(outputWindow.CreatePane(VSPackageManagerPaneGuid, Resources.NpmOutputPaneTitle, fInitVisible: 1, fClearWithSolution: 1)) ||
                             ErrorHandler.Failed(outputWindow.GetPane(VSPackageManagerPaneGuid, out this.lazyOutputPane)))
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudioTools.Project
                     ThreadHelper.ThrowIfNotOnUIThread();
 
                     var windowGuid = OutputWindowGuid;
-                    var hr = shell.FindToolWindow(0, ref windowGuid, out this.lazyOutputWindow);
+                    var hr = shell.FindToolWindow((int)__VSFINDTOOLWIN.FTW_fForceCreate, ref windowGuid, out this.lazyOutputWindow);
                     Debug.Assert(ErrorHandler.Succeeded(hr));
                 }
 
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public void WriteLine(string message)
         {
-            if(this.lazyOutputWindow == null)
+            if (this.lazyOutputWindow == null)
             {
                 throw new InvalidOperationException($"Ensure the output window is initialized by calling '{nameof(ShowWindow)}' first.");
             }
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudioTools.Project
         public void ShowWindow()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            var hr = this.OutputWindow.ShowNoActivate();
+            var hr = this.OutputWindow?.ShowNoActivate() ?? VSConstants.E_FAIL;
             Debug.Assert(ErrorHandler.Succeeded(hr));
         }
     }

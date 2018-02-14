@@ -2,14 +2,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Npm;
 using Microsoft.VisualStudio.Workspace;
+using Microsoft.VisualStudio.Workspace.Build;
 
 namespace Microsoft.NodejsTools.Workspace
 {
-    [ExportFileContextProvider(ProviderType, Guids.PackageJsonContextTypeString)]
+    [ExportFileContextProvider(
+        ProviderType,
+        ProviderPriority.Normal,
+        new Type[] { typeof(string) },
+        Guids.PackageJsonContextTypeString,
+        BuildContextTypes.BuildContextType)]
     public sealed class PackageJsonContextProviderFactory : IWorkspaceProviderFactory<IFileContextProvider>
     {
         private const string ProviderType = "{3662A7C3-F991-48F3-9810-F639DB7AEEC5}";
@@ -20,7 +28,7 @@ namespace Microsoft.NodejsTools.Workspace
             return new PackageJsonContextProvider(workspaceContext);
         }
 
-        private class PackageJsonContextProvider : IFileContextProvider
+        private class PackageJsonContextProvider : IFileContextProvider, IFileContextProvider<string>
         {
             private readonly IWorkspace workspaceContext;
 
@@ -31,16 +39,34 @@ namespace Microsoft.NodejsTools.Workspace
 
             public Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, CancellationToken cancellationToken)
             {
-                var fileName = Path.GetFileName(filePath);
-                if (StringComparer.OrdinalIgnoreCase.Equals(fileName, "package.json"))
+                return this.GetContextsForFileAsync(filePath, string.Empty, cancellationToken);
+            }
+            public Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, string context, CancellationToken cancellationToken)
+            {
+                if (PackageJsonHelpers.IsPackageJsonFile(filePath))
                 {
-                    var fileContext = new FileContext(ProviderTypeGuid, Guids.PackageJsonContextType, filePath, Array.Empty<string>());
+                    var fileContexts = new List<FileContext>();
 
-                    return Task.FromResult<IReadOnlyCollection<FileContext>>(new[] { fileContext });
+                    var packageJson = PackageJsonFactory.Create(this.workspaceContext.MakeRooted(filePath));
+
+                    Debug.Assert(packageJson != null);
+
+                    fileContexts.Add(new FileContext(ProviderTypeGuid,
+                        Guids.PackageJsonContextType,
+                        "",
+                        new[] { filePath },
+                        "package.json context"));
+
+                    return Task.FromResult<IReadOnlyCollection<FileContext>>(fileContexts);
                 }
 
-                return Task.FromResult<IReadOnlyCollection<FileContext>>(Array.Empty<FileContext>());
+                return Task.FromResult(FileContext.EmptyFileContexts);
             }
+        }
+
+        private sealed class PackageJsonBuildContext : IBuildConfigurationContext
+        {
+            public string BuildConfiguration => "Debug";
         }
     }
 }
