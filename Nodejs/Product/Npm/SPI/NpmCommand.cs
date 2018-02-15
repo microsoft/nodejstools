@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -18,15 +18,19 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         private StringBuilder error = new StringBuilder();
 
+        private readonly bool showConsole;
+
         private readonly ManualResetEvent cancellation = new ManualResetEvent(false);
         private readonly object bufferLock = new object();
 
         protected NpmCommand(
             string fullPathToRootPackageDirectory,
+            bool showConsole = false,
             string pathToNpm = null)
         {
             this.FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             this.pathToNpm = pathToNpm;
+            this.showConsole = showConsole;
         }
 
         protected string Arguments { get; set; }
@@ -72,7 +76,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public virtual async Task<bool> ExecuteAsync()
         {
             OnCommandStarted();
-            var redirector = new NpmCommandRedirector(this);
+            var redirector = this.showConsole ? null : new NpmCommandRedirector(this);
 
             try
             {
@@ -80,10 +84,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
             catch (NpmNotFoundException)
             {
-                redirector.WriteErrorLine(Resources.CouldNotFindNpm);
+                redirector?.WriteErrorLine(Resources.CouldNotFindNpm);
                 return false;
             }
-            redirector.WriteLine(
+            redirector?.WriteLine(
                 string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
                 string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, this.Arguments)));
 
@@ -95,13 +99,14 @@ namespace Microsoft.NodejsTools.Npm.SPI
                     GetPathToNpm(),
                     this.FullPathToRootPackageDirectory,
                     new[] { this.Arguments },
-                    this.cancellation);
+                    this.showConsole,
+                    cancellationResetEvent: this.cancellation);
             }
             catch (OperationCanceledException)
             {
                 cancelled = true;
             }
-            OnCommandCompleted(this.Arguments, redirector.HasErrors, cancelled);
+            OnCommandCompleted(this.Arguments, redirector?.HasErrors ?? false, cancelled);
             return !redirector.HasErrors;
         }
 

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,8 @@ namespace Microsoft.NodejsTools.Npm
             string pathToNpm,
             string executionDirectory,
             string[] arguments,
-            ManualResetEvent cancellationResetEvent)
+            bool showConsole,
+            ManualResetEvent cancellationResetEvent = null)
         {
             IEnumerable<string> standardOutputLines = null;
 
@@ -28,8 +29,8 @@ namespace Microsoft.NodejsTools.Npm
                 pathToNpm,
                 arguments,
                 executionDirectory,
-                null,
-                false,
+                /*env*/ null,
+                showConsole,
                 redirector,
                 quoteArgs: false,
                 outputEncoding: Encoding.UTF8 // npm uses UTF-8 regardless of locale if its output is redirected
@@ -40,10 +41,7 @@ namespace Microsoft.NodejsTools.Npm
                 {
                     // Process failed to start, and any exception message has
                     // already been sent through the redirector
-                    if (redirector != null)
-                    {
-                        redirector.WriteErrorLine(Resources.ErrCannotStartNpm);
-                    }
+                    redirector?.WriteErrorLine(Resources.ErrCannotStartNpm);
                 }
                 else
                 {
@@ -58,23 +56,19 @@ namespace Microsoft.NodejsTools.Npm
                         {
                             standardOutputLines = process.StandardOutputLines.ToList();
                         }
-                        if (redirector != null)
-                        {
-                            redirector.WriteLine(string.Format(CultureInfo.InvariantCulture,
-                                "\r\n===={0}====\r\n\r\n",
-                                string.Format(CultureInfo.InvariantCulture, Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
-                                ));
-                        }
+
+                        redirector?.WriteLine(string.Format(CultureInfo.InvariantCulture,
+                            "\r\n===={0}====\r\n\r\n",
+                            string.Format(CultureInfo.InvariantCulture, Resources.NpmCommandCompletedWithExitCode, process.ExitCode ?? -1)
+                            ));
                     }
                     else
                     {
                         process.Kill();
-                        if (redirector != null)
-                        {
-                            redirector.WriteErrorLine(string.Format(CultureInfo.InvariantCulture,
-                            "\r\n===={0}====\r\n\r\n",
-                            Resources.NpmCommandCancelled));
-                        }
+
+                        redirector?.WriteErrorLine(string.Format(CultureInfo.InvariantCulture,
+                        "\r\n===={0}====\r\n\r\n",
+                        Resources.NpmCommandCancelled));
 
                         if (cancellationResetEvent != null)
                         {

@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.NpmUI
             cmdr.CommandCompleted += Cmdr_CommandCompleted;
             try
             {
-                cmdr.ExecuteNpmCommandAsync(info.Arguments).Wait();
+                cmdr.ExecuteNpmCommandAsync(info.Arguments, showConsole: false).Wait();
             }
             catch (AggregateException e) when (e.InnerException is TaskCanceledException)
             {
@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 return Enumerable.Empty<IPackage>();
             }
 
-            TelemetryHelper.LogSearchNpm();
+            TelemetryHelper.LogSearchNpm(this.npmController.IsProject);
 
             if (filterText.Length == 1)
             {

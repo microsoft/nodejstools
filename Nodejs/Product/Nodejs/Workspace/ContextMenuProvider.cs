@@ -155,13 +155,12 @@ namespace Microsoft.NodejsTools.Workspace
                 var filePath = ((IFileNode)node).FullPath;
                 if (TryGetCommand(nCmdID, filePath, out var commandName))
                 {
-                    var npmPath = NpmHelpers.GetPathToNpm();
 
-                    await NpmWorker.ExecuteNpmCommandAsync(
-                        npmPath,
-                        executionDirectory: Path.GetDirectoryName(filePath),
-                        arguments: new[] { "run-script", commandName },
-                        visible: true); // show the CMD window
+                    using (var npmController = this.CreateController(node.Workspace))
+                    using (var commander = npmController.CreateNpmCommander())
+                    {
+                        await commander.ExecuteNpmCommandAsync($"run-script {commandName}", showConsole: true);
+                    }
                 }
             }
 
@@ -274,7 +273,8 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var npmController = NpmControllerFactory.Create(
                       projectHome,
-                      NodejsConstants.NpmCachePath);
+                      NodejsConstants.NpmCachePath,
+                      isProject: false);
 
                 npmController.ErrorLogged += this.WriteNpmOutput;
                 npmController.ExceptionLogged += this.WriteNpmException;

@@ -29,9 +29,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public NpmController(
             string fullPathToRootPackageDirectory,
             string cachePath,
+            bool isProject,
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null)
         {
+            this.IsProject = isProject;
             this.fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             this.cachePath = cachePath;
             this.showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
@@ -45,6 +47,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
             catch (NpmNotFoundException) { }
         }
+
+        public bool IsProject { get; }
 
         internal string FullPathToRootPackageDirectory
         {
