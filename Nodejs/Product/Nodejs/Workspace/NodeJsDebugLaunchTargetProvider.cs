@@ -51,7 +51,7 @@ namespace Microsoft.NodejsTools.Workspace
         private void SetupDebugTargetInfoForNodeProtocol(ref VsDebugTargetInfo4 vsDebugTargetInfo, DebugLaunchActionContext debugLaunchContext, string nodeExe)
         {
             var target = $"\"{vsDebugTargetInfo.bstrExe}\"";
-            if (debugLaunchContext.LaunchConfiguration.TryGetValue<string>(ScriptArgsKey, out var scriptArgs) && !string.IsNullOrEmpty(scriptArgs))
+            if (debugLaunchContext.LaunchConfiguration.TryGetValue<string>(ScriptArgsKey, out var scriptArgs) && !string.IsNullOrWhiteSpace(scriptArgs))
             {
                 target += " " + scriptArgs;
             }
@@ -63,7 +63,7 @@ namespace Microsoft.NodejsTools.Workspace
                 AppendOption(ref vsDebugTargetInfo, AD7Engine.InterpreterOptions, nodeArgs);
             }
 
-            if (debugLaunchContext.LaunchConfiguration.TryGetValue<string>(DebuggerPortKey, out var debuggerPort) && !string.IsNullOrEmpty(debuggerPort))
+            if (debugLaunchContext.LaunchConfiguration.TryGetValue<string>(DebuggerPortKey, out var debuggerPort) && !string.IsNullOrWhiteSpace(debuggerPort))
             {
                 AppendOption(ref vsDebugTargetInfo, AD7Engine.DebuggerPort, debuggerPort);
             }
@@ -92,7 +92,6 @@ namespace Microsoft.NodejsTools.Workspace
 
             vsDebugTargetInfo.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             vsDebugTargetInfo.guidLaunchDebugEngine = NodejsProjectLauncher.WebKitDebuggerV2Guid;
-            vsDebugTargetInfo.bstrExe = target;
             vsDebugTargetInfo.bstrOptions = jsonContent;
             vsDebugTargetInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
         }

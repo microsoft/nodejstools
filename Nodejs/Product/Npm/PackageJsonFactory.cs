@@ -70,7 +70,13 @@ namespace Microsoft.NodejsTools.Npm
 
         public static bool IsPackageJsonFile(string filePath)
         {
-            return filePath?.EndsWith(NodejsConstants.PackageJsonFile, StringComparison.OrdinalIgnoreCase) == true;
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return false;
+            }
+
+            var fileName = Path.GetFileName(filePath);
+            return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.PackageJsonFile);
         }
     }
 }

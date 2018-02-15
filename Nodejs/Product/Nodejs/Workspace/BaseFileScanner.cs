@@ -31,13 +31,12 @@ namespace Microsoft.NodejsTools.Workspace
 
         public virtual async Task<bool> IsUpToDateAsync(DateTimeOffset? lastScanTimestamp, string filePath, FileScannerType scannerType, CancellationToken cancellationToken)
         {
-            var uptodate = false;
             if (await this.IsValidFileAsync(filePath))
             {
                 try
                 {
                     var lastWrite = File.GetLastWriteTimeUtc(filePath);
-                    uptodate = lastScanTimestamp.HasValue && DateTime.Compare(lastWrite, lastScanTimestamp.Value.UtcDateTime) < 0;
+                    return lastScanTimestamp.HasValue && lastWrite < lastScanTimestamp.Value.UtcDateTime;
                 }
                 catch (Exception exc) when (exc is IOException || exc is UnauthorizedAccessException)
                 {
@@ -47,12 +46,12 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
-            return uptodate;
+            return false;
         }
 
         protected abstract Task<bool> IsValidFileAsync(string filePath);
 
-        public virtual async Task<T> ScanContentAsync<T>(string filePath, CancellationToken cancellationToken) where T : class
+        public async Task<T> ScanContentAsync<T>(string filePath, CancellationToken cancellationToken) where T : class
         {
             if (await this.IsValidFileAsync(filePath))
             {
@@ -73,7 +72,7 @@ namespace Microsoft.NodejsTools.Workspace
 
         protected abstract Task<List<FileDataValue>> ComputeFileDataValuesAsync(string filePath, CancellationToken cancellationToken);
 
-        protected virtual T GetDefaultScanValue<T>() where T : class
+        protected T GetDefaultScanValue<T>() where T : class
         {
             // We can't actually return null, this will crash the Index service
             if (typeof(T) == FileScannerTypeConstants.FileDataValuesType)

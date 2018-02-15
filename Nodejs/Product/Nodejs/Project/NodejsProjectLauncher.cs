@@ -379,7 +379,7 @@ namespace Microsoft.NodejsTools.Project
             var webBrowserUrl = GetFullUrl();
             var envVars = GetEnvironmentVariables(webBrowserUrl);
             var debuggerPort = this._project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
-            if (!string.IsNullOrWhiteSpace(debuggerPort))
+            if (string.IsNullOrWhiteSpace(debuggerPort))
             {
                 debuggerPort = NodejsConstants.DefaultDebuggerPort.ToString();
             }

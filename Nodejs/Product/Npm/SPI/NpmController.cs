@@ -9,7 +9,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmController : AbstractNpmLogSource, INpmController
     {
-        private string fullPathToRootPackageDirectory;
         private string cachePath;
         private bool showMissingDevOptionalSubPackages;
         private INpmPathProvider npmPathProvider;
@@ -34,12 +33,12 @@ namespace Microsoft.NodejsTools.Npm.SPI
             INpmPathProvider npmPathProvider = null)
         {
             this.IsProject = isProject;
-            this.fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            this.FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             this.cachePath = cachePath;
             this.showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             this.npmPathProvider = npmPathProvider;
 
-            this.localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.fullPathToRootPackageDirectory);
+            this.localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.FullPathToRootPackageDirectory);
 
             try
             {
@@ -50,10 +49,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public bool IsProject { get; }
 
-        internal string FullPathToRootPackageDirectory
-        {
-            get { return this.fullPathToRootPackageDirectory; }
-        }
+        internal string FullPathToRootPackageDirectory { get; }
 
         internal string PathToNpm
         {
@@ -129,7 +125,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 }
 
                 this.RootPackage = RootPackageFactory.Create(
-                            this.fullPathToRootPackageDirectory,
+                            this.FullPathToRootPackageDirectory,
                             this.showMissingDevOptionalSubPackages);
                 return;
             }

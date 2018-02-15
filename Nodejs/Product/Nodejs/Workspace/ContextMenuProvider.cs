@@ -57,6 +57,7 @@ namespace Microsoft.NodejsTools.Workspace
         private sealed class NpmCommandHandler : IWorkspaceCommandHandler
         {
             private readonly OutputPaneWrapper outputPane;
+            private static readonly NullBuildProgressUpdater DefaultBuildProgressUpdater = new NullBuildProgressUpdater();
 
             public NpmCommandHandler(OutputPaneWrapper outputPane)
             {
@@ -173,9 +174,10 @@ namespace Microsoft.NodejsTools.Workspace
                 var fileContextActions = await node.Workspace.GetFileContextActionsAsync(packageJson.Main, new[] { DebugLaunchActionContext.ContextTypeGuid });
                 if (fileContextActions.Any())
                 {
-                    var action = fileContextActions.First().FirstOrDefault();
+                    // we requested a single context, so there should be a single grouping. Use the First action, since they're ordered by priority.
+                    var action = fileContextActions.Single().FirstOrDefault();
                     Debug.Assert(action != null, "Why is action null, when we did get a fileContextActions?");
-                    await action.ExecuteAsync(new BuildProgressUpdater(), CancellationToken.None);
+                    await action.ExecuteAsync(DefaultBuildProgressUpdater, CancellationToken.None);
                 }
             }
 
@@ -296,11 +298,11 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
-            private struct BuildProgressUpdater : IProgress<IFileContextActionProgressUpdate>
+            private sealed class NullBuildProgressUpdater : IProgress<IFileContextActionProgressUpdate>
             {
                 void IProgress<IFileContextActionProgressUpdate>.Report(IFileContextActionProgressUpdate value)
                 {
-                    // Should this be outputting? It doesn't seem be called
+                    // unused in our scenario
                 }
             }
         }

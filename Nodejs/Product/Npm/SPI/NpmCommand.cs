@@ -15,8 +15,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         private string pathToNpm;
 
         private readonly StringBuilder output = new StringBuilder();
-
-        private StringBuilder error = new StringBuilder();
+        private readonly StringBuilder error = new StringBuilder();
 
         private readonly bool showConsole;
 
@@ -110,13 +109,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
             return !redirector.HasErrors;
         }
 
-        internal class NpmCommandRedirector : Redirector
+        private sealed class NpmCommandRedirector : Redirector
         {
-            private NpmCommand _owner;
+            private readonly NpmCommand owner;
 
             public NpmCommandRedirector(NpmCommand owner)
             {
-                this._owner = owner;
+                this.owner = owner;
             }
 
             public bool HasErrors { get; private set; }
@@ -125,7 +124,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 if (data != null)
                 {
-                    lock (this._owner.bufferLock)
+                    lock (this.owner.bufferLock)
                     {
                         buffer.Append(data + Environment.NewLine);
                     }
@@ -135,13 +134,13 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             public override void WriteLine(string line)
             {
-                this._owner.OnOutputLogged(AppendToBuffer(this._owner.output, line));
+                this.owner.OnOutputLogged(AppendToBuffer(this.owner.output, line));
             }
 
             public override void WriteErrorLine(string line)
             {
                 this.HasErrors = true;
-                this._owner.OnErrorLogged(AppendToBuffer(this._owner.error, line));
+                this.owner.OnErrorLogged(AppendToBuffer(this.owner.error, line));
             }
         }
     }
