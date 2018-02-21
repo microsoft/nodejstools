@@ -186,7 +186,7 @@
       <Link>SharedProject\SolutionEventsListener.cs</Link>
     </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
-      <Link>Project\TypeScriptHelpers.cs</Link>
+      <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
@@ -194,7 +194,10 @@
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
-    <Compile Include="Debugger\NodeDebugProvider.cs" />
+    <Compile Include="Workspace\BaseFileScanner.cs" />
+    <Compile Include="Workspace\ContextMenuProvider.cs" />
+    <Compile Include="Workspace\LaunchDebugTargetProvider.cs" />
+    <Compile Include="Workspace\NodeJsDebugLaunchTargetProvider.cs" />
     <Compile Include="GeneratedHelpAboutVersion.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -281,8 +284,8 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-    <Compile Include="Workspace\ContextMenuProvider.cs" />
-    <Compile Include="Workspace\PackageJsonContextProviderFactory.cs" />
+    <Compile Include="Workspace\JsFileDebugLaunchTargerProvider.cs" />
+    <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
@@ -567,6 +570,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OpenFolder.pkgdef">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Workspace\OpenFolderSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyHtml\EmptyHtml.html" />

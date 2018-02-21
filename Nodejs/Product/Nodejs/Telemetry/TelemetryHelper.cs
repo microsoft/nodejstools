@@ -18,35 +18,46 @@ namespace Microsoft.NodejsTools.Telemetry
 
         public static void LogDebuggingStarted(string debuggerName, string nodeVersion, bool isProject = true)
         {
-            if (TelemetryService.DefaultSession != null)
-            {
-                var userTask = new UserTaskEvent(DebbugerStarted, TelemetryResult.Success);
-                userTask.Properties[DebuggerEngine] = debuggerName;
-                userTask.Properties[NodeVersion] = nodeVersion;
-                userTask.Properties[IsProject] = isProject;
-
-                TelemetryService.DefaultSession.PostEvent(userTask);
-            }
+            LogUserTaskEvent(DebbugerStarted, (DebuggerEngine, debuggerName), (NodeVersion, nodeVersion), (IsProject, isProject));
         }
 
-        public static void LogSearchNpm()
+        public static void LogSearchNpm(bool isProject)
         {
-            TelemetryService.DefaultSession?.PostUserTask(SearchNpm, TelemetryResult.Success);
+            LogUserTaskEvent(SearchNpm, isProject);
         }
 
-        public static void LogInstallNpmPackage()
+        public static void LogInstallNpmPackage(bool isProject)
         {
-            TelemetryService.DefaultSession?.PostUserTask(InstallNpm, TelemetryResult.Success);
+            LogUserTaskEvent(InstallNpm, isProject);
         }
 
-        public static void LogUnInstallNpmPackage()
+        public static void LogUnInstallNpmPackage(bool isProject)
         {
-            TelemetryService.DefaultSession?.PostUserTask(UnInstallNpm, TelemetryResult.Success);
+            LogUserTaskEvent(UnInstallNpm, isProject);
         }
 
         public static void LogReplUse()
         {
             TelemetryService.DefaultSession?.PostUserTask(UsedRepl, TelemetryResult.Success);
+        }
+
+        private static void LogUserTaskEvent(string eventName, bool isProject)
+        {
+            LogUserTaskEvent(eventName, (IsProject, isProject));
+        }
+
+        private static void LogUserTaskEvent(string eventName, params (string PropertName, object Value)[] args)
+        {
+            if (TelemetryService.DefaultSession != null)
+            {
+                var userTask = new UserTaskEvent(DebbugerStarted, TelemetryResult.Success);
+                foreach (var (PropertName, Value) in args)
+                {
+                    userTask.Properties[PropertName] = Value;
+                }
+
+                TelemetryService.DefaultSession.PostEvent(userTask);
+            }
         }
     }
 }

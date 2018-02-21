@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
@@ -7,9 +7,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public GenericNpmCommand(
             string fullPathToRootPackageDirectory,
             string arguments,
+            bool showConsole,
             string pathToNpm = null) 
             : base(
             fullPathToRootPackageDirectory,
+            showConsole,
             pathToNpm)
         {
             this.Arguments = arguments;

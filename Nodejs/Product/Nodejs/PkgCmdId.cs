@@ -31,5 +31,8 @@ namespace Microsoft.NodejsTools
 
         // only allow 100 scripts
         public const int cmdidWorkSpaceNpmDynamicScriptMax = cmdidWorkSpaceNpmDynamicScript + 100;
+
+        // Workspace cmdIds
+        public const int cmdid_DebugActionContext = 0x1000;
     }
 }

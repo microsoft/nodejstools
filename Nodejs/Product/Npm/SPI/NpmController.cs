@@ -9,7 +9,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal class NpmController : AbstractNpmLogSource, INpmController
     {
-        private string fullPathToRootPackageDirectory;
         private string cachePath;
         private bool showMissingDevOptionalSubPackages;
         private INpmPathProvider npmPathProvider;
@@ -29,15 +28,17 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public NpmController(
             string fullPathToRootPackageDirectory,
             string cachePath,
+            bool isProject,
             bool showMissingDevOptionalSubPackages = false,
             INpmPathProvider npmPathProvider = null)
         {
-            this.fullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
+            this.IsProject = isProject;
+            this.FullPathToRootPackageDirectory = fullPathToRootPackageDirectory;
             this.cachePath = cachePath;
             this.showMissingDevOptionalSubPackages = showMissingDevOptionalSubPackages;
             this.npmPathProvider = npmPathProvider;
 
-            this.localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.fullPathToRootPackageDirectory);
+            this.localWatcher = CreateModuleDirectoryWatcherIfDirectoryExists(this.FullPathToRootPackageDirectory);
 
             try
             {
@@ -46,10 +47,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             catch (NpmNotFoundException) { }
         }
 
-        internal string FullPathToRootPackageDirectory
-        {
-            get { return this.fullPathToRootPackageDirectory; }
-        }
+        public bool IsProject { get; }
+
+        internal string FullPathToRootPackageDirectory { get; }
 
         internal string PathToNpm
         {
@@ -125,7 +125,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 }
 
                 this.RootPackage = RootPackageFactory.Create(
-                            this.fullPathToRootPackageDirectory,
+                            this.FullPathToRootPackageDirectory,
                             this.showMissingDevOptionalSubPackages);
                 return;
             }

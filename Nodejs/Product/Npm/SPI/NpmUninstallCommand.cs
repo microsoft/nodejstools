@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Globalization;
 
@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             bool global = false,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
-            : base(fullPathToRootPackageDirectory, pathToNpm)
+            : base(fullPathToRootPackageDirectory, showConsole: false, pathToNpm: pathToNpm)
         {
             this.Arguments = global
                             ? string.Format(CultureInfo.InvariantCulture, "uninstall {0} --g", packageName)
