@@ -11,7 +11,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             var parts = fullyQualifiedName.Split(new[] { "::" }, StringSplitOptions.None);
             if (parts.Length != 3)
             {
-                throw new ArgumentException("Invalid fully qualified test name", nameof(fullyQualifiedName));
+                throw new ArgumentException($"Invalid fully qualified test name. '{fullyQualifiedName}'", nameof(fullyQualifiedName));
             }
             this.ModulePath = parts[0];
             this.TestName = parts[1];
