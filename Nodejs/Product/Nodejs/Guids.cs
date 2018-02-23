@@ -66,6 +66,9 @@ namespace Microsoft.NodejsTools
         public const string PackageJsonContextTypeString = "{78F43160-2968-4FCA-8829-7E30E9B610CF}";
         public readonly static Guid PackageJsonContextType = new Guid(PackageJsonContextTypeString);
 
+        public const string TypeScriptContextTypeString = "{0E78FB31-F2A2-4AB8-A93D-1D123B3F677B}";
+        public readonly static Guid TypeScriptContextType = new Guid(TypeScriptContextTypeString);
+
         public const string WorkspaceExplorerDebugActionCmdSetString = "{5ea148a6-40af-4ff2-ab0f-60ed173c9f98}";
         public readonly static Guid WorkspaceExplorerDebugActionCmdSet = new Guid(WorkspaceExplorerDebugActionCmdSetString);
 

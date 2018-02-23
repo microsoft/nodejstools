@@ -61,5 +61,11 @@ namespace Microsoft.NodejsTools.TypeScript
 
             return null;
         }
+
+        public static bool IsTsConfigJsonFile(string filePath)
+        {
+            var fileName = Path.GetFileName(filePath);
+            return StringComparer.OrdinalIgnoreCase.Equals(fileName, "tsconfig.json");
+        }
     }
 }

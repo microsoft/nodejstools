@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.TypeScript
 {
-    internal class TsConfigJson
+    internal sealed class TsConfigJson
     {
         public readonly bool NoEmit;
 
@@ -28,11 +27,6 @@ namespace Microsoft.NodejsTools.TypeScript
         private bool SetNoEmit(JObject compilerOptions)
         {
             return bool.TryParse(compilerOptions["noEmit"]?.ToString(), out var result) && result;
-        }
-
-        public static bool IsValidFile(string filePath)
-        {
-            return filePath?.EndsWith("tsconfig.json", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }

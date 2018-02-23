@@ -7,6 +7,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.Extensions.Build;
@@ -41,25 +42,22 @@ namespace Microsoft.NodejsTools.Workspace
 
             public async Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, CancellationToken cancellationToken)
             {
-                if (IsTypeScriptFile(filePath))
+                if (TypeScriptHelpers.IsTypeScriptFile(filePath))
                 {
-                    var buildActionContext = new BuildActionContext("notepad.exe");
-                    var fileContext = new FileContext(new Guid(ProviderType), BuildActionContext.ContextTypeGuid, buildActionContext, Array.Empty<string>());
+                    var outFile = Path.ChangeExtension(filePath, "js");
+                    var buildActionContext = new BuildActionContext("notepad.exe", buildConfiguration: "debug");
 
-                    var projectTargetFileContext = new ProjectTargetFileContext(filePath);
+                    var fileContext = new FileContext(new Guid(ProviderType), BuildActionContext.ContextTypeGuid, buildActionContext, new[] { filePath });
 
-                    var debugLaunchContext = new DebugLaunchActionContext(filePath, this.vsDebugLaunchTargetProvider, projectTargetFileContext);
-                    var debugContext = new FileContext(new Guid(ProviderType), DebugLaunchActionContext.ContextTypeGuid, debugLaunchContext, Array.Empty<string>());
+                    var projectTargetFileContext = new ProjectTargetFileContext(filePath, outFile);
+
+                    var debugLaunchContext = new DebugLaunchActionContext(outFile, this.vsDebugLaunchTargetProvider, projectTargetFileContext, "debug");
+                    var debugContext = new FileContext(new Guid(ProviderType), DebugLaunchActionContext.ContextTypeGuid, debugLaunchContext, new[] { filePath });
 
                     return await Task.FromResult<IReadOnlyCollection<FileContext>>(new[] { fileContext, debugContext });
                 }
 
                 return Array.Empty<FileContext>();
-            }
-
-            private static bool IsTypeScriptFile(string filePath)
-            {
-                return StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(filePath), ".ts");
             }
         }
     }
@@ -134,4 +132,3 @@ namespace Microsoft.NodejsTools.Workspace
         }
     }
 }
-
