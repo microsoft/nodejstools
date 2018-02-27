@@ -171,10 +171,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private MSBuild.ProjectCollection buildEngine;
 
-        private IDEBuildLogger buildLogger;
-
-        private bool useProvidedLogger;
-
         private MSBuild.Project buildProject;
 
         private MSBuild.Project userBuildProject;
@@ -604,18 +600,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Gets or sets the build logger.
         /// </summary>
-        protected IDEBuildLogger BuildLogger
-        {
-            get
-            {
-                return this.buildLogger;
-            }
-            set
-            {
-                this.buildLogger = value;
-                this.useProvidedLogger = value != null;
-            }
-        }
+        protected IDEBuildLogger BuildLogger { get; set; }
 
         /// <summary>
         /// Gets the taskprovider.
@@ -1001,11 +986,11 @@ namespace Microsoft.VisualStudioTools.Project
                     SetBuildProject(null);
                 }
 
-                this.BuildLogger = null;
                 if (this.BuildLogger is IDisposable logger)
                 {
                     logger.Dispose();
                 }
+                this.BuildLogger = null;
 
                 var tasks = this.taskProvider;
                 this.taskProvider = null;
@@ -2577,24 +2562,22 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual void SetOutputLogger(IVsOutputWindowPane output)
         {
             // Create our logger, if it was not specified
-            if (!this.useProvidedLogger || this.buildLogger == null)
+            if (this.BuildLogger == null)
             {
                 // Create the logger
-                var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
-                logger.ErrorString = this.ErrorString;
-                logger.WarningString = this.WarningString;
-                this.BuildLogger = logger;
-                if (this.BuildLogger is IDisposable oldLogger)
+                var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>())
                 {
-                    oldLogger.Dispose();
-                }
+                    ErrorString = this.ErrorString,
+                    WarningString = this.WarningString
+                };
+                this.BuildLogger = logger;
             }
             else
             {
                 this.BuildLogger.OutputWindowPane = output;
             }
 
-            this.buildLogger.RefreshVerbosity();
+            this.BuildLogger.RefreshVerbosity();
         }
 
         /// <summary>
@@ -2659,7 +2642,7 @@ namespace Microsoft.VisualStudioTools.Project
                     submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
                     if (accessor != null)
                     {
-                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.buildLogger));
+                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                     }
 
                     var buildResult = submission.Execute();
@@ -2716,16 +2699,16 @@ namespace Microsoft.VisualStudioTools.Project
             var submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
             try
             {
-                if (this.useProvidedLogger && this.buildLogger != null)
+                if (this.BuildLogger != null)
                 {
-                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.buildLogger));
+                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                 }
 
                 submission.ExecuteAsync(sub =>
                 {
                     this.Site.GetUIThread().Invoke(() =>
                     {
-                        var ideLogger = this.buildLogger;
+                        var ideLogger = this.BuildLogger;
                         if (ideLogger != null)
                         {
                             ideLogger.FlushBuildOutput();
