@@ -288,8 +288,6 @@
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
     <Compile Include="Workspace\JsFileDebugLaunchTargerProvider.cs" />
-    <Compile Include="Workspace\NodeJsFileDebugLaunchTargetProvider.cs" />
-    <Compile Include="Workspace\NodeJsFileLaunchConfigurationProvider.cs" />
     <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
     <Compile Include="Workspace\TypeScriptBuildContextProvider.cs" />
     <Compile Include="Workspace\TypeScriptContextProviderFactory.cs" />
