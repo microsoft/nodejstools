@@ -4497,6 +4497,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},259" ItemType=";Menu" PsrId="240" Leaf="true">
           <Str Cat="Menu Item">
             <Val><![CDATA[Npm]]></Val>
+            <Tgt Cat="Menu Item" Stat="Loc" Orig="New">
+              <Val><![CDATA[npm]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4506,12 +4509,18 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},4096" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Start Script]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Iniciar script]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},4096" ItemType=";CommandName" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[StartScript]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[StartScript]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4521,6 +4530,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},512" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Install Missing npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Instalar los paquetes de npm que faltan...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4530,6 +4542,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},513" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Install New npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Instalar los nuevos paquetes de npm...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4539,6 +4554,9 @@
         <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},514" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button">
             <Val><![CDATA[Update npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Actualizar los paquetes de npm...]]></Val>
+            </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -5836,12 +5854,18 @@
       <Item ItemId=";6000" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Launch for Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Iniciar para Node.js]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";6001" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Debug launch configuration for Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Depurar la configuración de inicio de Node.js]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5872,7 +5896,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20221.1]]></Val>
+        <Val><![CDATA[1.4.20228.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5899,7 +5923,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20221.1 commit:063ed7f8cf8da9a83cd647f529d6c712c8c57c0c]]></Val>
+        <Val><![CDATA[1.4.20228.1 commit:79d35a30416015edcbcf036d9b42cc8a7d949f39]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
