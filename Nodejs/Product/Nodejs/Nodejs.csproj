@@ -284,7 +284,7 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-    <Compile Include="Workspace\JsFileDebugLaunchTargerProvider.cs" />
+    <Compile Include="Workspace\JsFileDebugLaunchTargetProvider.cs" />
     <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
   </ItemGroup>
   <ItemGroup>

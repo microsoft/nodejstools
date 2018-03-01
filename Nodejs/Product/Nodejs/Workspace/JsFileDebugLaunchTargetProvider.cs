@@ -16,12 +16,12 @@ using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
 namespace Microsoft.NodejsTools.Workspace
 {
     [ExportVsDebugLaunchTarget(ProviderType, new[] { ".js" }, ProviderPriority.Lowest)]
-    internal sealed class JsFileDebugLaunchTargerProvider : LaunchDebugTargetProvider, IVsDebugLaunchTargetProvider, ILaunchDebugTargetProvider
+    internal sealed class JsFileDebugLaunchTargetProvider : LaunchDebugTargetProvider, IVsDebugLaunchTargetProvider, ILaunchDebugTargetProvider
     {
         private const string ProviderType = "{0C231F54-C3EF-4719-9CA5-102B1B63A8DC}";
 
         [ImportingConstructor]
-        public JsFileDebugLaunchTargerProvider(SVsServiceProvider serviceProvider, IVsFolderWorkspaceService workspaceService)
+        public JsFileDebugLaunchTargetProvider(SVsServiceProvider serviceProvider, IVsFolderWorkspaceService workspaceService)
             : base(serviceProvider, workspaceService)
         {
         }
