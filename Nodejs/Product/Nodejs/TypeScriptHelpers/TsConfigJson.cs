@@ -18,13 +18,13 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             var compilerOptions = package["compilerOptions"] as JObject;
 
-            this.NoEmit = this.SetNoEmit(compilerOptions);
+            this.NoEmit = NoEmitSet(compilerOptions);
             this.OutFile = compilerOptions["outFile"]?.ToString();
             this.OutDir = compilerOptions["outDir"]?.ToString();
             this.RootDir = compilerOptions["rootDir"]?.ToString();
         }
 
-        private bool SetNoEmit(JObject compilerOptions)
+        private static bool NoEmitSet(JObject compilerOptions)
         {
             return bool.TryParse(compilerOptions["noEmit"]?.ToString(), out var result) && result;
         }

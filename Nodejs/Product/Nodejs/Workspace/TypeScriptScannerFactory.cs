@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio.Workspace;
+using Microsoft.VisualStudio.Workspace.Build;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.Indexing;
 
@@ -44,9 +45,9 @@ namespace Microsoft.NodejsTools.Workspace
                     var fileReferences = new List<FileReferenceInfo>
                     {
                         new FileReferenceInfo(outFile,
-                        context: "Debug",
-                        target: outFile,
-                        referenceType: (int)FileReferenceInfoType.Output)
+                                              context: "Debug",
+                                              target: outFile,
+                                              referenceType: (int)FileReferenceInfoType.Output)
                     };
 
                     return fileReferences;
@@ -74,12 +75,13 @@ namespace Microsoft.NodejsTools.Workspace
                         launchSettings,
                         target: outFile));
 
-                    // Target has to match the name used in the debug action context so it can be found during project configuration
-                    fileDataValues.Add(new FileDataValue(DebugLaunchActionContext.ContextTypeGuid, outFile, null, target: outFile));
+                    fileDataValues.Add(
+                        new FileDataValue(BuildConfigurationContext.ContextTypeGuid, outFile, null,
+                        context: "Debug", target: outFile));
 
-                    // Also need a null target so that can be found for the context menu when querying for build configurations. 
-                    // (See Microsoft.VisualStudio.Workspace.VSIntegration.UI.FileContextActionsCommandHandlersProvider.Provider.GetActionProviderForProjectConfiguration)
-                    fileDataValues.Add(new FileDataValue(DebugLaunchActionContext.ContextTypeGuid, outFile, null, target: null));
+                    fileDataValues.Add(
+                        new FileDataValue(BuildConfigurationContext.ContextTypeGuid, outFile, null,
+                        context: "Debug", target: null));
                 }
                 return Task.FromResult(fileDataValues);
             }

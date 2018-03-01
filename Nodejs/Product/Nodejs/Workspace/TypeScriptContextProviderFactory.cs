@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Build;
+using Microsoft.VisualStudio.Workspace.Debug;
 
 namespace Microsoft.NodejsTools.Workspace
 {
@@ -16,10 +17,10 @@ namespace Microsoft.NodejsTools.Workspace
     }
 
     [ExportFileContextProvider(
-        ProviderType,
-        ProviderPriority.Normal,
-        new Type[] { typeof(string) },
-        BuildContextTypes.BuildContextType)]
+              ProviderType,
+              ProviderPriority.Normal,
+              new Type[] { typeof(string) },
+              BuildContextTypes.BuildContextType)]
     public sealed class TypeScriptContextProviderFactory : IWorkspaceProviderFactory<IFileContextProvider>
     {
         private const string ProviderType = "{72D3FCEF-5787-4266-B8DD-D3ED06E35A2B}";
