@@ -4492,6 +4492,75 @@
     </Item>
     <Item ItemId=";Menus.ctmenu" ItemType="0" PsrId="240" Leaf="false">
       <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" />
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},259" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},259" ItemType=";Menu" PsrId="240" Leaf="true">
+          <Str Cat="Menu Item">
+            <Val><![CDATA[Npm]]></Val>
+            <Tgt Cat="Menu Item" Stat="Loc" Orig="New">
+              <Val><![CDATA[Npm]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},4096" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},4096" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Start Script]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Démarrer le script]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},4096" ItemType=";CommandName" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[StartScript]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[StartScript]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},512" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},512" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Install Missing npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Installer les packages npm manquants...]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},513" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},513" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Install New npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Installer les nouveaux packages npm...]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
+      <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},514" ItemType="0" PsrId="240" Leaf="false">
+        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
+        <Item ItemId=";{0d701f33-94a3-421c-9865-6f65e7e4b689},514" ItemType=";Button" PsrId="240" Leaf="true">
+          <Str Cat="Button">
+            <Val><![CDATA[Update npm Packages...]]></Val>
+            <Tgt Cat="Button" Stat="Loc" Orig="New">
+              <Val><![CDATA[Mettre à jour les packages npm...]]></Val>
+            </Tgt>
+          </Str>
+          <Disp Icon="Str" Expand="true" />
+        </Item>
+      </Item>
       <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},512" ItemType="0" PsrId="240" Leaf="false">
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},512" ItemType=";Button" PsrId="240" Leaf="true">
@@ -4676,75 +4745,6 @@
             <Val><![CDATA[Copy Full Path]]></Val>
             <Tgt Cat="Button" Stat="Loc" Orig="New">
               <Val><![CDATA[Copier le chemin complet]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
-      <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},259" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},259" ItemType=";Menu" PsrId="240" Leaf="true">
-          <Str Cat="Menu Item">
-            <Val><![CDATA[Npm]]></Val>
-            <Tgt Cat="Menu Item" Stat="Loc" Orig="New">
-              <Val><![CDATA[Npm]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
-      <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Start Script]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Démarrer le script]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},4096" ItemType=";CommandName" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[StartScript]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[StartScript]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
-      <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},512" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},512" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Install Missing npm Packages...]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Installer les packages npm manquants...]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
-      <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},513" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},513" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Install New npm Packages...]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Installer les nouveaux packages npm...]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
-      <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},514" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{985c4146-ce5d-4d56-912e-0ebbe2216fc1},514" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Update npm Packages...]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Mettre à jour les packages npm...]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -5851,6 +5851,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";6000" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Launch for Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Lancer pour Node.js]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";6001" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debug launch configuration for Node.js]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Configuration de lancement du débogage pour Node.js]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
     </Item>
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
@@ -5878,7 +5896,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20220.2]]></Val>
+        <Val><![CDATA[1.4.20227.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5905,7 +5923,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20220.2 commit:4bb501c20a211cf479df49ed63c5d16adb1fd1ca]]></Val>
+        <Val><![CDATA[1.4.20227.4 commit:4ea6c1cbe8d9e3e17fa4ac8fd88fc56a5daeb60a]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
