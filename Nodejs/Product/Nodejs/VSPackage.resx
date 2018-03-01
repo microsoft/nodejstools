@@ -504,10 +504,10 @@
   <data name="4010" xml:space="preserve">
     <value>JSON configuration file for the JavaScript Language Service</value>
   </data>
-   <data name="6000" xml:space="preserve">
+  <data name="6000" xml:space="preserve">
     <value>Launch for Node.js</value>
   </data>
   <data name="6001" xml:space="preserve">
-    <value>Debug launch configuration for Node.js</value>
+    <value>Debug JavaScript/TypeScript files with Node.js</value>
   </data>
 </root>
