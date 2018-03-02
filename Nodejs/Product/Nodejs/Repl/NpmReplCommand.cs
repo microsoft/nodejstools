@@ -110,19 +110,21 @@ namespace Microsoft.NodejsTools.Repl
                 }
             }
 
-            NodejsProjectNode nodejsProject = null;
             (string ProjectPath, IVsHierarchy Hierarchy) projectInfo;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
             {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
             }
-            else if (projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo))
+            else
             {
-                projectPath = projectInfo.ProjectPath;
-                if (projectInfo.Hierarchy != null)
-                {
-                    nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
-                }
+                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
+            }
+
+            NodejsProjectNode nodejsProject = null;
+            projectPath = projectInfo.ProjectPath;
+            if (projectInfo.Hierarchy != null)
+            {
+                nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
             }
 
             var isGlobalCommand = false;
