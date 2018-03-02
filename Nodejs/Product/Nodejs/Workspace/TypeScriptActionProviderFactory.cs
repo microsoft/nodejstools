@@ -29,8 +29,8 @@ namespace Microsoft.NodejsTools.Workspace
 
         public IReadOnlyCollection<CommandID> GetSupportedVsCommands()
         {
-            return new[] {
-                new CommandID(Guids.WorkspaceExplorerDebugActionCmdSet, PkgCmdId.cmdid_DebugActionContext ),
+            return new[] 
+            {
                 new CommandID(Guids.GuidWorkspaceExplorerBuildActionCmdSet, PkgCmdId.cmdid_BuildActionContext),
             };
         }
