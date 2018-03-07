@@ -797,4 +797,17 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="SaveInProjectFileToolTip" xml:space="preserve">
     <value>When checked the Node.js specific properties are saved per user</value>
   </data>
+  <data name="TscBuildCancelled" xml:space="preserve">
+    <value>Build Cancelled</value>
+  </data>
+  <data name="TscBuildCompleted" xml:space="preserve">
+    <value>Build Completed</value>
+  </data>
+  <data name="TscBuildError" xml:space="preserve">
+    <value>Error - Failed to start '{0}'</value>
+    <comment>Template is substituted with path to tsc.exe</comment>
+  </data>
+  <data name="TscBuildStarted" xml:space="preserve">
+    <value>Build Started</value>
+  </data>
 </root>

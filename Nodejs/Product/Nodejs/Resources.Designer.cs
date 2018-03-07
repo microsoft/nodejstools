@@ -1946,6 +1946,42 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Build Cancelled.
+        /// </summary>
+        internal static string TscBuildCancelled {
+            get {
+                return ResourceManager.GetString("TscBuildCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Completed.
+        /// </summary>
+        internal static string TscBuildCompleted {
+            get {
+                return ResourceManager.GetString("TscBuildCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error - Failed to start &apos;{0}&apos;.
+        /// </summary>
+        internal static string TscBuildError {
+            get {
+                return ResourceManager.GetString("TscBuildError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Started.
+        /// </summary>
+        internal static string TscBuildStarted {
+            get {
+                return ResourceManager.GetString("TscBuildStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed.
         /// </summary>
         internal static string TypeScriptMinVersionNotInstalled {

@@ -74,7 +74,9 @@ namespace Microsoft.NodejsTools
 
         public const string WorkspaceExplorerDebugActionCmdSetString = "5ea148a6-40af-4ff2-ab0f-60ed173c9f98";
         public readonly static Guid WorkspaceExplorerDebugActionCmdSet = new Guid(WorkspaceExplorerDebugActionCmdSetString);
-
+        public const string GuidWorkspaceExplorerBuildActionCmdSetString = "16537f6e-cb14-44da-b087-d1387ce3bf57";
+        public static readonly Guid GuidWorkspaceExplorerBuildActionCmdSet = new Guid(GuidWorkspaceExplorerBuildActionCmdSetString);
+        
         // Interactive window guids
         public const string NodejsInteractiveWindowString = "2153A414-267E-4731-B891-E875ADBA1993";
         public static readonly Guid NodejsInteractiveWindow = new Guid(NodejsInteractiveWindowString);
