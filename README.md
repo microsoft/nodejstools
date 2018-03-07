@@ -12,7 +12,7 @@ and our (old) [feature overview](https://channel9.msdn.com/events/Visual-Studio/
 
 Feel free to file issues or ask questions on our [issue tracker](http://github.com/Microsoft/nodejstools/issues), 
 and we welcome code contributions - see 
-[Contributing](https://github.com/Microsoft/nodejstools/.github/Contributing,md) for information. 
+[Contributing](https://github.com/Microsoft/nodejstools/.github/Contributing.md) for information. 
 
 ## Visual Studio 2017 installation
 
@@ -41,4 +41,4 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## License
 [Apache License 2.0 (Apache)](https://github.com/Microsoft/nodejstools/blob/master/LICENSE)
 
-Thank you for using and supporting the Node.js Tools for Visual Studio
+Thank you for using and supporting the Node.js Tools for Visual Studio.
