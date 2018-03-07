@@ -5862,10 +5862,13 @@
       </Item>
       <Item ItemId=";6001" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Debug launch configuration for Node.js]]></Val>
+          <Val><![CDATA[Debug JavaScript/TypeScript files with Node.js]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js için başlatma yapılandırmasında hata ayıkla]]></Val>
+            <Val><![CDATA[Node.js ile JavaScript/TypeScript dosyalarında hata ayıklama]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Debug launch configuration for Node.js]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -5896,7 +5899,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20228.1]]></Val>
+        <Val><![CDATA[1.4.20306.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5923,7 +5926,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20228.1 commit:79d35a30416015edcbcf036d9b42cc8a7d949f39]]></Val>
+        <Val><![CDATA[1.4.20306.1 commit:759b2ea7e5fd166770ccbdca745fb5d473237817]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
