@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -18,6 +18,13 @@ namespace Microsoft.NodejsTools.TypeScript
 
             return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptExtension)
                 || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptJsxExtension);
+        }
+
+        internal static bool IsTsJsConfigJsonFile(string filePath)
+        {
+            var fileName = Path.GetFileName(filePath);
+            return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.TsConfigJsonFile) ||
+                StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
         }
 
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)

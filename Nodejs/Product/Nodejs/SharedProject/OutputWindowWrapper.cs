@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -36,7 +35,7 @@ namespace Microsoft.VisualStudioTools.Project
             else
             {
                 ThreadHelper.ThrowIfNotOnUIThread();
-                var (title, guid) = GetPaneInfo();
+                var (title, guid) = GetPaneInfo(target);
                 var outputWindow = (IVsOutputWindow)this.ServiceProvider.GetService(typeof(SVsOutputWindow));
 
                 // Try to get the workspace pane if it has already been registered
@@ -60,16 +59,16 @@ namespace Microsoft.VisualStudioTools.Project
                 return lazyOutputPane;
             }
 
-            (string title, Guid guid) GetPaneInfo()
+            (string title, Guid guid) GetPaneInfo(OutputWindowTarget pane)
             {
-                switch (target)
+                switch (pane)
                 {
                     case OutputWindowTarget.Npm:
-                        return (Resources.NpmOutputPaneTitle, VSPackageManagerPaneGuid);
+                        return ("Npm", VSPackageManagerPaneGuid);
                     case OutputWindowTarget.Tsc:
                         return ("Tsc", TscPaneGuid); /* no need to localize since name of exe */
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(target));
+                        throw new ArgumentOutOfRangeException(nameof(pane));
                 }
             }
         }

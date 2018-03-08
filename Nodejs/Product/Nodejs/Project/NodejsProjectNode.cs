@@ -919,7 +919,7 @@ namespace Microsoft.NodejsTools.Project
             {
                 try
                 {
-                    return OutputWindowRedirector.Get(this.Site, VSPackageManagerPaneGuid, Resources.NpmOutputPaneTitle);
+                    return OutputWindowRedirector.Get(this.Site, VSPackageManagerPaneGuid, "Npm");
                 }
                 catch (InvalidOperationException)
                 {

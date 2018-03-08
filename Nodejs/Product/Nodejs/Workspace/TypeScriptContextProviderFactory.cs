@@ -40,21 +40,21 @@ namespace Microsoft.NodejsTools.Workspace
                 this.workspace = workspaceContext;
             }
 
-            public Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, CancellationToken cancellationToken)
+            public Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, string context, CancellationToken cancellationToken)
             {
-                return this.GetContextsForFileAsync(filePath, string.Empty, cancellationToken);
+                return this.GetContextsForFileAsync(filePath, cancellationToken);
             }
 
-            public async Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, string context, CancellationToken cancellationToken)
+            public async Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, CancellationToken cancellationToken)
             {
                 if (string.IsNullOrEmpty(filePath) || !IsSupportedFile(filePath))
                 {
                     return FileContext.EmptyFileContexts;
                 }
 
-                var (isContained, tsconfigJson) = await this.workspace.IsContainedByTsConfig(filePath);
+                var tsconfigJson = await this.workspace.IsContainedByTsConfig(filePath);
 
-                if (isContained)
+                if (tsconfigJson != null)
                 {
                     return FileContext.EmptyFileContexts;
                 }
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Workspace
 
             private static bool IsSupportedFile(string filePath)
             {
-                return TypeScriptHelpers.IsTypeScriptFile(filePath) || TsConfigJsonFactory.IsTsConfigJsonFile(filePath);
+                return TypeScriptHelpers.IsTypeScriptFile(filePath) || TypeScriptHelpers.IsTsJsConfigJsonFile(filePath);
             }
         }
     }

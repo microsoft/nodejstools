@@ -101,8 +101,8 @@ namespace Microsoft.NodejsTools.Workspace
             private async Task<string> DetermineOutFileAsync(string filePath)
             {
                 // check if there's a tsconfig which could be the root of this file. Use that to check the output file.
-                var (hasTsConfig, tsConfig) = await this.workspace.IsContainedByTsConfig(filePath);
-                if (hasTsConfig)
+                var tsConfig = await this.workspace.IsContainedByTsConfig(filePath);
+                if (tsConfig != null)
                 {
                     if (!string.IsNullOrEmpty(tsConfig.OutFile))
                     {
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.Workspace
                     }
 
                     var rootDir = Path.GetDirectoryName(tsConfig.FilePath);
-                    var relativeTsFile = filePath.Substring(rootDir.Length).TrimStart('/', '\\'); // save since we already know they have the same root
+                    var relativeTsFile = filePath.Substring(rootDir.Length).TrimStart('\\'); // save since we already know they have the same root
 
                     return this.workspace.MakeRelative(Path.Combine(rootDir, tsConfig.OutDir, Path.ChangeExtension(relativeTsFile, "js"))); // this works if outdir is null
                 }

@@ -941,7 +941,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled.
+        ///   Looks up a localized string similar to {0} canceled.
         /// </summary>
         internal static string NpmCancelled {
             get {
@@ -950,7 +950,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled with errors - see Output window for details.
+        ///   Looks up a localized string similar to {0} canceled with errors - see Output window for details.
         /// </summary>
         internal static string NpmCancelledWithErrors {
             get {
@@ -1031,15 +1031,6 @@ namespace Microsoft.NodejsTools {
         internal static string NpmNotInstalledMessageText {
             get {
                 return ResourceManager.GetString("NpmNotInstalledMessageText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Npm.
-        /// </summary>
-        internal static string NpmOutputPaneTitle {
-            get {
-                return ResourceManager.GetString("NpmOutputPaneTitle", resourceCulture);
             }
         }
         
@@ -1946,11 +1937,11 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Build Cancelled.
+        ///   Looks up a localized string similar to Build Canceled.
         /// </summary>
-        internal static string TscBuildCancelled {
+        internal static string TscBuildCanceled {
             get {
-                return ResourceManager.GetString("TscBuildCancelled", resourceCulture);
+                return ResourceManager.GetString("TscBuildCanceled", resourceCulture);
             }
         }
         

@@ -35,6 +35,7 @@ namespace Microsoft.NodejsTools
         internal const string DefaultPackageMainFile = "index.js";
 
         internal const string TsConfigJsonFile = "tsconfig.json";
+        internal const string JsConfigJsonFile = "jsconfig.json";
 
         internal const string BaseRegistryKey = "NodejsTools";
 

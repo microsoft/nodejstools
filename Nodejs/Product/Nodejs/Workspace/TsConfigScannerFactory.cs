@@ -16,9 +16,9 @@ namespace Microsoft.NodejsTools.Workspace
 {
     [ExportFileScanner(
         ProviderType, "TsConfigFileProvider",
-        new string[] { NodejsConstants.TsConfigJsonFile },
+        new string[] { NodejsConstants.TsConfigJsonFile, NodejsConstants.JsConfigJsonFile },
         new Type[] { typeof(IReadOnlyCollection<FileDataValue>), typeof(IReadOnlyCollection<FileReferenceInfo>) },
-        ProviderPriority.Highest)]
+        ProviderPriority.Normal)]
     public sealed class TsConfigScannerFactory : IWorkspaceProviderFactory<IFileScanner>
     {
 
@@ -97,7 +97,7 @@ namespace Microsoft.NodejsTools.Workspace
             {
                 // Only use the tsconfig.json determine the debug target when there is an outfile specified,
                 // otherwise each .ts file can (in theory) be the entry point.
-                if (TsConfigJsonFactory.IsTsConfigJsonFile(filePath))
+                if (TypeScriptHelpers.IsTsJsConfigJsonFile(filePath))
                 {
                     var tsconfig = await TsConfigJsonFactory.CreateAsync(filePath);
                     return !string.IsNullOrEmpty(tsconfig?.OutFile);

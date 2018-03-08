@@ -64,15 +64,15 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var actions = new List<IFileContextAction>();
 
-                if (TsConfigJsonFactory.IsTsConfigJsonFile(filePath))
+                if (TypeScriptHelpers.IsTsJsConfigJsonFile(filePath))
                 {
                     actions.Add(new BuildTsConfigContextAction(filePath, fileContext, this.outputPane));
                 }
-                if (TypeScriptHelpers.IsTypeScriptFile(filePath))
+                else if (TypeScriptHelpers.IsTypeScriptFile(filePath))
                 {
-                    var (isContained, tsconfig) = await this.workspaceContext.IsContainedByTsConfig(filePath);
+                    var tsconfig = await this.workspaceContext.IsContainedByTsConfig(filePath);
 
-                    if (!isContained)
+                    if (tsconfig == null)
                     {
                         actions.Add(new BuildTsFileContextAction(filePath, fileContext, this.outputPane));
                     }

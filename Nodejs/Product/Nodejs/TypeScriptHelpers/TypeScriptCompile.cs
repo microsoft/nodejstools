@@ -25,7 +25,7 @@ namespace Microsoft.NodejsTools.TypeScript
 
         public static async Task<bool> CompileProjectAsync(string filePath, OutputPaneWrapper outputPane)
         {
-            if (!TsConfigJsonFactory.IsTsConfigJsonFile(filePath) || !Path.IsPathRooted(filePath))
+            if (!TypeScriptHelpers.IsTsJsConfigJsonFile(filePath) || !Path.IsPathRooted(filePath))
             {
                 throw new ArgumentException($"{nameof(filePath)} has to be a rooted 'tsconfig.json' file.");
             }
@@ -76,7 +76,7 @@ namespace Microsoft.NodejsTools.TypeScript
                     else
                     {
                         process.Kill();
-                        redirector.WriteErrorLine($"==== {Resources.TscBuildCancelled} ====");
+                        redirector.WriteErrorLine($"==== {Resources.TscBuildCanceled} ====");
 
                         return false;
                     }

@@ -5,6 +5,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.TypeScript
 {
+    // TODO: replace this with calls to the TSJS Language Service
+
     [DebuggerDisplay("{FilePath}")]
     internal sealed class TsConfigJson
     {

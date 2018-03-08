@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.TypeScript
     {
         public static async Task<TsConfigJson> CreateAsync(string fullPathToFile)
         {
-            if (fullPathToFile == null || !fullPathToFile.EndsWith(NodejsConstants.TsConfigJsonFile, StringComparison.OrdinalIgnoreCase))
+            if (!TypeScriptHelpers.IsTsJsConfigJsonFile(fullPathToFile))
             {
                 throw new ArgumentException("Expected full path to 'tsconfig.json' file.", nameof(fullPathToFile));
             }
@@ -21,10 +21,9 @@ namespace Microsoft.NodejsTools.TypeScript
             if (File.Exists(fullPathToFile))
             {
                 var retryInterval = 500;
-                var attempts = 5;
 
                 // populate _source with retries for recoverable errors.
-                while (--attempts >= 0)
+                for(var attempts = 5; attempts >=0; attempts--)
                 {
                     try
                     {
@@ -60,12 +59,6 @@ namespace Microsoft.NodejsTools.TypeScript
             }
 
             return null;
-        }
-
-        public static bool IsTsConfigJsonFile(string filePath)
-        {
-            var fileName = Path.GetFileName(filePath);
-            return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.TsConfigJsonFile);
         }
     }
 }

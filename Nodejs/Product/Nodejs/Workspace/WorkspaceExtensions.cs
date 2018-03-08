@@ -1,8 +1,8 @@
-﻿using System;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio.Workspace;
@@ -11,25 +11,25 @@ namespace Microsoft.NodejsTools.Workspace
 {
     internal static class WorkspaceExtensions
     {
-        public static async Task<(bool, TsConfigJson)> IsContainedByTsConfig(this IWorkspace workspace, string filePath)
+        public static async Task<TsConfigJson> IsContainedByTsConfig(this IWorkspace workspace, string filePath)
         {
             var fileService = workspace.GetFindFilesService();
             var collector = new FileCollector();
-            await fileService.FindFilesAsync(NodejsConstants.TsConfigJsonFile, collector);
+            await fileService.FindFilesAsync("sconfig.json", collector);
 
-            if (collector.FoundFiles.Count > 0)
+            foreach (var configFile in collector.FoundFiles)
             {
-                foreach (var file in collector.FoundFiles)
+                if (TypeScriptHelpers.IsTsJsConfigJsonFile(configFile))
                 {
-                    var directory = Path.GetDirectoryName(file);
+                    var directory = Path.GetDirectoryName(configFile);
                     if (filePath.StartsWith(directory, StringComparison.OrdinalIgnoreCase))
                     {
-                        return (true, await TsConfigJsonFactory.CreateAsync(file));
+                        return await TsConfigJsonFactory.CreateAsync(configFile);
                     }
                 }
             }
 
-            return (false, null);
+            return null;
         }
 
         private sealed class FileCollector : IProgress<string>
