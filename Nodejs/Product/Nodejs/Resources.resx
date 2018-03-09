@@ -344,13 +344,13 @@
     <value>More than 3 months ago</value>
   </data>
   <data name="NpmCancelledWithErrors" xml:space="preserve">
-    <value>{0} cancelled with errors - see Output window for details</value>
+    <value>{0} canceled with errors - see Output window for details</value>
   </data>
   <data name="NpmCompletedWithErrors" xml:space="preserve">
     <value>{0} completed with errors - see Output window for details</value>
   </data>
   <data name="NpmCancelled" xml:space="preserve">
-    <value>{0} cancelled</value>
+    <value>{0} canceled</value>
   </data>
   <data name="NpmSuccessfullyCompleted" xml:space="preserve">
     <value>{0} successfully completed</value>
@@ -412,9 +412,6 @@ NAME2=value2
   </data>
   <data name="NodejsPortDescription" xml:space="preserve">
     <value>Specifies the port number used for process.env.port, if unspecified a random port is generated.</value>
-  </data>
-  <data name="NpmOutputPaneTitle" xml:space="preserve">
-    <value>Npm</value>
   </data>
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
     <value>(enter arguments above)</value>
@@ -796,5 +793,18 @@ Error retrieving websocket debug proxy information from web.config.</value>
   </data>
   <data name="SaveInProjectFileToolTip" xml:space="preserve">
     <value>When checked the Node.js specific properties are saved per user</value>
+  </data>
+  <data name="TscBuildCanceled" xml:space="preserve">
+    <value>Build Canceled</value>
+  </data>
+  <data name="TscBuildCompleted" xml:space="preserve">
+    <value>Build Completed</value>
+  </data>
+  <data name="TscBuildError" xml:space="preserve">
+    <value>Error - Failed to start '{0}'</value>
+    <comment>Template is substituted with path to tsc.exe</comment>
+  </data>
+  <data name="TscBuildStarted" xml:space="preserve">
+    <value>Build Started</value>
   </data>
 </root>

@@ -18,17 +18,14 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Workspace
 {
     [Export(typeof(INodeExtender))]
-    internal sealed class ContextMenuProvider : INodeExtender
+    public sealed class ContextMenuProvider : INodeExtender
     {
         private readonly IWorkspaceCommandHandler npmHandler;
-
-        private readonly OutputPaneWrapper outputPane;
 
         [ImportingConstructor]
         public ContextMenuProvider(OutputPaneWrapper outputPane)
         {
-            this.outputPane = outputPane;
-            this.npmHandler = new NpmCommandHandler(this.outputPane);
+            this.npmHandler = new NpmCommandHandler(outputPane);
         }
 
         public IChildrenSource ProvideChildren(WorkspaceVisualNodeBase parentNode)

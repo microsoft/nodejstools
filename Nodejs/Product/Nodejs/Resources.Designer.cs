@@ -941,7 +941,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled.
+        ///   Looks up a localized string similar to {0} canceled.
         /// </summary>
         internal static string NpmCancelled {
             get {
@@ -950,7 +950,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled with errors - see Output window for details.
+        ///   Looks up a localized string similar to {0} canceled with errors - see Output window for details.
         /// </summary>
         internal static string NpmCancelledWithErrors {
             get {
@@ -1031,15 +1031,6 @@ namespace Microsoft.NodejsTools {
         internal static string NpmNotInstalledMessageText {
             get {
                 return ResourceManager.GetString("NpmNotInstalledMessageText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Npm.
-        /// </summary>
-        internal static string NpmOutputPaneTitle {
-            get {
-                return ResourceManager.GetString("NpmOutputPaneTitle", resourceCulture);
             }
         }
         
@@ -1942,6 +1933,42 @@ namespace Microsoft.NodejsTools {
         internal static string TestFrameworkDescription {
             get {
                 return ResourceManager.GetString("TestFrameworkDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Canceled.
+        /// </summary>
+        internal static string TscBuildCanceled {
+            get {
+                return ResourceManager.GetString("TscBuildCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Completed.
+        /// </summary>
+        internal static string TscBuildCompleted {
+            get {
+                return ResourceManager.GetString("TscBuildCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error - Failed to start &apos;{0}&apos;.
+        /// </summary>
+        internal static string TscBuildError {
+            get {
+                return ResourceManager.GetString("TscBuildError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Started.
+        /// </summary>
+        internal static string TscBuildStarted {
+            get {
+                return ResourceManager.GetString("TscBuildStarted", resourceCulture);
             }
         }
         

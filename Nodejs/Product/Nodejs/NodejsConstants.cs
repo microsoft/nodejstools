@@ -34,6 +34,9 @@ namespace Microsoft.NodejsTools
         internal const string PackageJsonMainFileKey = "main";
         internal const string DefaultPackageMainFile = "index.js";
 
+        internal const string TsConfigJsonFile = "tsconfig.json";
+        internal const string JsConfigJsonFile = "jsconfig.json";
+
         internal const string BaseRegistryKey = "NodejsTools";
 
         internal const ushort DefaultDebuggerPort = 5858;

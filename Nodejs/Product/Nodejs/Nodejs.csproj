@@ -194,6 +194,10 @@
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="TypeScriptHelpers\TsConfigJson.cs" />
+    <Compile Include="TypeScriptHelpers\TsConfigJsonFactory.cs" />
+    <Compile Include="TypeScriptHelpers\TypeScriptCompile.cs" />
+    <Compile Include="TypeScriptHelpers\TypeScriptCompilerLocator.cs" />
     <Compile Include="Workspace\BaseFileScanner.cs" />
     <Compile Include="Workspace\ContextMenuProvider.cs" />
     <Compile Include="Workspace\LaunchDebugTargetProvider.cs" />
@@ -286,6 +290,11 @@
     <Compile Include="Jade\JadeEditorFactory.cs" />
     <Compile Include="Workspace\JsFileDebugLaunchTargetProvider.cs" />
     <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
+    <Compile Include="Workspace\TsConfigScannerFactory.cs" />
+    <Compile Include="Workspace\TypeScriptActionProviderFactory.cs" />
+    <Compile Include="Workspace\TypeScriptContextProviderFactory.cs" />
+    <Compile Include="Workspace\TypeScriptScannerFactory.cs" />
+    <Compile Include="Workspace\WorkspaceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
