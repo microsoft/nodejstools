@@ -236,9 +236,10 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ProgressBar Name="_progress"
-                             Height="4"
-                             IsIndeterminate="{Binding Path=IsExecutingCommand}"
-                             Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
+                         Height="4"
+                         IsEnabled="{Binding Path=IsExecutingCommand}"
+                         IsIndeterminate="{Binding Path=IsExecutingCommand}"
+                         Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
             <Button x:Name="CloseButton"
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
