@@ -18,7 +18,7 @@ namespace Microsoft.NodejsTools.NpmUI
                     return StringComparer.OrdinalIgnoreCase.Equals(state, expected) ? Visibility.Visible : Visibility.Hidden;
                 }
 
-                if(targetType == typeof(bool))
+                if (targetType == typeof(bool))
                 {
                     return StringComparer.OrdinalIgnoreCase.Equals(state, expected);
                 }
