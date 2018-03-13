@@ -407,7 +407,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Options\NodejsGeneralOptionsControl.Designer.cs">
-      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NodejsGeneralOptionsControl.resx</DependentUpon>
     </Compile>
     <Compile Include="Project\AbstractNpmNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
@@ -576,6 +578,7 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
       <SubType>Designer</SubType>
+      <LastGenOutput>NodejsGeneralOptionsControl.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -1264,9 +1267,10 @@
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(OutDir)RemoteDebug\
-copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
-</PostBuildEvent>
+    <PostBuildEvent>
+      mkdir $(OutDir)RemoteDebug\
+      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- 
       We build these assemblies into separate folders to avoid incremental cleaning issues,

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -52,11 +52,6 @@ namespace Microsoft.NodejsTools.Options
         public bool EditAndContinue { get; set; }
 
         /// <summary>
-        /// Indicates whether checks for long paths (exceeding MAX_PATH) are performed after installing packages.
-        /// </summary>
-        public bool CheckForLongPaths { get; set; }
-
-        /// <summary>
         /// Resets settings back to their defaults. This should be followed by
         /// a call to <see cref="SaveSettingsToStorage" /> to commit the new
         /// values.
@@ -66,7 +61,6 @@ namespace Microsoft.NodejsTools.Options
             this.WaitOnAbnormalExit = true;
             this.WaitOnNormalExit = false;
             this.EditAndContinue = true;
-            this.CheckForLongPaths = true;
         }
 
         public override void LoadSettingsFromStorage()
@@ -75,7 +69,6 @@ namespace Microsoft.NodejsTools.Options
             this.WaitOnAbnormalExit = LoadBool(WaitOnAbnormalExitSetting) ?? true;
             this.WaitOnNormalExit = LoadBool(WaitOnNormalExitSetting) ?? false;
             this.EditAndContinue = LoadBool(EditAndContinueSetting) ?? true;
-            this.CheckForLongPaths = LoadBool(CheckForLongPathsSetting) ?? true;
 
             // Synchronize UI with backing properties.
             if (this._window != null)
@@ -96,7 +89,6 @@ namespace Microsoft.NodejsTools.Options
             SaveBool(WaitOnNormalExitSetting, this.WaitOnNormalExit);
             SaveBool(WaitOnAbnormalExitSetting, this.WaitOnAbnormalExit);
             SaveBool(EditAndContinueSetting, this.EditAndContinue);
-            SaveBool(CheckForLongPathsSetting, this.CheckForLongPaths);
         }
     }
 }

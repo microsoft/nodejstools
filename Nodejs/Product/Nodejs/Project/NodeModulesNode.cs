@@ -285,11 +285,6 @@ namespace Microsoft.NodejsTools.Project
 
             var message = GetStatusBarMessage(e);
             ForceUpdateStatusBarWithNpmActivitySafe(message);
-
-            StopNpmIdleTimer();
-            this._npmIdleTimer = new Timer(
-                _ => this.ProjectMgr.Site.GetUIThread().Invoke(() => this.projectNode.CheckForLongPaths(e.Arguments).HandleAllExceptions(SR.ProductName).DoNotWait()),
-                null, 1000, Timeout.Infinite);
         }
 
         private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e)

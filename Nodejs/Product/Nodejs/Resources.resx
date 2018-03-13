@@ -419,42 +419,6 @@ NAME2=value2
   <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
     <value>{0} completed with errors</value>
   </data>
-  <data name="LongPathWarningTitle" xml:space="preserve">
-    <value>Path Too Long Warning</value>
-  </data>
-  <data name="LongPathWarningText" xml:space="preserve">
-    <value>Your project folder contains one or more paths that exceed the &lt;a href="#msdn"&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href="#uservoice"&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.</value>
-  </data>
-  <data name="LongPathShowPathsExceedingTheLimit" xml:space="preserve">
-    <value>Show &amp;paths exceeding the limit</value>
-  </data>
-  <data name="LongPathHidePathsExceedingTheLimit" xml:space="preserve">
-    <value>Hide &amp;paths exceeding the limit</value>
-  </data>
-  <data name="LongPathNpmDedupe" xml:space="preserve">
-    <value>Run 'npm &amp;dedupe' on the project</value>
-  </data>
-  <data name="LongPathNpmDedupeDetail" xml:space="preserve">
-    <value>In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.</value>
-  </data>
-  <data name="LongPathDoNothingButWarnNextTime" xml:space="preserve">
-    <value>Do nothing, but &amp;warn me next time it happens</value>
-  </data>
-  <data name="LongPathDoNothingAndDoNotWarnAgain" xml:space="preserve">
-    <value>Do nothing and &amp;never warn me again</value>
-  </data>
-  <data name="LongPathDoNothingAndDoNotWarnAgainDetail" xml:space="preserve">
-    <value>You can re-enable the check in Tools → Options → Node.js Tools → General.</value>
-  </data>
-  <data name="LongPathFooter" xml:space="preserve">
-    <value>&lt;a href="#help"&gt;Get more information&lt;/a&gt;</value>
-  </data>
-  <data name="LongPathClickToCopy" xml:space="preserve">
-    <value>Copy Full Path</value>
-  </data>
-  <data name="LongPathNpmDedupeDidNotHelp" xml:space="preserve">
-    <value>Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the &lt;a href="#help"&gt;documentation&lt;/a&gt; for other potential workarounds.</value>
-  </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
     <value>Could Not Clear Node.js Cache Directory</value>
   </data>
@@ -488,38 +452,11 @@ NAME2=value2
   <data name="RemoteDebugProxyFolderDoesNotExist" xml:space="preserve">
     <value>Could not find RemoteDebugProxyFolder</value>
   </data>
-  <data name="TypingsToolTypingsInstallCompleted" xml:space="preserve">
-    <value>Successfully installed typing files for IntelliSense.</value>
-  </data>
-  <data name="TypingsToolNotInstalledError" xml:space="preserve">
-    <value>Could not find Typings package manager tool used for IntelliSense</value>
-  </data>
-  <data name="TypingsToolTypingsInstallErrorOccurred" xml:space="preserve">
-    <value>An error occurred installing typings used for IntelliSense.</value>
-  </data>
-  <data name="TypingsInfoBarSpan1" xml:space="preserve">
-    <value>Node.js IntelliSense added a </value>
-  </data>
-  <data name="TypingsInfoBarSpan2" xml:space="preserve">
-    <value>typings folder</value>
-  </data>
-  <data name="TypingsInfoBarSpan3" xml:space="preserve">
-    <value> to your project</value>
-  </data>
-  <data name="TypingsOpenOptionsText" xml:space="preserve">
-    <value>Customize...</value>
-  </data>
   <data name="StatusTypingsLoaded" xml:space="preserve">
     <value>Node.js IntelliSense typings folder is up to date</value>
   </data>
   <data name="StatusTypingsLoading" xml:space="preserve">
     <value>Loading Node.js IntelliSense typings for npm packages...</value>
-  </data>
-  <data name="TypingsToolInstallFailed" xml:space="preserve">
-    <value>Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed</value>
-  </data>
-  <data name="TypingsToolCouldNotStart" xml:space="preserve">
-    <value>Could not start Typings tool used for IntelliSense</value>
   </data>
   <data name="TypeScriptMinVersionNotInstalled" xml:space="preserve">
     <value>Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed</value>

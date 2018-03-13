@@ -566,105 +566,6 @@ namespace Microsoft.NodejsTools.Project
             public bool IsDirectory;
         }
 
-        private static readonly Regex _uninstallRegex = new Regex(@"\b(uninstall|rm)\b");
-        private bool _isCheckingForLongPaths;
-
-        public async Task CheckForLongPaths(string npmArguments = null)
-        {
-            if (this._isCheckingForLongPaths || !NodejsPackage.Instance.GeneralOptionsPage.CheckForLongPaths)
-            {
-                return;
-            }
-
-            if (npmArguments != null && _uninstallRegex.IsMatch(npmArguments))
-            {
-                return;
-            }
-
-            try
-            {
-                this._isCheckingForLongPaths = true;
-
-                var longPaths = await Task.Factory.StartNew(() =>
-                    GetLongSubPaths(this.ProjectHome).Any() || GetLongSubPaths(this._intermediateOutputPath).Any());
-
-                if (longPaths)
-                {
-                    Utilities.ShowMessageBox(
-                      this.Site, Resources.LongPathWarningText, SR.ProductName, OLEMSGICON.OLEMSGICON_WARNING, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                }
-            }
-            finally
-            {
-                this._isCheckingForLongPaths = false;
-            }
-        }
-
-        internal static IEnumerable<LongPathInfo> GetLongSubPaths(string basePath, string path = "")
-        {
-            const int MaxFilePathLength = 260 - 1; // account for terminating NULL
-            const int MaxDirectoryPathLength = 248 - 1;
-
-            basePath = CommonUtils.EnsureEndSeparator(basePath);
-
-            var hFind = NativeMethods.FindFirstFile(basePath + path + "\\*", out var wfd);
-            if (hFind == NativeMethods.INVALID_HANDLE_VALUE)
-            {
-                yield break;
-            }
-
-            try
-            {
-                do
-                {
-                    if (wfd.cFileName == "." || wfd.cFileName == "..")
-                    {
-                        continue;
-                    }
-
-                    var isDirectory = (wfd.dwFileAttributes & NativeMethods.FILE_ATTRIBUTE_DIRECTORY) != 0;
-
-                    var childPath = path;
-                    if (childPath != string.Empty)
-                    {
-                        childPath += "\\";
-                    }
-                    childPath += wfd.cFileName;
-
-                    var fullChildPath = basePath + childPath;
-                    bool isTooLong;
-                    try
-                    {
-                        isTooLong = Path.GetFullPath(fullChildPath).Length > (isDirectory ? MaxDirectoryPathLength : MaxFilePathLength);
-                    }
-                    catch (PathTooLongException)
-                    {
-                        isTooLong = true;
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
-
-                    if (isTooLong)
-                    {
-                        yield return new LongPathInfo { FullPath = fullChildPath, RelativePath = childPath, IsDirectory = isDirectory };
-                    }
-                    else if (isDirectory)
-                    {
-                        foreach (var item in GetLongSubPaths(basePath, childPath))
-                        {
-                            yield return item;
-                        }
-                    }
-                } while (NativeMethods.FindNextFile(hFind, out wfd));
-            }
-            finally
-            {
-                NativeMethods.FindClose(hFind);
-            }
-        }
-
         internal event EventHandler OnDispose;
 
         protected override void Dispose(bool disposing)
@@ -689,18 +590,8 @@ namespace Microsoft.NodejsTools.Project
             base.Dispose(disposing);
         }
 
-        internal override async void BuildAsync(uint vsopts, string config, VisualStudio.Shell.Interop.IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback)
+        internal override void BuildAsync(uint vsopts, string config, VisualStudio.Shell.Interop.IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback)
         {
-            try
-            {
-                await CheckForLongPaths();
-            }
-            catch (Exception)
-            {
-                uiThreadCallback(MSBuildResult.Failed, target);
-                return;
-            }
-
             // BuildAsync can throw on the sync path before invoking the callback. If it does, we must still invoke the callback here,
             // because by this time there's no other way to propagate the error to the caller.
             try
