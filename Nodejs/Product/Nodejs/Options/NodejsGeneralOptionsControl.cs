@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Windows.Forms;
 
@@ -16,7 +16,6 @@ namespace Microsoft.NodejsTools.Options
             this._waitOnAbnormalExit.Checked = page.WaitOnAbnormalExit;
             this._waitOnNormalExit.Checked = page.WaitOnNormalExit;
             this._editAndContinue.Checked = page.EditAndContinue;
-            this._checkForLongPaths.Checked = page.CheckForLongPaths;
         }
 
         internal void SyncPageWithControlSettings(NodejsGeneralOptionsPage page)
@@ -24,7 +23,6 @@ namespace Microsoft.NodejsTools.Options
             page.WaitOnAbnormalExit = this._waitOnAbnormalExit.Checked;
             page.WaitOnNormalExit = this._waitOnNormalExit.Checked;
             page.EditAndContinue = this._editAndContinue.Checked;
-            page.CheckForLongPaths = this._checkForLongPaths.Checked;
         }
     }
 }

@@ -180,11 +180,6 @@ namespace Microsoft.NodejsTools.Repl
                 window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, arguments));
             }
 
-            if (nodejsProject != null)
-            {
-                await nodejsProject.CheckForLongPaths(npmArguments);
-            }
-
             return ExecutionResult.Success;
         }
 
