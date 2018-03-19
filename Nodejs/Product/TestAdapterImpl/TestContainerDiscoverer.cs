@@ -532,7 +532,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 string root = null;
                 switch (e.ChangedReason)
                 {
-                    case TestFileChangedReason.Added:
+                    case WatcherChangeTypes.Created:
                         Debug.Assert(e.Project != null);
                         if (e.Project.IsTestProject(Guids.NodejsBaseProjectFactory))
                         {
@@ -551,7 +551,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             OnTestContainersChanged(e.Project);
                         }
                         break;
-                    case TestFileChangedReason.Removed:
+                    case WatcherChangeTypes.Deleted:
                         Debug.Assert(e.Project != null);
 
                         if (this.fileRootMap.TryGetValue(e.File, out root))
@@ -577,8 +577,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // Dev12 renames files instead of overwriting them when
                     // saving, so we need to listen for renames where the new
                     // path is part of the project.
-                    case TestFileChangedReason.Renamed:
-                    case TestFileChangedReason.Changed:
+                    case WatcherChangeTypes.Renamed:
+                    case WatcherChangeTypes.Changed:
                         OnTestContainersChanged(GetTestProjectFromFile(e.File));
                         break;
                 }
