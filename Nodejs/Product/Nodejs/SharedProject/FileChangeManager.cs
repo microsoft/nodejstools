@@ -9,26 +9,12 @@ using IServiceProvider = System.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools.Project
 {
-    public sealed class FolderChangedEventArgs : EventArgs
-    {
-        public readonly string FolderName;
-        public readonly string FileName;
-        public _VSFILECHANGEFLAGS FileChangeFlag;
-
-        public FolderChangedEventArgs(string folderName, string fileName, _VSFILECHANGEFLAGS fileChangeFlag)
-        {
-            this.FolderName = folderName;
-            this.FileName = fileName;
-            this.FileChangeFlag = fileChangeFlag;
-        }
-    }
-
     /// <summary>
     /// This object is in charge of watching for changes to files and folders.
     /// </summary>
     internal sealed class FileChangeManager
     {
-        private sealed class FileChangeEvents : IVsFreeThreadedFileChangeEvents
+        private sealed class FileChangeEvents : IVsFreeThreadedFileChangeEvents2
         {
             private readonly FileChangeManager fileChangeManager;
 
@@ -56,6 +42,44 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(flags));
                 }
 
+                ProcessFileChanges(numberOfFilesChanged, filesChanged, flags);
+
+                return VSConstants.S_OK;
+            }
+
+            public int DirectoryChanged(string directory)
+            {
+                // not called since we implement DirectoryChangedEx2
+                return VSConstants.E_NOTIMPL;
+            }
+
+            public int DirectoryChangedEx(string pszDirectory, string pszFile)
+            {
+                // not called since we implement DirectoryChangedEx2
+                return VSConstants.E_NOTIMPL;
+            }
+
+            /// <summary>
+            /// Notifies clients of changes made to a directory. 
+            /// </summary>
+            /// <param name="directory">Name of the directory that had a change.</param>
+            /// <param name="numberOfFilesChanged">Number of files changed.</param>
+            /// <param name="filesChanged">Array of file names.</param>
+            /// <param name="flags">Array of flags indicating the type of changes. See _VSFILECHANGEFLAGS.</param>
+            public int DirectoryChangedEx2(string directory, uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
+            {
+                if (filesChanged == null)
+                {
+                    throw new ArgumentNullException(nameof(filesChanged));
+                }
+
+                ProcessFileChanges(numberOfFilesChanged, filesChanged, flags);
+
+                return VSConstants.S_OK;
+            }
+
+            private void ProcessFileChanges(uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
+            {
                 for (var i = 0; i < numberOfFilesChanged; i++)
                 {
                     var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
@@ -65,36 +89,6 @@ namespace Microsoft.VisualStudioTools.Project
                         this.fileChangeManager.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(fullFileName, ItemID, (_VSFILECHANGEFLAGS)flags[i]));
                     }
                 }
-
-                return VSConstants.S_OK;
-            }
-
-            /// <summary>
-            /// Notifies clients of changes made to a directory. 
-            /// </summary>
-            /// <param name="directory">Name of the directory that had a change.</param>
-            /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
-            public int DirectoryChanged(string directory)
-            {
-                return VSConstants.S_OK;
-            }
-
-            public int DirectoryChangedEx(string pszDirectory, string pszFile)
-            {
-                if (pszDirectory == null)
-                {
-                    throw new ArgumentNullException(nameof(pszDirectory));
-                }
-
-                if (pszFile == null)
-                {
-                    throw new ArgumentNullException(nameof(pszFile));
-                }
-
-                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile,
-                    (_VSFILECHANGEFLAGS)0 /* default for now, until VS implements API that returns actual change */));
-
-                return VSConstants.S_OK;
             }
         }
 
@@ -102,11 +96,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// Event that is raised when one of the observed files have changed on disk.
         /// </summary>
         public event EventHandler<FileChangedOnDiskEventArgs> FileChangedOnDisk;
-
-        /// <summary>
-        /// Event that is raised when one of the observed folders have changed on disk.
-        /// </summary>
-        public event EventHandler<FolderChangedEventArgs> FolderChangedOnDisk;
 
         /// <summary>
         /// Reference to the FileChange service.
