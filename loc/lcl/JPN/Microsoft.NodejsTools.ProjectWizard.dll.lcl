@@ -694,114 +694,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LongPathClickToCopy" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Copy Full Path]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[完全なパスのコピー]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgain" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing and &never warn me again]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[何もしないで、次回からは警告メッセージを表示しない(&N)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgainDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[You can re-enable the check in Tools → Options → Node.js Tools → General.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[[ツール]5D; → [オプション]5D; → [Node.js Tools]5D; → [全般]5D; でチェックをもう一度有効にできます。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingButWarnNextTime" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing, but &warn me next time it happens]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[何もしないが、次回は警告メッセージを表示する(&W)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathFooter" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[<a href="#help">Get more information</a>]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[<a href="#help">詳細情報の表示</a>]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathHidePathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Hide &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[上限を超えているパスを非表示にする(&P)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupe" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Run 'npm &dedupe' on the project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクトに対して 'npm dedupe' を実行する(&D)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[場合によっては、パッケージの重複除去によって node_modules の入れ子の量を大幅に削減して問題を解決することができます。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDidNotHelp" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the <a href="#help">documentation</a> for other potential workarounds.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['npm dedupe' を実行しても問題を解決できませんでした。その他の考えられる回避策について、<a href="#help">ドキュメント</a>を参照してください。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathShowPathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Show &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[上限を超えているパスを表示する(&P)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Your project folder contains one or more paths that exceed the <a href="#msdn">260 character limit</a>. Visual Studio <a href="#uservoice">does not fully support</a> such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクト フォルダーに <a href="#msdn">260 文字の制限</a>を超えるパスが 1 つ以上含まれています。Visual Studio ではそのようなプロジェクトを<a href="#uservoice">完全にはサポートしていません</a>。プロジェクトのビルドと発行で問題が生じたり、その他の Visual Studio および Node.js Tools の機能に障害が発生したりする可能性があります。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Path Too Long Warning]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[長すぎるパスの警告]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NoKeywordsInPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[(This package has no keywords.)]]></Val>
@@ -990,19 +882,25 @@
       </Item>
       <Item ItemId=";NpmCancelled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled]]></Val>
+          <Val><![CDATA[{0} canceled]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} がキャンセルされました]]></Val>
+            <Val><![CDATA[{0} 件が取り消されました]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";NpmCancelledWithErrors" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          <Val><![CDATA[{0} canceled with errors - see Output window for details]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} がキャンセルされ、エラーが発生しました - 詳細については、出力ウィンドウを参照してください]]></Val>
+            <Val><![CDATA[{0} 件が取り消されましたが、エラーがあります - 詳細については出力ウィンドウをご覧ください]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1074,15 +972,6 @@
           <Val><![CDATA[Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.]D;]A;]D;]A;The following error occurred trying to execute npm.cmd:]D;]A;]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[npm.cmd が見つかりませんでした。Node.js の最新のバージョンがインストールされており、プロジェクト プロパティに node.exe の場所が指定されていること、またはこれがシステム パスで利用可能であることをご確認ください。]D;]A;]D;]A;npm.cmd を実行しようして次のエラーが発生しました:]D;]A;]D;]A;{0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmOutputPaneTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Npm]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Npm]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1993,92 +1882,47 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TscBuildCanceled" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Canceled]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ビルドが取り消されました]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildCompleted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Completed]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ビルド完了]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildError" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Error - Failed to start '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[エラー - '{0}' を開始できませんでした]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildStarted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Started]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ビルドが開始されました]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TypeScriptMinVersionNotInstalled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Node.js Tools には TypeScript for Visual Studio {0} 以降が必要です。TypeScript がインストールされていることをご確認ください]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan1" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Node.js IntelliSense added a ]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js IntelliSense が]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan2" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[typings folder]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Typings フォルダー]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan3" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[ to your project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[をプロジェクトに追加しました]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsOpenOptionsText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Customize...]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[カスタマイズ...]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolCouldNotStart" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not start Typings tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense に使用される Typings ツールを開始できませんでした]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolInstallFailed" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense に使用される Typings ツールのインストールに失敗しました。Node.js が正しくインストールされていることをご確認ください]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolNotInstalledError" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not find Typings package manager tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense に使用される Typings パッケージ マネージャー ツールが見つかりませんでした]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallCompleted" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Successfully installed typing files for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense の Typings ファイルが正常にインストールされました。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallErrorOccurred" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[An error occurred installing typings used for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense に使用される Typings のインストールでエラーが発生しました。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3694,7 +3538,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11211.4]]></Val>
+        <Val><![CDATA[1.4.20317.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3721,7 +3565,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11211.4 commit:458eada4c30aad6251cfe357bb160a344d4170a8]]></Val>
+        <Val><![CDATA[1.4.20317.2 commit:9e761752cd35ad22b047c68452bfd3fe0647c8dc]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
