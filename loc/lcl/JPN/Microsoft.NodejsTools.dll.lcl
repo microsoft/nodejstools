@@ -5636,7 +5636,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Debug JavaScript/TypeScript files with Node.js]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js を使用して JavaScript/TypeScript ファイルをデバッグします]]></Val>
+            <Val><![CDATA[Node.js を使用する JavaScript/TypeScript ファイルをデバッグします]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Debug launch configuration for Node.js]]></Val>
