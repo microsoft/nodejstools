@@ -129,7 +129,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testFramework = GetTestFrameworkObject(testFx);
                 if (testFramework == null)
                 {
-                    logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Ignoring unsupported test framework {0}", testFx));
+                    logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Ignoring unsupported test framework \'{0}\'.", testFx));
                     continue;
                 }
 
@@ -137,7 +137,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var files = string.Join(";", fileList.Select(p => p.File));
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
-                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
+                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectRoot:projectHome);
                 testCount += discoveredTestCases.Count;
                 foreach (var discoveredTest in discoveredTestCases)
                 {

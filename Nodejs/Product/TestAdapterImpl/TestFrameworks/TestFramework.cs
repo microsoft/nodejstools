@@ -31,13 +31,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger,
-            string workingDirectory)
+            string projectRoot)
         {
             var testInfo = string.Empty;
             var discoverResultFile = Path.GetTempFileName();
             try
             {
-                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
+                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, projectRoot);
                 if (!string.IsNullOrWhiteSpace(stdout))
                 {
                     var stdoutLines = stdout.Split(new[] { Environment.NewLine },
@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column);
+                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column, projectRoot);
                     testCases.Add(test);
                 }
             }
