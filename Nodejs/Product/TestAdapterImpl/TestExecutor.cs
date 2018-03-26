@@ -198,8 +198,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
             userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
 
-            //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
-
             TelemetryService.DefaultSession?.PostEvent(userTask);
         }
 
@@ -228,7 +226,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
 
                 // All tests being run are for the same test file, so just use the first test listed to get the working dir
-                var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
+                var firstTest = tests.First();
+                var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
                 var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
 
                 var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
@@ -372,8 +371,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
-            var testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
-            var discover = new TestFrameworks.FrameworkDiscover();
+            var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
+            var discover = new FrameworkDiscover();
             return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
@@ -448,7 +447,7 @@ namespace Microsoft.NodejsTools.TestAdapter
     }
 }
 
-internal class TestReceiver : ITestCaseDiscoverySink
+internal sealed class TestReceiver : ITestCaseDiscoverySink
 {
     public List<TestCase> Tests { get; } = new List<TestCase>();
 
@@ -458,7 +457,7 @@ internal class TestReceiver : ITestCaseDiscoverySink
     }
 }
 
-internal class NodejsProjectSettings
+internal sealed class NodejsProjectSettings
 {
     public NodejsProjectSettings()
     {
@@ -473,16 +472,8 @@ internal class NodejsProjectSettings
     public string ProjectRootDir { get; set; }
 }
 
-internal class ResultObject
+internal sealed class ResultObject
 {
-    public ResultObject()
-    {
-        this.title = string.Empty;
-        this.passed = false;
-        this.pending = false;
-        this.stdout = string.Empty;
-        this.stderr = string.Empty;
-    }
     public string title { get; set; }
     public bool passed { get; set; }
     public bool? pending { get; set; }
@@ -490,14 +481,14 @@ internal class ResultObject
     public string stderr { get; set; }
 }
 
-internal class TestEvent
+internal sealed class TestEvent
 {
     public string type { get; set; }
     public string title { get; set; }
     public ResultObject result { get; set; }
 }
 
-internal class TestCaseObject
+internal sealed class TestCaseObject
 {
     public TestCaseObject()
     {
@@ -522,3 +513,4 @@ internal class TestCaseObject
     public string workingFolder { get; set; }
     public string projectFolder { get; set; }
 }
+
