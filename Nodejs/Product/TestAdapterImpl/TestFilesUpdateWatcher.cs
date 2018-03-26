@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             for (var i = 0; i < cChanges; i++)
             {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
             }
             return VSConstants.S_OK;
         }
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         {
             for (var i = 0; i < numberOfFilesChanged; i++)
             {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
+                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
             }
             return VSConstants.S_OK;
         }

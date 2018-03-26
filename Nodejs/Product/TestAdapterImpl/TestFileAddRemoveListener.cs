@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
         public readonly string File;
         public readonly WatcherChangeTypes ChangedReason;
 
-        public TestFileChangedEventArgs(IVsProject project, string file, WatcherChangeTypes reason)
+        public TestFileChangedEventArgs(string file, WatcherChangeTypes reason, IVsProject project = null)
         {
             this.Project = project;
             this.File = file;
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
                 if (project != null && project.IsTestProject(this._testProjectGuid))
                 {
-                    TestFileChanged?.Invoke(this, new TestFileChangedEventArgs(project, projectItem, reason));
+                    TestFileChanged?.Invoke(this, new TestFileChangedEventArgs(projectItem, reason, project));
                 }
             }
 

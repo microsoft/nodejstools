@@ -299,11 +299,6 @@ namespace Microsoft.VisualStudioTools.Project
         public readonly string FileName;
 
         /// <summary>
-        /// The item ide of the file that has changed.
-        /// </summary>
-        public readonly uint ItemID;
-
-        /// <summary>
         /// The reason the file has changed on disk.
         /// </summary>
         public readonly WatcherChangeTypes FileChange;
@@ -313,10 +308,9 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         /// <param name="fileName">File name that was changed on disk.</param>
         /// <param name="id">The item id of the file that was changed on disk.</param>
-        internal FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
+        internal FileChangedOnDiskEventArgs(string fileName, _VSFILECHANGEFLAGS flag)
         {
             this.FileName = fileName;
-            this.ItemID = id;
             this.FileChange = ConvertVSFILECHANGEFLAGS((uint)flag);
         }
 

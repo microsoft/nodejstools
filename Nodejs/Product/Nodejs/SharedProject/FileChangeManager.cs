@@ -42,7 +42,9 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(flags));
                 }
 
-                ProcessFileChanges(numberOfFilesChanged, filesChanged, flags);
+                Debug.Assert(numberOfFilesChanged == filesChanged.Length && numberOfFilesChanged == flags.Length, "number of files changed doesn't match actual files reported.");
+
+                ProcessFileChanges(filesChanged, flags);
 
                 return VSConstants.S_OK;
             }
@@ -73,21 +75,23 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(filesChanged));
                 }
 
-                ProcessFileChanges(numberOfFilesChanged, filesChanged, flags);
+                if (flags == null)
+                {
+                    throw new ArgumentNullException(nameof(flags));
+                }
+
+                Debug.Assert(numberOfFilesChanged == filesChanged.Length && numberOfFilesChanged == flags.Length, "number of files changed doesn't match actual files reported.");
+
+                ProcessFileChanges(filesChanged, flags);
 
                 return VSConstants.S_OK;
             }
 
-            private void ProcessFileChanges(uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
+            private void ProcessFileChanges(string[] filesChanged, uint[] flags)
             {
-                for (var i = 0; i < numberOfFilesChanged; i++)
+                for (var i = 0; i < filesChanged.Length; i++)
                 {
-                    var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
-                    if (this.fileChangeManager.observedFiles.TryGetValue(fullFileName, out var value))
-                    {
-                        var (ItemID, FileChangeCookie) = value;
-                        this.fileChangeManager.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(fullFileName, ItemID, (_VSFILECHANGEFLAGS)flags[i]));
-                    }
+                    this.fileChangeManager.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(filesChanged[i], (_VSFILECHANGEFLAGS)flags[i]));
                 }
             }
         }
@@ -106,7 +110,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Maps between the observed file identified by its filename (in canonicalized form) and the cookie used for subscribing 
         /// to the events.
         /// </summary>
-        private readonly ConcurrentDictionary<string, (uint ItemID, uint FileChangeCookie)> observedFiles = new ConcurrentDictionary<string, (uint, uint)>();
+        private readonly ConcurrentDictionary<string, uint> observedFiles = new ConcurrentDictionary<string, uint>();
 
         /// <summary>
         /// Maps between the observer folder identified by its foldername (in canonicalized form) and the cookie used for subscribing 
@@ -160,9 +164,9 @@ namespace Microsoft.VisualStudioTools.Project
             this.disposed = true;
 
             // Unsubscribe from the observed source files.
-            foreach (var (ItemID, FileChangeCookie) in this.observedFiles.Values)
+            foreach (var fileChangeCookie in this.observedFiles.Values)
             {
-                var hr = this.fileChangeService.UnadviseFileChange(FileChangeCookie);
+                var hr = this.fileChangeService.UnadviseFileChange(fileChangeCookie);
                 // don't want to crash VS during cleanup
                 Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
                 if (ErrorHandler.Failed(hr)) { break; }
@@ -185,22 +189,11 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// Observe when the given file is updated on disk. In this case we do not care about the item id that represents the file in the hierarchy.
-        /// </summary>
-        /// <param name="fileName">File to observe.</param>
-        public void ObserveFile(string fileName)
-        {
-            this.CheckDisposed();
-
-            this.ObserveFile(fileName, VSConstants.VSITEMID_NIL);
-        }
-
-        /// <summary>
         /// Observe when the given file is updated on disk.
         /// </summary>
         /// <param name="fileName">File to observe.</param>
         /// <param name="id">The item id of the item to observe.</param>
-        public void ObserveFile(string fileName, uint id)
+        public void ObserveFile(string fileName)
         {
             this.CheckDisposed();
 
@@ -216,7 +209,7 @@ namespace Microsoft.VisualStudioTools.Project
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this.fileChangeEvents, out var fileChangeCookie));
 
                 // Remember that we're observing this file (used in FilesChanged event handler)
-                this.observedFiles.TryAdd(fullFileName, (id, fileChangeCookie));
+                this.observedFiles.TryAdd(fullFileName, fileChangeCookie);
             }
         }
 
@@ -280,13 +273,10 @@ namespace Microsoft.VisualStudioTools.Project
             // Remove the file from our observed list. It's important that this is done before the call to 
             // UnadviseFileChange, because for some reason, the call to UnadviseFileChange can trigger a 
             // FilesChanged event, and we want to be able to filter that event away.
-            if (this.observedFiles.TryRemove(fullFileName, out var value))
+            if (this.observedFiles.TryRemove(fullFileName, out var fileChangeCookie))
             {
-                // Get the cookie that was used for this.observedItems to this file.
-                var (ItemID, FileChangeCookie) = value;
-
                 // Stop observing the file
-                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseFileChange(FileChangeCookie));
+                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseFileChange(fileChangeCookie));
             }
             return false;
         }
