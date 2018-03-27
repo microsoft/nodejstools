@@ -360,13 +360,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         var ft = File.GetLastWriteTimeUtc(filePath);
                         return (ft > latest) ? ft : latest;
                     }
-                    catch (UnauthorizedAccessException)
-                    {
-                    }
-                    catch (ArgumentException)
-                    {
-                    }
-                    catch (IOException)
+                    catch (Exception exc) when (exc is UnauthorizedAccessException || exc is ArgumentException || exc is IOException)
                     {
                     }
                     return latest;
@@ -530,13 +524,13 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (e != null && ShouldDiscover(e.File))
             {
                 string root = null;
+                var project = e.Project ?? GetTestProjectFromFile(e.File);
                 switch (e.ChangedReason)
                 {
-                    case TestFileChangedReason.Added:
-                        Debug.Assert(e.Project != null);
-                        if (e.Project.IsTestProject(Guids.NodejsBaseProjectFactory))
+                    case WatcherChangeTypes.Created:
+                        if (project.IsTestProject(Guids.NodejsBaseProjectFactory))
                         {
-                            root = e.Project.GetProjectHome();
+                            root = project.GetProjectHome();
 
                             if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
                             {
@@ -548,12 +542,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                                 this.testFilesUpdateWatcher.AddFileWatch(e.File);
                             }
 
-                            OnTestContainersChanged(e.Project);
+                            OnTestContainersChanged(project);
                         }
                         break;
-                    case TestFileChangedReason.Removed:
-                        Debug.Assert(e.Project != null);
-
+                    case WatcherChangeTypes.Deleted:
                         if (this.fileRootMap.TryGetValue(e.File, out root))
                         {
                             this.fileRootMap.Remove(e.File);
@@ -571,15 +563,15 @@ namespace Microsoft.NodejsTools.TestAdapter
                         // track the last delete as an update as our file system scan won't see it
                         this.lastWrite = DateTime.Now.ToUniversalTime();
 
-                        OnTestContainersChanged(e.Project);
+                        OnTestContainersChanged(project);
                         break;
 
                     // Dev12 renames files instead of overwriting them when
                     // saving, so we need to listen for renames where the new
                     // path is part of the project.
-                    case TestFileChangedReason.Renamed:
-                    case TestFileChangedReason.Changed:
-                        OnTestContainersChanged(GetTestProjectFromFile(e.File));
+                    case WatcherChangeTypes.Renamed:
+                    case WatcherChangeTypes.Changed:
+                        OnTestContainersChanged(project);
                         break;
                 }
             }
@@ -600,7 +592,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     CommonUtils.IsSamePath(projectPath, filename) ||
                     (hierarchy != null &&
                     project.IsTestProject(Guids.NodejsBaseProjectFactory) &&
-                    ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out var itemid))))
+                    ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out _))))
                 {
                     return project;
                 }
