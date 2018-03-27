@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -299,38 +297,25 @@ namespace Microsoft.VisualStudioTools.Project
         public readonly string FileName;
 
         /// <summary>
+        /// The item ide of the file that has changed.
+        /// </summary>
+        public readonly uint ItemID;
+
+        /// <summary>
         /// The reason the file has changed on disk.
         /// </summary>
-        public readonly WatcherChangeTypes FileChange;
+        public readonly _VSFILECHANGEFLAGS FileChangeFlag;
 
         /// <summary>
         /// Constructs a new event args.
         /// </summary>
         /// <param name="fileName">File name that was changed on disk.</param>
         /// <param name="id">The item id of the file that was changed on disk.</param>
-        internal FileChangedOnDiskEventArgs(string fileName, _VSFILECHANGEFLAGS flag)
+        internal FileChangedOnDiskEventArgs(string fileName, uint id, _VSFILECHANGEFLAGS flag)
         {
             this.FileName = fileName;
-            this.FileChange = ConvertVSFILECHANGEFLAGS((uint)flag);
-        }
-
-        private static WatcherChangeTypes ConvertVSFILECHANGEFLAGS(uint flag)
-        {
-            if ((flag & (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Attr)) != 0)
-            {
-                return WatcherChangeTypes.Changed;
-            }
-            if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Add) != 0)
-            {
-                return WatcherChangeTypes.Created;
-            }
-            if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Del) != 0)
-            {
-                return WatcherChangeTypes.Deleted;
-            }
-
-            Debug.Fail($"Unexpected value for the file changed event: \'{flag}\'");
-            return WatcherChangeTypes.Changed;
+            this.ItemID = id;
+            this.FileChangeFlag = flag;
         }
     }
 }

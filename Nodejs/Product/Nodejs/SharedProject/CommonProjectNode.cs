@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.idleManager.OnIdle += this.OnIdle;
 
             this.fileWatcher = new FileChangeManager(serviceProvider);
-            this.fileWatcher.FileChangedOnDisk += this.FileChangedOnDisk;
+            this.fileWatcher.FolderChangedOnDisk += this.FolderChangedOnDisk;
         }
 
         public override int QueryService(ref Guid guidService, out object result)
@@ -462,7 +462,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.idleManager.OnIdle -= this.OnIdle;
                 this.idleManager.Dispose();
 
-                this.fileWatcher.FileChangedOnDisk -= this.FileChangedOnDisk;
+                this.fileWatcher.FolderChangedOnDisk -= this.FolderChangedOnDisk;
                 this.fileWatcher.Dispose();
             }
 
@@ -728,10 +728,17 @@ namespace Microsoft.VisualStudioTools.Project
             return new CommonReferenceContainerNode(this);
         }
 
-        private void FileChangedOnDisk(object sender, FileChangedOnDiskEventArgs e)
+        private void FolderChangedOnDisk(object sender, FolderChangedEventArgs e)
         {
             var file = e.FileName;
-            this.QueueFileSystemChanges(new FileSystemChange(this, e.FileChange, file));
+            if (File.Exists(file) || Directory.Exists(file))
+            {
+                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Changed, file));
+            }
+            else
+            {
+                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Deleted, file));
+            }
         }
 
         private void QueueFileSystemChanges(params FileSystemChange[] changes)

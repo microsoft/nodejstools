@@ -1,20 +1,28 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.IO;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    internal sealed class TestFileChangedEventArgs : EventArgs
+    internal enum TestFileChangedReason
     {
-        public readonly IVsProject Project;
-        public readonly string File;
-        public readonly WatcherChangeTypes ChangedReason;
+        None,
+        Added,
+        Removed,
+        Changed,
+        Renamed,
+    }
 
-        public TestFileChangedEventArgs(string file, WatcherChangeTypes reason, IVsProject project = null)
+    internal class TestFileChangedEventArgs : EventArgs
+    {
+        public IVsProject Project { get; }
+        public string File { get; }
+        public TestFileChangedReason ChangedReason { get; }
+
+        public TestFileChangedEventArgs(IVsProject project, string file, TestFileChangedReason reason)
         {
             this.Project = project;
             this.File = file;
@@ -62,7 +70,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             }
         }
 
-        private int NotifyTestFileAddRemove(int changedProjectCount, IVsProject[] changedProjects, string[] changedProjectItems, int[] rgFirstIndices, WatcherChangeTypes reason)
+        private int NotifyTestFileAddRemove(int changedProjectCount, IVsProject[] changedProjects, string[] changedProjectItems, int[] rgFirstIndices, TestFileChangedReason reason)
         {
             for (var index = 0; index < changedProjectCount; index++)
             {
@@ -72,7 +80,11 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
                 if (project != null && project.IsTestProject(this._testProjectGuid))
                 {
-                    TestFileChanged?.Invoke(this, new TestFileChangedEventArgs(projectItem, reason, project));
+                    var evt = TestFileChanged;
+                    if (evt != null)
+                    {
+                        evt(this, new TestFileChangedEventArgs(project, projectItem, reason));
+                    }
                 }
             }
 
@@ -86,7 +98,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         int IVsTrackProjectDocumentsEvents2.OnAfterAddFilesEx(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSADDFILEFLAGS[] rgFlags)
         {
-            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgpszMkDocuments, rgFirstIndices, WatcherChangeTypes.Created);
+            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgpszMkDocuments, rgFirstIndices, TestFileChangedReason.Added);
         }
 
         int IVsTrackProjectDocumentsEvents2.OnAfterRemoveDirectories(int cProjects, int cDirectories, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEDIRECTORYFLAGS[] rgFlags)
@@ -96,7 +108,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         int IVsTrackProjectDocumentsEvents2.OnAfterRemoveFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, VSREMOVEFILEFLAGS[] rgFlags)
         {
-            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgpszMkDocuments, rgFirstIndices, WatcherChangeTypes.Deleted);
+            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgpszMkDocuments, rgFirstIndices, TestFileChangedReason.Removed);
         }
 
         int IVsTrackProjectDocumentsEvents2.OnAfterRenameDirectories(int cProjects, int cDirs, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEDIRECTORYFLAGS[] rgFlags)
@@ -106,8 +118,8 @@ namespace Microsoft.VisualStudioTools.TestAdapter
 
         int IVsTrackProjectDocumentsEvents2.OnAfterRenameFiles(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgszMkOldNames, string[] rgszMkNewNames, VSRENAMEFILEFLAGS[] rgFlags)
         {
-            NotifyTestFileAddRemove(cProjects, rgpProjects, rgszMkOldNames, rgFirstIndices, WatcherChangeTypes.Deleted);
-            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgszMkNewNames, rgFirstIndices, WatcherChangeTypes.Created);
+            NotifyTestFileAddRemove(cProjects, rgpProjects, rgszMkOldNames, rgFirstIndices, TestFileChangedReason.Removed);
+            return NotifyTestFileAddRemove(cProjects, rgpProjects, rgszMkNewNames, rgFirstIndices, TestFileChangedReason.Added);
         }
 
         int IVsTrackProjectDocumentsEvents2.OnAfterSccStatusChanged(int cProjects, int cFiles, IVsProject[] rgpProjects, int[] rgFirstIndices, string[] rgpszMkDocuments, uint[] rgdwSccStatus)
