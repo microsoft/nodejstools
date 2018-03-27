@@ -400,7 +400,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             // We only care about file deletes, so check for one before enumerating references.
-            if (e.FileChange != WatcherChangeTypes.Deleted)
+            if ((e.FileChangeFlag & _VSFILECHANGEFLAGS.VSFILECHG_Del) == 0)
             {
                 return;
             }

@@ -9,12 +9,26 @@ using IServiceProvider = System.IServiceProvider;
 
 namespace Microsoft.VisualStudioTools.Project
 {
+    public sealed class FolderChangedEventArgs : EventArgs
+    {
+        public readonly string FolderName;
+        public readonly string FileName;
+        public _VSFILECHANGEFLAGS FileChangeFlag;
+
+        public FolderChangedEventArgs(string folderName, string fileName, _VSFILECHANGEFLAGS fileChangeFlag)
+        {
+            this.FolderName = folderName;
+            this.FileName = fileName;
+            this.FileChangeFlag = fileChangeFlag;
+        }
+    }
+
     /// <summary>
     /// This object is in charge of watching for changes to files and folders.
     /// </summary>
     internal sealed class FileChangeManager
     {
-        private sealed class FileChangeEvents : IVsFreeThreadedFileChangeEvents2
+        private sealed class FileChangeEvents : IVsFreeThreadedFileChangeEvents
         {
             private readonly FileChangeManager fileChangeManager;
 
@@ -42,57 +56,45 @@ namespace Microsoft.VisualStudioTools.Project
                     throw new ArgumentNullException(nameof(flags));
                 }
 
-                Debug.Assert(numberOfFilesChanged == filesChanged.Length && numberOfFilesChanged == flags.Length, "number of files changed doesn't match actual files reported.");
-
-                ProcessFileChanges(filesChanged, flags);
+                for (var i = 0; i < numberOfFilesChanged; i++)
+                {
+                    var fullFileName = Utilities.CanonicalizeFileName(filesChanged[i]);
+                    if (this.fileChangeManager.observedFiles.TryGetValue(fullFileName, out var value))
+                    {
+                        var (ItemID, FileChangeCookie) = value;
+                        this.fileChangeManager.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(fullFileName, ItemID, (_VSFILECHANGEFLAGS)flags[i]));
+                    }
+                }
 
                 return VSConstants.S_OK;
-            }
-
-            public int DirectoryChanged(string directory)
-            {
-                // not called since we implement DirectoryChangedEx2
-                return VSConstants.E_NOTIMPL;
-            }
-
-            public int DirectoryChangedEx(string pszDirectory, string pszFile)
-            {
-                // not called since we implement DirectoryChangedEx2
-                return VSConstants.E_NOTIMPL;
             }
 
             /// <summary>
             /// Notifies clients of changes made to a directory. 
             /// </summary>
             /// <param name="directory">Name of the directory that had a change.</param>
-            /// <param name="numberOfFilesChanged">Number of files changed.</param>
-            /// <param name="filesChanged">Array of file names.</param>
-            /// <param name="flags">Array of flags indicating the type of changes. See _VSFILECHANGEFLAGS.</param>
-            public int DirectoryChangedEx2(string directory, uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
+            /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code. </returns>
+            public int DirectoryChanged(string directory)
             {
-                if (filesChanged == null)
-                {
-                    throw new ArgumentNullException(nameof(filesChanged));
-                }
-
-                if (flags == null)
-                {
-                    throw new ArgumentNullException(nameof(flags));
-                }
-
-                Debug.Assert(numberOfFilesChanged == filesChanged.Length && numberOfFilesChanged == flags.Length, "number of files changed doesn't match actual files reported.");
-
-                ProcessFileChanges(filesChanged, flags);
-
                 return VSConstants.S_OK;
             }
 
-            private void ProcessFileChanges(string[] filesChanged, uint[] flags)
+            public int DirectoryChangedEx(string pszDirectory, string pszFile)
             {
-                for (var i = 0; i < filesChanged.Length; i++)
+                if (pszDirectory == null)
                 {
-                    this.fileChangeManager.FileChangedOnDisk?.Invoke(this, new FileChangedOnDiskEventArgs(filesChanged[i], (_VSFILECHANGEFLAGS)flags[i]));
+                    throw new ArgumentNullException(nameof(pszDirectory));
                 }
+
+                if (pszFile == null)
+                {
+                    throw new ArgumentNullException(nameof(pszFile));
+                }
+
+                this.fileChangeManager.FolderChangedOnDisk?.Invoke(this, new FolderChangedEventArgs(pszDirectory, pszFile,
+                    (_VSFILECHANGEFLAGS)0 /* default for now, until VS implements API that returns actual change */));
+
+                return VSConstants.S_OK;
             }
         }
 
@@ -100,6 +102,11 @@ namespace Microsoft.VisualStudioTools.Project
         /// Event that is raised when one of the observed files have changed on disk.
         /// </summary>
         public event EventHandler<FileChangedOnDiskEventArgs> FileChangedOnDisk;
+
+        /// <summary>
+        /// Event that is raised when one of the observed folders have changed on disk.
+        /// </summary>
+        public event EventHandler<FolderChangedEventArgs> FolderChangedOnDisk;
 
         /// <summary>
         /// Reference to the FileChange service.
@@ -110,7 +117,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// Maps between the observed file identified by its filename (in canonicalized form) and the cookie used for subscribing 
         /// to the events.
         /// </summary>
-        private readonly ConcurrentDictionary<string, uint> observedFiles = new ConcurrentDictionary<string, uint>();
+        private readonly ConcurrentDictionary<string, (uint ItemID, uint FileChangeCookie)> observedFiles = new ConcurrentDictionary<string, (uint, uint)>();
 
         /// <summary>
         /// Maps between the observer folder identified by its foldername (in canonicalized form) and the cookie used for subscribing 
@@ -164,9 +171,9 @@ namespace Microsoft.VisualStudioTools.Project
             this.disposed = true;
 
             // Unsubscribe from the observed source files.
-            foreach (var fileChangeCookie in this.observedFiles.Values)
+            foreach (var (ItemID, FileChangeCookie) in this.observedFiles.Values)
             {
-                var hr = this.fileChangeService.UnadviseFileChange(fileChangeCookie);
+                var hr = this.fileChangeService.UnadviseFileChange(FileChangeCookie);
                 // don't want to crash VS during cleanup
                 Debug.Assert(ErrorHandler.Succeeded(hr), "UnadviseFileChange failed");
                 if (ErrorHandler.Failed(hr)) { break; }
@@ -189,11 +196,22 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
+        /// Observe when the given file is updated on disk. In this case we do not care about the item id that represents the file in the hierarchy.
+        /// </summary>
+        /// <param name="fileName">File to observe.</param>
+        public void ObserveFile(string fileName)
+        {
+            this.CheckDisposed();
+
+            this.ObserveFile(fileName, VSConstants.VSITEMID_NIL);
+        }
+
+        /// <summary>
         /// Observe when the given file is updated on disk.
         /// </summary>
         /// <param name="fileName">File to observe.</param>
         /// <param name="id">The item id of the item to observe.</param>
-        public void ObserveFile(string fileName)
+        public void ObserveFile(string fileName, uint id)
         {
             this.CheckDisposed();
 
@@ -209,7 +227,7 @@ namespace Microsoft.VisualStudioTools.Project
                 ErrorHandler.ThrowOnFailure(this.fileChangeService.AdviseFileChange(fullFileName, (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Del), this.fileChangeEvents, out var fileChangeCookie));
 
                 // Remember that we're observing this file (used in FilesChanged event handler)
-                this.observedFiles.TryAdd(fullFileName, fileChangeCookie);
+                this.observedFiles.TryAdd(fullFileName, (id, fileChangeCookie));
             }
         }
 
@@ -273,10 +291,13 @@ namespace Microsoft.VisualStudioTools.Project
             // Remove the file from our observed list. It's important that this is done before the call to 
             // UnadviseFileChange, because for some reason, the call to UnadviseFileChange can trigger a 
             // FilesChanged event, and we want to be able to filter that event away.
-            if (this.observedFiles.TryRemove(fullFileName, out var fileChangeCookie))
+            if (this.observedFiles.TryRemove(fullFileName, out var value))
             {
+                // Get the cookie that was used for this.observedItems to this file.
+                var (ItemID, FileChangeCookie) = value;
+
                 // Stop observing the file
-                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseFileChange(fileChangeCookie));
+                return ErrorHandler.Succeeded(this.fileChangeService.UnadviseFileChange(FileChangeCookie));
             }
             return false;
         }

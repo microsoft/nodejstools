@@ -3,16 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Microsoft.VisualStudioTools.TestAdapter
 {
-    // TODO: consider replacing this with Microsoft.VisualStudioTools.Project.FileChangeManager. (When we have an assembly we can use to share code)
-
-    internal sealed class TestFilesUpdateWatcher : IVsFreeThreadedFileChangeEvents2, IDisposable
+    internal class TestFilesUpdateWatcher : IVsFileChangeEvents, IDisposable
     {
         private readonly IDictionary<string, uint> watchedFiles = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
         private readonly IDictionary<string, uint> watchedFolders = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
@@ -84,61 +81,42 @@ namespace Microsoft.VisualStudioTools.TestAdapter
             return false;
         }
 
-        public int FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
+        int IVsFileChangeEvents.FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            for (var i = 0; i < cChanges; i++)
+            if (this.FileChangedEvent != null)
             {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                var evt = FileChangedEvent;
+                for (var i = 0; i < cChanges; i++)
+                {
+                    evt.Invoke(this, new TestFileChangedEventArgs(null, rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                }
             }
             return VSConstants.S_OK;
         }
 
-        public int DirectoryChanged(string directory)
+        int IVsFileChangeEvents.DirectoryChanged(string pszDirectory)
         {
-            // not called since we implement DirectoryChangedEx2
-            return VSConstants.E_NOTIMPL;
-        }
-
-        public int DirectoryChangedEx(string directory, string file)
-        {
-            // not called since we implement DirectoryChangedEx2
-            return VSConstants.E_NOTIMPL;
-        }
-
-        /// <summary>
-        /// Notifies clients of changes made to a directory. 
-        /// </summary>
-        /// <param name="directory">Name of the directory that had a change.</param>
-        /// <param name="numberOfFilesChanged">Number of files changed.</param>
-        /// <param name="filesChanged">Array of file names.</param>
-        /// <param name="flags">Array of flags indicating the type of changes. See _VSFILECHANGEFLAGS.</param>
-
-        public int DirectoryChangedEx2(string directory, uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
-        {
-            for (var i = 0; i < numberOfFilesChanged; i++)
-            {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
-            }
+            FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(null, pszDirectory, TestFileChangedReason.Changed));
             return VSConstants.S_OK;
         }
 
-        private static WatcherChangeTypes ConvertVSFILECHANGEFLAGS(uint flag)
+        private static TestFileChangedReason ConvertVSFILECHANGEFLAGS(uint flag)
         {
             if ((flag & (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time | _VSFILECHANGEFLAGS.VSFILECHG_Attr)) != 0)
             {
-                return WatcherChangeTypes.Changed;
+                return TestFileChangedReason.Changed;
             }
             if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Add) != 0)
             {
-                return WatcherChangeTypes.Created;
+                return TestFileChangedReason.Added;
             }
             if ((flag & (uint)_VSFILECHANGEFLAGS.VSFILECHG_Del) != 0)
             {
-                return WatcherChangeTypes.Deleted;
+                return TestFileChangedReason.Removed;
             }
 
             Debug.Fail($"Unexpected value for the file changed event: \'{flag}\'");
-            return WatcherChangeTypes.Changed;
+            return TestFileChangedReason.Changed;
         }
 
         private void CheckDisposed()
