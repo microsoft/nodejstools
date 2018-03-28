@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.discoverer = discoverer;
         }
 
-        public Uri ExecutorUri=> TestExecutor.ExecutorUri;
+        public Uri ExecutorUri=> NodejsConstants.ExecutorUri;
 
         public string GetCurrentTest(string filePath, int line, int lineCharOffset)
         {

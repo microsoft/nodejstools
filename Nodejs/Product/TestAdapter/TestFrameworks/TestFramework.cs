@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    internal sealed class TestFramework
+    public sealed class TestFramework
     {
         private readonly string vsixScriptFolder;
         private readonly string findTestsScriptFile;
@@ -182,6 +182,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
 
             return stdout;
+        }
+
+        public static bool IsValidTestFramework(string testFramework)
+        {
+            return !string.IsNullOrWhiteSpace(testFramework);
         }
 
         private sealed class DiscoveredTest

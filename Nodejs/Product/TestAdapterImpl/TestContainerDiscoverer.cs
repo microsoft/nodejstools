@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.TypeScript;
@@ -93,12 +92,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private static IEnumerable<uint> GetProjectItemIds(IVsProject project)
-        {
-            var hierarchy = (IVsHierarchy)project;
-            return GetProjectItemIds(hierarchy, VSConstants.VSITEMID_ROOT);
-        }
-
         private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId)
         {
             var pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
@@ -167,18 +160,13 @@ namespace Microsoft.NodejsTools.TestAdapter
             return null;
         }
 
-        internal static bool IsValidTestFramework(string testFramework)
-        {
-            return !string.IsNullOrWhiteSpace(testFramework);
-        }
-
         internal bool IsTestFile(string pathToFile)
         {
             var testCaseFile = pathToFile;
             var project = GetTestProjectFromFile(pathToFile);
             if (project == null)
             {
-                //The file is not included in the project.  
+                //The file is not included in the project. 
                 //Don't look for tests in it.
                 return false;
             }
@@ -238,7 +226,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     return false;
                 }
 
-                return IsValidTestFramework((string)testFile.Value);
+                return !string.IsNullOrEmpty((string)testFile.Value);
             }
             catch (ArgumentException)
             {
@@ -297,7 +285,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         #region ITestContainerDiscoverer
         public event EventHandler TestContainersUpdated;
 
-        public Uri ExecutorUri => TestExecutor.ExecutorUri;
+        public Uri ExecutorUri => NodejsConstants.ExecutorUri;
 
         public IEnumerable<ITestContainer> TestContainers
         {
@@ -643,7 +631,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             return false;
         }
 
-        private class ProjectInfo
+        private sealed class ProjectInfo
         {
             public readonly IVsProject Project;
             public readonly TestContainerDiscoverer Discoverer;

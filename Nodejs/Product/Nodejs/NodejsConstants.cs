@@ -71,6 +71,9 @@ namespace Microsoft.NodejsTools
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
+
+        public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
+        public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
     }
 
     internal static class NodeProjectProperty

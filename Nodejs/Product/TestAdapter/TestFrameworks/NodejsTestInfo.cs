@@ -6,7 +6,7 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    internal class NodejsTestInfo
+    public sealed class NodejsTestInfo
     {
         public NodejsTestInfo(string fullyQualifiedName, string modulePath)
         {
