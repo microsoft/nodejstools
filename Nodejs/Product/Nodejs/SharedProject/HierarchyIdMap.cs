@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,10 @@ namespace Microsoft.VisualStudioTools.Project
 {
     internal sealed class HierarchyIdMap
     {
-        private readonly List<WeakReference<HierarchyNode>> _ids = new List<WeakReference<HierarchyNode>>();
-        private readonly Stack<int> _freedIds = new Stack<int>();
+        private readonly List<WeakReference<HierarchyNode>> ids = new List<WeakReference<HierarchyNode>>();
+        private readonly Stack<int> freedIds = new Stack<int>();
+
+        private readonly object theLock = new object();
 
         /// <summary>
         /// Must be called from the UI thread
@@ -17,7 +19,7 @@ namespace Microsoft.VisualStudioTools.Project
         public uint Add(HierarchyNode node)
         {
 #if DEBUG
-            foreach (var reference in this._ids)
+            foreach (var reference in this.ids)
             {
                 if (reference != null)
                 {
@@ -28,17 +30,23 @@ namespace Microsoft.VisualStudioTools.Project
                 }
             }
 #endif
-            if (this._freedIds.Count > 0)
+
+            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+
+            lock (this.theLock)
             {
-                var i = this._freedIds.Pop();
-                this._ids[i] = new WeakReference<HierarchyNode>(node);
-                return (uint)i + 1;
-            }
-            else
-            {
-                this._ids.Add(new WeakReference<HierarchyNode>(node));
-                // ids are 1 based
-                return (uint)this._ids.Count;
+                if (this.freedIds.Count > 0)
+                {
+                    var i = this.freedIds.Pop();
+                    this.ids[i] = new WeakReference<HierarchyNode>(node);
+                    return (uint)i + 1;
+                }
+                else
+                {
+                    this.ids.Add(new WeakReference<HierarchyNode>(node));
+                    // ids are 1 based
+                    return (uint)this.ids.Count;
+                }
             }
         }
 
@@ -47,16 +55,19 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Remove(HierarchyNode node)
         {
-            var i = (int)node.ID - 1;
-            if (i < 0 ||
-                i >= this._ids.Count ||
-                (this._ids[i].TryGetTarget(out var found) && !object.ReferenceEquals(node, found)))
-            {
-                throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
-            }
+            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
-            this._ids[i] = null;
-            this._freedIds.Push(i);
+            lock (this.theLock)
+            {
+                var i = (int)node.ID - 1;
+                if (i < 0 || i >= this.ids.Count || (this.ids[i].TryGetTarget(out var found) && !object.ReferenceEquals(node, found)))
+                {
+                    throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
+                }
+
+                this.ids[i] = null;
+                this.freedIds.Push(i);
+            }
         }
 
         /// <summary>
@@ -67,9 +78,9 @@ namespace Microsoft.VisualStudioTools.Project
             get
             {
                 var i = (int)itemId - 1;
-                if (0 <= i && i < this._ids.Count)
+                if (0 <= i && i < this.ids.Count)
                 {
-                    var reference = this._ids[i];
+                    var reference = this.ids[i];
                     if (reference != null && reference.TryGetTarget(out var node))
                     {
                         return node;
