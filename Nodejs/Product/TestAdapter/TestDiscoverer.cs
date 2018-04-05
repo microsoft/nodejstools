@@ -66,32 +66,37 @@ namespace Microsoft.NodejsTools.TestAdapter
                         var testRoot = proj.GetProperty("TestRoot")?.EvaluatedValue;
                         var testFramework = proj.GetProperty("TestFramework")?.EvaluatedValue;
 
-                        IEnumerable<MSBuild.ProjectItem> unitTestFiles;
-
-                        if (!string.IsNullOrEmpty(testRoot))
+                        if( !string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
                         {
-                            var testRootPath = Path.GetFullPath(Path.Combine(proj.DirectoryPath, testRoot));
-                            unitTestFiles = proj.Items.Where(item =>
-                            {
-                                var fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                                return fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase);
-                            });
-                        }
-                        else
-                        {
-                            unitTestFiles = proj.Items.Where(item => item.ItemType != "None");
+                            logger.SendMessage(TestMessageLevel.Warning, $"TestRoot specified for '{Path.GetFileName(proj.FullPath)}' but no TestFramework.");
                         }
 
                         // Provide all files to the test analyzer
-                        foreach (var item in unitTestFiles)
+                        foreach (var item in proj.Items.Where(item => item.ItemType != "None"))
                         {
-                            //Check to see if this is a TestCase
-                            var testFrameworkName = item.GetMetadataValue("TestFramework");
-                            if (!TestFrameworks.TestFramework.IsValidTestFramework(testFrameworkName))
+                            string testFrameworkName;
+                            string fileAbsolutePath;
+                            if (!string.IsNullOrEmpty(testRoot))
                             {
-                                continue;
+                                testFrameworkName = testFramework;
+                                var testRootPath = Path.GetFullPath(Path.Combine(proj.DirectoryPath, testRoot));
+                                fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                                if (!fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    continue;
+                                }
                             }
-                            var fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            else
+                            {
+                                //Check to see if this is a TestCase
+                                testFrameworkName = item.GetMetadataValue("TestFramework");
+                                if (!TestFrameworks.TestFramework.IsValidTestFramework(testFrameworkName))
+                                {
+                                    continue;
+                                }
+                                fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            }
+
                             var typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if (typeScriptTest)
                             {
@@ -104,7 +109,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                             if (!testItems.TryGetValue(testFrameworkName, out var fileList))
                             {
-                                fileList = new HashSet<TestFileEntry>();
+                                fileList = new HashSet<TestFileEntry>(new TestFileEntryComparer());
                                 testItems.Add(testFrameworkName, fileList);
                             }
                             fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
@@ -201,7 +206,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             return TestFrameworks.FrameworkDiscover.Intance.Get(testFramework);
         }
 
-        private sealed class TestFileEntry : IEqualityComparer<TestFileEntry>
+        private sealed class TestFileEntry
         {
             public readonly string File;
             public readonly bool IsTypeScriptTest;
@@ -211,14 +216,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                 this.File = file;
                 this.IsTypeScriptTest = isTypeScriptTest;
             }
+        }
 
-            public override bool Equals(object obj) => this.Equals(this, obj as TestFileEntry);
-
+        private struct TestFileEntryComparer : IEqualityComparer<TestFileEntry>
+        {
             public bool Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
 
-            public override int GetHashCode() => this.File.GetHashCode();
-
-            public int GetHashCode(TestFileEntry obj) => obj?.GetHashCode() ?? 0;
+            public int GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
         }
     }
 }
