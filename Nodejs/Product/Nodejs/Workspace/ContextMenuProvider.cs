@@ -75,7 +75,7 @@ namespace Microsoft.NodejsTools.Workspace
 
                 if (pguidCmdGroup == Guids.NodeToolsWorkspaceCmdSet)
                 {
-                    this.outputPane.ShowWindow();
+                    this.outputPane.InitializeOutputPanes();
 
                     switch (nCmdID)
                     {

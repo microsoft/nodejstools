@@ -24,40 +24,36 @@ namespace Microsoft.VisualStudioTools.Project
         private SVsServiceProvider ServiceProvider { get; set; }
 
         private Dictionary<OutputWindowTarget, IVsOutputWindowPane> lazyOutputPaneCollection = new Dictionary<OutputWindowTarget, IVsOutputWindowPane>();
-        private IVsWindowFrame lazyOutputWindow;
 
-        private IVsOutputWindowPane GetOutputPane(OutputWindowTarget target)
+        public OutputPaneWrapper()
         {
-            if (this.lazyOutputPaneCollection.TryGetValue(target, out var lazyOutputPane))
-            {
-                return lazyOutputPane;
-            }
-            else
-            {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                var (title, guid) = GetPaneInfo(target);
-                var outputWindow = (IVsOutputWindow)this.ServiceProvider.GetService(typeof(SVsOutputWindow));
+            //...
+        }
 
-                // Try to get the workspace pane if it has already been registered
-                var hr = outputWindow.GetPane(guid, out lazyOutputPane);
+        private void InitializeOutputPane(OutputWindowTarget target)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var (title, guid) = GetPaneInfo(target);
+            var outputWindow = (IVsOutputWindow)this.ServiceProvider.GetService(typeof(SVsOutputWindow));
 
-                // If the workspace pane has not been registered before, create it
-                if (lazyOutputPane == null || ErrorHandler.Failed(hr))
+            // Try to get the workspace pane if it has already been registered
+            var hr = outputWindow.GetPane(guid, out var lazyOutputPane);
+
+            // If the workspace pane has not been registered before, create it
+            if (lazyOutputPane == null || ErrorHandler.Failed(hr))
+            {
+
+                if (ErrorHandler.Failed(outputWindow.CreatePane(guid, title, fInitVisible: 1, fClearWithSolution: 1)) ||
+                    ErrorHandler.Failed(outputWindow.GetPane(guid, out lazyOutputPane)))
                 {
-
-                    if (ErrorHandler.Failed(outputWindow.CreatePane(guid, title, fInitVisible: 1, fClearWithSolution: 1)) ||
-                        ErrorHandler.Failed(outputWindow.GetPane(guid, out lazyOutputPane)))
-                    {
-                        return null;
-                    }
-
-                    // Must activate the workspace pane for it to show up in the output window
-                    lazyOutputPane.Activate();
+                    return;
                 }
 
-                this.lazyOutputPaneCollection.Add(target, lazyOutputPane);
-                return lazyOutputPane;
+                // Must activate the workspace pane for it to show up in the output window
+                lazyOutputPane.Activate();
             }
+
+            this.lazyOutputPaneCollection.Add(target, lazyOutputPane);
 
             (string title, Guid guid) GetPaneInfo(OutputWindowTarget pane)
             {
@@ -73,39 +69,23 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        private IVsWindowFrame OutputWindow
-        {
-            get
-            {
-                if (this.lazyOutputWindow == null && this.ServiceProvider.GetService(typeof(SVsUIShell)) is IVsUIShell shell)
-                {
-                    ThreadHelper.ThrowIfNotOnUIThread();
-
-                    var windowGuid = OutputWindowGuid;
-                    var hr = shell.FindToolWindow((int)__VSFINDTOOLWIN.FTW_fForceCreate, ref windowGuid, out this.lazyOutputWindow);
-                    Debug.Assert(ErrorHandler.Succeeded(hr));
-                }
-
-                return this.lazyOutputWindow;
-            }
-        }
-
         public void WriteLine(string message, OutputWindowTarget target = OutputWindowTarget.Npm)
         {
-            if (this.lazyOutputWindow == null)
+            if (!this.lazyOutputPaneCollection.TryGetValue(target, out var lazyOutputPane))
             {
-                throw new InvalidOperationException($"Ensure the output window is initialized by calling '{nameof(ShowWindow)}' first.");
+                throw new InvalidOperationException("You need to initialize the output panes before using them.");
             }
 
-            var hr = this.GetOutputPane(target).OutputStringThreadSafe(message + Environment.NewLine);
+            var hr = lazyOutputPane.OutputStringThreadSafe(message + Environment.NewLine);
             Debug.Assert(ErrorHandler.Succeeded(hr));
         }
 
-        public void ShowWindow()
+        public void InitializeOutputPanes()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            var hr = this.OutputWindow?.ShowNoActivate() ?? VSConstants.E_FAIL;
-            Debug.Assert(ErrorHandler.Succeeded(hr));
+
+            InitializeOutputPane(OutputWindowTarget.Npm);
+            InitializeOutputPane(OutputWindowTarget.Tsc);
         }
     }
 
