@@ -162,13 +162,19 @@ namespace Microsoft.VisualStudioTools.Project
                     QuoteSingleArgument(filename),
                     GetArguments(arguments, quoteArgs)),
                 CreateNoWindow = !visible,
-                UseShellExecute = false,
-                RedirectStandardError = !visible || (redirector != null),
-                RedirectStandardOutput = !visible || (redirector != null),
-                RedirectStandardInput = !visible
+                UseShellExecute = false
             };
-            psi.StandardOutputEncoding = outputEncoding ?? psi.StandardOutputEncoding;
-            psi.StandardErrorEncoding = errorEncoding ?? outputEncoding ?? psi.StandardErrorEncoding;
+
+            if (!visible || (redirector != null))
+            {
+                psi.RedirectStandardError = true;
+                psi.RedirectStandardOutput = true;
+                psi.RedirectStandardInput = true;
+                // only set the encoding when we're redirecting the output
+                psi.StandardOutputEncoding = outputEncoding ?? psi.StandardOutputEncoding;
+                psi.StandardErrorEncoding = errorEncoding ?? outputEncoding ?? psi.StandardErrorEncoding;
+            }
+
             if (env != null)
             {
                 foreach (var kv in env)
