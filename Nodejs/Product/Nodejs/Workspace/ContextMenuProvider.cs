@@ -152,7 +152,6 @@ namespace Microsoft.NodejsTools.Workspace
                 var filePath = ((IFileNode)node).FullPath;
                 if (TryGetCommand(nCmdID, filePath, out var commandName))
                 {
-
                     using (var npmController = this.CreateController(node.Workspace))
                     using (var commander = npmController.CreateNpmCommander())
                     {

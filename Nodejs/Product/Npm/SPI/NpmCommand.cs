@@ -106,7 +106,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 cancelled = true;
             }
             OnCommandCompleted(this.Arguments, redirector?.HasErrors ?? false, cancelled);
-            return !redirector.HasErrors;
+            return redirector == null || !redirector.HasErrors; // return true when the command completed without errors, or redirector is null (which means we can't track)
         }
 
         private sealed class NpmCommandRedirector : Redirector
