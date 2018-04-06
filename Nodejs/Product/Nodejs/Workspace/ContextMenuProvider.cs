@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.NodejsTools.Npm;
@@ -80,21 +81,21 @@ namespace Microsoft.NodejsTools.Workspace
                     switch (nCmdID)
                     {
                         case PkgCmdId.cmdidWorkSpaceNpmInstallMissing:
-                            ExecNpmInstallMissing(node);
+                            ExecNpmInstallMissing((IFileNode)node);
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidWorkSpaceNpmInstallNew:
-                            ExecNpmInstallNew(node);
+                            ExecNpmInstallNew((IFileNode)node);
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidWorkSpaceNpmUpdate:
-                            ExecNpmUpdate(node);
+                            ExecNpmUpdate((IFileNode)node);
                             return VSConstants.S_OK;
                     }
 
                     if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID < PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
                     {
-                        ExecDynamic(node, nCmdID);
+                        ExecDynamic((IFileNode)node, nCmdID);
                         return VSConstants.S_OK;
                     }
                 }
@@ -116,18 +117,18 @@ namespace Microsoft.NodejsTools.Workspace
             // Note: all the Exec commands are async, this allows us to call them in a fire and forget
             // pattern, without blocking the UI or losing any logging
 
-            private async void ExecNpmInstallMissing(WorkspaceVisualNodeBase node)
+            private async void ExecNpmInstallMissing(IFileNode node)
             {
-                using (var npmController = this.CreateController(node.Workspace))
+                using (var npmController = this.CreateController(node.FullPath))
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     await commander.Install();
                 }
             }
 
-            private void ExecNpmInstallNew(WorkspaceVisualNodeBase node)
+            private void ExecNpmInstallNew(IFileNode node)
             {
-                using (var npmController = this.CreateController(node.Workspace))
+                using (var npmController = this.CreateController(node.FullPath))
                 using (var npmWorker = new NpmWorker(npmController))
                 using (var manager = new NpmPackageInstallWindow(npmController, npmWorker))
                 {
@@ -135,24 +136,24 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
-            private async void ExecNpmUpdate(WorkspaceVisualNodeBase node)
+            private async void ExecNpmUpdate(IFileNode node)
             {
-                using (var npmController = this.CreateController(node.Workspace))
+                using (var npmController = this.CreateController(node.FullPath))
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     await commander.UpdatePackagesAsync();
                 }
             }
 
-            private async void ExecDynamic(WorkspaceVisualNodeBase node, uint nCmdID)
+            private async void ExecDynamic(IFileNode node, uint nCmdID)
             {
                 // Unfortunately the NpmController (and NpmCommander), used for the install and update commands
                 // doesn't support running arbitrary scripts. And changing that is outside
                 // the scope of these changes.
-                var filePath = ((IFileNode)node).FullPath;
+                var filePath = node.FullPath;
                 if (TryGetCommand(nCmdID, filePath, out var commandName))
                 {
-                    using (var npmController = this.CreateController(node.Workspace))
+                    using (var npmController = this.CreateController(filePath))
                     using (var commander = npmController.CreateNpmCommander())
                     {
                         await commander.ExecuteNpmCommandAsync($"run-script {commandName}", showConsole: true);
@@ -264,9 +265,11 @@ namespace Microsoft.NodejsTools.Workspace
                 return false;
             }
 
-            private INpmController CreateController(IWorkspace workspace)
+            private INpmController CreateController(string packageJsonPath)
             {
-                var projectHome = workspace.Location;
+                Debug.Assert(Path.IsPathRooted(packageJsonPath) && PackageJsonFactory.IsPackageJsonFile(packageJsonPath));
+
+                var projectHome = Path.GetDirectoryName(packageJsonPath);
 
                 var npmController = NpmControllerFactory.Create(
                       projectHome,
