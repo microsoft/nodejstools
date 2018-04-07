@@ -11,10 +11,12 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.VSIntegration.UI;
 using Microsoft.VisualStudioTools.Project;
+using ShellInterop = Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Workspace
 {
@@ -165,6 +167,11 @@ namespace Microsoft.NodejsTools.Workspace
             {
                 var workspace = node.Workspace;
                 var packageJson = PackageJsonFactory.Create(((IFileNode)node).FullPath);
+
+                if (string.IsNullOrEmpty(packageJson.Main))
+                {
+                    return;
+                }
 
                 //invoke debuglaunchtargetprovider on this file
                 var fileContextActions = await node.Workspace.GetFileContextActionsAsync(packageJson.Main, new[] { DebugLaunchActionContext.ContextTypeGuid });
