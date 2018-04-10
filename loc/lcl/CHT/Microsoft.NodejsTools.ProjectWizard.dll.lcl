@@ -89,7 +89,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unable to start wizard: failed to load Node Tools support Package (0x{0:X08})]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[無法啟動精靈: 無法載入 Node Tools 支援套件 (0x{0:X08})]]></Val>
+            <Val><![CDATA[無法啟動精靈: 無法載入 Node 工具支援套件 (0x{0:X08})]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3538,7 +3538,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20314.1]]></Val>
+        <Val><![CDATA[1.4.20406.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3565,7 +3565,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20314.1 commit:09169f242e89831955093b44bc601b87ed89570e]]></Val>
+        <Val><![CDATA[1.4.20406.1 commit:7254f2ace777917a908e56add9360dcd42bb2a60]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
