@@ -395,7 +395,7 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("program", file),
                 new JProperty("args", scriptArguments),
                 new JProperty("runtimeExecutable", nodePath),
-                new JProperty("runtimeArgs", runtimeArguments),
+                new JProperty("runtimeArgs", runtimeArguments.Concat(new[] { $"--inspect-brk=${debuggerPort}" }).ToArray()), // If we supply the port argument we also need to manually add --inspect-brk=port to the runtime arguments
                 new JProperty("port", debuggerPort),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
