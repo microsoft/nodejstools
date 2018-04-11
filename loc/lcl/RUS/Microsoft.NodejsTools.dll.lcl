@@ -1295,7 +1295,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Узел]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5150,7 +5150,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Azure Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4 в Azure]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4 в Azure]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5159,7 +5159,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4 для Microsoft Azure.]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4 для Microsoft Azure.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5237,7 +5237,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4.]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5300,7 +5300,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Azure Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4 в Azure]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4 в Azure]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5309,7 +5309,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4 для Microsoft Azure.]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4 для Microsoft Azure.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5408,7 +5408,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5417,7 +5417,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Основное приложение Node.js Express 4.]]></Val>
+            <Val><![CDATA[Простое приложение Node.js Express 4.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5674,7 +5674,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20315.1]]></Val>
+        <Val><![CDATA[1.4.20406.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5701,7 +5701,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20315.1 commit:26103c3bc767322ed8848e1fa4d7ba5b2bd593bd]]></Val>
+        <Val><![CDATA[1.4.20406.1 commit:7254f2ace777917a908e56add9360dcd42bb2a60]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
