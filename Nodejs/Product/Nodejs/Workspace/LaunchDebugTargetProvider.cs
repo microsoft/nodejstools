@@ -61,9 +61,11 @@ namespace Microsoft.NodejsTools.Workspace
 
         protected static string GetJsonConfigurationForInspectProtocol(string target, string workingDir, string nodeExe, DebugLaunchActionContext debugLaunchContext)
         {
+            var debuggerPort = debugLaunchContext.LaunchConfiguration.GetValue(DebuggerPortKey, defaultValue: NodejsConstants.DefaultDebuggerPort);
             var runtimeArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(NodeArgsKey, defaultValue: null));
+            // If we supply the port argument we also need to manually add --inspect-brk=port to the runtime arguments
+            runtimeArguments = runtimeArguments.Append($"--inspect-brk=${debuggerPort}");
             var scriptArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(ScriptArgsKey, defaultValue: null));
-            var port = debugLaunchContext.LaunchConfiguration.GetValue(DebuggerPortKey, defaultValue: NodejsConstants.DefaultDebuggerPort);
 
             var configuration = new JObject(
                 new JProperty("name", "Debug Node.js program from Visual Studio"),
@@ -73,7 +75,7 @@ namespace Microsoft.NodejsTools.Workspace
                 new JProperty("args", scriptArguments),
                 new JProperty("runtimeExecutable", nodeExe),
                 new JProperty("runtimeArgs", runtimeArguments),
-                new JProperty("port", port),
+                new JProperty("port", debuggerPort),
                 new JProperty("cwd", workingDir),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("trace", NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption()),
