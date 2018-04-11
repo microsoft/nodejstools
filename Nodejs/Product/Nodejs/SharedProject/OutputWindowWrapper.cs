@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         // This is the package manager pane that ships with VS2015, and we should print there if available.
         private static readonly Guid VSPackageManagerPaneGuid = new Guid("C7E31C31-1451-4E05-B6BE-D11B6829E8BB");
-
         private static readonly Guid TscPaneGuid = new Guid("7CCFA622-001E-4459-9D8B-5B60BE0A18C2");
 
         [Import]
@@ -25,53 +24,34 @@ namespace Microsoft.VisualStudioTools.Project
 
         private Dictionary<OutputWindowTarget, IVsOutputWindowPane> lazyOutputPaneCollection = new Dictionary<OutputWindowTarget, IVsOutputWindowPane>();
 
-        public OutputPaneWrapper()
-        {
-            //...
-        }
-
-        private void InitializeOutputPane(OutputWindowTarget target)
+        private IVsOutputWindowPane InitializeOutputPane(string title, Guid paneId)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            var (title, guid) = GetPaneInfo(target);
             var outputWindow = (IVsOutputWindow)this.ServiceProvider.GetService(typeof(SVsOutputWindow));
 
             // Try to get the workspace pane if it has already been registered
-            var hr = outputWindow.GetPane(guid, out var lazyOutputPane);
+            var hr = outputWindow.GetPane(paneId, out var lazyOutputPane);
 
             // If the workspace pane has not been registered before, create it
             if (lazyOutputPane == null || ErrorHandler.Failed(hr))
             {
 
-                if (ErrorHandler.Failed(outputWindow.CreatePane(guid, title, fInitVisible: 1, fClearWithSolution: 1)) ||
-                    ErrorHandler.Failed(outputWindow.GetPane(guid, out lazyOutputPane)))
+                if (ErrorHandler.Failed(outputWindow.CreatePane(paneId, title, fInitVisible: 1, fClearWithSolution: 1)) ||
+                    ErrorHandler.Failed(outputWindow.GetPane(paneId, out lazyOutputPane)))
                 {
-                    return;
+                    return null;
                 }
 
                 // Must activate the workspace pane for it to show up in the output window
                 lazyOutputPane.Activate();
             }
 
-            this.lazyOutputPaneCollection.Add(target, lazyOutputPane);
-
-            (string title, Guid guid) GetPaneInfo(OutputWindowTarget pane)
-            {
-                switch (pane)
-                {
-                    case OutputWindowTarget.Npm:
-                        return ("Npm", VSPackageManagerPaneGuid);
-                    case OutputWindowTarget.Tsc:
-                        return ("Tsc", TscPaneGuid); /* no need to localize since name of exe */
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(pane));
-                }
-            }
+            return lazyOutputPane;
         }
 
         public void WriteLine(string message, OutputWindowTarget target = OutputWindowTarget.Npm)
         {
-            if (!this.lazyOutputPaneCollection.TryGetValue(target, out var lazyOutputPane))
+            if (!this.lazyOutputPaneCollection.TryGetValue(target, out var lazyOutputPane) || lazyOutputPane == null)
             {
                 throw new InvalidOperationException("You need to initialize the output panes before using them.");
             }
@@ -84,8 +64,10 @@ namespace Microsoft.VisualStudioTools.Project
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            InitializeOutputPane(OutputWindowTarget.Npm);
-            InitializeOutputPane(OutputWindowTarget.Tsc);
+            var npmPane = InitializeOutputPane("Npm", VSPackageManagerPaneGuid);
+            this.lazyOutputPaneCollection.Add(OutputWindowTarget.Npm, npmPane);
+            var tscPane = InitializeOutputPane("Tsc", TscPaneGuid);
+            this.lazyOutputPaneCollection.Add(OutputWindowTarget.Tsc, tscPane);
         }
     }
 

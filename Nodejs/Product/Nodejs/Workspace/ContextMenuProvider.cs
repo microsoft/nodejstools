@@ -11,12 +11,10 @@ using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Workspace;
 using Microsoft.VisualStudio.Workspace.Debug;
 using Microsoft.VisualStudio.Workspace.VSIntegration.UI;
 using Microsoft.VisualStudioTools.Project;
-using ShellInterop = Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools.Workspace
 {
@@ -80,24 +78,26 @@ namespace Microsoft.NodejsTools.Workspace
                 {
                     this.outputPane.InitializeOutputPanes();
 
+                    var fileNode = ((IFileNode)node).FullPath;
+
                     switch (nCmdID)
                     {
                         case PkgCmdId.cmdidWorkSpaceNpmInstallMissing:
-                            ExecNpmInstallMissing((IFileNode)node);
+                            ExecNpmInstallMissing(fileNode);
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidWorkSpaceNpmInstallNew:
-                            ExecNpmInstallNew((IFileNode)node);
+                            ExecNpmInstallNew(fileNode);
                             return VSConstants.S_OK;
 
                         case PkgCmdId.cmdidWorkSpaceNpmUpdate:
-                            ExecNpmUpdate((IFileNode)node);
+                            ExecNpmUpdate(fileNode);
                             return VSConstants.S_OK;
                     }
 
                     if (nCmdID >= PkgCmdId.cmdidWorkSpaceNpmDynamicScript && nCmdID < PkgCmdId.cmdidWorkSpaceNpmDynamicScriptMax)
                     {
-                        ExecDynamic((IFileNode)node, nCmdID);
+                        ExecDynamic(fileNode, nCmdID);
                         return VSConstants.S_OK;
                     }
                 }
@@ -119,18 +119,18 @@ namespace Microsoft.NodejsTools.Workspace
             // Note: all the Exec commands are async, this allows us to call them in a fire and forget
             // pattern, without blocking the UI or losing any logging
 
-            private async void ExecNpmInstallMissing(IFileNode node)
+            private async void ExecNpmInstallMissing(string filePath)
             {
-                using (var npmController = this.CreateController(node.FullPath))
+                using (var npmController = this.CreateController(filePath))
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     await commander.Install();
                 }
             }
 
-            private void ExecNpmInstallNew(IFileNode node)
+            private void ExecNpmInstallNew(string filePath)
             {
-                using (var npmController = this.CreateController(node.FullPath))
+                using (var npmController = this.CreateController(filePath))
                 using (var npmWorker = new NpmWorker(npmController))
                 using (var manager = new NpmPackageInstallWindow(npmController, npmWorker))
                 {
@@ -138,21 +138,20 @@ namespace Microsoft.NodejsTools.Workspace
                 }
             }
 
-            private async void ExecNpmUpdate(IFileNode node)
+            private async void ExecNpmUpdate(string filePath)
             {
-                using (var npmController = this.CreateController(node.FullPath))
+                using (var npmController = this.CreateController(filePath))
                 using (var commander = npmController.CreateNpmCommander())
                 {
                     await commander.UpdatePackagesAsync();
                 }
             }
 
-            private async void ExecDynamic(IFileNode node, uint nCmdID)
+            private async void ExecDynamic(string filePath, uint nCmdID)
             {
                 // Unfortunately the NpmController (and NpmCommander), used for the install and update commands
                 // doesn't support running arbitrary scripts. And changing that is outside
                 // the scope of these changes.
-                var filePath = node.FullPath;
                 if (TryGetCommand(nCmdID, filePath, out var commandName))
                 {
                     using (var npmController = this.CreateController(filePath))
@@ -174,7 +173,7 @@ namespace Microsoft.NodejsTools.Workspace
                 }
 
                 //invoke debuglaunchtargetprovider on this file
-                var fileContextActions = await node.Workspace.GetFileContextActionsAsync(packageJson.Main, new[] { DebugLaunchActionContext.ContextTypeGuid });
+                var fileContextActions = await workspace.GetFileContextActionsAsync(packageJson.Main, new[] { DebugLaunchActionContext.ContextTypeGuid });
                 if (fileContextActions.Any())
                 {
                     // we requested a single context, so there should be a single grouping. Use the First action, since they're ordered by priority.
@@ -274,7 +273,8 @@ namespace Microsoft.NodejsTools.Workspace
 
             private INpmController CreateController(string packageJsonPath)
             {
-                Debug.Assert(Path.IsPathRooted(packageJsonPath) && PackageJsonFactory.IsPackageJsonFile(packageJsonPath));
+                Debug.Assert(Path.IsPathRooted(packageJsonPath));
+                Debug.Assert(PackageJsonFactory.IsPackageJsonFile(packageJsonPath));
 
                 var projectHome = Path.GetDirectoryName(packageJsonPath);
 
