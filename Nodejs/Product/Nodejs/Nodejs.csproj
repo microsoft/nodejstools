@@ -1197,7 +1197,7 @@
   </ItemGroup>
   <ItemGroup>
     <T4ParameterValues Include="BuildVersion">
-      <Value>$(VSIXBuildVersion)</Value>
+      <Value>$(BuildVersionExtended)</Value>
       <Visible>false</Visible>
     </T4ParameterValues>
   </ItemGroup>
