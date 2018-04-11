@@ -60,7 +60,7 @@ namespace Microsoft.NodejsTools.Workspace
             {
                 await this.workspaceContext.JTF.SwitchToMainThreadAsync();
 
-                this.outputPane.ShowWindow();
+                this.outputPane.InitializeOutputPanes();
 
                 var actions = new List<IFileContextAction>();
 
