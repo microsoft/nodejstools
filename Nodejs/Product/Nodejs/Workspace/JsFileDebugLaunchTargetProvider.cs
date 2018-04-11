@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.Workspace
             var nodeExe = CheckNodeInstalledAndWarn(debugLaunchContext);
 
             var nodeVersion = Nodejs.GetNodeVersion(nodeExe);
-            if (nodeVersion >= new Version(8, 0) || NodejsProjectLauncher.CheckDebugProtocolOption())
+            if (nodeVersion >= new Version(8, 0))
             {
                 this.SetupDebugTargetInfoForInspectProtocol(ref vsDebugTargetInfo, debugLaunchContext, nodeExe);
                 TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString(), isProject: false);
