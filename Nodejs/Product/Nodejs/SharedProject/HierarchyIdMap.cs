@@ -57,12 +57,28 @@ namespace Microsoft.VisualStudioTools.Project
         {
             VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
+            if (node == null)
+            {
+                throw new ArgumentNullException(nameof(node));
+            }
+
             lock (this.theLock)
             {
                 var i = (int)node.ID - 1;
-                if (i < 0 || i >= this.ids.Count || (this.ids[i].TryGetTarget(out var found) && !object.ReferenceEquals(node, found)))
+                if (0 > i || i >= this.ids.Count)
                 {
-                    throw new InvalidOperationException("Removing node with invalid ID or map is corrupted");
+                    throw new InvalidOperationException($"Invalid id. {i}");
+                }
+
+                var weakRef = this.ids[i];
+                if (weakRef == null)
+                {
+                    throw new InvalidOperationException("Trying to retrieve a node before adding.");
+                }
+
+                if (weakRef.TryGetTarget(out var found) && !object.ReferenceEquals(node, found))
+                {
+                    throw new InvalidOperationException("The node has the wrong id.");
                 }
 
                 this.ids[i] = null;
