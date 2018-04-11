@@ -17,7 +17,6 @@ using Microsoft.VisualStudioTools.TestAdapter;
 namespace Microsoft.NodejsTools.TestAdapter
 {
     [Export(typeof(ITestContainerDiscoverer))]
-    [Export(typeof(TestContainerDiscoverer))]
     internal class TestContainerDiscoverer : ITestContainerDiscoverer, IDisposable
     {
         private readonly IServiceProvider serviceProvider;
@@ -31,24 +30,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         [ImportingConstructor]
         private TestContainerDiscoverer([Import(typeof(SVsServiceProvider))]IServiceProvider serviceProvider, [Import(typeof(IOperationState))]IOperationState operationState)
-            : this(serviceProvider,
-                   new SolutionEventsListener(serviceProvider),
-                   new TestFilesUpdateWatcher(serviceProvider),
-                   new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory),
-                   operationState)
-        {
-        }
-
-        public TestContainerDiscoverer(IServiceProvider serviceProvider,
-                                       SolutionEventsListener solutionListener,
-                                       TestFilesUpdateWatcher testFilesUpdateWatcher,
-                                       TestFileAddRemoveListener testFilesAddRemoveListener,
-                                       IOperationState operationState)
         {
             ValidateArg.NotNull(serviceProvider, "serviceProvider");
-            ValidateArg.NotNull(solutionListener, "solutionListener");
-            ValidateArg.NotNull(testFilesUpdateWatcher, "testFilesUpdateWatcher");
-            ValidateArg.NotNull(testFilesAddRemoveListener, "testFilesAddRemoveListener");
             ValidateArg.NotNull(operationState, "operationState");
 
             this.fileRootMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -56,10 +39,10 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             this.serviceProvider = serviceProvider;
 
-            this.testFilesAddRemoveListener = testFilesAddRemoveListener;
+            this.testFilesAddRemoveListener = new TestFileAddRemoveListener(serviceProvider, Guids.NodejsBaseProjectFactory);
             this.testFilesAddRemoveListener.TestFileChanged += this.OnProjectItemChanged;
 
-            this.solutionListener = solutionListener;
+            this.solutionListener = new SolutionEventsListener(serviceProvider);
             this.solutionListener.ProjectLoaded += this.OnProjectLoaded;
             this.solutionListener.ProjectUnloading += this.OnProjectUnloaded;
             this.solutionListener.ProjectClosing += this.OnProjectUnloaded;
@@ -67,7 +50,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.solutionListener.BuildCompleted += this.OnBuildCompleted;
             this.solutionListener.BuildStarted += this.OnBuildStarted;
 
-            this.testFilesUpdateWatcher = testFilesUpdateWatcher;
+            this.testFilesUpdateWatcher = new TestFilesUpdateWatcher(serviceProvider);
             this.testFilesUpdateWatcher.FileChangedEvent += this.OnProjectItemChanged;
             operationState.StateChanged += this.OperationStateChanged;
 
@@ -162,7 +145,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         internal bool IsTestFile(string pathToFile)
         {
-            var testCaseFile = pathToFile;
             var project = GetTestProjectFromFile(pathToFile);
             if (project == null)
             {
@@ -190,6 +172,18 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return false;
             }
 
+            var propStore = (IVsBuildPropertyStorage)project;
+            var hr = propStore.GetPropertyValue("TestRoot",/*configuration*/ "", (uint)_PersistStorageType.PST_PROJECT_FILE, out var testRoot);
+
+            // if test root is specified check if the file is contained, otherwise fall back to old logic
+            if (ErrorHandler.Succeeded(hr) && !string.IsNullOrEmpty(testRoot))
+            {
+                project.TryGetProjectPath(out var root);
+                var testRootPath = Path.Combine(root, testRoot);
+
+                return CommonUtils.IsSubpathOf(root, pathToFile);
+            }
+
             ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out var itemId));
 
             return IsTestFile(itemId, project);
@@ -197,17 +191,15 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private static bool IsTestFile(uint itemId, IVsProject project)
         {
-            var hierarchy = project as IVsHierarchy;
 
-            if (hierarchy == null)
+            if (!(project is IVsHierarchy hierarchy))
             {
                 return false;
             }
 
             hierarchy.GetProperty(itemId, (int)__VSHPROPID.VSHPROPID_ExtObject, out var extObject);
 
-            var projectItem = extObject as EnvDTE.ProjectItem;
-            if (projectItem == null)
+            if (!(extObject is EnvDTE.ProjectItem projectItem))
             {
                 return false;
             }
@@ -315,16 +307,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project)
         {
-            if (!project.IsTestProject(Guids.NodejsBaseProjectFactory))
-            {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestContainerDiscoverer: Ignoring project {0} as it is not a Node.js project.", project.GetProjectName());
-                }
-
-                yield break;
-            }
-
             project.GetMkDocument(VSConstants.VSITEMID_ROOT, out var path);
 
             if (this.detectingChanges)
@@ -389,8 +371,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
-            //so we need to re-discover when file change happens. 
-            if (pathToItem.EndsWith(NodejsConstants.NodejsProjectExtension, StringComparison.OrdinalIgnoreCase))
+            //so we need to re-discover when file change happens. Since we support all project files, this is a save check
+            if (pathToItem.EndsWith("proj", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -516,22 +498,19 @@ namespace Microsoft.NodejsTools.TestAdapter
                 switch (e.ChangedReason)
                 {
                     case WatcherChangeTypes.Created:
-                        if (project.IsTestProject(Guids.NodejsBaseProjectFactory))
+                        root = project.GetProjectHome();
+
+                        if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
                         {
-                            root = project.GetProjectHome();
-
-                            if (!string.IsNullOrEmpty(root) && CommonUtils.IsSubpathOf(root, e.File))
-                            {
-                                this.testFilesUpdateWatcher.AddFolderWatch(root);
-                                this.fileRootMap[e.File] = root;
-                            }
-                            else
-                            {
-                                this.testFilesUpdateWatcher.AddFileWatch(e.File);
-                            }
-
-                            OnTestContainersChanged(project);
+                            this.testFilesUpdateWatcher.AddFolderWatch(root);
+                            this.fileRootMap[e.File] = root;
                         }
+                        else
+                        {
+                            this.testFilesUpdateWatcher.AddFileWatch(e.File);
+                        }
+
+                        OnTestContainersChanged(project);
                         break;
                     case WatcherChangeTypes.Deleted:
                         if (this.fileRootMap.TryGetValue(e.File, out root))
@@ -578,9 +557,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var hierarchy = project as IVsHierarchy;
                 if (project.TryGetProjectPath(out var projectPath) &&
                     CommonUtils.IsSamePath(projectPath, filename) ||
-                    (hierarchy != null &&
-                    project.IsTestProject(Guids.NodejsBaseProjectFactory) &&
-                    ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out _))))
+                    (hierarchy != null && ErrorHandler.Succeeded(hierarchy.ParseCanonicalName(filename, out _))))
                 {
                     return project;
                 }
