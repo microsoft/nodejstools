@@ -156,7 +156,7 @@
 
   <PropertyGroup>
     <BuildVersionExtended>$(BuildVersion) unknown commit</BuildVersionExtended>
-    <BuildVersionExtended Condition="'$(BUILD_SOURCEVERSION)'!=''">$(BuildVersionExtended) commit:$(BUILD_SOURCEVERSION)</BuildVersionExtended>
+    <BuildVersionExtended Condition="'$(BUILD_SOURCEVERSION)'!=''">$(BuildVersion) Commit Hash:$(BUILD_SOURCEVERSION)</BuildVersionExtended>
 
     <VSIXBuildVersion>$(BuildVersion)</VSIXBuildVersion>
     <AssemblyVersion>$(MajorVersion).0.0.0</AssemblyVersion>
