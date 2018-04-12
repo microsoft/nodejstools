@@ -146,7 +146,7 @@ namespace Microsoft.NodejsTools.Jade
                     break;
                 }
 
-                if (this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)))
+                if (this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || char.IsLetter(this._cs.NextChar)))
                 {
                     if (this._cs.Position > start)
                     {

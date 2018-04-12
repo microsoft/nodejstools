@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Jade
 
             while (!this._cs.IsWhiteSpace() && !this._cs.IsEndOfStream())
             {
-                if (this._cs.CurrentChar == '.' && Char.IsWhiteSpace(this._cs.NextChar))
+                if (this._cs.CurrentChar == '.' && char.IsWhiteSpace(this._cs.NextChar))
                 {
                     // If this is last ., then what follows is a text literal
                     if (StringComparer.OrdinalIgnoreCase.Equals(ident, "script"))
@@ -115,7 +115,7 @@ namespace Microsoft.NodejsTools.Jade
                             selectorRange.Length
                         );
 
-                        if (Char.IsWhiteSpace(this._cs.CurrentChar) && this._cs.LookAhead(-1) == '.')
+                        if (char.IsWhiteSpace(this._cs.CurrentChar) && this._cs.LookAhead(-1) == '.')
                         {
                             this._cs.Position--;
                         }

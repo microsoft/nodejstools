@@ -91,8 +91,8 @@ namespace Microsoft.NodejsTools.Jade
 
                     if (ignoreCase)
                     {
-                        ch1 = Char.ToLowerInvariant(ch1);
-                        ch2 = Char.ToLowerInvariant(ch2);
+                        ch1 = char.ToLowerInvariant(ch1);
+                        ch2 = char.ToLowerInvariant(ch2);
                     }
 
                     if (ch1 != ch2)

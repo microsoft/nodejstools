@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.SourceMapping
 {
     /// <summary>
     /// Reads a V3 source map as documented at https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit?hl=en_US&pli=1&pli=1
     /// </summary>
-    internal class SourceMap
+    public sealed class SourceMap
     {
         private readonly Dictionary<string, object> _mapInfo;
         private readonly LineInfo[] _lines;
@@ -48,8 +48,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <param name="input"></param>
         internal SourceMap(TextReader input)
         {
-            var serializer = new JavaScriptSerializer();
-            this._mapInfo = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
+            this._mapInfo = JsonConvert.DeserializeObject<Dictionary<string, object>>(input.ReadToEnd());
             if (this.Version != 3)
             {
                 throw new NotSupportedException("Only V3 source maps are supported");
