@@ -555,9 +555,9 @@ namespace Microsoft.VisualStudioTools.Project
             }
         }
 
-        public Process Process { get; }
-
         public int? ProcessId => this.IsStarted ? this.Process.Id : (int?)null;
+
+        public Process Process { get; }
 
         /// <summary>
         /// The arguments that were originally passed, including the filename.

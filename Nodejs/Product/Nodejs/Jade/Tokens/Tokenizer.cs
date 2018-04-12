@@ -185,7 +185,7 @@ namespace Microsoft.NodejsTools.Jade
                         break;
                     }
 
-                    if (!Char.IsWhiteSpace(ch))
+                    if (!char.IsWhiteSpace(ch))
                     {
                         multiline = false;
                         break;
@@ -416,7 +416,7 @@ namespace Microsoft.NodejsTools.Jade
                     pos++;
                     for (var j = pos; j < this._cs.Position + 1; j++)
                     {
-                        if (j == this._cs.Position || !Char.IsWhiteSpace(this._cs[j]))
+                        if (j == this._cs.Position || !char.IsWhiteSpace(this._cs[j]))
                         {
                             baseIndent = j - pos;
                             break;
@@ -558,7 +558,7 @@ namespace Microsoft.NodejsTools.Jade
                     break;
                 }
 
-                if (!Char.IsWhiteSpace(ch))
+                if (!char.IsWhiteSpace(ch))
                 {
                     allWS = false;
                     break;
