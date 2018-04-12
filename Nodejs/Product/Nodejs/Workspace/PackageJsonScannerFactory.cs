@@ -43,13 +43,16 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var packageJson = PackageJsonFactory.Create(filePath);
                 var main = packageJson.Main;
-                var fileReferences = new List<FileReferenceInfo>
+
+                var fileReferences = new List<FileReferenceInfo>();
+
+                if (!string.IsNullOrEmpty(main))
                 {
-                    new FileReferenceInfo(main,
-                    context: "Debug",
-                    target: main,
-                    referenceType: (int)FileReferenceInfoType.Output)
-                };
+                    fileReferences.Add(new FileReferenceInfo(main,
+                        context: "Debug",
+                        target: main,
+                        referenceType: (int)FileReferenceInfoType.Output));
+                }
 
                 return Task.FromResult(fileReferences);
             }
