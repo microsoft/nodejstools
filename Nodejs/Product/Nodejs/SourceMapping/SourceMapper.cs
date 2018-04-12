@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.SourceMapping
 {
-    internal class SourceMapper
+    public sealed class SourceMapper
     {
         private readonly Dictionary<string, ReverseSourceMap> _generatedFileToSourceMap = new Dictionary<string, ReverseSourceMap>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
@@ -111,7 +111,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     {
                         for (; column < lineText.Length; column++)
                         {
-                            if (!Char.IsWhiteSpace(lineText[column]))
+                            if (!char.IsWhiteSpace(lineText[column]))
                             {
                                 break;
                             }
@@ -289,12 +289,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
         private static char[] InvalidPathChars = Path.GetInvalidPathChars();
 
-        internal static FunctionInformation MaybeMap(FunctionInformation funcInfo)
-        {
-            return MaybeMap(funcInfo, null);
-        }
-
-        internal static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps)
+        public static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps = null)
         {
             if (funcInfo.Filename != null &&
                 funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&

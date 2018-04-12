@@ -445,80 +445,15 @@ namespace Microsoft.NodejsTools.TestAdapter
             frameworkHandle.RecordEnd(test, result.Outcome);
             this.currentTests.Remove(test);
         }
+
+        private sealed class TestReceiver : ITestCaseDiscoverySink
+        {
+            public List<TestCase> Tests { get; } = new List<TestCase>();
+
+            public void SendTestCase(TestCase discoveredTest)
+            {
+                this.Tests.Add(discoveredTest);
+            }
+        }
     }
-}
-
-internal class TestReceiver : ITestCaseDiscoverySink
-{
-    public List<TestCase> Tests { get; } = new List<TestCase>();
-
-    public void SendTestCase(TestCase discoveredTest)
-    {
-        this.Tests.Add(discoveredTest);
-    }
-}
-
-internal class NodejsProjectSettings
-{
-    public NodejsProjectSettings()
-    {
-        this.NodeExePath = string.Empty;
-        this.SearchPath = string.Empty;
-        this.WorkingDir = string.Empty;
-    }
-
-    public string NodeExePath { get; set; }
-    public string SearchPath { get; set; }
-    public string WorkingDir { get; set; }
-    public string ProjectRootDir { get; set; }
-}
-
-internal class ResultObject
-{
-    public ResultObject()
-    {
-        this.title = string.Empty;
-        this.passed = false;
-        this.pending = false;
-        this.stdout = string.Empty;
-        this.stderr = string.Empty;
-    }
-    public string title { get; set; }
-    public bool passed { get; set; }
-    public bool? pending { get; set; }
-    public string stdout { get; set; }
-    public string stderr { get; set; }
-}
-
-internal class TestEvent
-{
-    public string type { get; set; }
-    public string title { get; set; }
-    public ResultObject result { get; set; }
-}
-
-internal class TestCaseObject
-{
-    public TestCaseObject()
-    {
-        this.framework = string.Empty;
-        this.testName = string.Empty;
-        this.testFile = string.Empty;
-        this.workingFolder = string.Empty;
-        this.projectFolder = string.Empty;
-    }
-
-    public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder)
-    {
-        this.framework = framework;
-        this.testName = testName;
-        this.testFile = testFile;
-        this.workingFolder = workingFolder;
-        this.projectFolder = projectFolder;
-    }
-    public string framework { get; set; }
-    public string testName { get; set; }
-    public string testFile { get; set; }
-    public string workingFolder { get; set; }
-    public string projectFolder { get; set; }
 }

@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.Jade
         // plain text with possible #{foo} variable references
         private void OnHtml()
         {
-            Debug.Assert(this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || Char.IsLetter(this._cs.NextChar)));
+            Debug.Assert(this._cs.CurrentChar == '<' && (this._cs.NextChar == '/' || char.IsLetter(this._cs.NextChar)));
 
             var length = this._cs.NextChar == '/' ? 2 : 1;
             AddToken(JadeTokenType.AngleBracket, this._cs.Position, length);
