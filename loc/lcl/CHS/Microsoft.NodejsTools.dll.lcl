@@ -1295,7 +1295,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[节点]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5671,7 +5671,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20313.1]]></Val>
+        <Val><![CDATA[1.4.20412.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5698,7 +5698,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20313.1 commit:df00f5d39c06690fb3aa51efde49cf4a6677d01b]]></Val>
+        <Val><![CDATA[1.4.20412.2 Commit Hash:7391c581d4505cc7b7022b867e91158d2884e44a]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
