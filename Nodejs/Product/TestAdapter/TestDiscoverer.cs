@@ -63,8 +63,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                         var testItems = new Dictionary<string, HashSet<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
 
-                        var testRoot = proj.GetProperty("TestRoot")?.EvaluatedValue;
-                        var testFramework = proj.GetProperty("TestFramework")?.EvaluatedValue;
+                        var testRoot = proj.GetProperty(NodeProjectProperty.TestRoot)?.EvaluatedValue;
+                        var testFramework = proj.GetProperty(NodeProjectProperty.TestFramework)?.EvaluatedValue;
 
                         if( !string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
                         {

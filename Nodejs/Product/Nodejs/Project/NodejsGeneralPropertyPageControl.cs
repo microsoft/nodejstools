@@ -49,9 +49,13 @@ namespace Microsoft.NodejsTools.Project
             this._startActionHeaderLabel.Text = Resources.StartActionHeader;
             this._nodeHeaderLabel.Text = Resources.NodeHeader;
             this._saveInProjectFileCheckBox.Text = Resources.SaveNodeSettingsInProjectFile;
+            this._TestHeaderLabel.Text = Resources.UnitTestHeader;
+            this._testFrameworkLabel.Text = Resources.TestFramework;
+            this._testRootLabel.Text = Resources.TestRoot;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
             this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browseTestroot.AccessibleName = Resources.PropertiesBrowseTestRootAccessibleName;
         }
 
         private void AddToolTips()
@@ -67,6 +71,8 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._debuggerPort, Resources.DebuggerPort);
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
             this._tooltip.SetToolTip(this._saveInProjectFileCheckBox, Resources.SaveInProjectFileToolTip);
+            this._tooltip.SetToolTip(this._testRoot, Resources.TestRootToolTip);
+            this._tooltip.SetToolTip(this._testFramework, Resources.TestFrameworkToolTip);
         }
 
         protected override bool DisableOnBuild => false;
@@ -209,6 +215,30 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
+        public string TestFramework
+        {
+            get
+            {
+                return this._testFramework.Text;
+            }
+            set
+            {
+                this._testFramework.Text = value;
+            }
+        }
+
+        public string TestRoot
+        {
+            get
+            {
+                return this._testRoot.Text;
+            }
+            set
+            {
+                this._testRoot.Text = value;
+            }
+        }
+
         private void Changed(object sender, EventArgs e)
         {
             this.IsDirty = true;
@@ -240,15 +270,31 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowseDirectoryClick(object sender, EventArgs e)
         {
+            var projectHome = this._propPage.Project.ProjectHome;
             var dir = this._workingDir.Text;
             if (string.IsNullOrEmpty(dir))
             {
-                dir = this._propPage.Project.ProjectHome;
+                dir = projectHome;
             }
 
-            if (this.GetDirectoryViaBrowseRelative(dir, this._propPage.Project.ProjectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
             {
                 this._workingDir.Text = string.IsNullOrEmpty(dir) ? "." : dir;
+            }
+        }
+
+        private void BrowseTestRootClick(object sender, EventArgs e)
+        {
+            var projectHome = this._propPage.Project.ProjectHome;
+            var dir = this._testRoot.Text;
+            if (string.IsNullOrEmpty(dir))
+            {
+                dir = projectHome;
+            }
+
+            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            {
+                this._testRoot.Text = string.IsNullOrEmpty(dir) ? "." : dir;
             }
         }
 

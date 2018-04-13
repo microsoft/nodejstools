@@ -744,4 +744,19 @@ Error retrieving websocket debug proxy information from web.config.</value>
   <data name="TscBuildStarted" xml:space="preserve">
     <value>Build Started</value>
   </data>
+  <data name="PropertiesBrowseTestRootAccessibleName" xml:space="preserve">
+    <value>Browse for test root</value>
+  </data>
+  <data name="TestRoot" xml:space="preserve">
+    <value>Test Root</value>
+  </data>
+  <data name="UnitTestHeader" xml:space="preserve">
+    <value>JavaScript Unit Test</value>
+  </data>
+  <data name="TestFrameworkToolTip" xml:space="preserve">
+    <value>Specifies the framework used for the unit tests.</value>
+  </data>
+  <data name="TestRootToolTip" xml:space="preserve">
+    <value>Specifies the directory where the unit tests are located.</value>
+  </data>
 </root>

@@ -173,7 +173,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             var propStore = (IVsBuildPropertyStorage)project;
-            var hr = propStore.GetPropertyValue("TestRoot",/*configuration*/ "", (uint)_PersistStorageType.PST_PROJECT_FILE, out var testRoot);
+            var hr = propStore.GetPropertyValue(NodeProjectProperty.TestRoot,/*configuration*/ "", (uint)_PersistStorageType.PST_PROJECT_FILE, out var testRoot);
 
             // if test root is specified check if the file is contained, otherwise fall back to old logic
             if (ErrorHandler.Succeeded(hr) && !string.IsNullOrEmpty(testRoot))
