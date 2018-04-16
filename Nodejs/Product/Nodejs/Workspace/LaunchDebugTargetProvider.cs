@@ -64,7 +64,7 @@ namespace Microsoft.NodejsTools.Workspace
             var debuggerPort = debugLaunchContext.LaunchConfiguration.GetValue(DebuggerPortKey, defaultValue: NodejsConstants.DefaultDebuggerPort);
             var runtimeArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(NodeArgsKey, defaultValue: null));
             // If we supply the port argument we also need to manually add --inspect-brk=port to the runtime arguments
-            runtimeArguments = runtimeArguments.Append($"--inspect-brk=${debuggerPort}");
+            runtimeArguments = runtimeArguments.Append($"--inspect-brk={debuggerPort}");
             var scriptArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(ScriptArgsKey, defaultValue: null));
 
             var configuration = new JObject(
