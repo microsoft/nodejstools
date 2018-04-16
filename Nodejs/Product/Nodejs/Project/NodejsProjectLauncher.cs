@@ -247,7 +247,7 @@ namespace Microsoft.NodejsTools.Project
 
             var runtimeArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments));
             // If we supply the port argument we also need to manually add --inspect-brk=port to the runtime arguments
-            runtimeArguments = runtimeArguments.Append($"--inspect-brk=${debuggerPort}");
+            runtimeArguments = runtimeArguments.Append($"--inspect-brk={debuggerPort}");
             var scriptArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments));
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
