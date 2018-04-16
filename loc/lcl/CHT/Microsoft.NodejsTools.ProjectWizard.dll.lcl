@@ -800,7 +800,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[在您的電腦上找不到 Node.js 執行階段。請從 https://nodejs.org 下載並安裝 Node.js 目前的版本，或在 Visual Studio 節點專案的屬性頁面中，指定您 Node.exe 的位置。]]></Val>
+            <Val><![CDATA[在您的電腦上找不到 Node.js 執行階段。請從 https://nodejs.org 下載並安裝 Node.js 目前的版本，或在 Visual Studio Node 專案的屬性頁面中，指定您 Node.exe 的位置。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3538,7 +3538,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20406.1]]></Val>
+        <Val><![CDATA[1.4.20413.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3565,7 +3565,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20406.1 commit:7254f2ace777917a908e56add9360dcd42bb2a60]]></Val>
+        <Val><![CDATA[1.4.20413.4 Commit Hash:0ae8f05fd65bbd2ab4e73c5278d2e28923db3e1d]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
