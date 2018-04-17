@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Import]
         private SVsServiceProvider ServiceProvider { get; set; }
 
-        private Dictionary<OutputWindowTarget, IVsOutputWindowPane> lazyOutputPaneCollection = new Dictionary<OutputWindowTarget, IVsOutputWindowPane>();
+        private ConcurrentDictionary<OutputWindowTarget, IVsOutputWindowPane> lazyOutputPaneCollection = new ConcurrentDictionary<OutputWindowTarget, IVsOutputWindowPane>();
 
         private IVsOutputWindowPane InitializeOutputPane(string title, Guid paneId)
         {
@@ -51,12 +52,12 @@ namespace Microsoft.VisualStudioTools.Project
 
         public void WriteLine(string message, OutputWindowTarget target = OutputWindowTarget.Npm)
         {
-            if (!this.lazyOutputPaneCollection.TryGetValue(target, out var lazyOutputPane) || lazyOutputPane == null)
+            if (!this.IsInitialized())
             {
                 throw new InvalidOperationException("You need to initialize the output panes before using them.");
             }
 
-            var hr = lazyOutputPane.OutputStringThreadSafe(message + Environment.NewLine);
+            var hr = this.lazyOutputPaneCollection[target].OutputStringThreadSafe(message + Environment.NewLine);
             Debug.Assert(ErrorHandler.Succeeded(hr));
         }
 
@@ -64,10 +65,19 @@ namespace Microsoft.VisualStudioTools.Project
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            var npmPane = InitializeOutputPane("Npm", VSPackageManagerPaneGuid);
-            this.lazyOutputPaneCollection.Add(OutputWindowTarget.Npm, npmPane);
-            var tscPane = InitializeOutputPane("Tsc", TscPaneGuid);
-            this.lazyOutputPaneCollection.Add(OutputWindowTarget.Tsc, tscPane);
+            if (!this.IsInitialized())
+            {
+                var npmPane = InitializeOutputPane("Npm", VSPackageManagerPaneGuid);
+                this.lazyOutputPaneCollection.TryAdd(OutputWindowTarget.Npm, npmPane);
+                var tscPane = InitializeOutputPane("Tsc", TscPaneGuid);
+                this.lazyOutputPaneCollection.TryAdd(OutputWindowTarget.Tsc, tscPane);
+            }
+        }
+
+        private bool IsInitialized()
+        {
+            return this.lazyOutputPaneCollection.TryGetValue(OutputWindowTarget.Npm, out var npmWindow) && npmWindow != null
+                && this.lazyOutputPaneCollection.TryGetValue(OutputWindowTarget.Tsc, out var tscWindow) && tscWindow != null;
         }
     }
 
