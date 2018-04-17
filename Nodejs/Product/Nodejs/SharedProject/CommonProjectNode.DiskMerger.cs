@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudioTools.Project
             private async Task<bool> ContinueMergeAsyncWorker((string Name, HierarchyNode Parent) dir, bool hierarchyCreated)
             {
                 var wasExpanded = hierarchyCreated ? dir.Parent.GetIsExpanded() : false;
-                var missingChildren = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
+                var missingOnDisk = new HashSet<HierarchyNode>(dir.Parent.AllChildren);
 
                 var thread = this.project.Site.GetUIThread();
 
@@ -92,15 +92,9 @@ namespace Microsoft.VisualStudioTools.Project
                             this.project.CreateSymLinkWatcher(curDir);
                         }
 
-                        var existing = this.project.FindNodeByFullPath(curDir);
-                        if (existing == null)
-                        {
-                            existing = this.project.AddAllFilesFolder(dir.Parent, curDir + Path.DirectorySeparatorChar, hierarchyCreated);
-                        }
-                        else
-                        {
-                            missingChildren.Remove(existing);
-                        }
+                        var existing = this.project.AddAllFilesFolder(dir.Parent, curDir, hierarchyCreated);
+                        missingOnDisk.Remove(existing);
+
                         this.remainingDirs.Push((curDir, existing));
                     }
                 }
@@ -136,7 +130,7 @@ namespace Microsoft.VisualStudioTools.Project
                         }
                         else
                         {
-                            missingChildren.Remove(existing);
+                            missingOnDisk.Remove(existing);
                         }
                     }
 
@@ -156,7 +150,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
 
                 // remove the excluded children which are no longer there
-                this.RemoveMissingChildren(missingChildren);
+                this.RemoveMissingChildren(missingOnDisk);
 
                 if (hierarchyCreated)
                 {
