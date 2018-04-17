@@ -1,25 +1,25 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace Microsoft.VisualStudioTools.Project
 {
     internal sealed class HierarchyIdMap
     {
-        private readonly List<WeakReference<HierarchyNode>> ids = new List<WeakReference<HierarchyNode>>();
-        private readonly Stack<int> freedIds = new Stack<int>();
-
-        private readonly object theLock = new object();
+        private readonly ConcurrentDictionary<int, WeakReference<HierarchyNode>> nodes = new ConcurrentDictionary<int, WeakReference<HierarchyNode>>();
+        private readonly ConcurrentStack<int> freedIds = new ConcurrentStack<int>();
 
         /// <summary>
         /// Must be called from the UI thread
         /// </summary>
         public uint Add(HierarchyNode node)
         {
+            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+
 #if DEBUG
-            foreach (var reference in this.ids)
+            foreach (var reference in this.nodes.Values)
             {
                 if (reference != null)
                 {
@@ -29,25 +29,15 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                 }
             }
+
 #endif
-
-            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
-
-            lock (this.theLock)
+            if (!this.freedIds.TryPop(out var idx))
             {
-                if (this.freedIds.Count > 0)
-                {
-                    var i = this.freedIds.Pop();
-                    this.ids[i] = new WeakReference<HierarchyNode>(node);
-                    return (uint)i + 1;
-                }
-                else
-                {
-                    this.ids.Add(new WeakReference<HierarchyNode>(node));
-                    // ids are 1 based
-                    return (uint)this.ids.Count;
-                }
+                idx = this.nodes.Count;
             }
+            this.nodes[idx] = new WeakReference<HierarchyNode>(node);
+
+            return (uint)idx + 1;
         }
 
         /// <summary>
@@ -57,33 +47,21 @@ namespace Microsoft.VisualStudioTools.Project
         {
             VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (node == null)
-            {
-                throw new ArgumentNullException(nameof(node));
-            }
+            Debug.Assert(node != null, "Called with null node");
 
-            lock (this.theLock)
-            {
-                var i = (int)node.ID - 1;
-                if (0 > i || i >= this.ids.Count)
-                {
-                    throw new InvalidOperationException($"Invalid id. {i}");
-                }
+            var idx = (int)node.ID - 1;
 
-                var weakRef = this.ids[i];
-                if (weakRef == null)
-                {
-                    throw new InvalidOperationException("Trying to retrieve a node before adding.");
-                }
+            var removeCheck = this.nodes.TryGetValue(idx, out var weakRef);
 
-                if (weakRef.TryGetTarget(out var found) && !object.ReferenceEquals(node, found))
-                {
-                    throw new InvalidOperationException("The node has the wrong id.");
-                }
+            Debug.Assert(removeCheck, "How did we get an id, which we haven't seen before");
+            Debug.Assert(weakRef != null, "Double delete is not expected.");
 
-                this.ids[i] = null;
-                this.freedIds.Push(i);
-            }
+            var checkReference = weakRef.TryGetTarget(out var found) && object.ReferenceEquals(node, found);
+
+            Debug.Assert(checkReference, "The node has the wrong id.");
+
+            this.nodes[idx] = null;
+            this.freedIds.Push(idx);
         }
 
         /// <summary>
@@ -93,12 +71,15 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
+                VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+
                 var i = (int)itemId - 1;
-                if (0 <= i && i < this.ids.Count)
+                if (0 <= i && i < this.nodes.Count)
                 {
-                    var reference = this.ids[i];
+                    var reference = this.nodes[i];
                     if (reference != null && reference.TryGetTarget(out var node))
                     {
+                        Debug.Assert(node != null);
                         return node;
                     }
                 }
