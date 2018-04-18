@@ -20,8 +20,8 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public uint Add(HierarchyNode node)
         {
-            Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
-
+            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            Debug.Assert(node != null, "The node added here should never be null.");
 #if DEBUG
             foreach (var reference in this.nodes.Values)
             {
@@ -33,7 +33,6 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                 }
             }
-
 #endif
             if (!this.freedIds.TryPop(out var idx))
             {
@@ -48,16 +47,16 @@ namespace Microsoft.VisualStudioTools.Project
 
         private uint NextIndex()
         {
+            // +1 since 0 is not a valid HierarchyId
             return (uint)this.nodes.Count + 1;
         }
-
 
         /// <summary>
         /// Must be called from the UI thread
         /// </summary>
         public void Remove(HierarchyNode node)
         {
-            Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
+            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
             Debug.Assert(node != null, "Called with null node");
 
@@ -66,7 +65,7 @@ namespace Microsoft.VisualStudioTools.Project
             var removeCheck = this.nodes.TryRemove(idx, out var weakRef);
 
             Debug.Assert(removeCheck, "How did we get an id, which we haven't seen before");
-            Debug.Assert(weakRef != null, "Double delete is not expected.");
+            Debug.Assert(weakRef != null, "How did we insert a null value.");
             Debug.Assert(weakRef.TryGetTarget(out var found) && object.ReferenceEquals(node, found), "The node has the wrong id, or was GC-ed before.");
 
             this.freedIds.Push(idx);
@@ -79,7 +78,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
+                VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
                 var idx = itemId;
                 if (this.nodes.TryGetValue(idx, out var reference) && reference != null && reference.TryGetTarget(out var node))
