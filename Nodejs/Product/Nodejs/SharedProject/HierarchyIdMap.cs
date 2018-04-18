@@ -8,8 +8,12 @@ namespace Microsoft.VisualStudioTools.Project
 {
     internal sealed class HierarchyIdMap
     {
-        private readonly ConcurrentDictionary<int, WeakReference<HierarchyNode>> nodes = new ConcurrentDictionary<int, WeakReference<HierarchyNode>>();
-        private readonly ConcurrentStack<int> freedIds = new ConcurrentStack<int>();
+        private readonly ConcurrentDictionary<uint, WeakReference<HierarchyNode>> nodes = new ConcurrentDictionary<uint, WeakReference<HierarchyNode>>();
+        private readonly ConcurrentStack<uint> freedIds = new ConcurrentStack<uint>();
+
+        public readonly static HierarchyIdMap Instance = new HierarchyIdMap();
+
+        private HierarchyIdMap() { }
 
         /// <summary>
         /// Must be called from the UI thread
@@ -33,14 +37,20 @@ namespace Microsoft.VisualStudioTools.Project
 #endif
             if (!this.freedIds.TryPop(out var idx))
             {
-                idx = this.nodes.Count;
+                idx = this.NextIndex();
             }
 
             var addSuccess = this.nodes.TryAdd(idx, new WeakReference<HierarchyNode>(node));
             Debug.Assert(addSuccess, "Failed to add a new item");
 
-            return (uint)idx + 1;
+            return idx;
         }
+
+        private uint NextIndex()
+        {
+            return (uint)this.nodes.Count + 1;
+        }
+
 
         /// <summary>
         /// Must be called from the UI thread
@@ -51,7 +61,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             Debug.Assert(node != null, "Called with null node");
 
-            var idx = (int)node.ID - 1;
+            var idx = node.ID;
 
             var removeCheck = this.nodes.TryRemove(idx, out var weakRef);
 
@@ -71,14 +81,11 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
 
-                var idx = (int)itemId - 1;
-                if (0 <= idx && idx < this.nodes.Count)
+                var idx = itemId;
+                if (this.nodes.TryGetValue(idx, out var reference) && reference != null && reference.TryGetTarget(out var node))
                 {
-                    if (this.nodes.TryGetValue(idx, out var reference) && reference != null && reference.TryGetTarget(out var node))
-                    {
-                        Debug.Assert(node != null);
-                        return node;
-                    }
+                    Debug.Assert(node != null);
+                    return node;
                 }
 
                 // This is a valid return value, this gets called by VS after we deleted the item

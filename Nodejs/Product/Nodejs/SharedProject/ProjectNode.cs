@@ -158,9 +158,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>A project will only try to build if it can obtain a lock on this object</summary>
         private volatile static object BuildLock = new object();
 
-        /// <summary>Maps integer ids to project item instances</summary>
-        private HierarchyIdMap itemIdMap = new HierarchyIdMap();
-
         /// <summary>A service provider call back object provided by the IDE hosting the project manager</summary>
         private IServiceProvider site;
 
@@ -590,7 +587,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Gets a collection of integer ids that maps to project item instances
         /// </summary>
-        internal HierarchyIdMap ItemIdMap => this.itemIdMap;
+        internal HierarchyIdMap ItemIdMap => HierarchyIdMap.Instance;
 
         /// <summary>
         /// Get the helper object that track document changes.
