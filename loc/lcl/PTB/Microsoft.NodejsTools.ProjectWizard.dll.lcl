@@ -89,7 +89,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unable to start wizard: failed to load Node Tools support Package (0x{0:X08})]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Não é possível iniciar o assistente: Falha ao carregar o pacote de suporte das Ferramentas do Nó (0x{0:X08})]]></Val>
+            <Val><![CDATA[Não é possível iniciar o assistente: Falha ao carregar o pacote de suporte das Ferramentas Node (0x{0:X08})]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -782,7 +782,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nó]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -800,7 +800,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project's properties page.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Não foi possível encontrar um tempo de execução do Node.js no computador. Baixe e instale a versão atual do Node.js em https://nodejs.org ou especifique a localização do Node.exe na página de propriedades do Projeto de Nó do Visual Studio.]]></Val>
+            <Val><![CDATA[Não foi possível encontrar um tempo de execução do Node.js no computador. Baixe e instale a versão atual do Node.js em https://nodejs.org ou especifique a localização do Node.exe na página de propriedades do Projeto do Node do Visual Studio.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -971,7 +971,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.]D;]A;]D;]A;The following error occurred trying to execute npm.cmd:]D;]A;]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Não foi possível encontrar o npm.cmd. Verifique se você tem uma versão recente do Node.js instalada e se especificou a localização do node.exe nas propriedades do projeto ou se ela está disponível no CAMINHO do sistema.]D;]A;]D;]A;O erro a seguir ocorreu ao tentar executar o npm.cmd:]D;]A;]D;]A;{0}]]></Val>
+            <Val><![CDATA[Não foi possível encontrar o npm.cmd. Verifique se você tem uma versão recente do node.js instalada e se especificou a localização do node.exe nas propriedades do projeto ou se ela está disponível no CAMINHO do sistema.]D;]A;]D;]A;O erro a seguir ocorreu ao tentar executar o npm.cmd:]D;]A;]D;]A;{0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3538,7 +3538,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20317.2]]></Val>
+        <Val><![CDATA[1.4.20417.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3565,7 +3565,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20317.2 commit:9e761752cd35ad22b047c68452bfd3fe0647c8dc]]></Val>
+        <Val><![CDATA[1.4.20417.2 Commit Hash:cd4afe154404dd353bd9b958b7f4b8b45fe6a1fa]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
