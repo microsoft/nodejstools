@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public uint Add(HierarchyNode node)
         {
-            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
 
 #if DEBUG
             foreach (var reference in this.nodes.Values)
@@ -35,7 +35,9 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 idx = this.nodes.Count;
             }
-            this.nodes[idx] = new WeakReference<HierarchyNode>(node);
+
+            var addSuccess = this.nodes.TryAdd(idx, new WeakReference<HierarchyNode>(node));
+            Debug.Assert(addSuccess, "Failed to add a new item");
 
             return (uint)idx + 1;
         }
@@ -45,22 +47,18 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         public void Remove(HierarchyNode node)
         {
-            VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+            Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
 
             Debug.Assert(node != null, "Called with null node");
 
             var idx = (int)node.ID - 1;
 
-            var removeCheck = this.nodes.TryGetValue(idx, out var weakRef);
+            var removeCheck = this.nodes.TryRemove(idx, out var weakRef);
 
             Debug.Assert(removeCheck, "How did we get an id, which we haven't seen before");
             Debug.Assert(weakRef != null, "Double delete is not expected.");
+            Debug.Assert(weakRef.TryGetTarget(out var found) && object.ReferenceEquals(node, found), "The node has the wrong id, or was GC-ed before.");
 
-            var checkReference = weakRef.TryGetTarget(out var found) && object.ReferenceEquals(node, found);
-
-            Debug.Assert(checkReference, "The node has the wrong id.");
-
-            this.nodes[idx] = null;
             this.freedIds.Push(idx);
         }
 
@@ -71,18 +69,19 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+                Debug.Assert(VisualStudio.Shell.ThreadHelper.CheckAccess());
 
-                var i = (int)itemId - 1;
-                if (0 <= i && i < this.nodes.Count)
+                var idx = (int)itemId - 1;
+                if (0 <= idx && idx < this.nodes.Count)
                 {
-                    var reference = this.nodes[i];
-                    if (reference != null && reference.TryGetTarget(out var node))
+                    if (this.nodes.TryGetValue(idx, out var reference) && reference != null && reference.TryGetTarget(out var node))
                     {
                         Debug.Assert(node != null);
                         return node;
                     }
                 }
+
+                // This is a valid return value, this gets called by VS after we deleted the item
                 return null;
             }
         }
