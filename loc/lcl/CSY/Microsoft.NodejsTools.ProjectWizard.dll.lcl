@@ -782,7 +782,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Uzel]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3538,7 +3538,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20413.4]]></Val>
+        <Val><![CDATA[1.4.20417.2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3565,7 +3565,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20413.4 Commit Hash:0ae8f05fd65bbd2ab4e73c5278d2e28923db3e1d]]></Val>
+        <Val><![CDATA[1.4.20417.2 Commit Hash:cd4afe154404dd353bd9b958b7f4b8b45fe6a1fa]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
