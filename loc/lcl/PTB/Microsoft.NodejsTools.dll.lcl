@@ -5291,7 +5291,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js Web application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Uma aplicativo Web Node.js vazio.]]></Val>
+            <Val><![CDATA[Um aplicativo Web Node.js vazio.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5671,7 +5671,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20417.2]]></Val>
+        <Val><![CDATA[1.4.20418.1]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5698,7 +5698,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20417.2 Commit Hash:cd4afe154404dd353bd9b958b7f4b8b45fe6a1fa]]></Val>
+        <Val><![CDATA[1.4.20418.1 Commit Hash:95c1ed17fe00f8cf558ad123fd4efcaefe876af6]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
