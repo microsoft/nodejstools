@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
@@ -559,15 +558,7 @@ namespace Microsoft.NodejsTools.Project
             return this.ModulesNode.InstallMissingModules();
         }
 
-        internal struct LongPathInfo
-        {
-            public string FullPath;
-            public string RelativePath;
-            public bool IsDirectory;
-        }
-
         internal event EventHandler OnDispose;
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -583,8 +574,12 @@ namespace Microsoft.NodejsTools.Project
 
                 OnDispose?.Invoke(this, EventArgs.Empty);
 
-                RemoveChild(this.ModulesNode);
-                this.ModulesNode?.Dispose();
+                var node = this.ModulesNode;
+                if (node != null)
+                {
+                    RemoveChild(node);
+                    node.Dispose();
+                }
                 this.ModulesNode = null;
             }
             base.Dispose(disposing);
