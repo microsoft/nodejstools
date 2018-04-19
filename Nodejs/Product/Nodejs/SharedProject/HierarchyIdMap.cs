@@ -23,32 +23,23 @@ namespace Microsoft.VisualStudioTools.Project
             VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             Debug.Assert(node != null, "The node added here should never be null.");
 #if DEBUG
-            foreach (var reference in this.nodes.Values)
+            foreach (var kv in this.nodes)
             {
-                if (reference != null)
-                {
-                    if (reference.TryGetTarget(out var item))
-                    {
-                        Debug.Assert(node != item);
-                    }
-                }
+                Debug.Assert(kv.Value.TryGetTarget(out var item), "should not be GC-ed before we remove");
+                Debug.Assert(kv.Key == item.ID, "the key should match the id of the node");
+                Debug.Assert(node != item, "don't double insert");
             }
 #endif
             if (!this.freedIds.TryPop(out var idx))
             {
-                idx = this.NextIndex();
+                // +1 since 0 is not a valid HierarchyId
+                idx = (uint)this.nodes.Count + 1;
             }
 
             var addSuccess = this.nodes.TryAdd(idx, new WeakReference<HierarchyNode>(node));
             Debug.Assert(addSuccess, "Failed to add a new item");
 
             return idx;
-        }
-
-        private uint NextIndex()
-        {
-            // +1 since 0 is not a valid HierarchyId
-            return (uint)this.nodes.Count + 1;
         }
 
         /// <summary>
@@ -80,8 +71,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
-                var idx = itemId;
-                if (this.nodes.TryGetValue(idx, out var reference) && reference != null && reference.TryGetTarget(out var node))
+                if (this.nodes.TryGetValue(itemId, out var reference) && reference.TryGetTarget(out var node))
                 {
                     Debug.Assert(node != null);
                     return node;
