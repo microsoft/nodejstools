@@ -693,10 +693,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private HierarchyNode AddAllFilesFolder(HierarchyNode curParent, string curDir, bool hierarchyCreated = true)
         {
-            var folderNode = FindNodeByFullPath(curDir);
+            var safePath = CommonUtils.EnsureEndSeparator(curDir);
+
+            var folderNode = FindNodeByFullPath(safePath);
             if (folderNode == null)
             {
-                folderNode = CreateFolderNode(new AllFilesProjectElement(curDir, "Folder", this));
+                folderNode = CreateFolderNode(new AllFilesProjectElement(safePath, "Folder", this));
                 AddAllFilesNode(curParent, folderNode);
 
                 if (hierarchyCreated)

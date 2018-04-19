@@ -550,7 +550,8 @@ namespace Microsoft.VisualStudioTools
         {
             if (string.IsNullOrEmpty(path))
             {
-                return string.Empty;
+                Debug.Fail("what??");
+                return path;
             }
             else if (!HasEndSeparator(path))
             {

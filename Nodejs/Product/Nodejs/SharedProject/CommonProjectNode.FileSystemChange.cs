@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudioTools.Project
                         this.project.CreateSymLinkWatcher(this.path);
                     }
 
-                    var folderNode = this.project.AddAllFilesFolder(parent, this.path + Path.DirectorySeparatorChar);
+                    var folderNode = this.project.AddAllFilesFolder(parent, this.path);
                     var folderNodeWasExpanded = folderNode.GetIsExpanded();
 
                     // then add the folder nodes
