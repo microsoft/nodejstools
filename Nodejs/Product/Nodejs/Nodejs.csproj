@@ -169,6 +169,9 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs">
       <Link>SharedProject\CommonConstants.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.VS.cs">
+      <Link>SharedProject\CommonConstants.VS.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
       <Link>SharedProject\CommonUtils.cs</Link>
     </Compile>
