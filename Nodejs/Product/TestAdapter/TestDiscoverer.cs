@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -14,7 +15,7 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    public class TestDiscoverer
+    public sealed class TestDiscoverer
     {
         public TestDiscoverer()
         {
@@ -29,16 +30,16 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="discoverySink">Callback used to notify client upon discovery of test cases</param>
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            ValidateArg.NotNull(sources, "sources");
-            ValidateArg.NotNull(discoverySink, "discoverySink");
-            ValidateArg.NotNull(logger, "logger");
+            ValidateArg.NotNull(sources, nameof(sources));
+            ValidateArg.NotNull(discoverySink, nameof(discoverySink));
+            ValidateArg.NotNull(logger, nameof(logger));
 
             var env = new Dictionary<string, string>();
-            var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
-            if (string.IsNullOrEmpty(root))
-            {
-                root = Environment.GetEnvironmentVariable("VSINSTALLDIR");
-            }
+            var root = Environment.GetEnvironmentVariable("VSINSTALLDIR");
+
+#if DEBUG
+            logger.SendMessage(TestMessageLevel.Informational, $"VSINSTALLDIR: {root}");
+#endif
 
             if (!string.IsNullOrEmpty(root))
             {
@@ -60,31 +61,56 @@ namespace Microsoft.NodejsTools.TestAdapter
                     {
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        var testItems = new Dictionary<string, List<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
-                        // Provide all files to the test analyzer
-                        foreach (var item in proj.Items.Where(item => item.ItemType == "Compile" || item.ItemType == "TypeScriptCompile"))
+                        var testItems = new Dictionary<string, HashSet<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
+
+                        var testRoot = proj.GetProperty(NodeProjectProperty.TestRoot)?.EvaluatedValue;
+                        var testFramework = proj.GetProperty(NodeProjectProperty.TestFramework)?.EvaluatedValue;
+
+                        if( !string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
                         {
-                            //Check to see if this is a TestCase
-                            var value = item.GetMetadataValue("TestFramework");
-                            if (!TestContainerDiscoverer.IsValidTestFramework(value))
+                            logger.SendMessage(TestMessageLevel.Warning, $"TestRoot specified for '{Path.GetFileName(proj.FullPath)}' but no TestFramework.");
+                        }
+
+                        // Provide all files to the test analyzer
+                        foreach (var item in proj.Items.Where(item => item.ItemType != "None"))
+                        {
+                            string testFrameworkName;
+                            string fileAbsolutePath;
+                            if (!string.IsNullOrEmpty(testRoot))
                             {
-                                continue;
+                                testFrameworkName = testFramework;
+                                var testRootPath = Path.GetFullPath(Path.Combine(proj.DirectoryPath, testRoot));
+                                fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                                if (!fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    continue;
+                                }
                             }
-                            var fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            else
+                            {
+                                //Check to see if this is a TestCase
+                                testFrameworkName = item.GetMetadataValue("TestFramework");
+                                if (!TestFrameworks.TestFramework.IsValidTestFramework(testFrameworkName))
+                                {
+                                    continue;
+                                }
+                                fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                            }
+
                             var typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
                             if (typeScriptTest)
                             {
                                 fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj, fileAbsolutePath);
                             }
-                            else if (!Path.GetExtension(fileAbsolutePath).Equals(".js", StringComparison.OrdinalIgnoreCase))
+                            else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(fileAbsolutePath), ".js"))
                             {
                                 continue;
                             }
 
-                            if (!testItems.TryGetValue(value, out var fileList))
+                            if (!testItems.TryGetValue(testFrameworkName, out var fileList))
                             {
-                                fileList = new List<TestFileEntry>();
-                                testItems.Add(value, fileList);
+                                fileList = new HashSet<TestFileEntry>(new TestFileEntryComparer());
+                                testItems.Add(testFrameworkName, fileList);
                             }
                             fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
                         }
@@ -106,7 +132,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void DiscoverTests(Dictionary<string, List<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger)
+        private void DiscoverTests(Dictionary<string, HashSet<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger)
         {
             var result = new List<TestFrameworks.NodejsTestInfo>();
             var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
@@ -119,7 +145,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             if (!File.Exists(nodeExePath))
             {
-                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.CurrentCulture, "Node.exe was not found.  Please install Node.js before running tests."));
+                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
                 return;
             }
 
@@ -129,7 +155,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testFramework = GetTestFrameworkObject(testFx);
                 if (testFramework == null)
                 {
-                    logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Ignoring unsupported test framework {0}", testFx));
+                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework \'{testFx}\'.");
                     continue;
                 }
 
@@ -137,15 +163,16 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var files = string.Join(";", fileList.Select(p => p.File));
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
-                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectHome);
+                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectRoot: projectHome);
                 testCount += discoveredTestCases.Count;
                 foreach (var discoveredTest in discoveredTestCases)
                 {
                     var qualifiedName = discoveredTest.FullyQualifiedName;
-                    logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "  " /*indent*/ + "Creating TestCase:{0}", qualifiedName));
+                    const string indent = "  ";
+                    logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
                     //figure out the test source info such as line number
                     var filePath = discoveredTest.ModulePath;
-                    var entry = fileList.Find(p => p.File.Equals(filePath, StringComparison.OrdinalIgnoreCase));
+                    var entry = fileList.First(p => StringComparer.OrdinalIgnoreCase.Equals(p.File, filePath));
                     FunctionInformation fi = null;
                     if (entry.IsTypeScriptTest)
                     {
@@ -154,15 +181,19 @@ namespace Microsoft.NodejsTools.TestAdapter
                                                                            discoveredTest.SourceLine,
                                                                            entry.File));
                     }
-                    discoverySink.SendTestCase(
-                        new TestCase(qualifiedName, TestExecutor.ExecutorUri, projSource)
-                        {
-                            CodeFilePath = (fi != null) ? fi.Filename : filePath,
-                            LineNumber = (fi != null && fi.LineNumber.HasValue) ? fi.LineNumber.Value : discoveredTest.SourceLine,
-                            DisplayName = discoveredTest.TestName
-                        });
+
+                    var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, projSource)
+                    {
+                        CodeFilePath = fi?.Filename ?? filePath,
+                        LineNumber = fi?.LineNumber ?? discoveredTest.SourceLine,
+                        DisplayName = discoveredTest.TestName
+                    };
+
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, discoveredTest.TestFramework);
+
+                    discoverySink.SendTestCase(testcase);
                 }
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework of {0}", testFx));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework \'{0}\'.", testFx));
             }
             if (testCount == 0)
             {
@@ -172,31 +203,26 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework)
         {
-            var discover = new TestFrameworks.FrameworkDiscover();
-            return discover.Get(testFramework);
+            return TestFrameworks.FrameworkDiscover.Intance.Get(testFramework);
         }
 
-        internal static MSBuild.Project LoadProject(MSBuild.ProjectCollection buildEngine, string fullProjectPath)
+        private sealed class TestFileEntry
         {
-            var buildProject = buildEngine.GetLoadedProjects(fullProjectPath).FirstOrDefault();
-
-            if (buildProject != null)
-            {
-                buildEngine.UnloadProject(buildProject);
-            }
-            return buildEngine.LoadProject(fullProjectPath);
-        }
-
-        private class TestFileEntry
-        {
-            public string File { get; set; }
-            public bool IsTypeScriptTest { get; set; }
+            public readonly string File;
+            public readonly bool IsTypeScriptTest;
 
             public TestFileEntry(string file, bool isTypeScriptTest)
             {
                 this.File = file;
                 this.IsTypeScriptTest = isTypeScriptTest;
             }
+        }
+
+        private struct TestFileEntryComparer : IEqualityComparer<TestFileEntry>
+        {
+            public bool Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
+
+            public int GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
         }
     }
 }

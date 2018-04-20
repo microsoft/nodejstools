@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudioTools.TestAdapter
                 var projectIndex = rgFirstIndices[index];
                 var project = changedProjects[projectIndex];
 
-                if (project != null && project.IsTestProject(this._testProjectGuid))
+                if (project != null)
                 {
                     TestFileChanged?.Invoke(this, new TestFileChangedEventArgs(projectItem, reason, project));
                 }

@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [ExtensionUri(TestExecutor.ExecutorUriString)]
+    [ExtensionUri(NodejsConstants.ExecutorUriString)]
     public class ShimTestExecutor : ITestExecutor
     {
         private TestExecutor testExecutor;
