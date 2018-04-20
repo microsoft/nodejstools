@@ -1,24 +1,19 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 namespace Microsoft.NodejsTools.TestFrameworks
 {
-    internal class TestFrameworkDirectories
+    internal static class TestFrameworkDirectories
     {
         public const string ExportRunnerFrameworkName = "ExportRunner";
         private const string TestFrameworksFolderName = "TestFrameworks";
         private const string TestAdapterFolderName = "TestAdapter";
 
-        private readonly Dictionary<string, string> frameworkDirectories = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        public static string TestFrameworksFolder1 => TestFrameworksFolderName;
-
-        public TestFrameworkDirectories()
+        public static string[] GetFrameworkNames()
         {
             var testFrameworkRoot = GetTestframeworkFolderRoot();
             if (!Directory.Exists(testFrameworkRoot))
@@ -26,21 +21,20 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
-            foreach (var directory in Directory.EnumerateDirectories(testFrameworkRoot))
-            {
-                var name = Path.GetFileName(directory);
-                this.frameworkDirectories.Add(name, directory);
-            }
-
-            if (!this.frameworkDirectories.TryGetValue(ExportRunnerFrameworkName, out var defaultFx) || string.IsNullOrEmpty(defaultFx))
-            {
-                throw new InvalidOperationException("Missing generic test framework.");
-            }
+            return Directory.EnumerateDirectories(testFrameworkRoot).Select(dir => Path.GetFileName(dir)).ToArray();
         }
 
-        public string[] GetFrameworkNames() => this.frameworkDirectories.Keys.ToArray();
+        public static string[] GetFrameworkDirectories()
+        {
 
-        public string[] GetFrameworkDirectories() => this.frameworkDirectories.Values.ToArray();
+            var testFrameworkRoot = GetTestframeworkFolderRoot();
+            if (!Directory.Exists(testFrameworkRoot))
+            {
+                throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
+            }
+
+            return Directory.EnumerateDirectories(testFrameworkRoot).ToArray();
+        }
 
         private static string GetTestframeworkFolderRoot()
         {

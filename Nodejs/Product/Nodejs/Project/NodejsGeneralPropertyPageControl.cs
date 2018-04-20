@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.Project
         {
             InitializeComponent();
 
-            var testFrameworks = new TestFrameworkDirectories().GetFrameworkNames();
+            var testFrameworks = TestFrameworkDirectories.GetFrameworkNames();
             this._frameworkSelector.Items.AddRange(testFrameworks);
 
             LocalizeLabels();

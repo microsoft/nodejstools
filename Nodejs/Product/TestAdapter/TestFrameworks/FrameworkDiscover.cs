@@ -14,8 +14,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 
         private FrameworkDiscover()
         {
-            var directoryLoader = new TestFrameworkDirectories();
-            var testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
+            var testFrameworkDirectories = TestFrameworkDirectories.GetFrameworkDirectories();
 
             foreach (var directory in testFrameworkDirectories)
             {
