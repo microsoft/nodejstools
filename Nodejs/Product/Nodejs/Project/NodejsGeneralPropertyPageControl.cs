@@ -6,11 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Microsoft.NodejsTools.TestFrameworks;
 using Microsoft.VisualStudio.Editors.PropertyPages;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase
+    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase /*UserControl*/
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -18,6 +19,9 @@ namespace Microsoft.NodejsTools.Project
         public NodejsGeneralPropertyPageControl()
         {
             InitializeComponent();
+
+            var testFrameworks = new TestFrameworkDirectories().GetFrameworkNames();
+            this._frameworkSelector.Items.AddRange(testFrameworks);
 
             LocalizeLabels();
             AddToolTips();
@@ -34,7 +38,7 @@ namespace Microsoft.NodejsTools.Project
         private void LocalizeLabels()
         {
             // There's a bug in winforms, where if you use the default localization infra structure
-            // the control is correctly sized in the property page.
+            // the control is not correctly sized in the property page.
 
             this._nodeExePathLabel.Text = Resources.PropertiesNodeExePath;
             this._nodeArgumentsLabel.Text = Resources.PropertiesNodeExeOptions;
@@ -72,7 +76,7 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._envVars, Resources.EnvironmentVariables);
             this._tooltip.SetToolTip(this._saveInProjectFileCheckBox, Resources.SaveInProjectFileToolTip);
             this._tooltip.SetToolTip(this._testRoot, Resources.TestRootToolTip);
-            this._tooltip.SetToolTip(this._testFramework, Resources.TestFrameworkToolTip);
+            this._tooltip.SetToolTip(this._frameworkSelector, Resources.TestFrameworkToolTip);
         }
 
         protected override bool DisableOnBuild => false;
@@ -219,11 +223,11 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                return this._testFramework.Text;
+                return (string)this._frameworkSelector.SelectedItem;
             }
             set
             {
-                this._testFramework.Text = value;
+                this._frameworkSelector.SelectedItem = value;
             }
         }
 

@@ -52,22 +52,22 @@
             this._nodejsPort = new System.Windows.Forms.TextBox();
             this._envVars = new System.Windows.Forms.TextBox();
             this._startBrowserCheckBox = new System.Windows.Forms.CheckBox();
+            this._saveInProjectFileCheckBox = new System.Windows.Forms.CheckBox();
             this._nodeExePathLabel = new System.Windows.Forms.Label();
             this._nodeExePath = new System.Windows.Forms.TextBox();
             this._browsePath = new System.Windows.Forms.Button();
             this._nodeExeArguments = new System.Windows.Forms.TextBox();
             this._debuggerPort = new System.Windows.Forms.TextBox();
-            this._saveInProjectFileCheckBox = new System.Windows.Forms.CheckBox();
             this.testHeaderTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._TestHeaderLabel = new System.Windows.Forms.Label();
             this.testHeaderLabelLine = new System.Windows.Forms.Label();
             this._testRootLabel = new System.Windows.Forms.Label();
             this._testRoot = new System.Windows.Forms.TextBox();
+            this._browseTestroot = new System.Windows.Forms.Button();
             this._testFrameworkLabel = new System.Windows.Forms.Label();
-            this._testFramework = new System.Windows.Forms.TextBox();
+            this._frameworkSelector = new System.Windows.Forms.ComboBox();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
             this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
-            this._browseTestroot = new System.Windows.Forms.Button();
             startActionTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             nodeHeaderTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             startActionTableLayoutPanel.SuspendLayout();
@@ -277,7 +277,7 @@
             this.overallPanel.Controls.Add(this._testRoot, 1, 14);
             this.overallPanel.Controls.Add(this._browseTestroot, 2, 14);
             this.overallPanel.Controls.Add(this._testFrameworkLabel, 0, 15);
-            this.overallPanel.Controls.Add(this._testFramework, 1, 15);
+            this.overallPanel.Controls.Add(this._frameworkSelector, 1, 15);
             this.overallPanel.Location = new System.Drawing.Point(0, 0);
             this.overallPanel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.overallPanel.Name = "overallPanel";
@@ -386,6 +386,18 @@
             this._startBrowserCheckBox.UseVisualStyleBackColor = true;
             this._startBrowserCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
             // 
+            // _saveInProjectFileCheckBox
+            // 
+            this._saveInProjectFileCheckBox.AutoSize = true;
+            this._saveInProjectFileCheckBox.Location = new System.Drawing.Point(3, 275);
+            this._saveInProjectFileCheckBox.Name = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this._saveInProjectFileCheckBox.Size = new System.Drawing.Size(172, 17);
+            this._saveInProjectFileCheckBox.TabIndex = 16;
+            this._saveInProjectFileCheckBox.Text = "_saveInProjectFileCheckBox";
+            this._saveInProjectFileCheckBox.UseVisualStyleBackColor = true;
+            this._saveInProjectFileCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
+            // 
             // _nodeExePathLabel
             // 
             this._nodeExePathLabel.AutoSize = true;
@@ -437,18 +449,6 @@
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
             this._debuggerPort.TabIndex = 20;
             this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
-            // 
-            // _saveInProjectFileCheckBox
-            // 
-            this._saveInProjectFileCheckBox.AutoSize = true;
-            this._saveInProjectFileCheckBox.Location = new System.Drawing.Point(3, 275);
-            this._saveInProjectFileCheckBox.Name = "_saveInProjectFileCheckBox";
-            this._saveInProjectFileCheckBox.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this._saveInProjectFileCheckBox.Size = new System.Drawing.Size(172, 17);
-            this._saveInProjectFileCheckBox.TabIndex = 16;
-            this._saveInProjectFileCheckBox.Text = "_saveInProjectFileCheckBox";
-            this._saveInProjectFileCheckBox.UseVisualStyleBackColor = true;
-            this._saveInProjectFileCheckBox.CheckedChanged += new System.EventHandler(this.Changed);
             // 
             // testHeaderTableLayoutPanel
             // 
@@ -506,6 +506,17 @@
             this._testRoot.Size = new System.Drawing.Size(620, 20);
             this._testRoot.TabIndex = 24;
             // 
+            // _browseTestroot
+            // 
+            this._browseTestroot.AutoSize = true;
+            this._browseTestroot.Location = new System.Drawing.Point(807, 398);
+            this._browseTestroot.Name = "_browseTestroot";
+            this._browseTestroot.Size = new System.Drawing.Size(26, 23);
+            this._browseTestroot.TabIndex = 25;
+            this._browseTestroot.Text = "...";
+            this._browseTestroot.UseVisualStyleBackColor = true;
+            this._browseTestroot.Click += new System.EventHandler(this.BrowseTestRootClick);
+            // 
             // _testFrameworkLabel
             // 
             this._testFrameworkLabel.AutoSize = true;
@@ -517,27 +528,22 @@
             this._testFrameworkLabel.TabIndex = 26;
             this._testFrameworkLabel.Text = "_testFrameworkLabel";
             // 
-            // _testFramework
+            // _frameworkSelector
             // 
-            this._testFramework.Location = new System.Drawing.Point(181, 427);
-            this._testFramework.Name = "_testFramework";
-            this._testFramework.Size = new System.Drawing.Size(100, 20);
-            this._testFramework.TabIndex = 27;
+            this._frameworkSelector.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._frameworkSelector.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this._frameworkSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._frameworkSelector.FormattingEnabled = true;
+            this._frameworkSelector.Location = new System.Drawing.Point(181, 427);
+            this._frameworkSelector.Name = "_frameworkSelector";
+            this._frameworkSelector.Size = new System.Drawing.Size(196, 21);
+            this._frameworkSelector.Sorted = true;
+            this._frameworkSelector.TabIndex = 28;
+            this._frameworkSelector.SelectedIndexChanged += new System.EventHandler(this.Changed);
             // 
             // _nodeExeErrorProvider
             // 
             this._nodeExeErrorProvider.ContainerControl = this;
-            // 
-            // _browseTestroot
-            // 
-            this._browseTestroot.AutoSize = true;
-            this._browseTestroot.Location = new System.Drawing.Point(807, 398);
-            this._browseTestroot.Name = "_browseTestroot";
-            this._browseTestroot.Size = new System.Drawing.Size(26, 23);
-            this._browseTestroot.TabIndex = 25;
-            this._browseTestroot.Text = "...";
-            this._browseTestroot.UseVisualStyleBackColor = true;
-            this._browseTestroot.Click += new System.EventHandler(this.BrowseTestRootClick);
             // 
             // NodejsGeneralPropertyPageControl
             // 
@@ -599,7 +605,7 @@
         private System.Windows.Forms.Label _testRootLabel;
         private System.Windows.Forms.TextBox _testRoot;
         private System.Windows.Forms.Label _testFrameworkLabel;
-        private System.Windows.Forms.TextBox _testFramework;
         private System.Windows.Forms.Button _browseTestroot;
+        private System.Windows.Forms.ComboBox _frameworkSelector;
     }
 }
