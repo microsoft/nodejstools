@@ -7,8 +7,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [FileExtension(".njsproj")]
-    [DefaultExecutorUri(TestExecutor.ExecutorUriString)]
+    [FileExtension(".njsproj"), FileExtension("*.csproj"), FileExtension("*.vbproj")]
+    [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public class ShimTestDiscoverer : ITestDiscoverer
     {
         private TestDiscoverer testDiscoverer;

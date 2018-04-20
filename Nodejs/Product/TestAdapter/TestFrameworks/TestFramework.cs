@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    internal class TestFramework
+    public sealed class TestFramework
     {
         private readonly string vsixScriptFolder;
         private readonly string findTestsScriptFile;
@@ -31,13 +31,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger,
-            string workingDirectory)
+            string projectRoot)
         {
             var testInfo = string.Empty;
             var discoverResultFile = Path.GetTempFileName();
             try
             {
-                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
+                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, projectRoot);
                 if (!string.IsNullOrWhiteSpace(stdout))
                 {
                     var stdoutLines = stdout.Split(new[] { Environment.NewLine },
@@ -82,14 +82,14 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
 
             var testCases = new List<NodejsTestInfo>();
-            var discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
+            var discoveredTests = JsonConvert.DeserializeObject<List<DiscoveredTest>>(testInfo);
             if (discoveredTests != null)
             {
                 foreach (var discoveredTest in discoveredTests)
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column);
+                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column, projectRoot);
                     testCases.Add(test);
                 }
             }
@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             };
         }
 
-        private string WrapWithQuotes(string path)
+        private static string WrapWithQuotes(string path)
         {
             if (!path.StartsWith("\"", StringComparison.Ordinal) && !path.StartsWith("\'", StringComparison.Ordinal))
             {
@@ -124,7 +124,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         /// </summary>
         /// <param name="testName">Name of the test to excape for command line usage.</param>
         /// <returns>Name of the test, escaped according to the command line rules.</returns>
-        private string WrapTestNameWithQuotes(string testName)
+        private static string WrapTestNameWithQuotes(string testName)
         {
             return "\"" + testName.Replace("\"", "\\\"") + "\"";
         }
@@ -138,9 +138,12 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 " " + WrapWithQuotes(discoverResultFile) +
                 " " + WrapWithQuotes(workingDirectory);
 
+#if DEBUG
+            logger.SendMessage(TestMessageLevel.Informational, "Arguments: " + arguments);
+#endif
+
             var processStartInfo = new ProcessStartInfo(nodeExePath, arguments)
             {
-
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardError = true,
@@ -175,13 +178,18 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
             catch (FileNotFoundException e)
             {
-                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.InvariantCulture, "Error starting node.exe.\n {0}", e));
+                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.InvariantCulture, "Error starting node.exe.\r\n {0}", e));
             }
 
             return stdout;
         }
 
-        private class DiscoveredTest
+        public static bool IsValidTestFramework(string testFramework)
+        {
+            return !string.IsNullOrWhiteSpace(testFramework);
+        }
+
+        private sealed class DiscoveredTest
         {
             public string Test { get; set; }
             public string Suite { get; set; }
