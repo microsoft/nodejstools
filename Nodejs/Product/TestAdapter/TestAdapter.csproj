@@ -93,9 +93,6 @@
     <PackageReference Include="Microsoft.Build">
       <Version>15.6.82</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
-      <Version>15.7.942-master669188BE</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>
     </PackageReference>

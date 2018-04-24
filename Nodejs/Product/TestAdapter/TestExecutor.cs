@@ -8,7 +8,6 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
-using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -31,7 +30,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         private readonly ManualResetEvent testsCompleted = new ManualResetEvent(false);
 
         private ProcessOutput nodeProcess;
-        private object syncObject = new object();
+        private readonly object syncObject = new object();
         private List<TestCase> currentTests;
         private IFrameworkHandle frameworkHandle;
         private TestResult currentResult = null;
@@ -161,18 +160,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging, string testFramework)
-        {
-            var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
-            userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
-            // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
-            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
-            userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
-            userTask.Properties["VS.NodejsTools.TestFramework"] = testFramework;
-
-            TelemetryService.DefaultSession?.PostEvent(userTask);
-        }
-
         private bool HasVisualStudioProcessId(out int processId)
         {
             processId = 0;
@@ -221,7 +208,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             // this way the .NET framework only tries to load the assemblies when we actually need them.
             if (startedFromVs)
             {
-                LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged, testFramework);
+                this.LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged, testFramework);
             }
 
             foreach (var test in tests)
@@ -308,6 +295,11 @@ namespace Microsoft.NodejsTools.TestAdapter
         private void DetachDebugger(int vsProcessId)
         {
             VisualStudioApp.DetachDebugger(vsProcessId);
+        }
+
+        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging, string testFramework)
+        {
+            VisualStudioApp.LogTelemetry(testCount, nodeVersion, isDebugging, testFramework);
         }
 
         private void AttachDebugger(int vsProcessId, int port, Version nodeVersion)

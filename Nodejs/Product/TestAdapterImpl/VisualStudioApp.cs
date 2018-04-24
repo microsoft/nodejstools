@@ -9,6 +9,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Telemetry;
 using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools
@@ -28,6 +29,18 @@ namespace Microsoft.VisualStudioTools
                 }
             }
             return inst;
+        }
+
+        public static void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging, string testFramework)
+        {
+            var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
+            userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
+            // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
+            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
+            userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
+            userTask.Properties["VS.NodejsTools.TestFramework"] = testFramework;
+
+            TelemetryService.DefaultSession?.PostEvent(userTask);
         }
 
         public static bool AttachToProcessNode2DebugAdapter(int vsProcessId, int port)
