@@ -1292,17 +1292,20 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e)
         {
             var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
-            var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
-            var documentContext = new AD7DocumentContext(codeContext);
-            var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
-            var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
-            this._breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
-            Send(
-                new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
-                AD7BreakpointBoundEvent.IID,
-                null
-            );
+            if (pendingBreakpoint != null)
+            {
+                var breakpointBinding = e.BreakpointBinding;
+                var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
+                var documentContext = new AD7DocumentContext(codeContext);
+                var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
+                var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
+                this._breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
+                Send(
+                    new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
+                    AD7BreakpointBoundEvent.IID,
+                    null
+                );
+            }
         }
 
         private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e)
@@ -1323,9 +1326,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e)
         {
             var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
-            var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
-            pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
-            Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
+            if (pendingBreakpoint != null)
+            {
+                var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
+                pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
+                Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
+            }
         }
 
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e)
