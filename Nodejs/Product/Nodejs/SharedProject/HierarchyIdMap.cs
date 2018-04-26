@@ -11,9 +11,9 @@ namespace Microsoft.VisualStudioTools.Project
         private readonly ConcurrentDictionary<uint, WeakReference<HierarchyNode>> nodes = new ConcurrentDictionary<uint, WeakReference<HierarchyNode>>();
         private readonly ConcurrentStack<uint> freedIds = new ConcurrentStack<uint>();
 
-        public readonly static HierarchyIdMap Instance = new HierarchyIdMap();
-
-        private HierarchyIdMap() { }
+        public HierarchyIdMap()
+        {
+        }
 
         /// <summary>
         /// Must be called from the UI thread
