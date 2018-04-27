@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Repl
             this.serviceProvider = serviceProvider;
             this.windowFactory = factory;
 
-            this.contentType = contentTypeService.GetContentType(ReplConstants.ContentType);
+            this.contentType = contentTypeService.GetContentType(NodejsConstants.TypeScript);
         }
 
         public IVsInteractiveWindow OpenOrCreateWindow()
