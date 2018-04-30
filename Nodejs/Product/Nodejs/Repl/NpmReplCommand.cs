@@ -23,7 +23,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Repl
 {
     [Export(typeof(IInteractiveWindowCommand))]
-    [ContentType(ReplConstants.ContentType)]
+    [ContentType(NodejsConstants.TypeScript)]
     internal class NpmReplCommand : InteractiveWindowCommand
     {
         public override async Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
