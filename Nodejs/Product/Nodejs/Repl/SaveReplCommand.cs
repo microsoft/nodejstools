@@ -15,7 +15,7 @@ using Microsoft.VisualStudio.InteractiveWindow;
 namespace Microsoft.NodejsTools.Repl
 {
     [Export(typeof(IInteractiveWindowCommand))]
-    [ContentType(ReplConstants.ContentType)]
+    [ContentType(NodejsConstants.TypeScript)]
     internal class SaveReplCommand : InteractiveWindowCommand
     {
         public override Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)

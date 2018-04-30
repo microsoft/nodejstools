@@ -585,9 +585,10 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// Gets a collection of integer ids that maps to project item instances
+        /// Gets a collection of integer ids that maps to project item instances. 
+        /// This should be a new instance for each hierarchy.
         /// </summary>
-        internal HierarchyIdMap ItemIdMap => HierarchyIdMap.Instance;
+        internal HierarchyIdMap ItemIdMap { get; } = new HierarchyIdMap();
 
         /// <summary>
         /// Get the helper object that track document changes.
