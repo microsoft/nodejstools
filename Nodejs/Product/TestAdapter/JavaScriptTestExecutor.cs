@@ -18,7 +18,8 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    public class TestExecutor
+    [ExtensionUri(NodejsConstants.ExecutorUriString)]
+    public class JavaScriptTestExecutor : ITestExecutor
     {
         private static readonly Version Node8Version = new Version(8, 0);
 
@@ -36,12 +37,32 @@ namespace Microsoft.NodejsTools.TestAdapter
         private TestResult currentResult = null;
         private ResultObject currentResultObject = null;
 
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
+            this.EnsureInitialized();
+            this.RunTestsCore(tests, runContext, frameworkHandle);
+        }
+
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
+            this.EnsureInitialized();
+            this.RunTestsCore(sources, runContext, frameworkHandle);
+        }
+
         public void Cancel()
         {
             //let us just kill the node process there, rather do it late, because VS engine process 
             //could exit right after this call and our node process will be left running.
             KillNodeProcess();
             this.cancelRequested.Set();
+        }
+
+        private void EnsureInitialized()
+        {
+            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
+            {
+                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
+            }
         }
 
         private void ProcessTestRunnerEmit(string line)
@@ -95,7 +116,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="sources">Refers to the list of test sources passed to the test adapter from the client.  (Client could be VS or command line)</param>
         /// <param name="runContext">Defines the settings related to the current run</param>
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        private void RunTestsCore(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             ValidateArg.NotNull(sources, "sources");
             ValidateArg.NotNull(runContext, "runContext");
@@ -104,7 +125,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.cancelRequested.Reset();
 
             var receiver = new TestReceiver();
-            var discoverer = new TestDiscoverer();
+            var discoverer = new JavaScriptTestDiscoverer();
             discoverer.DiscoverTests(sources, null, frameworkHandle, receiver);
 
             if (this.cancelRequested.WaitOne(0))
@@ -112,7 +133,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
-            RunTests(receiver.Tests, runContext, frameworkHandle);
+            this.RunTestsCore(receiver.Tests, runContext, frameworkHandle);
         }
 
         /// <summary>
@@ -121,7 +142,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="tests">The list of TestCases selected to run</param>
         /// <param name="runContext">Defines the settings related to the current run</param>
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        private void RunTestsCore(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             ValidateArg.NotNull(tests, "tests");
             ValidateArg.NotNull(runContext, "runContext");

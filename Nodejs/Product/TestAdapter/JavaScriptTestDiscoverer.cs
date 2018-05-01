@@ -15,10 +15,19 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    public sealed class TestDiscoverer
+    [FileExtension(".njsproj"), FileExtension("*.csproj"), FileExtension("*.vbproj")]
+    [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
+    public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {
-        public TestDiscoverer()
+        internal static AssemblyResolver AssemblyResolver { get; set; }
+
+        public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
+            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
+            {
+                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
+            }
+            this.DiscoverTestsCore(sources, discoveryContext, logger, discoverySink);
         }
 
         /// <summary>
@@ -28,7 +37,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="discoveryContext">Context and runSettings for current run.  Discoverer pulls out the tests based on current context</param>
         /// <param name="logger">Used to relay messages to registered loggers</param>
         /// <param name="discoverySink">Callback used to notify client upon discovery of test cases</param>
-        public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        private void DiscoverTestsCore(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
             ValidateArg.NotNull(sources, nameof(sources));
             ValidateArg.NotNull(discoverySink, nameof(discoverySink));
@@ -66,7 +75,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         var testRoot = proj.GetProperty(NodeProjectProperty.TestRoot)?.EvaluatedValue;
                         var testFramework = proj.GetProperty(NodeProjectProperty.TestFramework)?.EvaluatedValue;
 
-                        if( !string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
+                        if (!string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
                         {
                             logger.SendMessage(TestMessageLevel.Warning, $"TestRoot specified for '{Path.GetFileName(proj.FullPath)}' but no TestFramework.");
                         }
@@ -152,7 +161,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var testCount = 0;
             foreach (var testFx in testItems.Keys)
             {
-                var testFramework = GetTestFrameworkObject(testFx);
+                var testFramework = FrameworkDiscover.Intance.Get(testFx);
                 if (testFramework == null)
                 {
                     logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework \'{testFx}\'.");
@@ -199,30 +208,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Discovered 0 testcases."));
             }
-        }
-
-        private TestFrameworks.TestFramework GetTestFrameworkObject(string testFramework)
-        {
-            return TestFrameworks.FrameworkDiscover.Intance.Get(testFramework);
-        }
-
-        private sealed class TestFileEntry
-        {
-            public readonly string File;
-            public readonly bool IsTypeScriptTest;
-
-            public TestFileEntry(string file, bool isTypeScriptTest)
-            {
-                this.File = file;
-                this.IsTypeScriptTest = isTypeScriptTest;
-            }
-        }
-
-        private struct TestFileEntryComparer : IEqualityComparer<TestFileEntry>
-        {
-            public bool Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
-
-            public int GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
         }
     }
 }
