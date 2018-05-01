@@ -19,8 +19,6 @@ function hook_outputs() {
     process.stderr.write = append_stderr;
 }
 
-hook_outputs();
-
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
     try {
@@ -74,6 +72,8 @@ var run_tests = function (testCases, callback) {
         callback(event);
         hook_outputs();
     }
+
+    hook_outputs();
 
     for (var test of testCases) {
         post({

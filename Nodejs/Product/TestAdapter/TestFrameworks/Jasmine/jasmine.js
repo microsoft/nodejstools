@@ -63,7 +63,7 @@ function getJasmineOptions(projectFolder) {
         options && console.log("Found jasmine.json file.");
     }
     catch (ex) {
-        console.log("Using default Jasmine settings.");
+        console.error("Failed to load Jasmine setting, using default settings.", ex);
     }
     console.log("Using Jasmine settings: ", jasmineOptions);
     return jasmineOptions;
@@ -102,7 +102,6 @@ function enumerateSpecs(suite, testList, testFile) {
     });
 }
 
-
 /**
  * @param {string} testFileList
  * @param {string} discoverResultFile
@@ -129,7 +128,7 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
         }
         catch (ex) {
             //we would like continue discover other files, so swallow, log and continue;
-            logError("Test discovery error:", ex, "in", testFile);
+            console.error("Test discovery error:", ex, "in", testFile);
         }
     });
 
@@ -162,8 +161,6 @@ function hookStandardOutputs() {
         return true;
     };
 }
-
-hookStandardOutputs();
 
 function sendTestProgress(callback, evtType, result, title) {
     var event = {
@@ -207,6 +204,8 @@ function createCustomReporter(callback) {
 }
 
 function run_tests(testCases, callback) {
+    hookStandardOutputs();
+
     var projectFolder = testCases[0].projectFolder;
     var Jasmine = detectJasmine(projectFolder);
     if (!Jasmine) {

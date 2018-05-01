@@ -1,3 +1,4 @@
+// @ts-check
 "use strict";
 var EOL = require('os').EOL;
 var fs = require('fs');
@@ -6,16 +7,7 @@ var path = require('path');
 // 'min' produces undisplayable text to stdout and stderr under piped/redirect, 
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
-function append_stdout(string, encoding, fd) {
-    result.stdOut += string;
-}
-function append_stderr(string, encoding, fd) {
-    result.stdErr += string;
-}
-function hook_outputs() {
-    process.stdout.write = append_stdout;
-    process.stderr.write = append_stderr;
-}
+
 function reset_result() {
     return {
         'title': '',
@@ -27,8 +19,6 @@ function reset_result() {
 }
 
 var result = reset_result();
-
-hook_outputs();
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
@@ -68,7 +58,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             getTestList(mocha.suite, testFile);
         } catch (e) {
             //we would like continue discover other files, so swallow, log and continue;
-            logError("Test discovery error:", e, "in", testFile);
+            console.error("Test discovery error:", e, "in", testFile);
         }
     });
 
@@ -87,6 +77,21 @@ var run_tests = function (testCases, callback) {
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
+
+    function append_stdout(string, encoding, fd) {
+        result.stdOut += string;
+        return true;
+    }
+    function append_stderr(string, encoding, fd) {
+        result.stdErr += string;
+        return true;
+    }
+    function hook_outputs() {
+        process.stdout.write = append_stdout;
+        process.stderr.write = append_stderr;
+    }
+
+    hook_outputs();
 
     var testResults = [];
     var Mocha = detectMocha(testCases[0].projectFolder);
