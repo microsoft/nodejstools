@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudioTools
             var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
             userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
             // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
-            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
+            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString() ?? "0.0";
             userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
             userTask.Properties["VS.NodejsTools.TestFramework"] = testFramework;
 
