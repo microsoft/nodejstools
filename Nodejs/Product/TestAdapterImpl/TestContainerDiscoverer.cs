@@ -59,16 +59,16 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private static IEnumerable<IVsProject> EnumerateLoadedProjects(IVsSolution solution)
         {
-            var guid = Guids.NodejsBaseProjectFactory;
+            var ignored = Guid.Empty;
             ErrorHandler.ThrowOnFailure((solution.GetProjectEnum(
-                (uint)(__VSENUMPROJFLAGS.EPF_MATCHTYPE | __VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION),
-                ref guid,
+                (uint)__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION,
+                ref ignored,
                 out var hierarchies)));
 
-            var hierarchy = new IVsHierarchy[1];
-            while (ErrorHandler.Succeeded(hierarchies.Next(1, hierarchy, out var fetched)) && fetched == 1)
+            var current = new IVsHierarchy[1];
+            while (ErrorHandler.Succeeded(hierarchies.Next(1, current, out var fetchCount)) && fetchCount == 1)
             {
-                if (hierarchy[0] is IVsProject project)
+                if (current[0] is IVsProject project)
                 {
                     yield return project;
                 }
@@ -307,7 +307,10 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project)
         {
-            project.GetMkDocument(VSConstants.VSITEMID_ROOT, out var path);
+            if (ErrorHandler.Failed(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out var path)) || string.IsNullOrEmpty(path))
+            {
+                yield break;
+            }
 
             if (this.detectingChanges)
             {

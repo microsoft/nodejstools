@@ -15,7 +15,7 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [FileExtension(".njsproj"), FileExtension("*.csproj"), FileExtension("*.vbproj")]
+    [FileExtension(".njsproj"), FileExtension(".csproj"), FileExtension(".vbproj")]
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {
