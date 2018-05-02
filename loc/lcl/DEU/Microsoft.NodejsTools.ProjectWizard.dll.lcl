@@ -482,7 +482,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Specifies environment variables to be set in the spawned process in the form:]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ Gibt Umgebungsvariablen an, die im generierten Prozess im folgenden Format festgelegt werden müssen:]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
+            <Val><![CDATA[Gibt Umgebungsvariablen an, die im erzeugten Prozess im folgenden Format festgelegt werden müssen:]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3515,12 +3515,6 @@
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
-    <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft Corporation]]></Val>
@@ -3533,12 +3527,6 @@
         <Tgt Cat="Text" Stat="Loc" Orig="New">
           <Val><![CDATA[Node.js-Tools für Visual Studio – Assistenten]]></Val>
         </Tgt>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20314.3]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3560,12 +3548,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20314.3 commit:5f4e5add84b5a9b116ad83290b1523f7deba51a2]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

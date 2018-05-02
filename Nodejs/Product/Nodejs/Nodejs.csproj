@@ -266,7 +266,6 @@
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\InfoReplCommand.cs" />
-    <Compile Include="Repl\InteractiveContentType.cs" />
     <Compile Include="Repl\InteractiveWindowColor.cs" />
     <Compile Include="Repl\InteractiveWindowCommand.cs" />
     <Compile Include="Repl\InteractiveWindowProvider.cs" />
