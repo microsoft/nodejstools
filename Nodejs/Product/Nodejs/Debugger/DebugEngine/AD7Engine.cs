@@ -1291,6 +1291,9 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e)
         {
+            // This is a workaround for bug #604541. If that bug gets re-actived, or there is more information this should be re-visited.
+            // Current thinking is that this is caused by a timing issue between when Node wants to bind the breakpoint and VS creates the 
+            // unbound breakpoint.
             var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
             if (pendingBreakpoint != null)
             {
