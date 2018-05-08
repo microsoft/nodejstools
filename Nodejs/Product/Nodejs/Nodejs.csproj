@@ -193,6 +193,7 @@
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Repl\InteractiveWindowContentType.cs" />
     <Compile Include="TypeScriptHelpers\TsConfigJson.cs" />
     <Compile Include="TypeScriptHelpers\TsConfigJsonFactory.cs" />
     <Compile Include="TypeScriptHelpers\TypeScriptCompile.cs" />
@@ -961,7 +962,7 @@
     <Content Include="visualstudio_nodejs_repl.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.vstemplate">
       <SubType>Designer</SubType>

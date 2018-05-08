@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace Microsoft.NodejsTools.Repl
 {
     [Export(typeof(IInteractiveWindowCommand))]
-    [ContentType(NodejsConstants.TypeScript)]
+    [ContentType(InteractiveWindowContentType.ContentType)]
     internal sealed class InfoReplCommand : InteractiveWindowCommand
     {
         public override Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
