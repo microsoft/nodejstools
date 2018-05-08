@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
-            return Directory.EnumerateDirectories(testFrameworkRoot).Select(dir => Path.GetFileName(dir)).ToArray();
+            return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).ToArray();
         }
 
         public static string[] GetFrameworkDirectories()

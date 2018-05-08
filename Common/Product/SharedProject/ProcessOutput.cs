@@ -432,7 +432,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             try
             {
-                var started = this.Process.Start();
+                this.Process.Start();
             }
             catch (Exception ex)
             {

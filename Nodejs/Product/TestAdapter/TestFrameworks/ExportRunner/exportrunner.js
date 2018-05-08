@@ -22,7 +22,9 @@ function hook_outputs() {
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
     try {
-        debug = vm.runInDebugContext('Debug');
+        if (vm.runInDebugContext) {
+            debug = vm.runInDebugContext('Debug');
+        }
     } catch (ex) {
         console.error("NTVS_ERROR:", ex);
     }

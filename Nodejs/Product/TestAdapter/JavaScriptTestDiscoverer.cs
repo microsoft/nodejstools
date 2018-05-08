@@ -118,13 +118,13 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                             if (!testItems.TryGetValue(testFrameworkName, out var fileList))
                             {
-                                fileList = new HashSet<TestFileEntry>(new TestFileEntryComparer());
+                                fileList = new HashSet<TestFileEntry>(TestFileEntryComparer.Instance);
                                 testItems.Add(testFrameworkName, fileList);
                             }
                             fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
                         }
 
-                        DiscoverTests(testItems, proj, discoverySink, logger);
+                        this.DiscoverTests(testItems, proj, discoverySink, logger);
                     }
                 }
                 catch (Exception ex)
@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         DisplayName = discoveredTest.TestName
                     };
 
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, discoveredTest.TestFramework);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx);
 
                     discoverySink.SendTestCase(testcase);
                 }

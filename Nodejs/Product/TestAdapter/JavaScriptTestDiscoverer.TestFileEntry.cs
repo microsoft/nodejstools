@@ -19,11 +19,15 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private struct TestFileEntryComparer : IEqualityComparer<TestFileEntry>
+        private sealed class TestFileEntryComparer : IEqualityComparer<TestFileEntry>
         {
-            public bool Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
+            public static readonly IEqualityComparer<TestFileEntry> Instance = new TestFileEntryComparer();
 
-            public int GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
+            private TestFileEntryComparer() { }
+
+            bool IEqualityComparer<TestFileEntry>.Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
+
+            int IEqualityComparer<TestFileEntry>.GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
         }
     }
 }
