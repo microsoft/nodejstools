@@ -37,17 +37,17 @@ namespace Microsoft.NodejsTools.Repl
             this.nodeInteractiveContentType = contentTypeService.GetContentType(InteractiveWindowContentType.ContentType);
         }
 
-        public IVsInteractiveWindow OpenOrCreateWindow()
+        public IVsInteractiveWindow OpenOrCreateWindow(int id)
         {
             if (this.window == null)
             {
-                this.window = CreateReplWindow();
+                this.window = CreateReplWindow(id);
             }
 
             return this.window;
         }
 
-        public IVsInteractiveWindow CreateReplWindow(int replId = -1)
+        private IVsInteractiveWindow CreateReplWindow(int replId)
         {
             if (replId < 0)
             {
