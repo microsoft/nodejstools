@@ -26,7 +26,7 @@ for (; ;) {
 
 function send_response(socket, data) {
     var str = JSON.stringify(data);
-    var buf = Buffer(str);
+    var buf = Buffer.from(str);
     socket.write('Content-length: ' + buf.length + '\r\n\r\n');
     socket.write(buf);
 }
@@ -126,7 +126,7 @@ function processRequest(command) {
     }
 }
 
-var reader_state = { 'prevData': Buffer(0), 'state': 'header' }
+var reader_state = { 'prevData': Buffer.allocUnsafe(0), 'state': 'header' }
 
 client.on('data', function (data) {
     try {
@@ -153,7 +153,7 @@ client.on('data', function (data) {
                         throw 'expected Content-Length header, got ' + header;
                     }
 
-                    data = Buffer(0);
+                    data = Buffer.allocUnsafe(0);
                     reader_state['prevData'] = incoming.slice(endOfHeaders + 4, incoming.length);
                     reader_state['state'] = 'body';
                     reader_state['contentLength'] = contentLength;
