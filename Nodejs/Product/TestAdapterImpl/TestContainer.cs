@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
 using Microsoft.VisualStudio.TestWindow.Extensibility.Model;
 
-namespace Microsoft.VisualStudioTools.TestAdapter
+namespace Microsoft.NodejsTools.TestAdapter
 {
     internal class TestContainer : ITestContainer, IComparable<ITestContainer>
     {

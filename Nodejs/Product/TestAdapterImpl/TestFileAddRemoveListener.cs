@@ -6,7 +6,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudioTools.TestAdapter
+namespace Microsoft.NodejsTools.TestAdapter
 {
     internal sealed class TestFileChangedEventArgs : EventArgs
     {

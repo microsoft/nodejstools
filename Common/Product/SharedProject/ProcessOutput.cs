@@ -640,10 +640,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="line"></param>
         public void WriteInputLine(string line)
         {
-            if (IsStarted && redirector != null && !redirector.CloseStandardInput())
+            if (this.IsStarted && this.redirector != null && !this.redirector.CloseStandardInput())
             {
-                Process.StandardInput.WriteLine(line);
-                Process.StandardInput.Flush();
+                this.Process.StandardInput.WriteLine(line);
+                this.Process.StandardInput.Flush();
             }
         }
 

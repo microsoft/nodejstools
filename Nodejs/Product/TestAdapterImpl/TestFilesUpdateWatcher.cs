@@ -8,7 +8,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudioTools.TestAdapter
+namespace Microsoft.NodejsTools.TestAdapter
 {
     // TODO: consider replacing this with Microsoft.VisualStudioTools.Project.FileChangeManager. (When we have an assembly we can use to share code)
 
