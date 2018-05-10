@@ -417,6 +417,24 @@
   <data name="4004" xml:space="preserve">
     <value>Node.js background processing service.</value>
   </data>
+  <data name="4005" xml:space="preserve">
+    <value>TypeScript Vue Single File Component</value>
+  </data>
+  <data name="4006" xml:space="preserve">
+    <value>A TypeScript Vue Single File Component file</value>
+  </data>
+  <data name="4007" xml:space="preserve">
+    <value>JavaScript Vue Single File Component</value>
+  </data>
+  <data name="4008" xml:space="preserve">
+    <value>A JavaScript Vue Single File Component file</value>
+  </data>
+  <data name="4009" xml:space="preserve">
+    <value>Basic Vue.js Web Application</value>
+  </data>
+  <data name="4010" xml:space="preserve">
+    <value>A basic Vue.js Web application.</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\SystemRegisteredICO\NodeJS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

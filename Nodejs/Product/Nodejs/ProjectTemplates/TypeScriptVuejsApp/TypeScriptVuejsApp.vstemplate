@@ -1,0 +1,48 @@
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4009"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4010"/>
+    <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="412"/>
+    <ProjectType>TypeScript</ProjectType>
+    <TemplateID>Microsoft.TypeScript.VuejsApp</TemplateID>
+    <SortOrder>130</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>VuejsApp</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <PreviewImage>Preview.png</PreviewImage>
+    <TemplateGroupID>Node.jss</TemplateGroupID>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="TypeScriptVuejsApp.njsproj" ReplaceParameters="true">
+      <Folder Name="dist" />
+      <Folder Name="public">
+        <ProjectItem>favicon.ico</ProjectItem>
+        <ProjectItem>index.html</ProjectItem>
+      </Folder>
+      <Folder Name="src">
+        <Folder Name="assets" />
+        <Folder Name="components">
+          <ProjectItem>Home.vue</ProjectItem>
+        </Folder>
+        <ProjectItem>App.vue</ProjectItem>
+        <ProjectItem OpenInEditor="true">main.ts</ProjectItem>
+        <ProjectItem>shims.d.ts</ProjectItem>
+      </Folder>
+      <ProjectItem>.babelrc</ProjectItem>
+      <ProjectItem>.postcssrc.js</ProjectItem>
+      <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
+      <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
+      <ProjectItem>tsconfig.json</ProjectItem>      
+    </Project>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.NpmWizardExtension</FullClassName>
+  </WizardExtension>
+  <WizardExtension>
+    <Assembly>Microsoft.NodejsTools.ProjectWizard, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>Microsoft.NodejsTools.ProjectWizard.NodejsPackageParametersExtension</FullClassName>
+  </WizardExtension>
+</VSTemplate>

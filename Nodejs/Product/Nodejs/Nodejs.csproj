@@ -558,6 +558,7 @@
     <ConditionalEmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.Resources</LogicalName>
+      <SubType>Designer</SubType>
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -585,6 +586,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.vstemplate">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <Content Include="ProjectTemplates\TypeScriptVuejsApp\.postcssrc.js" />
+    <Resource Include="ProjectTemplates\TypeScriptVuejsApp\favicon.ico" />
+    <Content Include="ProjectTemplates\TypeScriptVuejsApp\index.html" />
+    <Content Include="ProjectTemplates\VuejsApp\.postcssrc.js" />
+    <Resource Include="ProjectTemplates\VuejsApp\favicon.ico" />
+    <Content Include="ProjectTemplates\VuejsApp\index.html" />
+    <TypeScriptProject Include="ProjectTemplates\VuejsApp\VuejsApp.vstemplate" />
+    <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -639,6 +652,24 @@
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
     <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
     <ZipItem Include="Templates\Files\TypeScriptJsConfig\jsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\.babelrc" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\App.vue" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\Home.vue" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\package.json" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\README.md" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\tsconfig.json" />
+    <None Include="ProjectTemplates\VuejsApp\.babelrc" />
+    <None Include="ProjectTemplates\VuejsApp\App.vue" />
+    <None Include="ProjectTemplates\VuejsApp\Home.vue" />
+    <None Include="ProjectTemplates\VuejsApp\package.json" />
+    <None Include="ProjectTemplates\VuejsApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\VuejsApp\VuejsApp.njsproj">
+      <SubType>Designer</SubType>
+    </TypeScriptProject>
+    <None Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1231,6 +1262,12 @@
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\main.ts" />
+    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\shims.d.ts" />
+    <Content Include="ProjectTemplates\VuejsApp\main.js" />
+    <None Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vue" />
   </ItemGroup>
   <PropertyGroup>
     <!--
