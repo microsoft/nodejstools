@@ -9,9 +9,9 @@
     "name": ""
   },
   "devDependencies": {
-    "@types/node": "^6.0.87"
+    "@types/node": "^8.0.14"
   },
   "engines": {
-    "node": "~6.10.x"
+    "node": "^8.0.0"
   }
 }

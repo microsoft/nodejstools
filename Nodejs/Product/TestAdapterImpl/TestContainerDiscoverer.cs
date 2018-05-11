@@ -374,7 +374,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
-            //so we need to re-discover when file change happens. Since we support all project files, this is a save check
+            //so we need to re-discover when file change happens. Since we support all project files, this is a safe check
             if (pathToItem.EndsWith("proj", StringComparison.OrdinalIgnoreCase))
             {
                 return true;

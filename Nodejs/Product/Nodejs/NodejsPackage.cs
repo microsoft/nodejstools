@@ -171,7 +171,7 @@ namespace Microsoft.NodejsTools
             {
                 var replProvider = this.GetInteractiveWindowProvider();
 
-                replProvider.CreateReplWindow(id);
+                replProvider.OpenOrCreateWindow(id);
                 return VSConstants.S_OK;
             }
 
@@ -182,7 +182,7 @@ namespace Microsoft.NodejsTools
         {
             var replProvider = this.GetInteractiveWindowProvider();
 
-            replProvider.OpenOrCreateWindow().Show(focus);
+            replProvider.OpenOrCreateWindow(-1).Show(focus);
         }
 
         private InteractiveWindowProvider GetInteractiveWindowProvider()
