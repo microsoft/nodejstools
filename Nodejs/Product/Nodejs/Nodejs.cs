@@ -7,6 +7,8 @@ using System.IO;
 using System.Windows.Forms;
 #endif
 using Microsoft.Win32;
+//using Microsoft.VisualStudio.Shell;
+//using Microsoft.VisualStudio.Shell.Interop;
 #if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
 #endif
@@ -135,31 +137,31 @@ namespace Microsoft.NodejsTools
                 }
             }
 
-            const string nodeJsPackageRegistryKey = "Microsoft.VisualStudio.Package.NodeJs";
-            const string node32Value = "NodeExecutablePath32";
-            const string node64Value = "NodeExecutablePath64";
-            const string npmValue = "NpmExecutablePath";
+            // TODO: this doesn't work in the NPM assembly figure out how to make that work.
+            //const string nodeJsPackageRegistryKey = "Microsoft.VisualStudio.Package.NodeJs";
+            //const string node32Value = "NodeExecutablePath32";
+            //const string node64Value = "NodeExecutablePath64";
+            //const string npmValue = "NpmExecutablePath";
 
-            // Attempt to find Node.js/NPM from the VS package
-            using (var nodeJsPackageKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_Configuration, true).CreateSubKey(nodeJsPackageRegistryKey))
-            {
-                if (executable == "node.exe")
-                {
-                    var key;
-                    if (Environment.Is64BitOperatingSystem)
-                    {
-                        return nodeJsPackageKey.GetValue(node64Value) as string;
-                    }
-                    else
-                    {
-                        return nodeJsPackageKey.GetValue(node32Value) as string;
-                    }
-                }
-                else if (executable == "npm.cmd")
-                {
-                    return nodeJsPackageKey.GetValue(npmValue) as string;
-                }
-            }
+            //// Attempt to find Node.js/NPM from the VS package
+            //using (var nodeJsPackageKey = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_Configuration, writable: false).CreateSubKey(nodeJsPackageRegistryKey))
+            //{
+            //    if (executable == "node.exe")
+            //    {
+            //        if (Environment.Is64BitOperatingSystem)
+            //        {
+            //            return nodeJsPackageKey.GetValue(node64Value) as string;
+            //        }
+            //        else
+            //        {
+            //            return nodeJsPackageKey.GetValue(node32Value) as string;
+            //        }
+            //    }
+            //    else if (executable == "npm.cmd")
+            //    {
+            //        return nodeJsPackageKey.GetValue(npmValue) as string;
+            //    }
+            //}
 
             // we didn't find the path.
             return null;
@@ -186,5 +188,5 @@ namespace Microsoft.NodejsTools
             );
         }
 #endif
-   }
+    }
 }
