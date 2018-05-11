@@ -585,8 +585,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vstemplate" />
-    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -664,8 +662,11 @@
     <ZipProject Include="ProjectTemplates\VuejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\VuejsApp\README.md" />
     <ZipProject Include="ProjectTemplates\VuejsApp\VuejsApp.njsproj" />
-    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />    
+    <ZipProject Include="ProjectTemplates\VuejsApp\VuejsApp.vstemplate" />
+    <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vstemplate" />
     <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vue" />
+    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
