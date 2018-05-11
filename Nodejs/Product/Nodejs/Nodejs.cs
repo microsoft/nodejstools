@@ -7,12 +7,13 @@ using System.IO;
 using System.Windows.Forms;
 #endif
 using Microsoft.Win32;
-//using Microsoft.VisualStudio.Shell;
-//using Microsoft.VisualStudio.Shell.Interop;
+
 #if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
 #endif
 using Microsoft.VisualStudioTools;
+//using Microsoft.VisualStudio.Shell;
+//using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.NodejsTools
 {

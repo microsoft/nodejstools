@@ -7,46 +7,46 @@ namespace Microsoft.NodejsTools
 {
     internal static class NodejsConstants
     {
-        internal const string JavaScriptExtension = ".js";
-        internal const string JavaScriptJsxExtension = ".jsx";
-        internal const string TypeScriptExtension = ".ts";
-        internal const string TypeScriptJsxExtension = ".tsx";
-        internal const string TypeScriptDeclarationExtension = ".d.ts";
-        internal const string MapExtension = ".map";
-        internal const string NodejsProjectExtension = ".njsproj";
+        public const string JavaScriptExtension = ".js";
+        public const string JavaScriptJsxExtension = ".jsx";
+        public const string TypeScriptExtension = ".ts";
+        public const string TypeScriptJsxExtension = ".tsx";
+        public const string TypeScriptDeclarationExtension = ".d.ts";
+        public const string MapExtension = ".map";
+        public const string NodejsProjectExtension = ".njsproj";
 
-        internal const string JavaScript = "JavaScript";
-        internal const string CSS = "CSS";
-        internal const string HTML = "HTML";
-        internal const string Nodejs = "Node.js";
+        public const string JavaScript = "JavaScript";
+        public const string CSS = "CSS";
+        public const string HTML = "HTML";
+        public const string Nodejs = "Node.js";
 
-        internal const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
+        public const string ProjectFileFilter = "Node.js Project File (*.njsproj)\n*.njsproj\nAll Files (*.*)\n*.*\n";
 
-        internal const string NodeModulesFolder = "node_modules";
-        internal const string NodeModulesFolderWithSeparators = "\\" + NodeModulesFolder + "\\";
-        internal const string NodeModulesStagingFolder = "node_modules\\.staging\\";
-        internal const string BowerComponentsFolder = "bower_components";
+        public const string NodeModulesFolder = "node_modules";
+        public const string NodeModulesFolderWithSeparators = "\\" + NodeModulesFolder + "\\";
+        public const string NodeModulesStagingFolder = "node_modules\\.staging\\";
+        public const string BowerComponentsFolder = "bower_components";
 
         /// <summary>
         /// The name of the package.json file
         /// </summary>
-        internal const string PackageJsonFile = "package.json";
-        internal const string PackageJsonMainFileKey = "main";
-        internal const string DefaultPackageMainFile = "index.js";
+        public const string PackageJsonFile = "package.json";
+        public const string PackageJsonMainFileKey = "main";
+        public const string DefaultPackageMainFile = "index.js";
 
-        internal const string TsConfigJsonFile = "tsconfig.json";
-        internal const string JsConfigJsonFile = "jsconfig.json";
+        public const string TsConfigJsonFile = "tsconfig.json";
+        public const string JsConfigJsonFile = "jsconfig.json";
 
-        internal const string BaseRegistryKey = "NodejsTools";
+        public const string BaseRegistryKey = "NodejsTools";
 
-        internal const ushort DefaultDebuggerPort = 5858;
+        public const ushort DefaultDebuggerPort = 5858;
 
-        internal const string TypeScriptCompileItemType = "TypeScriptCompile";
-        internal const string CommonJSModuleKind = "CommonJS";
-        internal const string TypeScript = "TypeScript";
+        public const string TypeScriptCompileItemType = "TypeScriptCompile";
+        public const string CommonJSModuleKind = "CommonJS";
+        public const string TypeScript = "TypeScript";
 
-        internal const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
-        internal const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
+        public const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
+        public const string NodeToolsVsInstallRootEnvironmentVariable = "_NTVS_VSINSTALLROOT";
 
         public static string NtvsLocalAppData => Path.Combine(
                     System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData),
@@ -65,30 +65,35 @@ namespace Microsoft.NodejsTools
         /// <summary>
         /// Checks whether a relative and double-backslashed seperated path contains a folder name.
         /// </summary>
-        internal static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
+        public static bool ContainsNodeModulesOrBowerComponentsFolder(string path)
         {
             var tmp = "\\" + path + "\\";
             return tmp.IndexOf("\\" + NodeModulesFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0
                 || tmp.IndexOf("\\" + BowerComponentsFolder + "\\", StringComparison.OrdinalIgnoreCase) >= 0;
         }
+
+        public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
+        public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
     }
 
     internal static class NodeProjectProperty
     {
-        internal const string DebuggerPort = "DebuggerPort";
-        internal const string EnableTypeScript = "EnableTypeScript";
-        internal const string Environment = "Environment";
-        internal const string EnvironmentVariables = "EnvironmentVariables";
-        internal const string LaunchUrl = "LaunchUrl";
-        internal const string NodeExeArguments = "NodeExeArguments";
-        internal const string NodeExePath = "NodeExePath";
-        internal const string NodejsPort = "NodejsPort";
-        internal const string ScriptArguments = "ScriptArguments";
-        internal const string StartWebBrowser = "StartWebBrowser";
-        internal const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
-        internal const string TypeScriptModuleKind = "TypeScriptModuleKind";
-        internal const string TypeScriptOutDir = "TypeScriptOutDir";
-        internal const string TypeScriptSourceMap = "TypeScriptSourceMap";
-        internal const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
+        public const string DebuggerPort = "DebuggerPort";
+        public const string EnableTypeScript = "EnableTypeScript";
+        public const string Environment = "Environment";
+        public const string EnvironmentVariables = "EnvironmentVariables";
+        public const string LaunchUrl = "LaunchUrl";
+        public const string NodeExeArguments = "NodeExeArguments";
+        public const string NodeExePath = "NodeExePath";
+        public const string NodejsPort = "NodejsPort";
+        public const string ScriptArguments = "ScriptArguments";
+        public const string StartWebBrowser = "StartWebBrowser";
+        public const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
+        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        public const string TypeScriptOutDir = "TypeScriptOutDir";
+        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        public const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
+        public const string TestRoot = "TestRoot";
+        public const string TestFramework = "TestFramework";
     }
 }

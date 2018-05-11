@@ -1440,6 +1440,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse for test root.
+        /// </summary>
+        internal static string PropertiesBrowseTestRootAccessibleName {
+            get {
+                return ResourceManager.GetString("PropertiesBrowseTestRootAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Local Package Properties.
         /// </summary>
         internal static string PropertiesClassLocalPackage {
@@ -1829,6 +1838,33 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specifies the framework used for the unit tests..
+        /// </summary>
+        internal static string TestFrameworkToolTip {
+            get {
+                return ResourceManager.GetString("TestFrameworkToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test Root.
+        /// </summary>
+        internal static string TestRoot {
+            get {
+                return ResourceManager.GetString("TestRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the directory where the unit tests are located..
+        /// </summary>
+        internal static string TestRootToolTip {
+            get {
+                return ResourceManager.GetString("TestRootToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Build Canceled.
         /// </summary>
         internal static string TscBuildCanceled {
@@ -1870,6 +1906,15 @@ namespace Microsoft.NodejsTools {
         internal static string TypeScriptMinVersionNotInstalled {
             get {
                 return ResourceManager.GetString("TypeScriptMinVersionNotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JavaScript Unit Test.
+        /// </summary>
+        internal static string UnitTestHeader {
+            get {
+                return ResourceManager.GetString("UnitTestHeader", resourceCulture);
             }
         }
         

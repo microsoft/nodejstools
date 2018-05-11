@@ -1,14 +1,10 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
-using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
 
 namespace Microsoft.VisualStudioTools
 {
-    internal static class CommonConstants
+    internal static partial class CommonConstants
     {
         /// <summary>
         /// <see cref="VsConstants.UICONTEXT_NoSolution"/>.
@@ -58,10 +54,6 @@ namespace Microsoft.VisualStudioTools
         //Working Directory project property
         public const string WorkingDirectory = "WorkingDirectory";
 
-        //"Open Folder in Windows Explorer" command ID.
-        //Don't change this! This is Visual Studio constant.
-        public const VsCommands2K OpenFolderInExplorerCmdId = (VsCommands2K)1635;
-
         //Sort priority for the Working Directory node
         //We want this node to be the first node in the Search Path subtree
         public const int WorkingDirectorySortPriority = 100;
@@ -78,17 +70,6 @@ namespace Microsoft.VisualStudioTools
         public const string IsWindowsApplication = "IsWindowsApplication";
 
         public const string PublishUrl = "PublishUrl";
-
-        //These are VS internal constants - don't change them
-        public static Guid Std97CmdGroupGuid = typeof(VSConstants.VSStd97CmdID).GUID;
-        public static Guid Std2KCmdGroupGuid = typeof(VSConstants.VSStd2KCmdID).GUID;
-
-        //Command statuses
-        public const int NotSupportedInvisibleCmdStatus = (int)OleConstants.OLECMDERR_E_NOTSUPPORTED |
-                            (int)OleConstants.OLECMDSTATE_INVISIBLE;
-        public const int SupportedEnabledCmdStatus = (int)(OLECMDF.OLECMDF_SUPPORTED |
-                            OLECMDF.OLECMDF_ENABLED);
-        public const int SupportedCmdStatus = (int)OLECMDF.OLECMDF_SUPPORTED;
 
         /// <summary>
         /// Show all files is enabled, we show the merged view of project + files

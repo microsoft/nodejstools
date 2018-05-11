@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="line">The line of text, not including the newline. This
         /// is never null.</param>
         public abstract void WriteLine(string line);
+
         /// <summary>
         /// Called when a line is written to standard error.
         /// </summary>
@@ -548,7 +549,7 @@ namespace Microsoft.VisualStudioTools.Project
                     }
                     if (this.redirector != null)
                     {
-                        this.redirector.WriteLine(line);
+                        this.redirector.WriteErrorLine(line);
                     }
                 }
             }

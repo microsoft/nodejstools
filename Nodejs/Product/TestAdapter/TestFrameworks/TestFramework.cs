@@ -2,17 +2,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    internal class TestFramework
+    public sealed class TestFramework
     {
         private readonly string vsixScriptFolder;
         private readonly string findTestsScriptFile;
@@ -31,13 +31,13 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger,
-            string workingDirectory)
+            string projectRoot)
         {
             var testInfo = string.Empty;
             var discoverResultFile = Path.GetTempFileName();
             try
             {
-                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, workingDirectory);
+                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, projectRoot);
                 if (!string.IsNullOrWhiteSpace(stdout))
                 {
                     var stdoutLines = stdout.Split(new[] { Environment.NewLine },
@@ -70,6 +70,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
             finally
             {
+#if !DEBUG
                 try
                 {
                     File.Delete(discoverResultFile);
@@ -79,17 +80,18 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                     //Unable to delete for some reason
                     //We leave the file behind in this case, its in TEMP so eventually OS will clean up
                 }
+#endif
             }
 
             var testCases = new List<NodejsTestInfo>();
-            var discoveredTests = (List<DiscoveredTest>)JsonConvert.DeserializeObject(testInfo, typeof(List<DiscoveredTest>));
+            var discoveredTests = JsonConvert.DeserializeObject<List<DiscoveredTest>>(testInfo);
             if (discoveredTests != null)
             {
                 foreach (var discoveredTest in discoveredTests)
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column);
+                    var test = new NodejsTestInfo(discoveredTest.File, discoveredTest.Test, this.Name, line, column, projectRoot);
                     testCases.Add(test);
                 }
             }
@@ -110,7 +112,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             };
         }
 
-        private string WrapWithQuotes(string path)
+        private static string WrapWithQuotes(string path)
         {
             if (!path.StartsWith("\"", StringComparison.Ordinal) && !path.StartsWith("\'", StringComparison.Ordinal))
             {
@@ -124,7 +126,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         /// </summary>
         /// <param name="testName">Name of the test to excape for command line usage.</param>
         /// <returns>Name of the test, escaped according to the command line rules.</returns>
-        private string WrapTestNameWithQuotes(string testName)
+        private static string WrapTestNameWithQuotes(string testName)
         {
             return "\"" + testName.Replace("\"", "\\\"") + "\"";
         }
@@ -132,62 +134,70 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         private string EvaluateJavaScript(string nodeExePath, string testFile, string discoverResultFile, IMessageLogger logger, string workingDirectory)
         {
             workingDirectory = workingDirectory.TrimEnd(new char['\\']);
-            var arguments = WrapWithQuotes(this.findTestsScriptFile)
-                + " " + this.Name +
-                " " + WrapWithQuotes(testFile) +
-                " " + WrapWithQuotes(discoverResultFile) +
-                " " + WrapWithQuotes(workingDirectory);
-
-            var processStartInfo = new ProcessStartInfo(nodeExePath, arguments)
-            {
-
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            };
+#if DEBUG
+            var arguments = $"{WrapWithQuotes(this.findTestsScriptFile)} {this.Name} {WrapWithQuotes(testFile)} {WrapWithQuotes(discoverResultFile)} {WrapWithQuotes(workingDirectory)}";
+            logger.SendMessage(TestMessageLevel.Informational, "Arguments: " + arguments);
+#endif
 
             var stdout = string.Empty;
             try
             {
-                using (var process = Process.Start(processStartInfo))
-                {
-                    process.EnableRaisingEvents = true;
-                    process.OutputDataReceived += (sender, args) =>
-                    {
-                        stdout += args.Data + Environment.NewLine;
-                    };
-                    process.ErrorDataReceived += (sender, args) =>
-                    {
-                        stdout += args.Data + Environment.NewLine;
-                    };
-                    process.BeginErrorReadLine();
-                    process.BeginOutputReadLine();
+                var process = ProcessOutput.Run(nodeExePath, new[] { this.findTestsScriptFile, this.Name, testFile, discoverResultFile, workingDirectory }, workingDirectory, env: null, visible: false, redirector: new DiscoveryRedirector(logger));
 
-                    process.WaitForExit();
-#if DEBUG
-                    logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.InvariantCulture, "  Process exited: {0}", process.ExitCode));
-#endif
-                }
-#if DEBUG
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.InvariantCulture, "  StdOut:{0}", stdout));
-#endif
+                process.Wait();
             }
             catch (FileNotFoundException e)
             {
-                logger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.InvariantCulture, "Error starting node.exe.\n {0}", e));
+                logger.SendMessage(TestMessageLevel.Error, $"Error starting node.exe.{Environment.NewLine}{e}");
             }
 
             return stdout;
         }
 
-        private class DiscoveredTest
+        public static bool IsValidTestFramework(string testFramework)
         {
-            public string Test { get; set; }
-            public string Suite { get; set; }
-            public string File { get; set; }
-            public int Line { get; set; }
-            public int Column { get; set; }
+            return !string.IsNullOrWhiteSpace(testFramework);
+        }
+
+        private sealed class DiscoveredTest
+        {
+            // fields are set using serializer
+#pragma warning disable CS0649
+            public string Test;
+            public string Suite;
+            public string File;
+            public int Line;
+            public int Column;
+#pragma warning restore CS0649
+        }
+
+        private sealed class DiscoveryRedirector : Redirector
+        {
+            private const string NTVS_Error = "NTVS_ERROR:";
+
+            private readonly IMessageLogger logger;
+
+            public DiscoveryRedirector(IMessageLogger logger)
+            {
+                this.logger = logger;
+            }
+
+            public override void WriteErrorLine(string line)
+            {
+                if (line.StartsWith(NTVS_Error))
+                {
+                    this.logger.SendMessage(TestMessageLevel.Error, line.Substring(NTVS_Error.Length).TrimStart());
+                }
+                else
+                {
+                    this.logger.SendMessage(TestMessageLevel.Error, line);
+                }
+            }
+
+            public override void WriteLine(string line)
+            {
+                this.logger.SendMessage(TestMessageLevel.Informational, line);
+            }
         }
     }
 }

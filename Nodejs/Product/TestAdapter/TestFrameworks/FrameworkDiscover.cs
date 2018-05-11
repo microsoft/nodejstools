@@ -6,14 +6,15 @@ using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    internal class FrameworkDiscover
+    public sealed class FrameworkDiscover
     {
         private readonly Dictionary<string, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
 
-        public FrameworkDiscover()
+        public static FrameworkDiscover Intance = new FrameworkDiscover();
+
+        private FrameworkDiscover()
         {
-            var directoryLoader = new TestFrameworkDirectories();
-            var testFrameworkDirectories = directoryLoader.GetFrameworkDirectories();
+            var testFrameworkDirectories = TestFrameworkDirectories.GetFrameworkDirectories();
 
             foreach (var directory in testFrameworkDirectories)
             {

@@ -10,7 +10,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         public readonly int? LineNumber;
         public readonly bool IsRecompilation;
 
-        internal FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation = false)
+        public FunctionInformation(string ns, string methodName, int? lineNo, string filename, bool isRecompilation = false)
         {
             this.Namespace = ns;
             this.Function = methodName;

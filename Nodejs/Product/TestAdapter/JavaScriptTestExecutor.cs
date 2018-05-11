@@ -8,7 +8,6 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
-using Microsoft.VisualStudio.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -19,36 +18,9 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal class TestExecutionRedirector : Redirector
+    [ExtensionUri(NodejsConstants.ExecutorUriString)]
+    public class JavaScriptTestExecutor : ITestExecutor
     {
-        private readonly Action<string> writer;
-
-        public TestExecutionRedirector(Action<string> onWriteLine)
-        {
-            this.writer = onWriteLine;
-        }
-
-        public override void WriteErrorLine(string line)
-        {
-            this.writer(line);
-        }
-
-        public override void WriteLine(string line)
-        {
-            this.writer(line);
-        }
-
-        public override bool CloseStandardInput()
-        {
-            return false;
-        }
-    }
-
-    public class TestExecutor
-    {
-        public const string ExecutorUriString = "executor://NodejsTestExecutor/v1";
-        public static readonly Uri ExecutorUri = new Uri(ExecutorUriString);
-
         private static readonly Version Node8Version = new Version(8, 0);
 
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
@@ -58,13 +30,24 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private readonly ManualResetEvent testsCompleted = new ManualResetEvent(false);
 
-        private static readonly char[] needToBeQuoted = new[] { ' ', '"' };
         private ProcessOutput nodeProcess;
-        private object syncObject = new object();
+        private readonly object syncObject = new object();
         private List<TestCase> currentTests;
         private IFrameworkHandle frameworkHandle;
         private TestResult currentResult = null;
         private ResultObject currentResultObject = null;
+
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
+            this.EnsureInitialized();
+            this.RunTestsCore(tests, runContext, frameworkHandle);
+        }
+
+        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        {
+            this.EnsureInitialized();
+            this.RunTestsCore(sources, runContext, frameworkHandle);
+        }
 
         public void Cancel()
         {
@@ -72,6 +55,14 @@ namespace Microsoft.NodejsTools.TestAdapter
             //could exit right after this call and our node process will be left running.
             KillNodeProcess();
             this.cancelRequested.Set();
+        }
+
+        private void EnsureInitialized()
+        {
+            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
+            {
+                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
+            }
         }
 
         private void ProcessTestRunnerEmit(string line)
@@ -125,7 +116,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="sources">Refers to the list of test sources passed to the test adapter from the client.  (Client could be VS or command line)</param>
         /// <param name="runContext">Defines the settings related to the current run</param>
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
-        public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        private void RunTestsCore(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             ValidateArg.NotNull(sources, "sources");
             ValidateArg.NotNull(runContext, "runContext");
@@ -134,7 +125,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.cancelRequested.Reset();
 
             var receiver = new TestReceiver();
-            var discoverer = new TestDiscoverer();
+            var discoverer = new JavaScriptTestDiscoverer();
             discoverer.DiscoverTests(sources, null, frameworkHandle, receiver);
 
             if (this.cancelRequested.WaitOne(0))
@@ -142,7 +133,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
-            RunTests(receiver.Tests, runContext, frameworkHandle);
+            this.RunTestsCore(receiver.Tests, runContext, frameworkHandle);
         }
 
         /// <summary>
@@ -151,7 +142,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <param name="tests">The list of TestCases selected to run</param>
         /// <param name="runContext">Defines the settings related to the current run</param>
         /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        private void RunTestsCore(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             ValidateArg.NotNull(tests, "tests");
             ValidateArg.NotNull(runContext, "runContext");
@@ -190,17 +181,16 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging)
+        private bool HasVisualStudioProcessId(out int processId)
         {
-            var userTask = new UserTaskEvent("VS/NodejsTools/UnitTestsExecuted", TelemetryResult.Success);
-            userTask.Properties["VS.NodejsTools.TestCount"] = testCount;
-            // This is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
-            userTask.Properties["VS.NodejsTools.NodeVersion"] = nodeVersion.ToString();
-            userTask.Properties["VS.NodejsTools.IsDebugging"] = isDebugging;
+            processId = 0;
+            var pid = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable);
+            if (pid == null)
+            {
+                return false;
+            }
 
-            //todo: when we have support for the Node 8 debugger log which version of the debugger people are actually using
-
-            TelemetryService.DefaultSession?.PostEvent(userTask);
+            return int.TryParse(pid, out processId);
         }
 
         private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
@@ -213,145 +203,163 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
-            using (var app = VisualStudioApp.FromEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable))
+            var startedFromVs = this.HasVisualStudioProcessId(out var vsProcessId);
+
+            var nodeArgs = new List<string>();
+            // .njsproj file path -> project settings
+            var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
+            var testObjects = new List<TestCaseObject>();
+
+            if (!File.Exists(settings.NodeExePath))
             {
-                var port = 0;
-                var nodeArgs = new List<string>();
-                // .njsproj file path -> project settings
-                var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-                var testObjects = new List<TestCaseObject>();
-
-                if (!File.Exists(settings.NodeExePath))
-                {
-                    frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
-                    return;
-                }
-
-                // All tests being run are for the same test file, so just use the first test listed to get the working dir
-                var testInfo = new NodejsTestInfo(tests.First().FullyQualifiedName);
-                var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
-
-                var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
-
-                // We can only log telemetry when we're running in VS.
-                // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
-                // this way the .NET framework only tries to load the assemblies when we actually need them.
-                if (app != null)
-                {
-                    LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged);
-                }
-
-                foreach (var test in tests)
-                {
-                    if (this.cancelRequested.WaitOne(0))
-                    {
-                        break;
-                    }
-
-                    if (settings == null)
-                    {
-                        frameworkHandle.SendMessage(
-                            TestMessageLevel.Error,
-                            $"Unable to determine interpreter to use for '{test.Source}'.");
-                        frameworkHandle.RecordEnd(test, TestOutcome.Failed);
-                    }
-
-                    var args = new List<string>();
-                    args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
-
-                    // Fetch the run_tests argument for starting node.exe if not specified yet
-                    if (nodeArgs.Count == 0 && args.Count > 0)
-                    {
-                        nodeArgs.Add(args[0]);
-                    }
-
-                    testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
-                }
-
-                if (runContext.IsBeingDebugged && app != null)
-                {
-                    app.GetDTE().Debugger.DetachAll();
-                    // Ensure that --debug-brk is the first argument
-                    nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
-                }
-
-                // make sure the testscompleted is not signalled.
-                this.testsCompleted.Reset();
-
-                this.nodeProcess = ProcessOutput.Run(
-                    settings.NodeExePath,
-                    nodeArgs,
-                    settings.WorkingDir,
-                    env: null,
-                    visible: false,
-                    redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                    quoteArgs: false);
-
-                if (runContext.IsBeingDebugged && app != null)
-                {
-                    try
-                    {
-                        if (nodeVersion >= Node8Version)
-                        {
-                            app.AttachToProcessNode2DebugAdapter(port);
-                        }
-                        else
-                        {
-                            //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
-                            //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
-                            var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
-                            while (!app.AttachToProcess(this.nodeProcess, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
-                            {
-                                if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
-                                {
-                                    break;
-                                }
-                            }
-                        }
-#if DEBUG
-                    }
-                    catch (COMException ex)
-                    {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                        KillNodeProcess();
-                    }
-#else
-                    }
-                    catch (COMException)
-                    {
-                        frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                        KillNodeProcess();
-                    }
-#endif
-                }
-                // Send the process the list of tests to run and wait for it to complete
-                this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
-
-                // for node 8 the process doesn't automatically exit when debugging, so always detach
-                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
-                if (runContext.IsBeingDebugged && app != null)
-                {
-                    app.GetDTE().Debugger.DetachAll();
-                }
-
-                // Automatically fail tests that haven't been run by this point (failures in before() hooks)
-                foreach (var notRunTest in this.currentTests)
-                {
-                    var result = new TestResult(notRunTest)
-                    {
-                        Outcome = TestOutcome.Failed
-                    };
-
-                    if (this.currentResultObject != null)
-                    {
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, this.currentResultObject.stdout));
-                        result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, this.currentResultObject.stderr));
-                    }
-                    frameworkHandle.RecordResult(result);
-                    frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
-                }
+                frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
+                return;
             }
+
+            // All tests being run are for the same test file, so just use the first test listed to get the working dir
+            var firstTest = tests.First();
+            var testFramework = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: "unknown");
+            var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
+            var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+
+            var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
+
+            // We can only log telemetry when we're running in VS.
+            // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
+            // this way the .NET framework only tries to load the assemblies when we actually need them.
+            if (startedFromVs)
+            {
+                this.LogTelemetry(tests.Count(), nodeVersion, runContext.IsBeingDebugged, testFramework);
+            }
+
+            foreach (var test in tests)
+            {
+                if (this.cancelRequested.WaitOne(0))
+                {
+                    break;
+                }
+
+                if (settings == null)
+                {
+                    frameworkHandle.SendMessage(
+                        TestMessageLevel.Error,
+                        $"Unable to determine interpreter to use for '{test.Source}'.");
+                    frameworkHandle.RecordEnd(test, TestOutcome.Failed);
+                }
+
+                var args = new List<string>();
+                args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
+
+                // Fetch the run_tests argument for starting node.exe if not specified yet
+                if (nodeArgs.Count == 0 && args.Count > 0)
+                {
+                    nodeArgs.Add(args[0]);
+                }
+
+                testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
+            }
+
+            var port = 0;
+            if (runContext.IsBeingDebugged && startedFromVs)
+            {
+                this.DetachDebugger(vsProcessId);
+                // Ensure that --debug-brk or --inspect-brk is the first argument
+                nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
+            }
+
+            // make sure the testscompleted is not signalled.
+            this.testsCompleted.Reset();
+
+            this.nodeProcess = ProcessOutput.Run(
+                settings.NodeExePath,
+                nodeArgs,
+                settings.WorkingDir,
+                env: null,
+                visible: false,
+                redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                quoteArgs: false);
+
+            if (runContext.IsBeingDebugged && startedFromVs)
+            {
+                this.AttachDebugger(vsProcessId, port, nodeVersion);
+            }
+
+
+            // Send the process the list of tests to run and wait for it to complete
+            this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
+
+            // for node 8 the process doesn't automatically exit when debugging, so always detach
+            WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
+            if (runContext.IsBeingDebugged && startedFromVs)
+            {
+                this.DetachDebugger(vsProcessId);
+            }
+
+            // Automatically fail tests that haven't been run by this point (failures in before() hooks)
+            foreach (var notRunTest in this.currentTests)
+            {
+                var result = new TestResult(notRunTest)
+                {
+                    Outcome = TestOutcome.Failed
+                };
+
+                if (this.currentResultObject != null)
+                {
+                    result.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, this.currentResultObject.stdout));
+                    result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, this.currentResultObject.stderr));
+                }
+                frameworkHandle.RecordResult(result);
+                frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
+            }
+        }
+
+        private void DetachDebugger(int vsProcessId)
+        {
+            VisualStudioApp.DetachDebugger(vsProcessId);
+        }
+
+        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging, string testFramework)
+        {
+            VisualStudioApp.LogTelemetry(testCount, nodeVersion, isDebugging, testFramework);
+        }
+
+        private void AttachDebugger(int vsProcessId, int port, Version nodeVersion)
+        {
+            try
+            {
+                if (nodeVersion >= Node8Version)
+                {
+                    VisualStudioApp.AttachToProcessNode2DebugAdapter(vsProcessId, port);
+                }
+                else
+                {
+                    //the '#ping=0' is a special flag to tell VS node debugger not to connect to the port,
+                    //because a connection carries the consequence of setting off --debug-brk, and breakpoints will be missed.
+                    var qualifierUri = string.Format("tcp://localhost:{0}#ping=0", port);
+                    while (!VisualStudioApp.AttachToProcess(this.nodeProcess.Process, vsProcessId, NodejsRemoteDebugPortSupplierUnsecuredId, qualifierUri))
+                    {
+                        if (this.nodeProcess.Wait(TimeSpan.FromMilliseconds(500)))
+                        {
+                            break;
+                        }
+                    }
+                }
+#if DEBUG
+            }
+            catch (COMException ex)
+            {
+                this.frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                this.frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
+                KillNodeProcess();
+            }
+#else
+            }
+            catch (COMException)
+            {
+                frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                KillNodeProcess();
+            }
+#endif
         }
 
         private void KillNodeProcess()
@@ -372,9 +380,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
-            var testInfo = new TestFrameworks.NodejsTestInfo(test.FullyQualifiedName);
-            var discover = new TestFrameworks.FrameworkDiscover();
-            return discover.Get(testInfo.TestFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
+            var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
+            var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
+            return FrameworkDiscover.Intance.Get(testFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)
@@ -446,9 +454,25 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.currentTests.Remove(test);
         }
 
+        private sealed class TestExecutionRedirector : Redirector
+        {
+            private readonly Action<string> writer;
+
+            public TestExecutionRedirector(Action<string> onWriteLine)
+            {
+                this.writer = onWriteLine;
+            }
+
+            public override void WriteErrorLine(string line) => this.writer(line);
+
+            public override void WriteLine(string line) => this.writer(line);
+
+            public override bool CloseStandardInput() => false;
+        }
+
         private sealed class TestReceiver : ITestCaseDiscoverySink
         {
-            public List<TestCase> Tests { get; } = new List<TestCase>();
+            public readonly List<TestCase> Tests = new List<TestCase>();
 
             public void SendTestCase(TestCase discoveredTest)
             {
