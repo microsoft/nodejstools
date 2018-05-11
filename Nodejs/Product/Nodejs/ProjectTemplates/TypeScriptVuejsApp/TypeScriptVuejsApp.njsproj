@@ -28,11 +28,9 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
-    <NODE_ENV>development</NODE_ENV>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
-    <NODE_ENV>production</NODE_ENV>
   </PropertyGroup>
 
   <ItemGroup>
