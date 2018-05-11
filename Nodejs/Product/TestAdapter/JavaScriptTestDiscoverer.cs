@@ -164,7 +164,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testFramework = FrameworkDiscover.Intance.Get(testFx);
                 if (testFramework == null)
                 {
-                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework \'{testFx}\'.");
+                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");
                     continue;
                 }
 
@@ -202,7 +202,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                     discoverySink.SendTestCase(testcase);
                 }
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework \'{0}\'.", testFx));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework '{0}'.", testFx));
             }
             if (testCount == 0)
             {

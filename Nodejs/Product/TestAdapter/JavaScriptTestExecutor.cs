@@ -198,7 +198,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             // May be null, but this is handled by RunTestCase if it matters.
             // No VS instance just means no debugging, but everything else is
             // okay.
-            if (tests.Count() == 0)
+            if (!tests.Any())
             {
                 return;
             }
@@ -454,7 +454,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.currentTests.Remove(test);
         }
 
-        private sealed class TestExecutionRedirector : Redirector
+        internal sealed class TestExecutionRedirector : Redirector
         {
             private readonly Action<string> writer;
 
@@ -470,7 +470,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             public override bool CloseStandardInput() => false;
         }
 
-        private sealed class TestReceiver : ITestCaseDiscoverySink
+        internal sealed class TestReceiver : ITestCaseDiscoverySink
         {
             public readonly List<TestCase> Tests = new List<TestCase>();
 

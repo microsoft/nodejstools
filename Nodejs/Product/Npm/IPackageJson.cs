@@ -21,5 +21,6 @@ namespace Microsoft.NodejsTools.Npm
         IEnumerable<string> RequiredBy { get; }
         string Main { get; }
         IPackageJsonScript[] Scripts { get; }
+        string TestRoot { get; }
     }
 }

@@ -31,6 +31,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.Author = package.author == null ? null : Person.CreateFromJsonSource(package.author.ToString());
             this.Main = package.main?.ToString();
             this.Scripts = LoadScripts(package);
+            this.TestRoot = LoadVsTestOptions(package);
         }
 
         private static PackageJsonException WrapRuntimeBinderException(string errorProperty, RuntimeBinderException rbe)
@@ -44,7 +45,6 @@ The following error occurred:
                         errorProperty,
                         rbe));
         }
-
         private static IKeywords LoadKeywords(dynamic package)
         {
             try
@@ -172,6 +172,23 @@ The following error occurred:
             }
         }
 
+        private string LoadVsTestOptions(dynamic package)
+        {
+            try
+            {
+                if (package["vsTest"] is JObject vsTest && vsTest["testRoot"] is JValue testRoot)
+                {
+                    return testRoot.ToString();
+                }
+
+                return null;
+            }
+            catch (RuntimeBinderException rbe)
+            {
+                throw WrapRuntimeBinderException("vsTestOptions", rbe);
+            }
+        }
+
         public string Name { get; }
 
         public SemverVersion Version
@@ -202,5 +219,6 @@ The following error occurred:
         public IEnumerable<string> RequiredBy { get; }
         public string Main { get; }
         public IPackageJsonScript[] Scripts { get; }
+        public string TestRoot { get; }
     }
 }

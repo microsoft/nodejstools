@@ -7,7 +7,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     public partial class JavaScriptTestDiscoverer
     {
-        private sealed class TestFileEntry
+        internal sealed class TestFileEntry
         {
             public readonly string File;
             public readonly bool IsTypeScriptTest;
@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private sealed class TestFileEntryComparer : IEqualityComparer<TestFileEntry>
+        internal sealed class TestFileEntryComparer : IEqualityComparer<TestFileEntry>
         {
             public static readonly IEqualityComparer<TestFileEntry> Instance = new TestFileEntryComparer();
 
