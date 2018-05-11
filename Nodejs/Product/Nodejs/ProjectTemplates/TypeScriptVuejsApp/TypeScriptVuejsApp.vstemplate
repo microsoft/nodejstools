@@ -11,15 +11,14 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-    <PreviewImage>Preview.png</PreviewImage>
-    <TemplateGroupID>Node.jss</TemplateGroupID>
+    <TemplateGroupID>Node.js</TemplateGroupID>
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptVuejsApp.njsproj" ReplaceParameters="true">
       <Folder Name="dist" />
       <Folder Name="public">
         <ProjectItem>favicon.ico</ProjectItem>
-        <ProjectItem>index.html</ProjectItem>
+        <ProjectItem ReplaceParameters="true">index.html</ProjectItem>
       </Folder>
       <Folder Name="src">
         <Folder Name="assets" />

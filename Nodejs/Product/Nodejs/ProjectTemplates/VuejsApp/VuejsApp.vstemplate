@@ -11,14 +11,13 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
-    <PreviewImage>Preview.png</PreviewImage>
   </TemplateData>
   <TemplateContent>
     <Project File="VuejsApp.njsproj" ReplaceParameters="true">
       <Folder Name="dist" />
       <Folder Name="public">
         <ProjectItem>favicon.ico</ProjectItem>
-        <ProjectItem>index.html</ProjectItem>
+        <ProjectItem ReplaceParameters="true">index.html</ProjectItem>
       </Folder>
       <Folder Name="src">
         <Folder Name="assets" />
