@@ -14,13 +14,13 @@
     <!-- Define properties that drive the manifest creation here. -->
     <FinalizeManifest>true</FinalizeManifest>
     <FinalizeSkipLayout>true</FinalizeSkipLayout>
-    <BuildNumber>$(VSTarget).$(BuildNumber)</BuildNumber>
     <TargetName>$(MSBuildProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup>
     <!-- NTVS uses BuildVersion as 'major.minor.build.revision' and BuildNumber is 'build.revision'.
              But VS Manifest task wants BuildNumber to be 'major.minor.build.revision' -->
     <BuildNumber>$(BuildVersion)</BuildNumber>
+    <ManifestBuildVersion>$(BuildVersion)</ManifestBuildVersion>
     <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
