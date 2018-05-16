@@ -1,13 +1,13 @@
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
-    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4005"/>
-    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4006"/>
+    <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4011"/>
+    <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4012"/>
     <Icon Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="415"/>
     <ProjectType>Node.js</ProjectType>
     <DefaultName>component.vue</DefaultName>
     <SortOrder>200</SortOrder>
   </TemplateData>
   <TemplateContent>
-    <ProjectItem SubType="Code" TargetFileName="$fileinputname$.$fileinputextension$" ReplaceParameters="true">TypeScriptVueComponent.vue</ProjectItem>
+    <ProjectItem SubType="Code" TargetFileName="$fileinputname$.$fileinputextension$">TypeScriptVueComponent.vue</ProjectItem>
   </TemplateContent>
 </VSTemplate>
