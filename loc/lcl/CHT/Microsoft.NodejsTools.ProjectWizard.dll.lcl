@@ -1489,6 +1489,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";PropertiesBrowseTestRootAccessibleName" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Browse for test root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[瀏覽是否有測試根目錄]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";PropertiesClassLocalPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Local Package Properties]]></Val>
@@ -1882,6 +1891,33 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestFrameworkToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the framework used for the unit tests.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[指定用於單元測試的架構。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRoot" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Test Root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[測試根目錄]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRootToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the directory where the unit tests are located.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[指定單元測試所在的目錄。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TscBuildCanceled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Build Canceled]]></Val>
@@ -1923,6 +1959,15 @@
           <Val><![CDATA[Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Node.js 工具要求 TypeScript for Visual Studio {0} 或更高版本。請確認已安裝 TypeScript]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";UnitTestHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript Unit Test]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[JavaScript 單元測試]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3515,12 +3560,6 @@
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
-    <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft Corporation]]></Val>
@@ -3533,12 +3572,6 @@
         <Tgt Cat="Text" Stat="Loc" Orig="New">
           <Val><![CDATA[適用於 Visual Studio 的 Node.js 工具 - 精靈]]></Val>
         </Tgt>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20413.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3560,12 +3593,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.20413.4 Commit Hash:0ae8f05fd65bbd2ab4e73c5278d2e28923db3e1d]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
