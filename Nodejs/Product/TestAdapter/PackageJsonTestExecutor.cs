@@ -19,8 +19,9 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         private List<TestCase> currentTests;
         private IFrameworkHandle frameworkHandle;
-        private TestResult currentResult = null;
-        private ResultObject currentResultObject = null;
+        private TestResult currentResult;
+        private ResultObject currentResultObject;
+
         public void Cancel()
         {
             // We don't support cancellation
@@ -46,8 +47,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.currentTests = new List<TestCase>(tests);
 
             var nodeArgs = new List<string>();
-            // .njsproj file path -> project settings
-            var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
             var testObjects = new List<TestCaseObject>();
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir

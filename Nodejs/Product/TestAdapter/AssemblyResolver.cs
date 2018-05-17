@@ -42,7 +42,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             // This is what comes in for args.Name, but we really just want the dll file name:
             // "Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-            var resolveTargetAssemblyName = args.Name.Substring(0, args.Name.IndexOf(',')) + ".dll";
+            var requestedAssembly = new AssemblyName(args.Name);
+            var resolveTargetAssemblyName = requestedAssembly.Name + ".dll";
 
             foreach (var path in this.probePaths)
             {

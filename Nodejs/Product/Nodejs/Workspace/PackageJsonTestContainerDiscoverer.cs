@@ -32,12 +32,7 @@ namespace Microsoft.NodejsTools.Workspace
             if (this.workspaceService.CurrentWorkspace != null)
             {
                 this.currentWorkspace = this.workspaceService.CurrentWorkspace;
-
-                var fileWatcherService = this.currentWorkspace.GetFileWatcherService();
-                fileWatcherService.OnFileSystemChanged += this.FileSystemChangedAsync;
-
-                var indexService = this.currentWorkspace.GetIndexWorkspaceService();
-                indexService.OnFileScannerCompleted += this.FileScannerCompletedAsync;
+                this.RegisterEvents();
 
                 this.currentWorkspace.JTF.RunAsync(async () =>
                 {
@@ -50,7 +45,7 @@ namespace Microsoft.NodejsTools.Workspace
             }
         }
 
-        public Uri ExecutorUri { get; } = NodejsConstants.PackageJsonExecutorUri;
+        public Uri ExecutorUri => NodejsConstants.PackageJsonExecutorUri;
 
         public IEnumerable<ITestContainer> TestContainers
         {
@@ -93,9 +88,43 @@ namespace Microsoft.NodejsTools.Workspace
 
         private async Task OnActiveWorkspaceChangedAsync(object sender, EventArgs e)
         {
+            this.UnRegisterEvents();
+
             this.currentWorkspace = this.workspaceService.CurrentWorkspace;
 
+            this.RegisterEvents();
+
             await AttemptUpdateAsync();
+        }
+
+        private void RegisterEvents()
+        {
+            var fileWatcherService = this.currentWorkspace?.GetFileWatcherService();
+            if (fileWatcherService != null)
+            {
+                fileWatcherService.OnFileSystemChanged += this.FileSystemChangedAsync;
+            }
+
+            var indexService = this.currentWorkspace?.GetIndexWorkspaceService();
+            if (indexService != null)
+            {
+                indexService.OnFileScannerCompleted += this.FileScannerCompletedAsync;
+            }
+        }
+
+        private void UnRegisterEvents()
+        {
+            var fileWatcherService = this.currentWorkspace?.GetFileWatcherService();
+            if (fileWatcherService != null)
+            {
+                fileWatcherService.OnFileSystemChanged -= this.FileSystemChangedAsync;
+            }
+
+            var indexService = this.currentWorkspace?.GetIndexWorkspaceService();
+            if (indexService != null)
+            {
+                indexService.OnFileScannerCompleted -= this.FileScannerCompletedAsync;
+            }
         }
 
         private Task FileSystemChangedAsync(object sender, FileSystemEventArgs args)
@@ -103,7 +132,7 @@ namespace Microsoft.NodejsTools.Workspace
             // We only need to raise the containers updated event in case a js file contained in the
             // test root is updated.
             // Any changes to the 'package.json' will be handled by the FileScannerCompleted event.
-            if (IsJavaScriptFile(args.FullPath))
+            if (IsJavaScriptFile(args.FullPath) || args.IsDirectoryChanged())
             {
                 // use a flag so we don't deadlock
                 var testsUpdated = false;

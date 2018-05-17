@@ -34,20 +34,19 @@ namespace Microsoft.NodejsTools.Workspace
 
         public string TestRoot { get; }
 
-        public IEnumerable<Guid> DebugEngines { get { yield break; } }
+        public IEnumerable<Guid> DebugEngines => Array.Empty<Guid>();
 
-        public FrameworkVersion TargetFramework { get; } = FrameworkVersion.None;
+        public FrameworkVersion TargetFramework => FrameworkVersion.None;
 
-        public Architecture TargetPlatform { get; } = Architecture.X86;
+        public Architecture TargetPlatform => Architecture.Default;
 
-        public bool IsAppContainerTestContainer { get; } = false;
+        public bool IsAppContainerTestContainer => false;
 
         public int CompareTo(ITestContainer other)
         {
-            if (other == null || !(other is PackageJsonTestContainer testContainer))
-            {
-                return -1;
-            }
+            Debug.Assert(other is PackageJsonTestContainer, "Only test containers based on package.json are expected.");
+
+            var testContainer = (PackageJsonTestContainer)other;
 
             if (this.version != testContainer.version)
             {
@@ -56,7 +55,7 @@ namespace Microsoft.NodejsTools.Workspace
 
             var sourceCompare = StringComparer.OrdinalIgnoreCase.Compare(this.Source, testContainer.Source);
 
-            return sourceCompare == 0 ? sourceCompare : StringComparer.OrdinalIgnoreCase.Compare(this.TestRoot, testContainer.TestRoot);
+            return sourceCompare != 0 ? sourceCompare : StringComparer.OrdinalIgnoreCase.Compare(this.TestRoot, testContainer.TestRoot);
         }
 
         public IDeploymentData DeployAppContainer() => null;
@@ -65,7 +64,7 @@ namespace Microsoft.NodejsTools.Workspace
 
         public bool IsContained(string javaScriptFilePath)
         {
-            Debug.Assert(Path.IsPathRooted(javaScriptFilePath) && !string.IsNullOrEmpty(javaScriptFilePath), "Expected a rooted path.");
+            Debug.Assert(!string.IsNullOrEmpty(javaScriptFilePath) && Path.IsPathRooted(javaScriptFilePath), "Expected a rooted path.");
 
             return javaScriptFilePath.StartsWith(this.TestRoot, StringComparison.OrdinalIgnoreCase);
         }

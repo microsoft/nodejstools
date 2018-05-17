@@ -37,6 +37,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
+            if (!Directory.Exists(packageJson.TestRoot))
+            {
+                logger.SendMessage(TestMessageLevel.Error, $"Testroot '{packageJson.TestRoot}' doesn't exist.");
+                return;
+            }
+
             var workingDir = Path.GetDirectoryName(packageJsonPath);
             var testFolderPath = Path.Combine(workingDir, packageJson.TestRoot);
             TestFramework testFx = null;
@@ -86,7 +92,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 discoverySink.SendTestCase(testcase);
             }
-            logger.SendMessage(TestMessageLevel.Informational, "Processing finished for framework 'mocha'.");
+            logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx}'.");
 
             if (testCount == 0)
             {
