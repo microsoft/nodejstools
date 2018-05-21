@@ -14,7 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
-using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -31,7 +30,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         private readonly ManualResetEvent testsCompleted = new ManualResetEvent(false);
 
         private ProcessOutput nodeProcess;
-        private readonly object syncObject = new object();
         private List<TestCase> currentTests;
         private IFrameworkHandle frameworkHandle;
         private TestResult currentResult = null;
@@ -151,8 +149,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
-            var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-            NodejsProjectSettings projectSettings = null;
 
             // put tests into dictionary where key is their source file
             foreach (var test in tests)
@@ -167,17 +163,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             // where key is the file and value is a list of tests
             foreach (var entry in fileToTests)
             {
-                var firstTest = entry.Value.ElementAt(0);
-                if (!sourceToSettings.TryGetValue(firstTest.Source, out projectSettings))
-                {
-                    sourceToSettings[firstTest.Source] = projectSettings = LoadProjectSettings(firstTest.Source);
-                }
-
                 this.currentTests = entry.Value;
                 this.frameworkHandle = frameworkHandle;
 
                 // Run all test cases in a given file
-                RunTestCases(entry.Value, runContext, frameworkHandle, projectSettings);
+                RunTestCases(entry.Value, runContext, frameworkHandle);
             }
         }
 
@@ -193,7 +183,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             return int.TryParse(pid, out processId);
         }
 
-        private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle, NodejsProjectSettings settings)
+        private void RunTestCases(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             // May be null, but this is handled by RunTestCase if it matters.
             // No VS instance just means no debugging, but everything else is
@@ -206,23 +196,24 @@ namespace Microsoft.NodejsTools.TestAdapter
             var startedFromVs = this.HasVisualStudioProcessId(out var vsProcessId);
 
             var nodeArgs = new List<string>();
-            // .njsproj file path -> project settings
-            var sourceToSettings = new Dictionary<string, NodejsProjectSettings>();
-            var testObjects = new List<TestCaseObject>();
 
-            if (!File.Exists(settings.NodeExePath))
-            {
-                frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + settings.NodeExePath);
-                return;
-            }
+            var testObjects = new List<TestCaseObject>();
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First();
-            var testFramework = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: "unknown");
             var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
-            var workingDir = Path.GetDirectoryName(CommonUtils.GetAbsoluteFilePath(settings.WorkingDir, testInfo.ModulePath));
+            var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: "ExportRunner");
+            var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
+            var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
+            var projectRootDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
 
-            var nodeVersion = Nodejs.GetNodeVersion(settings.NodeExePath);
+            if (string.IsNullOrEmpty(nodeExePath) || !File.Exists(nodeExePath))
+            {
+                frameworkHandle.SendMessage(TestMessageLevel.Error, "Interpreter path does not exist: " + nodeExePath);
+                return;
+            }
+
+            var nodeVersion = Nodejs.GetNodeVersion(nodeExePath);
 
             // We can only log telemetry when we're running in VS.
             // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
@@ -239,16 +230,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     break;
                 }
 
-                if (settings == null)
-                {
-                    frameworkHandle.SendMessage(
-                        TestMessageLevel.Error,
-                        $"Unable to determine interpreter to use for '{test.Source}'.");
-                    frameworkHandle.RecordEnd(test, TestOutcome.Failed);
-                }
-
                 var args = new List<string>();
-                args.AddRange(GetInterpreterArgs(test, workingDir, settings.ProjectRootDir));
+                args.AddRange(GetInterpreterArgs(test, workingDir, projectRootDir));
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
                 if (nodeArgs.Count == 0 && args.Count > 0)
@@ -271,9 +254,9 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.testsCompleted.Reset();
 
             this.nodeProcess = ProcessOutput.Run(
-                settings.NodeExePath,
+                nodeExePath,
                 nodeArgs,
-                settings.WorkingDir,
+                workingDir,
                 env: null,
                 visible: false,
                 redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
@@ -283,7 +266,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 this.AttachDebugger(vsProcessId, port, nodeVersion);
             }
-
 
             // Send the process the list of tests to run and wait for it to complete
             this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
@@ -364,10 +346,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void KillNodeProcess()
         {
-            lock (this.syncObject)
-            {
-                this.nodeProcess?.Kill();
-            }
+            this.nodeProcess?.Kill();
         }
 
         private static int GetFreePort()
@@ -395,39 +374,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             return $"--debug-brk={port}";
-        }
-
-        private NodejsProjectSettings LoadProjectSettings(string projectFile)
-        {
-            var env = new Dictionary<string, string>();
-
-            var root = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsVsInstallRootEnvironmentVariable);
-            if (string.IsNullOrEmpty(root))
-            {
-                root = Environment.GetEnvironmentVariable("VSINSTALLDIR");
-            }
-
-            if (!string.IsNullOrEmpty(root))
-            {
-                env["VsInstallRoot"] = root;
-                env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
-            }
-
-            var buildEngine = new MSBuild.ProjectCollection(env);
-            var proj = buildEngine.LoadProject(projectFile);
-
-            var projectRootDir = Path.GetFullPath(Path.Combine(proj.DirectoryPath, proj.GetPropertyValue(CommonConstants.ProjectHome) ?? "."));
-
-            return new NodejsProjectSettings()
-            {
-                ProjectRootDir = projectRootDir,
-
-                WorkingDir = Path.GetFullPath(Path.Combine(projectRootDir, proj.GetPropertyValue(CommonConstants.WorkingDirectory) ?? ".")),
-
-                NodeExePath = Nodejs.GetAbsoluteNodeExePath(
-                    projectRootDir,
-                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath))
-            };
         }
 
         private void RecordEnd(IFrameworkHandle frameworkHandle, TestCase test, TestResult result, ResultObject resultObject)

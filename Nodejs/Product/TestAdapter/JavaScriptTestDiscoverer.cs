@@ -199,6 +199,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     };
 
                     testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, nodeExePath);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, projectHome);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, projectHome);
 
                     discoverySink.SendTestCase(testcase);
                 }

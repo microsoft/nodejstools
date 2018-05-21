@@ -108,6 +108,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
             }
         }
+
         private static IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
             var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
@@ -122,7 +123,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
                 // Extract test from list of tests
                 var tests = this.currentTests.Where(n => n.DisplayName == testEvent.title);
-                if (tests.Count() > 0)
+                if (tests.Any())
                 {
                     switch (testEvent.type)
                     {
