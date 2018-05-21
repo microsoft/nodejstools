@@ -5668,12 +5668,18 @@
       <Item ItemId=";4015" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Basic Vue.js Web Application]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Простое веб-приложение Vue.js]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";4016" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[A basic Vue.js Web application.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Простое веб-приложение Vue.js.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
