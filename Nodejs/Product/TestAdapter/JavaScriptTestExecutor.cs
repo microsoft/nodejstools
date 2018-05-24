@@ -201,7 +201,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First();
-            var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
             var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: "ExportRunner");
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
@@ -230,16 +229,15 @@ namespace Microsoft.NodejsTools.TestAdapter
                     break;
                 }
 
-                var args = new List<string>();
-                args.AddRange(GetInterpreterArgs(test, workingDir, projectRootDir));
+                var args = GetInterpreterArgs(test, workingDir, projectRootDir);
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
-                if (nodeArgs.Count == 0 && args.Count > 0)
+                if (nodeArgs.Count == 0)
                 {
-                    nodeArgs.Add(args[0]);
+                    nodeArgs.Add(args.RunTestsScriptFile);
                 }
 
-                testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
+                testObjects.Add(new TestCaseObject(framework: args.TestFramework, testName: args.TestName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
             }
 
             var port = 0;
@@ -267,8 +265,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                 this.AttachDebugger(vsProcessId, port, nodeVersion);
             }
 
+            var serializedObjects = JsonConvert.SerializeObject(testObjects);
+
             // Send the process the list of tests to run and wait for it to complete
-            this.nodeProcess.WriteInputLine(JsonConvert.SerializeObject(testObjects));
+            this.nodeProcess.WriteInputLine(serializedObjects);
 
             // for node 8 the process doesn't automatically exit when debugging, so always detach
             WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
@@ -357,11 +357,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             ).First();
         }
 
-        private IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
+        private static TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
-            var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
+            var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return FrameworkDiscover.Intance.Get(testFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
+            return FrameworkDiscover.Intance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

@@ -9,12 +9,12 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         internal sealed class TestFileEntry
         {
-            public readonly string File;
+            public readonly string FullPath;
             public readonly bool IsTypeScriptTest;
 
-            public TestFileEntry(string file, bool isTypeScriptTest)
+            public TestFileEntry(string fullPath, bool isTypeScriptTest)
             {
-                this.File = file;
+                this.FullPath = fullPath;
                 this.IsTypeScriptTest = isTypeScriptTest;
             }
         }
@@ -25,9 +25,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             private TestFileEntryComparer() { }
 
-            bool IEqualityComparer<TestFileEntry>.Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.File, y?.File);
+            bool IEqualityComparer<TestFileEntry>.Equals(TestFileEntry x, TestFileEntry y) => StringComparer.OrdinalIgnoreCase.Equals(x?.FullPath, y?.FullPath);
 
-            int IEqualityComparer<TestFileEntry>.GetHashCode(TestFileEntry obj) => obj?.File?.GetHashCode() ?? 0;
+            int IEqualityComparer<TestFileEntry>.GetHashCode(TestFileEntry obj) => obj?.FullPath?.GetHashCode() ?? 0;
         }
     }
 }

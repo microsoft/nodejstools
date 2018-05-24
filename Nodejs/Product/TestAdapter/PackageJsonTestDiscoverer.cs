@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -70,14 +71,19 @@ namespace Microsoft.NodejsTools.TestAdapter
             logger.SendMessage(TestMessageLevel.Informational, $"Processing: {files}");
 
             var discoveredTestCases = testFx.FindTests(fileList, nodeExePath, logger, projectRoot: workingDir);
-            var testCount = discoveredTestCases.Count;
+            if (!discoveredTestCases.Any())
+            {
+                logger.SendMessage(TestMessageLevel.Warning, "Discovered 0 testcases.");
+                return;
+            }
+
             foreach (var discoveredTest in discoveredTestCases)
             {
                 var qualifiedName = discoveredTest.FullyQualifiedName;
                 const string indent = "  ";
                 logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
                 //figure out the test source info such as line number
-                var filePath = discoveredTest.ModulePath;
+                var filePath = discoveredTest.TestFile;
 
                 var testcase = new TestCase(qualifiedName, NodejsConstants.PackageJsonExecutorUri, packageJsonPath)
                 {
@@ -92,12 +98,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 discoverySink.SendTestCase(testcase);
             }
-            logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx}'.");
 
-            if (testCount == 0)
-            {
-                logger.SendMessage(TestMessageLevel.Warning, "Discovered 0 testcases.");
-            }
+            logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx}'.");
         }
     }
 }

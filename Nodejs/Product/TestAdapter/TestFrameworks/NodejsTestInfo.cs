@@ -1,47 +1,38 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.IO;
+using System.Diagnostics;
 using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     public sealed class NodejsTestInfo
     {
-        public NodejsTestInfo(string fullyQualifiedName, string modulePath)
+        public NodejsTestInfo(string testPath, string testName, string testFramework, int line, int column, string projectRootDir)
         {
-            var parts = fullyQualifiedName.Split(new[] { "::" }, StringSplitOptions.None);
-            if (parts.Length != 3)
-            {
-                throw new ArgumentException($"Invalid fully qualified test name. '{fullyQualifiedName}'", nameof(fullyQualifiedName));
-            }
+            Debug.Assert(testPath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) || testPath.EndsWith(".jsx", StringComparison.OrdinalIgnoreCase));
 
-            this.ModulePath = modulePath;
+            var testFileRelative = CommonUtils.GetRelativeFilePath(projectRootDir, testPath);
 
-            this.ModuleName = parts[0];
-            this.TestName = parts[1];
-            this.TestFramework = parts[2];
-        }
-
-        public NodejsTestInfo(string modulePath, string testName, string testFramework, int line, int column, string projectRootDir)
-        {
-            var relativePath = CommonUtils.GetRelativeFilePath(projectRootDir, modulePath);
-
-            var fileName = Path.GetFileNameWithoutExtension(modulePath);
-
-            this.ModulePath = modulePath;
-            this.ModuleName = relativePath;
+            this.TestFile = testFileRelative;
+            this.TestPath = testPath;
             this.TestName = testName;
             this.TestFramework = testFramework;
             this.SourceLine = line;
             this.SourceColumn = column;
         }
 
-        public string FullyQualifiedName => $"{this.ModuleName}::{this.TestName}::{this.TestFramework}";
+        public string FullyQualifiedName => $"{this.TestFile}::{this.TestName}::{this.TestFramework}";
 
-        public string ModulePath { get; }
+        /// <summary>
+        /// Project root relative path to the test file.
+        /// </summary>
+        public string TestFile { get; }
 
-        public string ModuleName { get; }
+        /// <summary>
+        /// Full path to the test file.
+        /// </summary>
+        public string TestPath { get; }
 
         public string TestName { get; }
 

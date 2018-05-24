@@ -52,7 +52,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First();
             var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: "ExportRunner");
-            var testInfo = new NodejsTestInfo(firstTest.FullyQualifiedName, firstTest.CodeFilePath);
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.Source));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
 
@@ -64,16 +63,15 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             foreach (var test in tests)
             {
-                var args = new List<string>();
-                args.AddRange(GetInterpreterArgs(test, workingDir, workingDir));
+                var args = GetInterpreterArgs(test, workingDir, workingDir);
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
-                if (nodeArgs.Count == 0 && args.Count > 0)
+                if (nodeArgs.Count == 0)
                 {
-                    nodeArgs.Add(args[0]);
+                    nodeArgs.Add(args.RunTestsScriptFile);
                 }
 
-                testObjects.Add(new TestCaseObject(framework: args[1], testName: args[2], testFile: args[3], workingFolder: args[4], projectFolder: args[5]));
+                testObjects.Add(new TestCaseObject(framework: args.TestFramework, testName: args.TestName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
             }
 
             var nodeProcess = ProcessOutput.Run(
@@ -109,11 +107,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private static IEnumerable<string> GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
+        private static TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
-            var testInfo = new NodejsTestInfo(test.FullyQualifiedName, test.CodeFilePath);
+            var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return FrameworkDiscover.Intance.Get(testFramework).ArgumentsToRunTests(testInfo.TestName, testInfo.ModulePath, workingDir, projectRootDir);
+            return FrameworkDiscover.Intance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private void ProcessTestRunnerEmit(string line)
