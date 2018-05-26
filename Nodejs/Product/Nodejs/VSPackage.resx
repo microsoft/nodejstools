@@ -417,6 +417,48 @@
   <data name="4004" xml:space="preserve">
     <value>Node.js background processing service.</value>
   </data>
+  <data name="4005" xml:space="preserve">
+    <value>JavaScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4006" xml:space="preserve">
+    <value>A JavaScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4007" xml:space="preserve">
+    <value>TypeScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4008" xml:space="preserve">
+    <value>A TypeScript Jasmine UnitTest file</value>
+  </data>
+  <data name="4009" xml:space="preserve">
+    <value>JavaScript JSON Configuration File</value>
+  </data>
+  <data name="4010" xml:space="preserve">
+    <value>JSON configuration file for the JavaScript Language Service</value>
+  </data>
+  <data name="4011" xml:space="preserve">
+    <value>TypeScript Vue Single File Component</value>
+  </data>
+  <data name="4012" xml:space="preserve">
+    <value>A TypeScript Vue Single File Component file</value>
+  </data>
+  <data name="4013" xml:space="preserve">
+    <value>JavaScript Vue Single File Component</value>
+  </data>
+  <data name="4014" xml:space="preserve">
+    <value>A JavaScript Vue Single File Component file</value>
+  </data>
+  <data name="4015" xml:space="preserve">
+    <value>Basic Vue.js Web Application</value>
+  </data>
+  <data name="4016" xml:space="preserve">
+    <value>A basic Vue.js Web application.</value>
+  </data>
+  <data name="6000" xml:space="preserve">
+    <value>Launch for Node.js</value>
+  </data>
+  <data name="6001" xml:space="preserve">
+    <value>Debug JavaScript/TypeScript files with Node.js</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\SystemRegisteredICO\NodeJS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -485,29 +527,5 @@
   <data name="418" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>_BUILDROOT_\Nodejs\Product\Icons\AddNewItemICO\StylusSheet.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>{Locked}</comment>
-  </data>
-  <data name="4005" xml:space="preserve">
-    <value>JavaScript Jasmine UnitTest file</value>
-  </data>
-  <data name="4006" xml:space="preserve">
-    <value>A JavaScript Jasmine UnitTest file</value>
-  </data>
-  <data name="4007" xml:space="preserve">
-    <value>TypeScript Jasmine UnitTest file</value>
-  </data>
-  <data name="4008" xml:space="preserve">
-    <value>A TypeScript Jasmine UnitTest file</value>
-  </data>
-  <data name="4009" xml:space="preserve">
-    <value>JavaScript JSON Configuration File</value>
-  </data>
-  <data name="4010" xml:space="preserve">
-    <value>JSON configuration file for the JavaScript Language Service</value>
-  </data>
-  <data name="6000" xml:space="preserve">
-    <value>Launch for Node.js</value>
-  </data>
-  <data name="6001" xml:space="preserve">
-    <value>Debug JavaScript/TypeScript files with Node.js</value>
   </data>
 </root>
