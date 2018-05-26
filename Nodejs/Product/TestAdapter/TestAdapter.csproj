@@ -70,10 +70,12 @@
     <Compile Include="JavaScriptTestExecutor.cs" />
     <Compile Include="JavaScriptTestDiscoverer.cs" />
     <Compile Include="JavaScriptTestDiscoverer.TestFileEntry.cs" />
+    <Compile Include="TestExecutorWorker.cs" />
     <Compile Include="TestFrameworks\FrameworkDiscover.cs" />
     <Compile Include="JavaScriptTestCaseProperties.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />
+    <Compile Include="TestReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">

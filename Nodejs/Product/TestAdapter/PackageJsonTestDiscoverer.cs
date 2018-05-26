@@ -8,6 +8,7 @@ using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -38,14 +39,15 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return;
             }
 
-            if (!Directory.Exists(packageJson.TestRoot))
+            var workingDir = Path.GetDirectoryName(packageJsonPath);
+            var testFolderPath = Path.Combine(workingDir, packageJson.TestRoot);
+
+            if (!Directory.Exists(testFolderPath))
             {
                 logger.SendMessage(TestMessageLevel.Error, $"Testroot '{packageJson.TestRoot}' doesn't exist.");
                 return;
             }
 
-            var workingDir = Path.GetDirectoryName(packageJsonPath);
-            var testFolderPath = Path.Combine(workingDir, packageJson.TestRoot);
             TestFramework testFx = null;
 
             foreach (var dep in packageJson.AllDependencies)
@@ -83,7 +85,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 const string indent = "  ";
                 logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
                 //figure out the test source info such as line number
-                var filePath = discoveredTest.TestFile;
+                var filePath = CommonUtils.GetAbsoluteFilePath(workingDir, discoveredTest.TestFile);
 
                 var testcase = new TestCase(qualifiedName, NodejsConstants.PackageJsonExecutorUri, packageJsonPath)
                 {
@@ -94,12 +96,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx.Name);
                 testcase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, workingDir);
+                testcase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, workingDir);
                 testcase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, nodeExePath);
+                testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
 
                 discoverySink.SendTestCase(testcase);
             }
 
-            logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx}'.");
+            logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx.Name}'.");
         }
     }
 }
