@@ -574,28 +574,28 @@ namespace Microsoft.VisualStudioTools.Project
             this.projectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
             this.projectMgr.ItemIdMap.Remove(node);
 
-            HierarchyNode last = null;
-            for (var n = this.firstChild; n != null; n = n.nextSibling)
+            HierarchyNode previous = null;
+            for (var current = this.firstChild; current != null; current = current.nextSibling)
             {
-                if (n == node)
+                if (current == node)
                 {
-                    if (last != null)
+                    if (previous != null)
                     {
-                        last.nextSibling = n.nextSibling;
+                        previous.nextSibling = current.nextSibling;
                     }
-                    if (n == this.firstChild)
+                    if (current == this.firstChild)
                     {
-                        this.firstChild = n.nextSibling;
+                        this.firstChild = current.nextSibling;
                     }
                     if (object.ReferenceEquals(node, this.lastChild))
                     {
-                        this.lastChild = last;
+                        this.lastChild = previous;
                     }
                     return;
                 }
-                last = n;
+                previous = current;
             }
-            throw new InvalidOperationException("Node not found");
+            // Node is no longer in the tree
         }
 
         /// <summary>
