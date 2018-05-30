@@ -96,7 +96,6 @@ namespace Microsoft.NodejsTools.Workspace
             }
         }
 
-
         private sealed class BuildTsConfigContextAction : BuildFileContextAction, IFileContextAction, IVsCommandItem
         {
             public BuildTsConfigContextAction(string filePath, FileContext fileContext, OutputPaneWrapper outputPane)

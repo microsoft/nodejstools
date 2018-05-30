@@ -16,7 +16,7 @@ namespace Microsoft.NodejsTools.Workspace
 {
     [ExportFileScanner(
         ProviderType, "TypeScriptFile",
-        new string[] { "*.ts" },
+        new string[] { "*.ts", "*.tsx" },
         new Type[] { typeof(IReadOnlyCollection<FileDataValue>), typeof(IReadOnlyCollection<FileReferenceInfo>) },
         ProviderPriority.Normal)]
     public sealed class TypeScriptScannerFactory : IWorkspaceProviderFactory<IFileScanner>
@@ -113,12 +113,22 @@ namespace Microsoft.NodejsTools.Workspace
                     var rootDir = Path.GetDirectoryName(tsConfig.FilePath);
                     var relativeTsFile = filePath.Substring(rootDir.Length).TrimStart('\\'); // save since we already know they have the same root
 
-                    return this.workspace.MakeRelative(Path.Combine(rootDir, tsConfig.OutDir, Path.ChangeExtension(relativeTsFile, "js"))); // this works if outdir is null
+                    return this.workspace.MakeRelative(Path.Combine(rootDir, tsConfig.OutDir, ChangeExtension(relativeTsFile))); // this works if outdir is null
                 }
                 else
                 {
-                    return this.workspace.MakeRelative(Path.ChangeExtension(filePath, "js"));
+                    return this.workspace.MakeRelative(ChangeExtension(filePath));
                 }
+            }
+
+            private static string ChangeExtension(string filePath)
+            {
+                if(filePath.EndsWith("tsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Path.ChangeExtension(filePath, "jsx");
+                }
+
+                return Path.ChangeExtension(filePath, "js");
             }
         }
     }
