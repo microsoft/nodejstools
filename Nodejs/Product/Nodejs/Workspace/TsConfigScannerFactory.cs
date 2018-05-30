@@ -42,7 +42,10 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var tsconfig = await TsConfigJsonFactory.CreateAsync(filePath);
 
-                Debug.Assert(!string.IsNullOrEmpty(tsconfig?.OutFile), "Should have an outfile specified.");
+                if (string.IsNullOrEmpty(tsconfig.OutFile))
+                {
+                    return new List<FileReferenceInfo>();
+                }
 
                 var tsconfigFolder = Path.GetDirectoryName(filePath);
                 var outFile = Path.Combine(tsconfigFolder, tsconfig.OutFile);
@@ -64,7 +67,15 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var tsconfig = await TsConfigJsonFactory.CreateAsync(filePath);
 
-                Debug.Assert(!string.IsNullOrEmpty(tsconfig?.OutFile), "Should have an outfile specified.");
+                // Only use the tsconfig.json determine the debug target when there is an outfile specified,
+                // otherwise each .ts file can (in theory) be the entry point.
+                if (string.IsNullOrEmpty(tsconfig.OutFile))
+                {
+                    return new List<FileDataValue> {
+                        new FileDataValue(BuildConfigurationContext.ContextTypeGuid, filePath, null,
+                            context: "Debug", target: null)
+                    };
+                }
 
                 var tsconfigFolder = Path.GetDirectoryName(filePath);
                 var outFile = Path.Combine(tsconfigFolder, tsconfig.OutFile);
@@ -80,8 +91,8 @@ namespace Microsoft.NodejsTools.Workspace
                     new FileDataValue(
                         DebugLaunchActionContext.ContextTypeGuid,
                         DebugLaunchActionContext.IsDefaultStartupProjectEntry,
-                       launchSettings,
-                       target: outFile),
+                        launchSettings,
+                        target: outFile),
 
                     new FileDataValue(BuildConfigurationContext.ContextTypeGuid, outFile, null,
                         context: "Debug", target: outFile),
@@ -93,17 +104,9 @@ namespace Microsoft.NodejsTools.Workspace
                 return fileDataValues;
             }
 
-            protected override async Task<bool> IsValidFileAsync(string filePath)
+            protected override Task<bool> IsValidFileAsync(string filePath)
             {
-                // Only use the tsconfig.json determine the debug target when there is an outfile specified,
-                // otherwise each .ts file can (in theory) be the entry point.
-                if (TypeScriptHelpers.IsTsJsConfigJsonFile(filePath))
-                {
-                    var tsconfig = await TsConfigJsonFactory.CreateAsync(filePath);
-                    return !string.IsNullOrEmpty(tsconfig?.OutFile);
-                }
-
-                return false;
+                return Task.FromResult(TypeScriptHelpers.IsTsJsConfigJsonFile(filePath));
             }
         }
     }

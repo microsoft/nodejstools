@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.TypeScript;
@@ -47,19 +46,12 @@ namespace Microsoft.NodejsTools.Workspace
 
             public async Task<IReadOnlyCollection<FileContext>> GetContextsForFileAsync(string filePath, CancellationToken cancellationToken)
             {
-                if (string.IsNullOrEmpty(filePath) || !IsSupportedFile(filePath))
+                if (string.IsNullOrEmpty(filePath) || !(await IsSupportedFileAsync(filePath)))
                 {
                     return FileContext.EmptyFileContexts;
                 }
 
-                var tsconfigJson = await this.workspace.IsContainedByTsConfig(filePath);
-
-                if (tsconfigJson != null)
-                {
-                    return FileContext.EmptyFileContexts;
-                }
-
-                var list = new List<FileContext>
+                return new List<FileContext>
                 {
                     new FileContext(
                         ProviderTypeGuid,
@@ -68,13 +60,26 @@ namespace Microsoft.NodejsTools.Workspace
                         new[]{ filePath },
                         displayName: "TypeScript Build")
                 };
-
-                return list;
             }
 
-            private static bool IsSupportedFile(string filePath)
+            private async Task<bool> IsSupportedFileAsync(string filePath)
             {
-                return TypeScriptHelpers.IsTypeScriptFile(filePath) || TypeScriptHelpers.IsTsJsConfigJsonFile(filePath);
+                // config files are always good
+                if (TypeScriptHelpers.IsTsJsConfigJsonFile(filePath))
+                {
+                    return true;
+                }
+
+                // TypeScript files should only build when there is no containing config file
+                if (TypeScriptHelpers.IsTypeScriptFile(filePath))
+                {
+                    if (await this.workspace.IsContainedByTsConfig(filePath) == null)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
     }
