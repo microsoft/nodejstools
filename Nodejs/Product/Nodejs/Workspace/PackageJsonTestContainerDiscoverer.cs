@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Workspace
                     foreach (var dataValue in filesDataValues)
                     {
                         var rootFilePath = workspace.MakeRooted(dataValue.Key);
-                        var testRoot = dataValue.Value.Where(f => f.Name == "TestRoot").FirstOrDefault()?.Value;
+                        var testRoot = dataValue.Value.Where(f => f.Name == NodejsConstants.TestRootDataValueName).FirstOrDefault()?.Value;
 
                         if (!string.IsNullOrEmpty(testRoot))
                         {

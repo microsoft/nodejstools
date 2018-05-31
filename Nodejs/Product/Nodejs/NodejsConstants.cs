@@ -80,6 +80,8 @@ namespace Microsoft.NodejsTools
 
         private const string TestRootDataValueGuidString = "{FF41BE7F-6D8C-4D27-91D4-51E4233BC7E4}";
         public readonly static Guid TestRootDataValueGuid = new Guid(TestRootDataValueGuidString);
+
+        public const string TestRootDataValueName = nameof(TestRootDataValueName);
     }
 
     internal static class NodeProjectProperty

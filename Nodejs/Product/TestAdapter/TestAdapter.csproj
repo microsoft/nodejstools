@@ -71,7 +71,7 @@
     <Compile Include="JavaScriptTestDiscoverer.cs" />
     <Compile Include="JavaScriptTestDiscoverer.TestFileEntry.cs" />
     <Compile Include="TestExecutorWorker.cs" />
-    <Compile Include="TestFrameworks\FrameworkDiscover.cs" />
+    <Compile Include="TestFrameworks\FrameworkDiscoverer.cs" />
     <Compile Include="JavaScriptTestCaseProperties.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />

@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Workspace
                 var testRoot = packageJson.TestRoot;
                 if (!string.IsNullOrEmpty(testRoot))
                 {
-                    fileDataValues.Add(new FileDataValue(NodejsConstants.TestRootDataValueGuid, "TestRoot", testRoot));
+                    fileDataValues.Add(new FileDataValue(NodejsConstants.TestRootDataValueGuid, NodejsConstants.TestRootDataValueName, testRoot));
                 }
 
                 return Task.FromResult(fileDataValues);
