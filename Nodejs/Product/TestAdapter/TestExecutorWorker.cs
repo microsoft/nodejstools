@@ -356,7 +356,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return FrameworkDiscover.Intance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
+            return FrameworkDiscoverer.Instance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

@@ -52,13 +52,13 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             foreach (var dep in packageJson.AllDependencies)
             {
-                testFx = FrameworkDiscover.Intance.Get(dep.Name);
+                testFx = FrameworkDiscoverer.Instance.Get(dep.Name);
                 if (testFx != null)
                 {
                     break;
                 }
             }
-            testFx = testFx ?? FrameworkDiscover.Intance.Get("ExportRunner");
+            testFx = testFx ?? FrameworkDiscoverer.Instance.Get("ExportRunner");
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
 

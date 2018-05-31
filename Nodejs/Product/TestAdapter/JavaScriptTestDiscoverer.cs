@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var testCount = 0;
             foreach (var testFx in testItems.Keys)
             {
-                var testFramework = FrameworkDiscover.Intance.Get(testFx);
+                var testFramework = FrameworkDiscoverer.Instance.Get(testFx);
                 if (testFramework == null)
                 {
                     logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");

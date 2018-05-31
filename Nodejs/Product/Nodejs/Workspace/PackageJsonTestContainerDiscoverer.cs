@@ -62,22 +62,23 @@ namespace Microsoft.NodejsTools.Workspace
 
         private async Task AttemptUpdateAsync()
         {
-            if (this.currentWorkspace != null)
+            var workspace = this.currentWorkspace;
+            if (workspace != null)
             {
-                var indexServce = this.currentWorkspace.GetIndexWorkspaceService();
-                var filesDataValues = await indexServce.GetFilesDataValuesAsync<string>(NodejsConstants.TestRootDataValueGuid);
+                var indexService = workspace.GetIndexWorkspaceService();
+                var filesDataValues = await indexService.GetFilesDataValuesAsync<string>(NodejsConstants.TestRootDataValueGuid);
 
                 lock (this.containerLock)
                 {
                     this.containers.Clear();
                     foreach (var dataValue in filesDataValues)
                     {
-                        var rootFilePath = this.currentWorkspace.MakeRooted(dataValue.Key);
-                        var testRoot = dataValue.Value.Where(f => f.Name == "TestRoot").Select(f => f.Value).FirstOrDefault();
+                        var rootFilePath = workspace.MakeRooted(dataValue.Key);
+                        var testRoot = dataValue.Value.Where(f => f.Name == "TestRoot").FirstOrDefault()?.Value;
 
                         if (!string.IsNullOrEmpty(testRoot))
                         {
-                            var testRootPath = this.currentWorkspace.MakeRooted(testRoot);
+                            var testRootPath = workspace.MakeRooted(testRoot);
                             this.containers.Add(new PackageJsonTestContainer(this, rootFilePath, testRootPath));
                         }
                     }
