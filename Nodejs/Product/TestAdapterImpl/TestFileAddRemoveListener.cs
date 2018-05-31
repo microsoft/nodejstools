@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
     internal sealed class TestFileAddRemoveListener : IVsTrackProjectDocumentsEvents2, IDisposable
     {
-        private IVsTrackProjectDocuments2 _projectDocTracker;
+        private readonly IVsTrackProjectDocuments2 _projectDocTracker;
         private uint _cookie = VSConstants.VSCOOKIE_NIL;
         private Guid _testProjectGuid;
 

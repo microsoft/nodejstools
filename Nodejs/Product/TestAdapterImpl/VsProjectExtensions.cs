@@ -3,9 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.NodejsTools;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -100,12 +98,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             try
             {
                 var projHome = props.Item("ProjectHome");
-                if (projHome == null)
-                {
-                    return null;
-                }
-
-                return projHome.Value as string;
+                return projHome == null ? null : projHome.Value as string;
             }
             catch (ArgumentException)
             {

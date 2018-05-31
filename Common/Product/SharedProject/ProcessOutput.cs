@@ -824,11 +824,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             this.haveRaisedExitedEvent = true;
             FlushAndCloseOutput();
-            var evt = Exited;
-            if (evt != null)
-            {
-                evt(this, e);
-            }
+            Exited?.Invoke(this, e);
         }
 
         /// <summary>
