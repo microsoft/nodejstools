@@ -18,6 +18,7 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
+            AssemblyResolver.SetupHandler();
             foreach (var source in sources)
             {
                 // we're only interested in package.json files here.

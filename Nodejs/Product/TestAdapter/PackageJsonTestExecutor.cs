@@ -18,12 +18,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
+            AssemblyResolver.SetupHandler();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(sources, new PackageJsonTestDiscoverer());
         }
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
+            AssemblyResolver.SetupHandler();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(tests);
         }

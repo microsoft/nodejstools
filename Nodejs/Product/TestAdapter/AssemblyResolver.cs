@@ -7,9 +7,12 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal sealed class AssemblyResolver : IDisposable
+    internal sealed class AssemblyResolver
     {
-        public AssemblyResolver()
+        private const string ResolveHandlerKey = "JavaScriptUnitTest_ResolveHandler";
+        private static AssemblyResolver resolver;
+
+        private AssemblyResolver()
         {
             // Use the setup API to find the VS install Dir, then build paths to the Private and Public Assemblies folders
             var installPath = GetVSInstallDir();
@@ -24,9 +27,19 @@ namespace Microsoft.NodejsTools.TestAdapter
             AppDomain.CurrentDomain.AssemblyResolve += this.OnAssemblyResolve;
         }
 
+        public static void SetupHandler()
+        {
+            var handler = AppDomain.CurrentDomain.GetData(ResolveHandlerKey);
+            if(handler == null)
+            {
+                resolver = new AssemblyResolver();
+                AppDomain.CurrentDomain.SetData(ResolveHandlerKey, "set");
+            }
+        }
+
         private readonly string[] probePaths;
 
-        internal static string GetVSInstallDir()
+        private static string GetVSInstallDir()
         {
             var vsTestFrameworkAssembly = typeof(ITestExecutor).Assembly;
             var testAdapterPath = vsTestFrameworkAssembly.Location;
@@ -57,11 +70,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
             }
             return null;
-        }
-
-        public void Dispose()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve -= this.OnAssemblyResolve;
         }
     }
 }

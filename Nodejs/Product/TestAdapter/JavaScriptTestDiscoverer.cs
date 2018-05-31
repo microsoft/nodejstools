@@ -19,14 +19,9 @@ namespace Microsoft.NodejsTools.TestAdapter
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {
-        internal static AssemblyResolver AssemblyResolver { get; set; }
-
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
-            {
-                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
-            }
+            AssemblyResolver.SetupHandler();
             this.DiscoverTestsCore(sources, discoveryContext, logger, discoverySink);
         }
 

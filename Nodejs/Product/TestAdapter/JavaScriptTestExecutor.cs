@@ -13,14 +13,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            this.EnsureInitialized();
+            AssemblyResolver.SetupHandler();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(tests);
         }
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            this.EnsureInitialized();
+            AssemblyResolver.SetupHandler();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(sources, new JavaScriptTestDiscoverer());
         }
@@ -28,14 +28,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void Cancel()
         {
             this.worker?.Cancel();
-        }
-
-        private void EnsureInitialized()
-        {
-            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
-            {
-                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
-            }
         }
     }
 }
