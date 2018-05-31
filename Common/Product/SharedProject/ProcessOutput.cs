@@ -640,10 +640,10 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="line"></param>
         public void WriteInputLine(string line)
         {
-            if (IsStarted && redirector != null && !redirector.CloseStandardInput())
+            if (this.IsStarted && this.redirector != null && !this.redirector.CloseStandardInput())
             {
-                Process.StandardInput.WriteLine(line);
-                Process.StandardInput.Flush();
+                this.Process.StandardInput.WriteLine(line);
+                this.Process.StandardInput.Flush();
             }
         }
 
@@ -824,11 +824,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             this.haveRaisedExitedEvent = true;
             FlushAndCloseOutput();
-            var evt = Exited;
-            if (evt != null)
-            {
-                evt(this, e);
-            }
+            Exited?.Invoke(this, e);
         }
 
         /// <summary>

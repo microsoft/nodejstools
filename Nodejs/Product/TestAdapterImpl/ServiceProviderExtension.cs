@@ -4,7 +4,7 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-namespace Microsoft.VisualStudioTools.TestAdapter
+namespace Microsoft.NodejsTools.TestAdapter
 {
     internal static class ServiceProviderExtensions
     {
