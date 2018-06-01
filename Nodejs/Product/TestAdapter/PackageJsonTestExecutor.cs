@@ -19,6 +19,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             AssemblyResolver.SetupHandler();
+
+            this.Cancel();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(sources, new PackageJsonTestDiscoverer());
         }
@@ -26,6 +28,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             AssemblyResolver.SetupHandler();
+
+            this.Cancel();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(tests);
         }

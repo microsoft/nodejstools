@@ -75,7 +75,7 @@
     <Compile Include="JavaScriptTestCaseProperties.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />
-    <Compile Include="TestReceiver.cs" />
+    <Compile Include="TestExecutorWorker.TestReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">

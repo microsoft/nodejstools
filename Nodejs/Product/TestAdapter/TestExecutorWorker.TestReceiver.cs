@@ -6,13 +6,16 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal sealed class TestReceiver : ITestCaseDiscoverySink
+    internal sealed partial class TestExecutorWorker
     {
-        public readonly List<TestCase> Tests = new List<TestCase>();
-
-        public void SendTestCase(TestCase discoveredTest)
+        private sealed class TestReceiver : ITestCaseDiscoverySink
         {
-            this.Tests.Add(discoveredTest);
+            public readonly List<TestCase> Tests = new List<TestCase>();
+
+            public void SendTestCase(TestCase discoveredTest)
+            {
+                this.Tests.Add(discoveredTest);
+            }
         }
     }
 }

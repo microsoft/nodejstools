@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal sealed class TestExecutorWorker
+    internal sealed partial class TestExecutorWorker
     {
         private static readonly Version Node8Version = new Version(8, 0);
 
@@ -59,7 +59,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(sources, nameof(sources));
             ValidateArg.NotNull(discoverer, nameof(discoverer));
 
-            this.cancelRequested.Reset();
+            // Cancel any running tests before starting a new batch
+            this.Cancel();
 
             var receiver = new TestReceiver();
             discoverer.DiscoverTests(sources, /*discoveryContext*/null, this.frameworkHandle, receiver);
@@ -81,7 +82,9 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void RunTests(IEnumerable<TestCase> tests)
         {
             ValidateArg.NotNull(tests, nameof(tests));
-            this.cancelRequested.Reset();
+
+            // Cancel any running tests before starting a new batch
+            this.Cancel();
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
@@ -97,12 +100,12 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             // where key is the file and value is a list of tests
-            foreach (var entry in fileToTests)
+            foreach (var testcaseList in fileToTests.Values)
             {
-                this.currentTests = entry.Value;
+                this.currentTests = testcaseList;
 
                 // Run all test cases in a given file
-                RunTestCases(entry.Value);
+                RunTestCases(testcaseList);
             }
         }
 
@@ -342,7 +345,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 #endif
         }
-
 
         private static int GetFreePort()
         {
