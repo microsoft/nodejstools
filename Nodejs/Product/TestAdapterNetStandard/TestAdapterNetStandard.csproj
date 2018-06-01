@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Microsoft.JavaScript.TestAdapter</AssemblyName>
+    <RootNamespace>Microsoft.NodejsTools.TestAdapter</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs" Link="CommonConstants.cs" />
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs" Link="CommonUtils.cs" />
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs" Link="ProcessOutput.cs" />
+    <Compile Include="..\Nodejs\Nodejs.cs" Link="Nodejs.cs" />
+    <Compile Include="..\Nodejs\NodejsConstants.cs" Link="NodejsConstants.cs" />
+    <Compile Include="..\Nodejs\SourceMapping\FunctionInfo.cs" Link="SourceMapping\FunctionInfo.cs" />
+    <Compile Include="..\Nodejs\SourceMapping\JavaScriptSourceMapInfo.cs" Link="SourceMapping\JavaScriptSourceMapInfo.cs" />
+    <Compile Include="..\Nodejs\SourceMapping\SourceMap.cs" Link="SourceMapping\SourceMap.cs" />
+    <Compile Include="..\Nodejs\SourceMapping\SourceMapper.cs" Link="SourceMapping\SourceMapper.cs" />
+    <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs" Link="TestFrameworks\TestFrameworkDirectories.cs" />
+    <Compile Include="..\TestAdapter\JavaScriptTestCaseProperties.cs" Link="JavaScriptTestCaseProperties.cs" />
+    <Compile Include="..\TestAdapter\JavaScriptTestDiscoverer.cs" Link="JavaScriptTestDiscoverer.cs" />
+    <Compile Include="..\TestAdapter\JavaScriptTestDiscoverer.TestFileEntry.cs" Link="JavaScriptTestDiscoverer.TestFileEntry.cs" />
+    <Compile Include="..\TestAdapter\JavaScriptTestExecutor.cs" Link="JavaScriptTestExecutor.cs" />
+    <Compile Include="..\TestAdapter\SerializationHelpers.cs" Link="SerializationHelpers.cs" />
+    <Compile Include="..\TestAdapter\TestExecutorWorker.cs" Link="TestExecutorWorker.cs" />
+    <Compile Include="..\TestAdapter\TestExecutorWorker.TestExecutionRedirector.cs" Link="TestExecutorWorker.TestExecutionRedirector.cs" />
+    <Compile Include="..\TestAdapter\TestExecutorWorker.TestReceiver.cs" Link="TestExecutorWorker.TestReceiver.cs" />
+    <Compile Include="..\TestAdapter\TestFrameworks\FrameworkDiscoverer.cs" Link="TestFrameworks\FrameworkDiscoverer.cs" />
+    <Compile Include="..\TestAdapter\TestFrameworks\NodejsTestInfo.cs" Link="TestFrameworks\NodejsTestInfo.cs" />
+    <Compile Include="..\TestAdapter\TestFrameworks\TestFramework.cs" Link="TestFrameworks\TestFramework.cs" />
+    <Compile Include="..\TypeScript\TypeScriptHelpers.cs" Link="TypeScriptHelpers.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MicroBuild.Core" Version="0.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build" Version="15.7.179" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.7.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestFrameworks\" />
+    <Folder Include="SourceMapping\" />
+  </ItemGroup>
+
+</Project>

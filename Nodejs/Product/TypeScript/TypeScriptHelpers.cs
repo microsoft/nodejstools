@@ -35,7 +35,7 @@ namespace Microsoft.NodejsTools.TypeScript
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
         }
 
-        private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
+        internal static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
         {
             var jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -15,15 +16,120 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
+#if NETSTANDARD2_0
+    [FileExtension(".dll")]
+#else
     [FileExtension(".njsproj"), FileExtension(".csproj"), FileExtension(".vbproj")]
+#endif
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
+#if !NETSTANDARD2_0
             AssemblyResolver.SetupHandler();
             this.DiscoverTestsCore(sources, discoveryContext, logger, discoverySink);
+#else
+            this.DiscoverTestsCoreNetStandard(sources, logger, discoverySink);
+#endif
         }
+
+#if NETSTANDARD2_0
+        private void DiscoverTestsCoreNetStandard(IEnumerable<string> sources, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        {
+            ValidateArg.NotNull(sources, nameof(sources));
+            ValidateArg.NotNull(discoverySink, nameof(discoverySink));
+            ValidateArg.NotNull(logger, nameof(logger));
+
+            var projects = new List<(string projectFilePath, IEnumerable<XElement> propertyGroup)>();
+
+            // There's an issue when loading the project using the .NET Core msbuild bits,
+            // so we load the xml, and extract the properties we care about.
+            // Downside is we only have the raw contents of the XmlElements, i.e. we don't
+            // expand any variables.
+            try
+            {
+                foreach (var source in sources)
+                {
+                    var cleanPath = source.Trim('\'', '"');
+                    var project = XDocument.Load(cleanPath);
+
+                    // structure looks like Project/PropertyGroup/JsTestRoot and Project/PropertyGroup/JsTestFramework
+                    var propertyGroup = project.Descendants("Project").Descendants("PropertyGroup");
+
+                    projects.Add((cleanPath, propertyGroup));
+                }
+
+                foreach (var (projectFile, propertyGroup) in projects)
+                {
+                    var testFramework = propertyGroup.Descendants(NodeProjectProperty.TestFramework).FirstOrDefault()?.Value;
+                    var testRoot = propertyGroup.Descendants(NodeProjectProperty.TestRoot).FirstOrDefault()?.Value;
+                    var outDir = propertyGroup.Descendants(NodeProjectProperty.TypeScriptOutDir).FirstOrDefault()?.Value ?? "";
+
+                    if (string.IsNullOrEmpty(testRoot) || string.IsNullOrEmpty(testFramework))
+                    {
+                        logger.SendMessage(TestMessageLevel.Warning, $"No TestRoot or TestFramework specified for '{Path.GetFileName(projectFile)}'.");
+                        continue;
+                    }
+
+                    var projectHome = Path.GetDirectoryName(projectFile);
+                    var testItems = new Dictionary<string, HashSet<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
+                    var testFolder = Path.Combine(projectHome, testRoot);
+
+                    if (!Directory.Exists(testFolder))
+                    {
+                        logger.SendMessage(TestMessageLevel.Warning, $"Test folder path '{testFolder}' doesn't exist.");
+                        continue;
+                    }
+
+                    // grab all files, we try for .ts files first, and only parse the .js files if we don't find any
+                    foreach (var file in Directory.EnumerateFiles(testFolder, "*.ts", SearchOption.AllDirectories))
+                    {
+                        ProcessFiles(file);
+                    }
+
+                    if (!testItems.Any())
+                    {
+                        foreach (var file in Directory.EnumerateFiles(Path.Combine(projectHome, testRoot), "*.ts", SearchOption.AllDirectories))
+                        {
+                            ProcessFiles(file);
+                        }
+                    }
+
+                    if (testItems.Any())
+                    {
+                        var nodeExePath = Nodejs.GetAbsoluteNodeExePath(projectHome, propertyGroup.Descendants(NodeProjectProperty.NodeExePath).FirstOrDefault()?.Value);
+                        this.DiscoverTests(testItems, discoverySink, logger, nodeExePath, projectHome, projectFile);
+                    }
+
+                    void ProcessFiles(string fileAbsolutePath)
+                    {
+                        var typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
+                        if (typeScriptTest)
+                        {
+                            fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(projectHome, outDir, fileAbsolutePath);
+                        }
+                        else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(fileAbsolutePath), ".js"))
+                        {
+                            return;
+                        }
+
+                        if (!testItems.TryGetValue(testFramework, out var fileList))
+                        {
+                            fileList = new HashSet<TestFileEntry>(TestFileEntryComparer.Instance);
+                            testItems.Add(testFramework, fileList);
+                        }
+                        fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.SendMessage(TestMessageLevel.Error, ex.Message);
+                throw;
+            }
+        }
+#endif 
 
         /// <summary>
         /// ITestDiscover, Given a list of test sources this method pulls out the test cases
@@ -58,7 +164,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // Load all the test containers passed in (.njsproj msbuild files)
                     foreach (var source in sources)
                     {
-                        buildEngine.LoadProject(source);
+                        var cleanPath = source.Trim('\'', '"');
+                        buildEngine.LoadProject(cleanPath);
                     }
 
                     foreach (var proj in buildEngine.LoadedProjects)
@@ -150,6 +257,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                     projectHome,
                     proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
 
+            this.DiscoverTests(testItems, discoverySink, logger, nodeExePath, projectHome, projSource);
+        }
+
+        private void DiscoverTests(Dictionary<string, HashSet<TestFileEntry>> testItems, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectHome, string projectFullPath)
+        {
             if (!File.Exists(nodeExePath))
             {
                 logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
@@ -189,7 +301,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                                                                            entry.FullPath));
                     }
 
-                    var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, projSource)
+                    var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, projectFullPath)
                     {
                         CodeFilePath = fi?.Filename ?? filePath,
                         LineNumber = fi?.LineNumber ?? discoveredTest.SourceLine,

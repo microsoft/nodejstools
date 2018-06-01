@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal sealed partial class TestExecutorWorker
+    internal  sealed partial class TestExecutorWorker
     {
         private static readonly Version Node8Version = new Version(8, 0);
 
@@ -44,7 +44,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             //let us just kill the node process there, rather do it late, because VS engine process 
             //could exit right after this call and our node process will be left running.
-            KillNodeProcess();
+            this.KillNodeProcess();
             this.cancelRequested.Set();
         }
 
@@ -58,6 +58,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             ValidateArg.NotNull(sources, nameof(sources));
             ValidateArg.NotNull(discoverer, nameof(discoverer));
+
+            this.cancelRequested.Reset();
 
             var receiver = new TestReceiver();
             discoverer.DiscoverTests(sources, /*discoveryContext*/null, this.frameworkHandle, receiver);
@@ -79,6 +81,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void RunTests(IEnumerable<TestCase> tests)
         {
             ValidateArg.NotNull(tests, nameof(tests));
+            this.cancelRequested.Reset();
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
@@ -94,12 +97,12 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             // where key is the file and value is a list of tests
-            foreach (var testcaseList in fileToTests.Values)
+            foreach (var entry in fileToTests)
             {
-                this.currentTests = testcaseList;
+                this.currentTests = entry.Value;
 
                 // Run all test cases in a given file
-                RunTestCases(testcaseList);
+                this.RunTestCases(entry.Value);
             }
         }
 
@@ -138,7 +141,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 if (this.cancelRequested.WaitOne(0))
                 {
-                    this.frameworkHandle.SendMessage(TestMessageLevel.Warning, "Test run was cancelled.");
                     break;
                 }
 
@@ -164,32 +166,30 @@ namespace Microsoft.NodejsTools.TestAdapter
             // make sure the tests completed is not signalled.
             this.testsCompleted.Reset();
 
-            using (this.nodeProcess = ProcessOutput.Run(
-                   nodeExePath,
-                   nodeArgs,
-                   workingDir,
-                   env: null,
-                   visible: false,
-                   redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                   quoteArgs: false))
+            this.nodeProcess = ProcessOutput.Run(
+                nodeExePath,
+                nodeArgs,
+                workingDir,
+                env: null,
+                visible: false,
+                redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                quoteArgs: false);
+
+            if (this.runContext.IsBeingDebugged && startedFromVs)
             {
+                this.AttachDebugger(vsProcessId, port, nodeVersion);
+            }
 
-                if (this.runContext.IsBeingDebugged && startedFromVs)
-                {
-                    this.AttachDebugger(vsProcessId, port, nodeVersion);
-                }
+            var serializedObjects = JsonConvert.SerializeObject(testObjects);
 
-                var serializedObjects = JsonConvert.SerializeObject(testObjects);
+            // Send the process the list of tests to run and wait for it to complete
+            this.nodeProcess.WriteInputLine(serializedObjects);
 
-                // Send the process the list of tests to run and wait for it to complete
-                this.nodeProcess.WriteInputLine(serializedObjects);
-
-                // for node 8 the process doesn't automatically exit when debugging, so always detach
-                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted, this.cancelRequested });
-                if (this.runContext.IsBeingDebugged && startedFromVs)
-                {
-                    this.DetachDebugger(vsProcessId);
-                }
+            // for node 8 the process doesn't automatically exit when debugging, so always detach
+            WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
+            if (this.runContext.IsBeingDebugged && startedFromVs)
+            {
+                this.DetachDebugger(vsProcessId);
             }
 
             // Automatically fail tests that haven't been run by this point (failures in before() hooks)
@@ -270,11 +270,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     this.currentResult.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
                 }
 
-                var errorMessage = string.Join(Environment.NewLine, standardErrorLines);
-
                 this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, errorMessage));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, errorMessage));
+                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
+                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
                 this.frameworkHandle.RecordResult(this.currentResult);
                 this.frameworkHandle.RecordEnd(test, this.currentResult.Outcome);
                 this.currentTests.Remove(test);
@@ -290,11 +288,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DetachDebugger(int vsProcessId)
         {
+#if !NETSTANDARD2_0
             VisualStudioApp.DetachDebugger(vsProcessId);
+#endif
         }
 
         private void AttachDebugger(int vsProcessId, int port, Version nodeVersion)
         {
+#if !NETSTANDARD2_0
             try
             {
                 if (nodeVersion >= Node8Version)
@@ -320,7 +321,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 this.frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
                 this.frameworkHandle.SendMessage(TestMessageLevel.Error, ex.ToString());
-                KillNodeProcess();
+                this.KillNodeProcess();
             }
 #else
             }
@@ -330,7 +331,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 KillNodeProcess();
             }
 #endif
+#endif
         }
+
 
         private static int GetFreePort()
         {
@@ -357,22 +360,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         private void KillNodeProcess()
         {
             this.nodeProcess?.Kill();
-        }
-
-        internal sealed class TestExecutionRedirector : Redirector
-        {
-            private readonly Action<string> writer;
-
-            public TestExecutionRedirector(Action<string> onWriteLine)
-            {
-                this.writer = onWriteLine;
-            }
-
-            public override void WriteErrorLine(string line) => this.writer(line);
-
-            public override void WriteLine(string line) => this.writer(line);
-
-            public override bool CloseStandardInput() => false;
         }
     }
 }

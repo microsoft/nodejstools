@@ -48,7 +48,8 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
             var currentAssembly = typeof(TestFrameworkDirectories).Assembly;
 
-            if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase))
+            if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase) ||
+               (currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase)))
             {
                 testAdapterAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
             }
