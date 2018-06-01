@@ -19,14 +19,9 @@ namespace Microsoft.NodejsTools.TestAdapter
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {
-        internal static AssemblyResolver AssemblyResolver { get; set; }
-
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            if (JavaScriptTestDiscoverer.AssemblyResolver == null)
-            {
-                JavaScriptTestDiscoverer.AssemblyResolver = new AssemblyResolver();
-            }
+            AssemblyResolver.SetupHandler();
             this.DiscoverTestsCore(sources, discoveryContext, logger, discoverySink);
         }
 
@@ -161,34 +156,34 @@ namespace Microsoft.NodejsTools.TestAdapter
             var testCount = 0;
             foreach (var testFx in testItems.Keys)
             {
-                var testFramework = FrameworkDiscover.Intance.Get(testFx);
+                var testFramework = FrameworkDiscoverer.Instance.Get(testFx);
                 if (testFramework == null)
                 {
-                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework \'{testFx}\'.");
+                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");
                     continue;
                 }
 
                 var fileList = testItems[testFx];
-                var files = string.Join(";", fileList.Select(p => p.File));
+                var files = string.Join(";", fileList.Select(p => p.FullPath));
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
-                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.File), nodeExePath, logger, projectRoot: projectHome);
-                testCount += discoveredTestCases.Count;
+                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.FullPath), nodeExePath, logger, projectRoot: projectHome);
+                testCount += discoveredTestCases.Count();
                 foreach (var discoveredTest in discoveredTestCases)
                 {
                     var qualifiedName = discoveredTest.FullyQualifiedName;
                     const string indent = "  ";
                     logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
                     //figure out the test source info such as line number
-                    var filePath = discoveredTest.ModulePath;
-                    var entry = fileList.First(p => StringComparer.OrdinalIgnoreCase.Equals(p.File, filePath));
+                    var filePath = discoveredTest.TestPath;
+                    var entry = fileList.First(p => StringComparer.OrdinalIgnoreCase.Equals(p.FullPath, filePath));
                     FunctionInformation fi = null;
                     if (entry.IsTypeScriptTest)
                     {
                         fi = SourceMapper.MaybeMap(new FunctionInformation(string.Empty,
                                                                            discoveredTest.TestName,
                                                                            discoveredTest.SourceLine,
-                                                                           entry.File));
+                                                                           entry.FullPath));
                     }
 
                     var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, projSource)
@@ -199,10 +194,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                     };
 
                     testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, nodeExePath);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, projectHome);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, projectHome);
+                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
 
                     discoverySink.SendTestCase(testcase);
                 }
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework \'{0}\'.", testFx));
+                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework '{0}'.", testFx));
             }
             if (testCount == 0)
             {

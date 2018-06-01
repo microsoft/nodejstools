@@ -6,18 +6,14 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [ExtensionUri(NodejsConstants.ExecutorUriString)]
-    public class JavaScriptTestExecutor : ITestExecutor
+    [ExtensionUri(NodejsConstants.PackageJsonExecutorUriString)]
+    public sealed class PackageJsonTestExecutor : ITestExecutor
     {
         private TestExecutorWorker worker;
 
-        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
+        public void Cancel()
         {
-            AssemblyResolver.SetupHandler();
-
-            this.Cancel();
-            this.worker = new TestExecutorWorker(runContext, frameworkHandle);
-            this.worker.RunTests(tests);
+            this.worker?.Cancel();
         }
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
@@ -26,12 +22,16 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             this.Cancel();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
-            this.worker.RunTests(sources, new JavaScriptTestDiscoverer());
+            this.worker.RunTests(sources, new PackageJsonTestDiscoverer());
         }
 
-        public void Cancel()
+        public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            this.worker?.Cancel();
+            AssemblyResolver.SetupHandler();
+
+            this.Cancel();
+            this.worker = new TestExecutorWorker(runContext, frameworkHandle);
+            this.worker.RunTests(tests);
         }
     }
 }

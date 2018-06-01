@@ -63,15 +63,19 @@
       <Link>TypeScriptHelpers.cs</Link>
     </Compile>
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="PackageJsonTestDiscoverer.cs" />
+    <Compile Include="PackageJsonTestExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelpers.cs" />
     <Compile Include="JavaScriptTestExecutor.cs" />
     <Compile Include="JavaScriptTestDiscoverer.cs" />
     <Compile Include="JavaScriptTestDiscoverer.TestFileEntry.cs" />
-    <Compile Include="TestFrameworks\FrameworkDiscover.cs" />
-    <Compile Include="TestFrameworks\JavaScriptTestCaseProperties.cs" />
+    <Compile Include="TestExecutorWorker.cs" />
+    <Compile Include="TestFrameworks\FrameworkDiscoverer.cs" />
+    <Compile Include="JavaScriptTestCaseProperties.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="TestFrameworks\TestFramework.cs" />
+    <Compile Include="TestExecutorWorker.TestReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
@@ -115,6 +119,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestAdapterImpl\TestAdapterImpl.csproj">
       <Project>{5085df35-3a32-4894-835e-e5a3956d4f57}</Project>
       <Name>TestAdapterImpl</Name>

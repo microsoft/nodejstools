@@ -6,13 +6,13 @@ using Microsoft.NodejsTools.TestFrameworks;
 
 namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
-    public sealed class FrameworkDiscover
+    public sealed class FrameworkDiscoverer
     {
         private readonly Dictionary<string, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
 
-        public static FrameworkDiscover Intance = new FrameworkDiscover();
+        public static FrameworkDiscoverer Instance = new FrameworkDiscoverer();
 
-        private FrameworkDiscover()
+        private FrameworkDiscoverer()
         {
             var testFrameworkDirectories = TestFrameworkDirectories.GetFrameworkDirectories();
 

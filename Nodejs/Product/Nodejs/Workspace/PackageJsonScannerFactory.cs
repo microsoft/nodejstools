@@ -87,6 +87,13 @@ namespace Microsoft.NodejsTools.Workspace
                     // (See Microsoft.VisualStudio.Workspace.VSIntegration.UI.FileContextActionsCommandHandlersProvider.Provider.GetActionProviderForProjectConfiguration)
                     fileDataValues.Add(new FileDataValue(DebugLaunchActionContext.ContextTypeGuid, main, null, target: null));
                 }
+
+                var testRoot = packageJson.TestRoot;
+                if (!string.IsNullOrEmpty(testRoot))
+                {
+                    fileDataValues.Add(new FileDataValue(NodejsConstants.TestRootDataValueGuid, NodejsConstants.TestRootDataValueName, testRoot));
+                }
+
                 return Task.FromResult(fileDataValues);
             }
         }

@@ -12,7 +12,6 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
 using Microsoft.VisualStudioTools;
-using Microsoft.VisualStudioTools.TestAdapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -339,10 +338,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     return latest;
                 });
 
-            var architecture = Architecture.X86;
-            // TODO: Read the architecture from the project
-
-            yield return new TestContainer(this, path, latestWrite, architecture);
+            yield return new TestContainer(this, path, latestWrite);
         }
 
         private void SaveModifiedFiles(IVsProject project)

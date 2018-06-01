@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools.Project;
 using Newtonsoft.Json;
@@ -28,7 +28,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 
         public string Name { get; }
 
-        public List<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
+        public IEnumerable<NodejsTestInfo> FindTests(IEnumerable<string> testFiles,
             string nodeExe,
             IMessageLogger logger,
             string projectRoot)
@@ -50,7 +50,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                             logger.SendMessage(TestMessageLevel.Error, s);
                         }
                         //There was an error during detection, return an empty set
-                        return new List<NodejsTestInfo>();
+                        return Enumerable.Empty<NodejsTestInfo>();
                     }
                 }
 
@@ -98,18 +98,17 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             return testCases;
         }
 
-        public string[] ArgumentsToRunTests(string testName, string testFile, string workingDirectory, string projectRootDir)
+        public ArgumentsToRunTests GetArgumentsToRunTests(string testName, string testFile, string workingDirectory, string projectRootDir)
         {
             workingDirectory = workingDirectory.TrimEnd('\\');
             projectRootDir = projectRootDir.TrimEnd('\\');
-            return new[] {
-                WrapWithQuotes(this.runTestsScriptFile),
+            return new ArgumentsToRunTests(
+                this.runTestsScriptFile,
                 this.Name,
-                WrapTestNameWithQuotes(testName),
-                WrapWithQuotes(testFile),
-                WrapWithQuotes(workingDirectory),
-                WrapWithQuotes(projectRootDir)
-            };
+                testName,
+                testFile,
+                workingDirectory,
+                projectRootDir);
         }
 
         private static string WrapWithQuotes(string path)
@@ -198,6 +197,26 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             {
                 this.logger.SendMessage(TestMessageLevel.Informational, line);
             }
+        }
+
+        public sealed class ArgumentsToRunTests
+        {
+            public ArgumentsToRunTests(string runTestsScriptFile, string testFramework, string testName, string testFile, string workingDirectory, string projectRootDir)
+            {
+                this.RunTestsScriptFile = WrapWithQuotes(runTestsScriptFile);
+                this.TestFramework = testFramework;
+                this.TestName = WrapTestNameWithQuotes(testName);
+                this.TestFile = WrapWithQuotes(testFile);
+                this.WorkingDirectory = WrapWithQuotes(workingDirectory);
+                this.ProjectRootDir = WrapWithQuotes(projectRootDir);
+            }
+
+            public readonly string RunTestsScriptFile;
+            public readonly string TestFramework;
+            public readonly string TestName;
+            public readonly string TestFile;
+            public readonly string WorkingDirectory;
+            public readonly string ProjectRootDir;
         }
     }
 }

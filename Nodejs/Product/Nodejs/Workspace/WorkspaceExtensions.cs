@@ -32,7 +32,7 @@ namespace Microsoft.NodejsTools.Workspace
             return null;
         }
 
-        private sealed class FileCollector : IProgress<string>
+        public sealed class FileCollector : IProgress<string>
         {
             public readonly List<string> FoundFiles = new List<string>();
 
