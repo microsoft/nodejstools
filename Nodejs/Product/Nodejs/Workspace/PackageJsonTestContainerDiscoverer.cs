@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.Workspace
         private readonly List<PackageJsonTestContainer> containers = new List<PackageJsonTestContainer>();
         private readonly object containerLock = new object();
 
-        private IWorkspace currentWorkspace;
+        private IWorkspace activeWorkspace;
 
         [ImportingConstructor]
         public PackageJsonTestContainerDiscoverer(IVsFolderWorkspaceService workspaceService)
@@ -31,10 +31,10 @@ namespace Microsoft.NodejsTools.Workspace
 
             if (this.workspaceService.CurrentWorkspace != null)
             {
-                this.currentWorkspace = this.workspaceService.CurrentWorkspace;
+                this.activeWorkspace = this.workspaceService.CurrentWorkspace;
                 this.RegisterEvents();
 
-                this.currentWorkspace.JTF.RunAsync(async () =>
+                this.activeWorkspace.JTF.RunAsync(async () =>
                 {
                     // Yield so we don't do this now. Don't want to block the constructor.
                     await Task.Yield();
@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.Workspace
 
         private async Task AttemptUpdateAsync()
         {
-            var workspace = this.currentWorkspace;
+            var workspace = this.activeWorkspace;
             if (workspace != null)
             {
                 var indexService = workspace.GetIndexWorkspaceService();
@@ -91,7 +91,7 @@ namespace Microsoft.NodejsTools.Workspace
         {
             this.UnRegisterEvents();
 
-            this.currentWorkspace = this.workspaceService.CurrentWorkspace;
+            this.activeWorkspace = this.workspaceService.CurrentWorkspace;
 
             this.RegisterEvents();
 
@@ -100,28 +100,32 @@ namespace Microsoft.NodejsTools.Workspace
 
         private void RegisterEvents()
         {
-            var fileWatcherService = this.currentWorkspace?.GetFileWatcherService();
-            if (fileWatcherService != null)
+            var workspace = this.activeWorkspace;
+            if (workspace != null)
             {
-                fileWatcherService.OnFileSystemChanged += this.FileSystemChangedAsync;
-            }
+                var fileWatcherService = workspace.GetFileWatcherService();
+                if (fileWatcherService != null)
+                {
+                    fileWatcherService.OnFileSystemChanged += this.FileSystemChangedAsync;
+                }
 
-            var indexService = this.currentWorkspace?.GetIndexWorkspaceService();
-            if (indexService != null)
-            {
-                indexService.OnFileScannerCompleted += this.FileScannerCompletedAsync;
+                var indexService = workspace.GetIndexWorkspaceService();
+                if (indexService != null)
+                {
+                    indexService.OnFileScannerCompleted += this.FileScannerCompletedAsync;
+                }
             }
         }
 
         private void UnRegisterEvents()
         {
-            var fileWatcherService = this.currentWorkspace?.GetFileWatcherService();
+            var fileWatcherService = this.activeWorkspace?.GetFileWatcherService();
             if (fileWatcherService != null)
             {
                 fileWatcherService.OnFileSystemChanged -= this.FileSystemChangedAsync;
             }
 
-            var indexService = this.currentWorkspace?.GetIndexWorkspaceService();
+            var indexService = this.activeWorkspace?.GetIndexWorkspaceService();
             if (indexService != null)
             {
                 indexService.OnFileScannerCompleted -= this.FileScannerCompletedAsync;
@@ -135,7 +139,7 @@ namespace Microsoft.NodejsTools.Workspace
             // Any changes to the 'package.json' will be handled by the FileScannerCompleted event.
             if (IsJavaScriptFile(args.FullPath) || args.IsDirectoryChanged())
             {
-                // use a flag so we don't deadlock
+                // use a flag so we don't raise the event while under the lock
                 var testsUpdated = false;
                 lock (this.containerLock)
                 {

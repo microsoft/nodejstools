@@ -281,9 +281,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                     this.currentResult.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
                 }
 
+                var errorMessage = string.Join(Environment.NewLine, standardErrorLines);
+
                 this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
+                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, errorMessage));
+                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, errorMessage));
                 this.frameworkHandle.RecordResult(this.currentResult);
                 this.frameworkHandle.RecordEnd(test, this.currentResult.Outcome);
                 this.currentTests.Remove(test);
