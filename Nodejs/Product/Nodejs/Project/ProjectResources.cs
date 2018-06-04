@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Resources;
@@ -13,9 +13,7 @@ namespace Microsoft.NodejsTools.Project
 
         internal const string NodeExeDoesntExist = "NodeExeDoesntExist";
         internal const string NodejsNotInstalled = "NodejsNotInstalled";
-#if !DEV15
-        internal const string NodejsVersionNotSupported = "NodejsVersionNotSupported";
-#endif
+
         internal const string TestFramework = "TestFramework";
 
         private static readonly Lazy<ResourceManager> _manager = new Lazy<ResourceManager>(

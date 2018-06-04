@@ -8,15 +8,8 @@
     </MSBuildAllProjects>
   </PropertyGroup>
 
-
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-    <!-- The version number to compare with existing install. -->
-    <MsiVersion Condition="$(MsiVersion)==''">0.7.4100.000</MsiVersion>
-    <!-- The version number that will be displayed to users. -->
-    <ReleaseVersion Condition="$(ReleaseVersion)==''">0.7</ReleaseVersion>
-    <!-- When true, increases build restrictions to ensure complete public releases -->
-    <ReleaseBuild Condition="'$(ReleaseBuild)' == ''">false</ReleaseBuild>
 
     <!-- The default Platform value is specified in the imports below -->
 
@@ -117,7 +110,6 @@
   </ItemDefinitionGroup>
 
   <Import Project="$(TargetsPath)\Common.Build.CSharp.settings" Condition="'$(MSBuildProjectExtension)' == '.csproj' or '$(MSBuildProjectExtension)' == '.tmp_proj'" />
-  <Import Project="$(TargetsPath)\CodeCoverage.proj" />
 
   <ItemGroup>
     <CodeAnalysisDictionary Include="$(BuildRoot)\Build\CustomDictionary.xml" />
@@ -129,10 +121,10 @@
 
   <PropertyGroup>
     <MajorVersion>1</MajorVersion>
-    <MinorVersion>4</MinorVersion>
+    <MinorVersion>5</MinorVersion>
 
     <!-- This was reset for Dev15. It needs to eventually be reset to the current year for Dev16 -->
-    <VersionZeroYear>2016</VersionZeroYear>
+    <VersionZeroYear>2018</VersionZeroYear>
   </PropertyGroup>
 
   <!-- BUILD_BUILDNUMBER is expected to be set by the build server.
