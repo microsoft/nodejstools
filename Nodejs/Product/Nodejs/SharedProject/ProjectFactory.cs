@@ -597,7 +597,6 @@ namespace Microsoft.VisualStudioTools.Project
             return VSConstants.S_OK;
         }
 
-#if DEV11_OR_LATER
         void IVsProjectUpgradeViaFactory4.UpgradeProject_CheckOnly(
             string bstrFileName,
             IVsUpgradeLogger pLogger,
@@ -681,7 +680,7 @@ namespace Microsoft.VisualStudioTools.Project
                 pguidNewProjectFactory = Guid.Empty;
             }
         }
-#endif
+
         #endregion
     }
 
