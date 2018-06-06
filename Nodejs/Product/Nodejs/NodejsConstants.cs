@@ -101,7 +101,7 @@ namespace Microsoft.NodejsTools
         public const string TypeScriptOutDir = "TypeScriptOutDir";
         public const string TypeScriptSourceMap = "TypeScriptSourceMap";
         public const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
-        public const string TestRoot = "TestRoot";
-        public const string TestFramework = "TestFramework";
+        public const string TestRoot = "JavaScriptTestRoot";
+        public const string TestFramework = "JavaScriptTestFramework";
     }
 }
