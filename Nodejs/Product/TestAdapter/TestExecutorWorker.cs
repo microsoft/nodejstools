@@ -134,14 +134,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             var nodeVersion = Nodejs.GetNodeVersion(nodeExePath);
 
-            // We can only log telemetry when we're running in VS.
-            // Since the required assemblies are not on disk if we're not running in VS, we have to reference them in a separate method
-            // this way the .NET framework only tries to load the assemblies when we actually need them.
-            if (startedFromVs)
-            {
-                this.LogTelemetry(tests.Count(), nodeVersion, this.runContext.IsBeingDebugged, testFramework);
-            }
-
             foreach (var test in tests)
             {
                 if (this.cancelRequested.WaitOne(0))
@@ -299,11 +291,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         private void DetachDebugger(int vsProcessId)
         {
             VisualStudioApp.DetachDebugger(vsProcessId);
-        }
-
-        private void LogTelemetry(int testCount, Version nodeVersion, bool isDebugging, string testFramework)
-        {
-            VisualStudioApp.LogTelemetry(testCount, nodeVersion, isDebugging, testFramework);
         }
 
         private void AttachDebugger(int vsProcessId, int port, Version nodeVersion)
