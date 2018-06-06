@@ -59,9 +59,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(sources, nameof(sources));
             ValidateArg.NotNull(discoverer, nameof(discoverer));
 
-            // Cancel any running tests before starting a new batch
-            this.Cancel();
-
             var receiver = new TestReceiver();
             discoverer.DiscoverTests(sources, /*discoveryContext*/null, this.frameworkHandle, receiver);
 
@@ -82,9 +79,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void RunTests(IEnumerable<TestCase> tests)
         {
             ValidateArg.NotNull(tests, nameof(tests));
-
-            // Cancel any running tests before starting a new batch
-            this.Cancel();
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCase>>();
@@ -152,6 +146,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 if (this.cancelRequested.WaitOne(0))
                 {
+                    this.frameworkHandle.SendMessage(TestMessageLevel.Warning, "Test run was cancelled.");
                     break;
                 }
 
@@ -177,30 +172,32 @@ namespace Microsoft.NodejsTools.TestAdapter
             // make sure the tests completed is not signalled.
             this.testsCompleted.Reset();
 
-            this.nodeProcess = ProcessOutput.Run(
-                nodeExePath,
-                nodeArgs,
-                workingDir,
-                env: null,
-                visible: false,
-                redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                quoteArgs: false);
-
-            if (this.runContext.IsBeingDebugged && startedFromVs)
+            using (this.nodeProcess = ProcessOutput.Run(
+                   nodeExePath,
+                   nodeArgs,
+                   workingDir,
+                   env: null,
+                   visible: false,
+                   redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                   quoteArgs: false))
             {
-                this.AttachDebugger(vsProcessId, port, nodeVersion);
-            }
 
-            var serializedObjects = JsonConvert.SerializeObject(testObjects);
+                if (this.runContext.IsBeingDebugged && startedFromVs)
+                {
+                    this.AttachDebugger(vsProcessId, port, nodeVersion);
+                }
 
-            // Send the process the list of tests to run and wait for it to complete
-            this.nodeProcess.WriteInputLine(serializedObjects);
+                var serializedObjects = JsonConvert.SerializeObject(testObjects);
 
-            // for node 8 the process doesn't automatically exit when debugging, so always detach
-            WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
-            if (this.runContext.IsBeingDebugged && startedFromVs)
-            {
-                this.DetachDebugger(vsProcessId);
+                // Send the process the list of tests to run and wait for it to complete
+                this.nodeProcess.WriteInputLine(serializedObjects);
+
+                // for node 8 the process doesn't automatically exit when debugging, so always detach
+                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted, this.cancelRequested });
+                if (this.runContext.IsBeingDebugged && startedFromVs)
+                {
+                    this.DetachDebugger(vsProcessId);
+                }
             }
 
             // Automatically fail tests that haven't been run by this point (failures in before() hooks)
