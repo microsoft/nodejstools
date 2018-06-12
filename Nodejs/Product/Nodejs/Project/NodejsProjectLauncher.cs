@@ -93,7 +93,7 @@ namespace Microsoft.NodejsTools.Project
         {
             var optionString = NodejsDialogPage.LoadString(name: "DiagnosticLogging", cat: "Debugging");
 
-            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
+            return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "false");
         }
 
         private void StartNodeProcess(string file, string nodePath, bool startBrowser)
