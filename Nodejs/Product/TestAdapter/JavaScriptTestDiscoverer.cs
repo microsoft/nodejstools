@@ -94,7 +94,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             {
                                 //Check to see if this is a TestCase
                                 testFrameworkName = item.GetMetadataValue("TestFramework");
-                                if (!TestFrameworks.TestFramework.IsValidTestFramework(testFrameworkName))
+                                if (!TestFramework.IsValidTestFramework(testFrameworkName))
                                 {
                                     continue;
                                 }
@@ -119,7 +119,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                             fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
                         }
 
-                        this.DiscoverTests(testItems, proj, discoverySink, logger);
+                        if (testItems.Any())
+                        {
+                            this.DiscoverTests(testItems, proj, discoverySink, logger);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -138,7 +141,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DiscoverTests(Dictionary<string, HashSet<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger)
         {
-            var result = new List<TestFrameworks.NodejsTestInfo>();
+            var result = new List<NodejsTestInfo>();
             var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
             var projSource = proj.FullPath;
 
@@ -202,10 +205,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                     discoverySink.SendTestCase(testcase);
                 }
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework '{0}'.", testFx));
-            }
-            if (testCount == 0)
-            {
-                logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, "Discovered 0 testcases."));
             }
         }
     }

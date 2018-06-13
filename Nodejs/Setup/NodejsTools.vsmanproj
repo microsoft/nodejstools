@@ -48,6 +48,7 @@
   <Target Name="Build" />
   <Target Name="Clean" />
   <Target Name="ReBuild" />
+  <Target Name="BuiltProjectOutputGroup" />
   <Import Project=".\SetupProjectAfter.settings" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
