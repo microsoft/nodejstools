@@ -129,9 +129,6 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes">
       <Version>15.0.17</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
-      <Version>15.7.942-master669188BE</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>
     </PackageReference>
