@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudioTools
 
         private bool AttachToProcessNode2DebugAdapter(int port)
         {
-            var dte = (VisualStudio.OLE.Interop.IServiceProvider)GetDTE();
+            var dte = (VisualStudio.OLE.Interop.IServiceProvider)this.GetDTE();
 
             var serviceProvider = new ServiceProvider(dte);
 
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudioTools
 
         private bool AttachToProcess(Process testProcess, Guid portSupplier, string transportQualifierUri)
         {
-            var dte = GetDTE();
+            var dte = this.GetDTE();
             var debugger3 = (EnvDTE90.Debugger3)dte.Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;

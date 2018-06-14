@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         private readonly JObject _mapInfo;
         private readonly LineInfo[] _lines;
         private readonly string[] _names, _sources;
-        private static Dictionary<char, int> _base64Mapping = BuildBase64Mapping();
+        private static readonly Dictionary<char, int> _base64Mapping = BuildBase64Mapping();
 
         /// <summary>
         /// Index into the mappings for the starting column
@@ -98,7 +98,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     {
                         // each segment is Base64 VLQ encoded
 
-                        var info = DecodeVLQ(segment);
+                        var info = this.DecodeVLQ(segment);
                         if (info.Length == 0)
                         {
                             throw new InvalidOperationException("invalid data in source map, no starting column.");
@@ -195,18 +195,18 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <summary>
         /// Version number of the source map.
         /// </summary>
-        internal int Version => GetValue("version", -1);
+        internal int Version => this.GetValue("version", -1);
 
         /// <summary>
         /// Filename of the generated code
         /// </summary>
-        internal string File => GetValue("file", string.Empty);
+        internal string File => this.GetValue("file", string.Empty);
 
         /// <summary>
         /// Provides the root for the sources to save space, automatically
         /// included in the Sources array so it's not public.
         /// </summary>
-        private string SourceRoot => GetValue("sourceRoot", string.Empty);
+        private string SourceRoot => this.GetValue("sourceRoot", string.Empty);
 
         /// <summary>
         /// All of the filenames that were combined.
