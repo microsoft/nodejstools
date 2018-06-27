@@ -3,7 +3,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Node.js Tools for Visual Studio - Test Explorer Integration Shims")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 
