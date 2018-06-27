@@ -1,11 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project ToolsVersion="15.0">
 
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Microsoft.JavaScript.TestAdapter</AssemblyName>
     <RootNamespace>Microsoft.NodejsTools.TestAdapter</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <!-- 
+          Disable default assemblyinfo generation and replace with custom from 
+          fileversion.targets imported below
+    -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-
+  <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
@@ -50,4 +57,17 @@
     <Folder Include="SourceMapping\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
+      <Authenticode>Microsoft</Authenticode>
+      <StrongName>StrongName</StrongName>
+      <InProject>false</InProject>
+    </FilesToSign>
+    <!--<FilesToSign Include="$(OutDir)\Microsoft.JavaScript.TestAdapter.1.0.0.nupkg">
+      <Authenticode>NuGet</Authenticode>
+      <InProject>false</InProject>
+    </FilesToSign>-->
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="..\ProjectAfter.targets" />
 </Project>

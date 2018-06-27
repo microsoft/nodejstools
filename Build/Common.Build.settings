@@ -8,6 +8,10 @@
     </MSBuildAllProjects>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == ''">
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkMoniker>.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>
+  </PropertyGroup>
 
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
@@ -28,9 +32,6 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
     <VSTarget Condition="$(VSTarget)==''">15.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
-
-    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6.1</TargetFrameworkVersion>
-    <TargetFrameworkMoniker>.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>
 
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
 
