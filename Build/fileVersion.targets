@@ -37,6 +37,12 @@
       <AssemblyAttribute Include="System.Reflection.AssemblyInformationalVersionAttribute"> 
         <_Parameter1>$(BuildVersionExtended)</_Parameter1> 
       </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyProductAttribute">
+         <_Parameter1>Microsoft&#174; VisualStudio&#174;</_Parameter1> 
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyTitle">
+         <_Parameter1>$(AssemblyName).dll</_Parameter1> 
+      </AssemblyAttribute>
     </ItemGroup>
 
     <WriteCodeFragment AssemblyAttributes="@(AssemblyAttribute)"
