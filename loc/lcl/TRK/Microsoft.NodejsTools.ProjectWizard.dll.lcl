@@ -3567,11 +3567,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Visual Studio için Node.js Araçları - Sihirbazlar]]></Val>
-        </Tgt>
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3593,6 +3593,12 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
+      </Str>
+      <Disp Icon="Str" />
+    </Item>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
