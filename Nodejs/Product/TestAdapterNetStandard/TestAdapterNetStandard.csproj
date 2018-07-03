@@ -1,5 +1,4 @@
 ﻿<Project ToolsVersion="15.0">
-
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -16,12 +15,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.UnitTest.JavaScript.targets" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs" Link="CommonConstants.cs" />
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs" Link="CommonUtils.cs" />
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs" Link="ProcessOutput.cs" />
-    <Compile Include="..\Nodejs\Nodejs.cs" Link="Nodejs.cs" />
+    <Compile Include="..\Nodejs\Nodejs.cs" Link="Nodejs.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="..\Nodejs\NodejsConstants.cs" Link="NodejsConstants.cs" />
     <Compile Include="..\Nodejs\SourceMapping\FunctionInfo.cs" Link="SourceMapping\FunctionInfo.cs" />
     <Compile Include="..\Nodejs\SourceMapping\JavaScriptSourceMapInfo.cs" Link="SourceMapping\JavaScriptSourceMapInfo.cs" />
@@ -39,6 +43,7 @@
     <Compile Include="..\TestAdapter\TestFrameworks\FrameworkDiscoverer.cs" Link="TestFrameworks\FrameworkDiscoverer.cs" />
     <Compile Include="..\TestAdapter\TestFrameworks\NodejsTestInfo.cs" Link="TestFrameworks\NodejsTestInfo.cs" />
     <Compile Include="..\TestAdapter\TestFrameworks\TestFramework.cs" Link="TestFrameworks\TestFramework.cs" />
+    <Compile Include="..\TestAdapter\UnitTestSettings.cs" Link="UnitTestSettings.cs" />
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs" Link="TypeScriptHelpers.cs" />
   </ItemGroup>
 
@@ -47,7 +52,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build" Version="15.7.179" />
+    <!--<PackageReference Include="Microsoft.Build" Version="15.7.179" />-->
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.7.2" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
@@ -67,6 +72,15 @@
       <Authenticode>NuGet</Authenticode>
       <InProject>false</InProject>
     </FilesToSign>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Microsoft.UnitTest.JavaScript.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Microsoft.UnitTest.JavaScript.props">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <Import Project="..\ProjectAfter.targets" />
