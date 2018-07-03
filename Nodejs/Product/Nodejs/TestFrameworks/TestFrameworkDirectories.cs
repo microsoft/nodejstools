@@ -26,7 +26,6 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         public static string[] GetFrameworkDirectories()
         {
-
             var testFrameworkRoot = GetTestframeworkFolderRoot();
             if (!Directory.Exists(testFrameworkRoot))
             {

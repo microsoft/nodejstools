@@ -12,8 +12,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
+#if !NETSTANDARD2_0
 using MSBuild = Microsoft.Build.Evaluation;
-
+#endif
 namespace Microsoft.NodejsTools.TestAdapter
 {
 #if NETSTANDARD2_0
@@ -22,15 +23,15 @@ namespace Microsoft.NodejsTools.TestAdapter
     [FileExtension(".njsproj"), FileExtension(".csproj"), FileExtension(".vbproj")]
 #endif
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
-    public partial class JavaScriptTestDiscoverer : ITestDiscoverer
+    public partial class JavaScriptTestDiscoverer : IJavaScriptTestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-#if !NETSTANDARD2_0
+#if NETSTANDARD2_0
+            this.DiscoverTestsCoreNetStandard(sources, logger, discoverySink);
+#else
             AssemblyResolver.SetupHandler();
             this.DiscoverTestsCore(sources, discoveryContext, logger, discoverySink);
-#else
-            this.DiscoverTestsCoreNetStandard(sources, logger, discoverySink);
 #endif
         }
 
@@ -129,7 +130,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 throw;
             }
         }
-#endif 
+#else
 
         /// <summary>
         /// ITestDiscover, Given a list of test sources this method pulls out the test cases
@@ -259,7 +260,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             this.DiscoverTests(testItems, discoverySink, logger, nodeExePath, projectHome, projSource);
         }
-
+#endif
         private void DiscoverTests(Dictionary<string, HashSet<TestFileEntry>> testItems, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectHome, string projectFullPath)
         {
             if (!File.Exists(nodeExePath))
@@ -319,5 +320,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                 logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework '{0}'.", testFx));
             }
         }
+    }
+
+
+    public interface IJavaScriptTestDiscoverer : ITestDiscoverer
+    {
+        void DiscoverTests(UnitTestSettings testSettings, IMessageLogger logger, ITestCaseDiscoverySink discoverySink);
     }
 }

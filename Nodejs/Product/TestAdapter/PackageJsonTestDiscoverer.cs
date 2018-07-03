@@ -14,7 +14,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     [FileExtension(".json")]
     [DefaultExecutorUri(NodejsConstants.PackageJsonExecutorUriString)]
-    public sealed class PackageJsonTestDiscoverer : ITestDiscoverer
+    public sealed class PackageJsonTestDiscoverer : IJavaScriptTestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
@@ -27,6 +27,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                     this.DiscoverTestFiles(source, logger, discoverySink);
                 }
             }
+        }
+
+        public void DiscoverTests(UnitTestSettings unitTestSettings, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        {
+
         }
 
         private void DiscoverTestFiles(string packageJsonPath, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
@@ -60,6 +65,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
             }
             testFx = testFx ?? FrameworkDiscoverer.Instance.Get("ExportRunner");
+
+            this.DiscoverTestFiles(testFolderPath, testFx, logger, discoverySink);
+        }
+
+        private void DiscoverTestFiles(string testFolderPath, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        {
+            var workingDir = ".";
+            var packageJsonPath = ".\\package.json";
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
 

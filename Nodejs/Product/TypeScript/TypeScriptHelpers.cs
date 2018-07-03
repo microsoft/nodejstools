@@ -8,8 +8,9 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 #endif
 using Microsoft.VisualStudioTools;
+#if !NETSTANDARD2_0
 using MSBuild = Microsoft.Build.Evaluation;
-
+#endif
 namespace Microsoft.NodejsTools.TypeScript
 {
     internal static class TypeScriptHelpers
@@ -28,13 +29,13 @@ namespace Microsoft.NodejsTools.TypeScript
             return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.TsConfigJsonFile) ||
                 StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
         }
-
+#if !NETSTANDARD2_0
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
         {
             var typeScriptOutDir = project.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir);
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
         }
-
+#endif
         internal static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
         {
             var jsFilePath = Path.ChangeExtension(pathToFile, NodejsConstants.JavaScriptExtension);

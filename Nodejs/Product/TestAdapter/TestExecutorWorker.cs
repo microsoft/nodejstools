@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.cancelRequested.Reset();
 
             var receiver = new TestReceiver();
-            discoverer.DiscoverTests(sources, /*discoveryContext*/null, this.frameworkHandle, receiver);
+            discoverer.DiscoverTests(sources, this.runContext, this.frameworkHandle, receiver);
 
             if (this.cancelRequested.WaitOne(0))
             {
