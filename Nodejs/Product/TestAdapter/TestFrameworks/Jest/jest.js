@@ -59,27 +59,26 @@ const run_tests = function (testCases, post) {
         localJestMajorVersion: 23 // TODO: Get the jest version from the package.
     };
 
-    // Promise chain to make it process the test cases one by one.
-    testCases.reduce((promise, testCase) => {
-        return promise.then(() => {
-            return runTest(testCase, post);
-        });
-    }, Promise.resolve())
+    runTest(testCases)
         .then(() => post({
             type: 'suite end',
             result: {}
-        }));
+        }))
+        .catch((error) => logError(error));
 
-    function runTest(testCase, post) {
+    function runTest(testCases) {
         return new Promise((resolve, reject) => {
-            post({
-                type: 'test start',
-                title: testCase.testName
-            });
+
+            // Start all test cases. Jest doesn't report when each test start, only reports the whole file.
+            for (const testCase of testCases) {
+                post({
+                    type: 'test start',
+                    title: testCase.testName
+                });
+            }
 
             const runner = new jestEditorSupport.Runner(workspace, {
-                testFileNamePattern: escapeRegExp(testCase.testFile),
-                testNamePattern: escapeRegExp(testCase.testName)
+                testFileNamePattern: escapeRegExp(testCases[0].testFile)
             });
 
             runner
@@ -96,28 +95,24 @@ const run_tests = function (testCases, post) {
                             const parsedResult = JSON.parse(resultFile.toString());
 
                             for (const testResult of parsedResult.testResults) {
-                                // Filter out pending test cases.
-                                const assertionResult = testResult.assertionResults.find(x => x.status !== 'pending');
-                                if (assertionResult.length !== 0) {
+                                for (const assertionResult of testResult.assertionResults) {
                                     const result = {
                                         passed: assertionResult.status === 'passed',
-                                        pending: false,
+                                        pending: assertionResult.status === 'pending',
                                         stderr: assertionResult.failureMessages.join('\n'),
                                         stdout: "",
                                         title: assertionResult.title
                                     };
 
                                     post({
-                                        type: 'result',
+                                        type: result.pending ? 'pending' : 'result',
                                         title: assertionResult.title,
                                         result: result
                                     });
-
-                                    return resolve(testCase);
                                 }
                             }
 
-                            return reject(new Error('Test case has no result or was not found.'));
+                            return resolve(testCases);
                         });
                     }
                 })
@@ -129,7 +124,7 @@ const run_tests = function (testCases, post) {
 };
 
 function getJestPath(projectFolder) {
-    return path.join(projectFolder, "node_modules/.bin/jest.cmd");
+    return path.join(projectFolder, "node_modules", ".bin", "jest.cmd");
 }
 
 function escapeRegExp(string) {
