@@ -24,9 +24,10 @@ namespace Microsoft.NodejsTools.TestFrameworks
             return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).ToArray();
         }
 
-        public static string[] GetFrameworkDirectories()
+        public static string[] GetFrameworkDirectories(string testFrameworkRoot = null)
         {
-            var testFrameworkRoot = GetTestframeworkFolderRoot();
+            testFrameworkRoot = testFrameworkRoot ?? GetTestframeworkFolderRoot();
+
             if (!Directory.Exists(testFrameworkRoot))
             {
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");

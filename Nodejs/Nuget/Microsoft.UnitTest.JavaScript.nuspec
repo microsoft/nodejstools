@@ -22,11 +22,11 @@
   </metadata>
   <files>
     <!-- unit test framework specific and shared js files -->
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\*.js" target="build\_common\TestAdapter\TestFrameworks\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\ExportRunner\ExportRunner.js" target="build\_common\TestAdapter\TestFrameworks\ExportRunner\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Jasmine\Jasmine.js" target="build\_common\TestAdapter\TestFrameworks\Jasmine\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Mocha\Mocha.js" target="build\_common\TestAdapter\TestFrameworks\Mocha\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Tape\Tape.js" target="build\_common\TestAdapter\TestFrameworks\Tape\" />
+    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\*.js" target="build\_common\TestFrameworks\" />
+    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\ExportRunner\ExportRunner.js" target="build\_common\TestFrameworks\ExportRunner\" />
+    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Jasmine\Jasmine.js" target="build\_common\TestFrameworks\Jasmine\" />
+    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Mocha\Mocha.js" target="build\_common\TestFrameworks\Mocha\" />
+    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Tape\Tape.js" target="build\_common\TestFrameworks\Tape\" />
     <!-- net standard library -->
     <file src="..\..\BuildOutput\Debug\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.props" target="build\netstandard2.0\" />
     <file src="..\..\BuildOutput\Debug\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.targets" target="build\netstandard2.0\" />

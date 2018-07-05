@@ -8,7 +8,7 @@
   -->
   <Target Name="SetNodeToolsJavaScriptTestSource" BeforeTargets="VSTest">
     <PropertyGroup>
-      <VSTestCLIRunSettings>$(VSTestCLIRunSettings);JavaScriptUnitTest.TestSource='$(MSBuildProjectFullPath)';JavaScriptUnitTest.TestFrameworkRoot='$(MSBuildThisFileDirectory)..\_common\TestFrameworks\'</VSTestCLIRunSettings>
+      <VSTestCLIRunSettings>$(VSTestCLIRunSettings);JavaScriptUnitTest.TestSource=$(MSBuildProjectFullPath);JavaScriptUnitTest.TestFrameworkRoot=$(MSBuildThisFileDirectory)..\_common\TestFrameworks\</VSTestCLIRunSettings>
     </PropertyGroup>
   </Target>
 </Project>

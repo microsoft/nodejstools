@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    internal  sealed partial class TestExecutorWorker
+    internal sealed partial class TestExecutorWorker
     {
         private static readonly Version Node8Version = new Version(8, 0);
 
@@ -34,10 +34,17 @@ namespace Microsoft.NodejsTools.TestAdapter
         private TestResult currentResult;
         private ResultObject currentResultObject;
 
+        private readonly FrameworkDiscoverer frameworkDiscoverer;
+
         public TestExecutorWorker(IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             this.frameworkHandle = frameworkHandle;
             this.runContext = runContext;
+
+            var unittestsettings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
+
+            // todo: use unit test settings to initialize to correct folderr
+            this.frameworkDiscoverer = new FrameworkDiscoverer(unittestsettings.TestFrameworksLocation);
         }
 
         public void Cancel()
@@ -52,8 +59,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// This is the equivalent of "RunAll" functionality
         /// </summary>
         /// <param name="sources">Refers to the list of test sources passed to the test adapter from the client.  (Client could be VS or command line)</param>
-        /// <param name="runContext">Defines the settings related to the current run</param>
-        /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
         public void RunTests(IEnumerable<string> sources, ITestDiscoverer discoverer)
         {
             ValidateArg.NotNull(sources, nameof(sources));
@@ -76,8 +81,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// This is the equivalent of "Run Selected Tests" functionality.
         /// </summary>
         /// <param name="tests">The list of TestCases selected to run</param>
-        /// <param name="runContext">Defines the settings related to the current run</param>
-        /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
         public void RunTests(IEnumerable<TestCase> tests)
         {
             ValidateArg.NotNull(tests, nameof(tests));
@@ -144,10 +147,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                     break;
                 }
 
-                var args = GetInterpreterArgs(test, workingDir, projectRootDir);
+                var args = this.GetInterpreterArgs(test, workingDir, projectRootDir);
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
-                if (nodeArgs.Count == 0)
+                if (!nodeArgs.Any())
                 {
                     nodeArgs.Add(args.RunTestsScriptFile);
                 }
@@ -343,11 +346,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             ).First();
         }
 
-        private static TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
+        private TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return FrameworkDiscoverer.Instance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
+            return this.frameworkDiscoverer.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

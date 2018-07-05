@@ -33,10 +33,8 @@
     <Compile Include="..\Nodejs\SourceMapping\SourceMapper.cs" Link="SourceMapping\SourceMapper.cs" />
     <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs" Link="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="..\TestAdapter\JavaScriptTestCaseProperties.cs" Link="JavaScriptTestCaseProperties.cs" />
-    <Compile Include="..\TestAdapter\JavaScriptTestDiscoverer.cs" Link="JavaScriptTestDiscoverer.cs" />
-    <Compile Include="..\TestAdapter\JavaScriptTestDiscoverer.TestFileEntry.cs" Link="JavaScriptTestDiscoverer.TestFileEntry.cs" />
-    <Compile Include="..\TestAdapter\JavaScriptTestExecutor.cs" Link="JavaScriptTestExecutor.cs" />
     <Compile Include="..\TestAdapter\SerializationHelpers.cs" Link="SerializationHelpers.cs" />
+    <Compile Include="..\TestAdapter\TestDiscovererWorker.cs" Link="TestDiscovererWorker.cs" />
     <Compile Include="..\TestAdapter\TestExecutorWorker.cs" Link="TestExecutorWorker.cs" />
     <Compile Include="..\TestAdapter\TestExecutorWorker.TestExecutionRedirector.cs" Link="TestExecutorWorker.TestExecutionRedirector.cs" />
     <Compile Include="..\TestAdapter\TestExecutorWorker.TestReceiver.cs" Link="TestExecutorWorker.TestReceiver.cs" />
