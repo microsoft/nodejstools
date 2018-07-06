@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.NodejsTools.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -64,7 +65,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     break;
                 }
             }
-            testFx = testFx ?? this.FrameworkDiscoverer.Get("ExportRunner");
+            testFx = testFx ?? this.FrameworkDiscoverer.Get(TestFrameworkDirectories.ExportRunnerFrameworkName);
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
             var worker = new TestDiscovererWorker(packageJsonPath, NodejsConstants.PackageJsonExecutorUri, nodeExePath);

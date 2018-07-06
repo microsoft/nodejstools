@@ -5,12 +5,9 @@ using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
-#endif
-using Microsoft.Win32;
-
-#if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
 #endif
+using Microsoft.Win32;
 using Microsoft.VisualStudioTools;
 //using Microsoft.VisualStudio.Shell;
 //using Microsoft.VisualStudio.Shell.Interop;

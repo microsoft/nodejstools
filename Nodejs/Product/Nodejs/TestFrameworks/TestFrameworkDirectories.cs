@@ -48,8 +48,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
             var currentAssembly = typeof(TestFrameworkDirectories).Assembly;
 
-            if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase) ||
-               (currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase)))
+            if (currentAssembly.FullName.StartsWith("Microsoft.NodejsTools.TestAdapter", StringComparison.OrdinalIgnoreCase))
             {
                 testAdapterAssemblyFolder = Path.GetDirectoryName(currentAssembly.Location);
             }
@@ -71,6 +70,10 @@ namespace Microsoft.NodejsTools.TestFrameworks
                     return Path.Combine(microsoftRoot, "Node.js Test Adapter", version, TestFrameworksFolderName);
                 }
 #endif
+            }
+            else if(currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("'TestFrameworkRoot' should have been set in the targets file in the nuget package.");
             }
             else
             {

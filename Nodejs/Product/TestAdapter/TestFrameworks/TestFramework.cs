@@ -14,13 +14,11 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     public sealed class TestFramework
     {
-        private readonly string vsixScriptFolder;
         private readonly string findTestsScriptFile;
         private readonly string runTestsScriptFile;
 
         public TestFramework(string vsixScriptFolder)
         {
-            this.vsixScriptFolder = vsixScriptFolder;
             this.Name = Path.GetFileNameWithoutExtension(vsixScriptFolder);
             this.findTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "find_tests.js");
             this.runTestsScriptFile = Path.Combine(Path.GetDirectoryName(vsixScriptFolder), "run_tests.js");
