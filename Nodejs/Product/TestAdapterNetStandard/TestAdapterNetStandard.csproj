@@ -12,20 +12,15 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Microsoft.UnitTest.JavaScript.targets" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs" Link="CommonConstants.cs" />
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs" Link="CommonUtils.cs" />
     <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs" Link="ProcessOutput.cs" />
-    <Compile Include="..\Nodejs\Nodejs.cs" Link="Nodejs.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="..\Nodejs\Nodejs.cs" Link="Nodejs.cs" />
     <Compile Include="..\Nodejs\NodejsConstants.cs" Link="NodejsConstants.cs" />
     <Compile Include="..\Nodejs\SourceMapping\FunctionInfo.cs" Link="SourceMapping\FunctionInfo.cs" />
     <Compile Include="..\Nodejs\SourceMapping\JavaScriptSourceMapInfo.cs" Link="SourceMapping\JavaScriptSourceMapInfo.cs" />
@@ -50,7 +45,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <!--<PackageReference Include="Microsoft.Build" Version="15.7.179" />-->
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="15.7.2" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
@@ -66,10 +60,6 @@
       <StrongName>StrongName</StrongName>
       <InProject>false</InProject>
     </FilesToSign>
-    <!--<FilesToSign Include="$(OutDir)\Microsoft.JavaScript.TestAdapter.1.0.0.nupkg">
-      <Authenticode>NuGet</Authenticode>
-      <InProject>false</InProject>
-    </FilesToSign>-->
   </ItemGroup>
 
   <ItemGroup>
