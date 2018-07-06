@@ -2,6 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Microsoft.UnitTest.JavaScript</id>
+    <!-- build updates the version -->
     <version>0.0.0</version>
     <title>Microsoft.UnitTest.JavaScript</title>
     <authors>Microsoft</authors>
@@ -22,14 +23,14 @@
   </metadata>
   <files>
     <!-- unit test framework specific and shared js files -->
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\*.js" target="build\_common\TestFrameworks\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\ExportRunner\ExportRunner.js" target="build\_common\TestFrameworks\ExportRunner\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Jasmine\Jasmine.js" target="build\_common\TestFrameworks\Jasmine\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Mocha\Mocha.js" target="build\_common\TestFrameworks\Mocha\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapter\TestFrameworks\Tape\Tape.js" target="build\_common\TestFrameworks\Tape\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapter\TestFrameworks\*.js" target="build\_common\TestFrameworks\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapter\TestFrameworks\ExportRunner\ExportRunner.js" target="build\_common\TestFrameworks\ExportRunner\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapter\TestFrameworks\Jasmine\Jasmine.js" target="build\_common\TestFrameworks\Jasmine\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapter\TestFrameworks\Mocha\Mocha.js" target="build\_common\TestFrameworks\Mocha\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapter\TestFrameworks\Tape\Tape.js" target="build\_common\TestFrameworks\Tape\" />
     <!-- net standard library -->
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.props" target="build\netstandard2.0\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.targets" target="build\netstandard2.0\" />
-    <file src="..\..\BuildOutput\Debug\Binaries\TestAdapterNetStandard\Microsoft.JavaScript.TestAdapter.dll" target="build\netstandard2.0\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.props" target="build\netstandard2.0\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapterNetStandard\Microsoft.UnitTest.JavaScript.targets" target="build\netstandard2.0\" />
+    <file src="..\..\BuildOutput\Release\Binaries\TestAdapterNetStandard\Microsoft.JavaScript.TestAdapter.dll" target="build\netstandard2.0\" />
   </files>
 </package>
