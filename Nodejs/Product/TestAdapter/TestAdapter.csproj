@@ -111,6 +111,9 @@
     <Content Include="TestFrameworks\Jest\jest.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="TestFrameworks\Jest\jestReporter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFrameworks\mocha\mocha.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

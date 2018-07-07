@@ -43,93 +43,28 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 
 const run_tests = function (testCases, post) {
-    // Jest package is not required for this tests to run, but it's still good to check 
-    // in case the user have a build system or an automation that requires Jest.
     const jest = detectPackage(testCases[0].projectFolder, 'jest');
-    const jestEditorSupport = detectPackage(testCases[0].projectFolder, 'jest-editor-support');
-
-    if (!jest || !jestEditorSupport) {
+    if (!jest) {
         return;
     }
 
-    const workspace = {
-        rootPath: testCases[0].projectFolder,
-        pathToJest: getJestPath(testCases[0].projectFolder),
-        pathToConfig: '',
-        localJestMajorVersion: 23 // TODO: Get the jest version from the package.
-    };
-
-    runTest(testCases)
-        .then(() => post({
-            type: 'suite end',
-            result: {}
-        }))
-        .catch((error) => logError(error));
-
-    function runTest(testCases) {
-        return new Promise((resolve, reject) => {
-
-            // Start all test cases. Jest doesn't report when each test start, only reports the whole file.
-            for (const testCase of testCases) {
-                post({
-                    type: 'test start',
-                    title: testCase.testName
-                });
-            }
-
-            const runner = new jestEditorSupport.Runner(workspace, {
-                testFileNamePattern: escapeRegExp(testCases[0].testFile)
-            });
-
-            runner
-                // Jest uses the stdErr for output to the console.
-                .on('executableStdErr', (data) => {
-                    if (data.toString().indexOf("Test results written to") !== -1) {
-                        const tempFile = os.tmpdir + '/jest_runner.json';
-                        fs.readFile(tempFile, (err, resultFile) => {
-
-                            if (err) {
-                                return reject(err);
-                            }
-
-                            const parsedResult = JSON.parse(resultFile.toString());
-
-                            for (const testResult of parsedResult.testResults) {
-                                for (const assertionResult of testResult.assertionResults) {
-                                    const result = {
-                                        passed: assertionResult.status === 'passed',
-                                        pending: assertionResult.status === 'pending',
-                                        stderr: assertionResult.failureMessages.join('\n'),
-                                        stdout: "",
-                                        title: assertionResult.title
-                                    };
-
-                                    post({
-                                        type: result.pending ? 'pending' : 'result',
-                                        title: assertionResult.title,
-                                        result: result
-                                    });
-                                }
-                            }
-
-                            return resolve(testCases);
-                        });
-                    }
-                })
-                .on('terminalError', (error) => reject(error));
-
-            runner.start(false);
+    // Start all test cases, as jest is unable to filter out independently
+    for (const testCase of testCases) {
+        post({
+            type: 'test start',
+            title: testCase.testName
         });
     }
+
+    const config = {
+        json: true,
+        reporters: [[__dirname + '/jestReporter.js', { post: post }]],
+        testMatch: [testCases[0].testFile]
+    };
+
+    jest.runCLI(config, [testCases[0].projectFolder])
+        .catch((error) => logError(error));
 };
-
-function getJestPath(projectFolder) {
-    return path.join(projectFolder, "node_modules", ".bin", "jest.cmd");
-}
-
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
 
 function detectPackage(projectFolder, packageName) {
     try {
