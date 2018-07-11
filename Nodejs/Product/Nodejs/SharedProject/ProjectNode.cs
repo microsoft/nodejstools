@@ -680,8 +680,8 @@ namespace Microsoft.VisualStudioTools.Project
         protected ProjectNode(IServiceProvider serviceProvider)
         {
             this.extensibilityEventsDispatcher = new ExtensibilityEventsDispatcher(this);
-            this.Initialize();
             this.site = serviceProvider;
+            this.Initialize();
             this.taskProvider = new TaskProvider(this.site);
         }
 
@@ -5686,6 +5686,9 @@ If the files in the existing folder have the same names as files in the folder y
         {
             this.ID = VSConstants.VSITEMID_ROOT;
             this.tracker = new TrackDocumentsHelper(this);
+
+            var accessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
+            Utilities.CheckNotNull(accessor);
         }
 
         /// <summary>
