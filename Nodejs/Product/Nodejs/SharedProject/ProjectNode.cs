@@ -5687,6 +5687,9 @@ If the files in the existing folder have the same names as files in the folder y
             this.ID = VSConstants.VSITEMID_ROOT;
             this.tracker = new TrackDocumentsHelper(this);
 
+            // Ensure the SVsBuildManagerAccessor is initialized, so there is an IVsUpdateSolutionEvents4 for
+            // solution update events (through Microsoft.VisualStudio.CommonIDE.BuildManager.BuildManagerAccessor).
+            // This ensures that the first build after project creation succeeds.
             var accessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
             Utilities.CheckNotNull(accessor);
         }
