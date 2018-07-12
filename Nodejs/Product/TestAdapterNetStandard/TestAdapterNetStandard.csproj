@@ -15,6 +15,7 @@
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
     <PackageVersion>$(VSIXBuildVersion)</PackageVersion>
+    <PackageId>Microsoft.UnitTest.JavaScript</PackageId>
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
 
