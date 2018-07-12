@@ -14,6 +14,7 @@
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
+    <PackageVersion>$(VSIXBuildVersion)</PackageVersion>
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
 
@@ -40,7 +41,7 @@
     <Compile Include="..\TestAdapter\UnitTestSettings.cs" Link="UnitTestSettings.cs" />
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs" Link="TypeScriptHelpers.cs" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="Microsoft.UnitTest.JavaScript.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -67,7 +68,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core" Version="0.3.0">
       <PrivateAssets>all</PrivateAssets>
@@ -91,12 +92,12 @@
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <Import Project="..\ProjectAfter.targets" />
-  
+
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);version=$(VSIXBuildVersion)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);outDir=$(OutDir)</NuspecProperties>
     </PropertyGroup>
   </Target>
-  
+
 </Project>
