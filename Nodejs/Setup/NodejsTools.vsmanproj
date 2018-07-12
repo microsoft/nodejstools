@@ -6,6 +6,8 @@
     <ProjectGuid>{D9BADB3D-B6E9-4A54-8196-9374CFB93DA9}</ProjectGuid>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <UseVSSDK>false</UseVSSDK>
+    <Language>xml</Language>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration) == 'Release' " />
   <PropertyGroup Condition="$(Configuration) == 'Debug' " />
@@ -49,6 +51,15 @@
   <Target Name="Clean" />
   <Target Name="ReBuild" />
   <Target Name="BuiltProjectOutputGroup" />
+  <Target Name="BuiltProjectOutputGroupDependencies" />
+  <Target Name="DebugSymbolsProjectOutputGroup" />
+  <Target Name="DebugSymbolsProjectOutputGroupDependencies" />
+  <Target Name="DocumentationProjectOutputGroup" />
+  <Target Name="DocumentationProjectOutputGroupDependencies" />
+  <Target Name="SGenFilesOutputGroup" />
+  <Target Name="SGenFilesOutputGroupDependencies" />
+  <Target Name="SatelliteDllsProjectOutputGroup" />
+  <Target Name="SatelliteDllsProjectOutputGroupDependencies" />
   <Import Project=".\SetupProjectAfter.settings" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

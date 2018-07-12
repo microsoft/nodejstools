@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="Common.Build.CSharp.targets" Condition="'$(Language)' == 'C#'" />
-  <Import Project="Common.Build.VSSDK.targets" Condition="$(UseVSSDK) or $(UseVSSDKTemplateOnly)" />
+  <Import Project="Common.Build.VSSDK.targets" Condition="'$(UseVSSDK)'=='true' or '$(UseVSSDKTemplateOnly)'=='true'" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" Condition="'$(Language)' == 'C++'" />
   <Import Project="fileVersion.targets" Condition="'$(Language)' == 'C#'" />
 
@@ -130,7 +130,7 @@
   <Target Name="_CopyOutputsToPath"
           AfterTargets="AfterBuild"
           DependsOnTargets="BuiltProjectOutputGroup;SatelliteDllsProjectOutputGroup;DebugSymbolsFinalOutputProjectOutputGroup"
-          Condition="'$(CopyOutputsToPath)' != '' and $(MSBuildProjectExtension) != '.wixproj' and Exists($(TargetPath))">
+          Condition="'$(CopyOutputsToPath)' != '' and $(MSBuildProjectExtension) != '.vsmanproj' and Exists($(TargetPath))">
     <PropertyGroup>
       <CopyOutputsToPath Condition="!HasTrailingSlash($(CopyOutputsToPath))">$(CopyOutputsToPath)\</CopyOutputsToPath>
     </PropertyGroup>
