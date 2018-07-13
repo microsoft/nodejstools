@@ -1,22 +1,21 @@
 # Node.js tools for Visual Studio
 
-Node.js tools for [Visual Studio 2017](http://aka.ms/explorentvs) is developed and managed here.
+Node.js tools for Visual Studio 2017 is developed and managed here.
 
 ![Build status for master branch](https://devdiv.visualstudio.com/_apis/public/build/definitions/0bdbc590-a062-4c3f-b0f6-9383f67865ee/4492/badge)
 [![Join the chat at https://gitter.im/Microsoft/nodejstools](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Microsoft/nodejstools?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-Visit our page on [VisualStudio.com](https://aka.ms/explorentvs) for an overview and download links, 
-and check out our documentation on [the NTVS wiki](https://github.com/Microsoft/nodejstools/wiki) 
+Check out our documentation on [the NTVS wiki](https://github.com/Microsoft/nodejstools/wiki) 
 and our (old) [feature overview](https://channel9.msdn.com/events/Visual-Studio/Connect-event-2015/801) video on Channel 9.
 
 Feel free to file issues or ask questions on our [issue tracker](http://github.com/Microsoft/nodejstools/issues), 
 and we welcome code contributions - see 
-[Contributing](https://github.com/Microsoft/nodejstools/.github/Contributing,md) for information. 
+[Contributing](https://github.com/Microsoft/nodejstools/.github/Contributing.md) for information. 
 
 ## Visual Studio 2017 installation
 
-The Node.js development workload is available as part of [Visual Studio 2017](https://aka.ms/explorentvs) Community, Professional 
+The Node.js development workload is available as part of Visual Studio 2017 Community, Professional 
 and Enterprise. 
 To install, run the [normal VS installer](https://visualstudio.com/vs/downloads?wt.mc_id=github_microsoft_com) 
 and select the **Node.js development workload**.
@@ -41,4 +40,4 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## License
 [Apache License 2.0 (Apache)](https://github.com/Microsoft/nodejstools/blob/master/LICENSE)
 
-Thank you for using and supporting the Node.js Tools for Visual Studio
+Thank you for using and supporting the Node.js Tools for Visual Studio.

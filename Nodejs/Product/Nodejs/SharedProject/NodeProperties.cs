@@ -606,9 +606,8 @@ namespace Microsoft.VisualStudioTools.Project
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            var nodeProps = context.Instance as FileNodeProperties;
             IEnumerable<string> itemNames;
-            if (nodeProps != null)
+            if (context.Instance is FileNodeProperties nodeProps)
             {
                 itemNames = nodeProps.HierarchyNode.ProjectMgr.GetAvailableItemNames();
             }

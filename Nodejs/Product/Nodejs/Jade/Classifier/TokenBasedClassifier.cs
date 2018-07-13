@@ -191,9 +191,8 @@ namespace Microsoft.NodejsTools.Jade
 
             foreach (var token in tokensInSpan)
             {
-                var compositeToken = token as ICompositeToken<TTokenClass>;
 
-                if (compositeToken != null)
+                if (token is ICompositeToken<TTokenClass> compositeToken)
                 {
                     foreach (var internalToken in compositeToken.TokenList)
                     {

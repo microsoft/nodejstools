@@ -70,8 +70,7 @@ namespace Microsoft.NodejsTools
                 )
             );
 
-            var proj = extObject as EnvDTE.Project;
-            if (proj != null)
+            if (extObject is EnvDTE.Project proj)
             {
                 try
                 {
@@ -298,13 +297,15 @@ namespace Microsoft.NodejsTools
         private int ShowContextMenu(IntPtr pvaIn, int ctxMenu)
         {
             var variant = Marshal.GetObjectForNativeVariant(pvaIn);
-            var pointsAsUint = (UInt32)variant;
+            var pointsAsUint = (uint)variant;
             var x = (short)(pointsAsUint & 0x0000ffff);
             var y = (short)((pointsAsUint & 0xffff0000) / 0x10000);
 
-            var points = new POINTS();
-            points.x = x;
-            points.y = y;
+            var points = new POINTS
+            {
+                x = x,
+                y = y
+            };
 
             return ShowContextMenu(ctxMenu, VsMenus.guidSHLMainMenu, points);
         }
@@ -377,8 +378,7 @@ namespace Microsoft.NodejsTools
 
         private static bool IsJavaScriptFile(object name)
         {
-            var strName = name as string;
-            if (strName != null)
+            if (name is string strName)
             {
                 var ext = Path.GetExtension(strName);
                 if (StringComparer.OrdinalIgnoreCase.Equals(ext, ".js"))
@@ -970,8 +970,7 @@ namespace Microsoft.NodejsTools
 
             var encoding = Encoding.UTF8;
 
-            var userData = lines as IVsUserData;
-            if (userData != null)
+            if (lines is IVsUserData userData)
             {
                 var guid = VSConstants.VsTextBufferUserDataGuid.VsBufferEncodingVSTFF_guid;
                 int cp;

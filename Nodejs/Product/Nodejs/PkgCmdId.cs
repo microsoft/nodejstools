@@ -9,7 +9,7 @@ namespace Microsoft.NodejsTools
         public const int cmdidSetAsNodejsStartupFile = 0x203;
 
         public const int cmdidImportWizard = 0x205;
- 
+
         public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
 
         public const int cmdidDiagnostics = 0x208;
@@ -31,5 +31,12 @@ namespace Microsoft.NodejsTools
 
         // only allow 100 scripts
         public const int cmdidWorkSpaceNpmDynamicScriptMax = cmdidWorkSpaceNpmDynamicScript + 100;
+
+        // Workspace cmdIds
+        public const int cmdid_DebugActionContext = 0x1000;
+
+        public const int cmdid_BuildActionContext = 0x1000;
+        public const int cmdid_RebuildActionContext = 0x1010;
+        public const int cmdid_CleanActionContext = 0x1020;
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -101,8 +101,7 @@ namespace Microsoft.NodejsTools.Project
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            var discover = new TestFrameworkDirectories();
-            var knownFrameworkList = discover.GetFrameworkNames();
+            var knownFrameworkList = TestFrameworkDirectories.GetFrameworkNames();
             return new StandardValuesCollection(knownFrameworkList);
         }
     }

@@ -84,6 +84,14 @@
     <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestWindow.Interfaces">
+      <HintPath>$(DevEnvDir)CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestWindow.Interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
+      <HintPath>$(DevEnvDir)CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="microsoft.visualstudio.textmanager.interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -101,12 +109,6 @@
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Build, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Conversion.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Engine, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Framework, Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Tasks.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.Build.Utilities.$(MicrosoftBuildAssemblyVersionSuffix), Version=$(MicrosoftBuildAssemblyVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.JScript" />
     <Reference Include="microsoft.msxml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -150,7 +152,6 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -176,6 +177,9 @@
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs">
       <Link>SharedProject\CommonConstants.cs</Link>
     </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.VS.cs">
+      <Link>SharedProject\CommonConstants.VS.cs</Link>
+    </Compile>
     <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
       <Link>SharedProject\CommonUtils.cs</Link>
     </Compile>
@@ -186,7 +190,7 @@
       <Link>SharedProject\SolutionEventsListener.cs</Link>
     </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
-      <Link>Project\TypeScriptHelpers.cs</Link>
+      <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
     <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
@@ -194,7 +198,17 @@
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
-    <Compile Include="Debugger\NodeDebugProvider.cs" />
+    <Compile Include="Repl\InteractiveWindowContentType.cs" />
+    <Compile Include="TypeScriptHelpers\TsConfigJson.cs" />
+    <Compile Include="TypeScriptHelpers\TsConfigJsonFactory.cs" />
+    <Compile Include="TypeScriptHelpers\TypeScriptCompile.cs" />
+    <Compile Include="TypeScriptHelpers\TypeScriptCompilerLocator.cs" />
+    <Compile Include="Workspace\BaseFileScanner.cs" />
+    <Compile Include="Workspace\ContextMenuProvider.cs" />
+    <Compile Include="Workspace\LaunchDebugTargetProvider.cs" />
+    <Compile Include="Workspace\PackageJsonTestContainer.cs" />
+    <Compile Include="Workspace\PackageJsonTestContainerDiscoverer.cs" />
+    <Compile Include="Workspace\NodeJsDebugLaunchTargetProvider.cs" />
     <Compile Include="GeneratedHelpAboutVersion.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -227,6 +241,7 @@
     </Compile>
     <Compile Include="NpmUI\PackageCatalogEntryViewModel.cs" />
     <Compile Include="Project\AzureToolsContracts.cs" />
+    <Compile Include="Project\ImportWizard\ProjectLanguageBoolConverter.cs" />
     <Compile Include="Project\MissingNodeInfoBar.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileUtilities.cs" />
     <Compile Include="Project\NewFileMenuGroup\NewFileNameForm.cs">
@@ -262,7 +277,6 @@
     <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\InfoReplCommand.cs" />
-    <Compile Include="Repl\InteractiveContentType.cs" />
     <Compile Include="Repl\InteractiveWindowColor.cs" />
     <Compile Include="Repl\InteractiveWindowCommand.cs" />
     <Compile Include="Repl\InteractiveWindowProvider.cs" />
@@ -280,8 +294,13 @@
     <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-    <Compile Include="Workspace\ContextMenuProvider.cs" />
-    <Compile Include="Workspace\PackageJsonContextProviderFactory.cs" />
+    <Compile Include="Workspace\JsFileDebugLaunchTargetProvider.cs" />
+    <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
+    <Compile Include="Workspace\TsConfigScannerFactory.cs" />
+    <Compile Include="Workspace\TypeScriptActionProviderFactory.cs" />
+    <Compile Include="Workspace\TypeScriptContextProviderFactory.cs" />
+    <Compile Include="Workspace\TypeScriptScannerFactory.cs" />
+    <Compile Include="Workspace\WorkspaceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
@@ -394,7 +413,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Options\NodejsGeneralOptionsControl.Designer.cs">
-      <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>NodejsGeneralOptionsControl.resx</DependentUpon>
     </Compile>
     <Compile Include="Project\AbstractNpmNode.cs" />
     <Compile Include="Project\ImportWizard\StartupPage.xaml.cs">
@@ -563,9 +584,18 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <DependentUpon>NodejsGeneralOptionsControl.cs</DependentUpon>
       <SubType>Designer</SubType>
+      <LastGenOutput>NodejsGeneralOptionsControl.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="OpenFolder.pkgdef">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Workspace\OpenFolderSchema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.css" />
     <ZipItem Include="Templates\Files\EmptyCss\EmptyCss.vstemplate" />
     <ZipItem Include="Templates\Files\EmptyHtml\EmptyHtml.html" />
@@ -616,6 +646,34 @@
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
     <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
     <ZipItem Include="Templates\Files\TypeScriptJsConfig\jsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\.babelrc" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\.postcssrc.js" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\App.vue" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\favicon.ico" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\Home.vue" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\index.html" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\main.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\package.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\tsconfig.json" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.njsproj" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.vstemplate" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\.babelrc" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\.postcssrc.js" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\App.vue" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\favicon.ico" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\Home.vue" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\index.html" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\main.js" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\package.json" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\README.md" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\VuejsApp.njsproj" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\VuejsApp.vstemplate" />
+    <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vstemplate" />
+    <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vue" />
+    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
+    <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -939,7 +997,7 @@
     <Content Include="visualstudio_nodejs_repl.js">
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubpath>.</VSIXSubpath>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <ZipProject Include="ProjectTemplates\NodejsWebApp\NodejsWebApp.vstemplate">
       <SubType>Designer</SubType>
@@ -1173,22 +1231,37 @@
   </ItemGroup>
   <ItemGroup>
     <T4ParameterValues Include="BuildVersion">
-      <Value>$(VSIXBuildVersion)</Value>
+      <Value>$(BuildVersionExtended)</Value>
       <Visible>false</Visible>
     </T4ParameterValues>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
-      <Version>0.2.0</Version>
+      <Version>0.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build">
+      <Version>15.6.82</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Framework">
+      <Version>15.6.82</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Build.Utilities.Core">
+      <Version>15.6.82</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.AppDesigner">
       <Version>15.3.0-rc-6162104</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes">
+      <Version>15.0.17</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.15.7.DesignTime">
+      <Version>15.7.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Telemetry">
-      <Version>15.3.799-masterDDDBA9E4</Version>
+      <Version>15.7.942-master669188BE</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading">
-      <Version>15.5.13-beta</Version>
+      <Version>15.6.46</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.VsInteractiveWindow">
       <Version>2.3.0</Version>
@@ -1243,9 +1316,10 @@
     </ItemGroup>
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(OutDir)RemoteDebug\
-copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
-</PostBuildEvent>
+    <PostBuildEvent>
+      mkdir $(OutDir)RemoteDebug\
+      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- 
       We build these assemblies into separate folders to avoid incremental cleaning issues,

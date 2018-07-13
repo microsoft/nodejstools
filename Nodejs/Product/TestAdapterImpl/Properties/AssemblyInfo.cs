@@ -1,11 +1,10 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 
-[assembly: AssemblyTitle("Node.js Tools for Visual Studio - Test Explorer Integration")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 

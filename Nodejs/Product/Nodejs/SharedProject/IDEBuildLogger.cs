@@ -112,9 +112,8 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (disposing)
             {
-                var sp = this.serviceProvider as ServiceProvider;
                 this.serviceProvider = null;
-                if (sp != null)
+                if (this.serviceProvider is ServiceProvider sp)
                 {
                     sp.Dispose();
                 }

@@ -276,8 +276,7 @@ namespace Microsoft.NodejsTools.Jade
             {
                 foreach (var kvp in this._servicesByType)
                 {
-                    var service = kvp.Value as T;
-                    if (service != null)
+                    if (kvp.Value is T service)
                     {
                         list.Add(service);
                     }

@@ -123,8 +123,7 @@ namespace Microsoft.NodejsTools.Project
         {
             get
             {
-                var node = this.DependencyNode as HierarchyNode;
-                if (null != node && node.Parent is DependencyNode)
+                if (this.DependencyNode is HierarchyNode node && node.Parent is DependencyNode)
                 {
                     return true;
                 }

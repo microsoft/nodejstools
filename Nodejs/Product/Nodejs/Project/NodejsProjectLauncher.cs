@@ -32,8 +32,6 @@ namespace Microsoft.NodejsTools.Project
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        private static readonly Guid WebkitDebuggerGuid = Guid.Parse("4cc6df14-0ab5-4a91-8bb4-eb0bf233d0fe");
-        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
         internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
 
         public NodejsProjectLauncher(NodejsProjectNode project)
@@ -64,26 +62,20 @@ namespace Microsoft.NodejsTools.Project
             }
 
             var nodeVersion = Nodejs.GetNodeVersion(nodePath);
-            var chromeProtocolRequired = nodeVersion >= new Version(8, 0) || CheckDebugProtocolOption();
             var startBrowser = ShouldStartBrowser();
 
             // The call to Version.ToString() is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
-            if (debug && !chromeProtocolRequired)
+            if (debug)
             {
-                StartWithDebugger(file);
-                TelemetryHelper.LogDebuggingStarted("Node6", nodeVersion.ToString());
-            }
-            else if (debug && chromeProtocolRequired)
-            {
-                if (CheckUseNewChromeDebugProtocolOption())
+                if (nodeVersion >= new Version(8, 0))
                 {
                     StartWithChromeV2Debugger(file, nodePath, startBrowser);
                     TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
                 }
                 else
                 {
-                    StartAndAttachDebugger(file, nodePath, startBrowser);
-                    TelemetryHelper.LogDebuggingStarted("Chrome", nodeVersion.ToString());
+                    StartWithDebugger(file);
+                    TelemetryHelper.LogDebuggingStarted("Node6", nodeVersion.ToString());
                 }
             }
             else
@@ -97,142 +89,11 @@ namespace Microsoft.NodejsTools.Project
 
         // todo: move usersettings to separate class, so we can use this from other places.
 
-        internal static bool CheckUseNewChromeDebugProtocolOption()
-        {
-            var optionString = NodejsDialogPage.LoadString(name: "WebKitVersion", cat: "Debugging");
-
-            return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "V1");
-        }
-
-        internal static bool CheckDebugProtocolOption()
-        {
-            var optionString = NodejsDialogPage.LoadString(name: "DebugProtocol", cat: "Debugging");
-
-            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "chrome");
-        }
-
         internal static bool CheckEnableDiagnosticLoggingOption()
         {
             var optionString = NodejsDialogPage.LoadString(name: "DiagnosticLogging", cat: "Debugging");
 
-            return StringComparer.OrdinalIgnoreCase.Equals(optionString, "true");
-        }
-
-        internal static string CheckForRegistrySpecifiedNodeParams()
-        {
-            var paramString = NodejsDialogPage.LoadString(name: "NodeCmdParams", cat: "Debugging");
-
-            return paramString;
-        }
-
-        private void StartAndAttachDebugger(string file, string nodePath, bool startBrowser)
-        {
-            // start the node process
-            var workingDir = _project.GetWorkingDirectory();
-            var url = GetFullUrl();
-            var env = GetEnvironmentVariablesString(url);
-            var interpreterOptions = _project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-            var debugOptions = this.GetDebugOptions();
-            var script = GetFullArguments(file, includeNodeArgs: false);
-
-            var process = NodeDebugger.StartNodeProcessWithInspect(exe: nodePath, script: script, dir: workingDir, env: env, interpreterOptions: interpreterOptions, debugOptions: debugOptions);
-            process.Start();
-
-            // setup debug info and attach
-            var debugUri = $"http://127.0.0.1:{process.DebuggerPort}";
-
-            var dbgInfo = new VsDebugTargetInfo4();
-            dbgInfo.dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning;
-            dbgInfo.LaunchFlags = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
-
-            dbgInfo.guidLaunchDebugEngine = WebkitDebuggerGuid;
-            dbgInfo.dwDebugEngineCount = 1;
-
-            var enginesPtr = MarshalDebugEngines(new[] { WebkitDebuggerGuid });
-            dbgInfo.pDebugEngines = enginesPtr;
-            dbgInfo.guidPortSupplier = WebkitPortSupplierGuid;
-            dbgInfo.bstrPortName = debugUri;
-            dbgInfo.fSendToOutputWindow = 0;
-
-            // we connect through a URI, so no need to set the process, 
-            // we need to set the process id to '1' so the debugger is able to attach 
-            dbgInfo.bstrExe = $"\01";
-
-            AttachDebugger(dbgInfo);
-
-            if (startBrowser)
-            {
-                Uri uri = null;
-                if (!String.IsNullOrWhiteSpace(url))
-                {
-                    uri = new Uri(url);
-                }
-
-                if (uri != null)
-                {
-                    OnPortOpenedHandler.CreateHandler(
-                        uri.Port,
-                        shortCircuitPredicate: () => process.HasExited,
-                        action: () =>
-                        {
-                            VsShellUtilities.OpenBrowser(url, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                        }
-                    );
-                }
-            }
-        }
-
-        private NodeDebugOptions GetDebugOptions()
-        {
-            var debugOptions = NodeDebugOptions.None;
-
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit)
-            {
-                debugOptions |= NodeDebugOptions.WaitOnAbnormalExit;
-            }
-
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit)
-            {
-                debugOptions |= NodeDebugOptions.WaitOnNormalExit;
-            }
-
-            return debugOptions;
-        }
-
-        private void AttachDebugger(VsDebugTargetInfo4 dbgInfo)
-        {
-            var serviceProvider = _project.Site;
-
-            var debugger = serviceProvider.GetService(typeof(SVsShellDebugger)) as IVsDebugger4;
-
-            if (debugger == null)
-            {
-                throw new InvalidOperationException("Failed to get the debugger service.");
-            }
-
-            var launchResults = new VsDebugTargetProcessInfo[1];
-            debugger.LaunchDebugTargets4(1, new[] { dbgInfo }, launchResults);
-        }
-
-        private static IntPtr MarshalDebugEngines(Guid[] debugEngines)
-        {
-            if (debugEngines.Length == 0)
-            {
-                return IntPtr.Zero;
-            }
-
-            var guidSize = Marshal.SizeOf(typeof(Guid));
-            var size = debugEngines.Length * guidSize;
-            var bytes = new byte[size];
-            for (var i = 0; i < debugEngines.Length; ++i)
-            {
-                debugEngines[i].ToByteArray().CopyTo(bytes, i * guidSize);
-            }
-
-            var pDebugEngines = Marshal.AllocCoTaskMem(size);
-            Marshal.Copy(bytes, 0, pDebugEngines, size);
-
-            return pDebugEngines;
+            return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "false");
         }
 
         private void StartNodeProcess(string file, string nodePath, bool startBrowser)
@@ -378,8 +239,15 @@ namespace Microsoft.NodejsTools.Project
             // Here we need to massage the env variables into the format expected by node and vs code
             var webBrowserUrl = GetFullUrl();
             var envVars = GetEnvironmentVariables(webBrowserUrl);
+            var debuggerPort = this._project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
+            if (string.IsNullOrWhiteSpace(debuggerPort))
+            {
+                debuggerPort = NodejsConstants.DefaultDebuggerPort.ToString();
+            }
 
             var runtimeArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments));
+            // If we supply the port argument we also need to manually add --inspect-brk=port to the runtime arguments
+            runtimeArguments = runtimeArguments.Append($"--inspect-brk={debuggerPort}");
             var scriptArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments));
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
@@ -391,6 +259,7 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("args", scriptArguments),
                 new JProperty("runtimeExecutable", nodePath),
                 new JProperty("runtimeArgs", runtimeArguments),
+                new JProperty("port", debuggerPort),
                 new JProperty("cwd", cwd),
                 new JProperty("console", "externalTerminal"),
                 new JProperty("env", JObject.FromObject(envVars)),
@@ -463,14 +332,13 @@ namespace Microsoft.NodejsTools.Project
                     Resources.DebugTypeScriptCombineNotSupportedWarningMessage,
                     SR.ProductName,
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning
-                    ) == DialogResult.Yes;
+                    MessageBoxIcon.Warning) == DialogResult.Yes;
             }
 
             return true;
         }
 
-        private void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value)
+        private static void AppendOption(ref VsDebugTargetInfo dbgInfo, string option, string value)
         {
             if (!string.IsNullOrWhiteSpace(dbgInfo.bstrOptions))
             {

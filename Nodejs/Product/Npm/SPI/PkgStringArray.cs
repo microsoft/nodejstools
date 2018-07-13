@@ -43,8 +43,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
         {
             foreach (var name in arrayPropertyNames)
             {
-                var array = package[name] as JToken;
-                if (null != array)
+                if (package[name] is JToken array)
                 {
                     return array;
                 }

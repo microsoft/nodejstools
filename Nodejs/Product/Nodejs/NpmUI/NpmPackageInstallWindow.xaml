@@ -236,9 +236,10 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ProgressBar Name="_progress"
-                             Height="4"
-                             IsIndeterminate="true"
-                             Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
+                         Height="4"
+                         IsEnabled="{Binding Path=IsExecutingCommand}"
+                         IsIndeterminate="{Binding Path=IsExecutingCommand}"
+                         Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
             <Button x:Name="CloseButton"
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
@@ -310,10 +311,10 @@
                                    Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=NoFilterText}"
                                    Text="{x:Static resx:NpmInstallWindowResources.SearchPromptMessage}" />
                         <ProgressBar 
-                    HorizontalAlignment="Stretch"
-                    IsEnabled="True" 
-                    IsIndeterminate="True"
-                    Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=Filtering}"/>
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=Filtering}" 
+                            IsIndeterminate="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=Filtering}"
+                            Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=Filtering}"/>
                         <TextBlock
                             HorizontalAlignment="Center"
                             Visibility="{Binding PackageFilterState, Converter={StaticResource filterStateConverter}, ConverterParameter=NoResults}"

@@ -7,7 +7,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestWindow.Extensibility;
-using Microsoft.VisualStudioTools.TestAdapter;
 using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
@@ -28,11 +27,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.discoverer = discoverer;
         }
 
-        public Uri ExecutorUri=> TestExecutor.ExecutorUri;
+        public Uri ExecutorUri=> NodejsConstants.ExecutorUri;
 
         public string GetCurrentTest(string filePath, int line, int lineCharOffset)
         {
-            var project = PathToProject(filePath);
+            var project = this.PathToProject(filePath);
             if (project != null && this.discoverer.IsProjectKnown(project))
             {
                 var buildEngine = new MSBuild.ProjectCollection();
@@ -61,9 +60,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                     (uint)_VSRDTFLAGS.RDT_NoLock,
                     filePath,
                     out hierarchy,
-                    out var _,
+                    out _,
                     out docData,
-                    out var _);
+                    out _);
                 ErrorHandler.ThrowOnFailure(hr);
             }
             finally

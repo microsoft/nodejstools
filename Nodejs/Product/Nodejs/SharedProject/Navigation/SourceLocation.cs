@@ -11,12 +11,6 @@ namespace Microsoft.VisualStudioTools.Parsing
     [Serializable]
     public struct SourceLocation
     {
-        // TODO: remove index
-        private readonly int _index;
-
-        private readonly int _line;
-        private readonly int _column;
-
         /// <summary>
         /// Creates a new source location.
         /// </summary>
@@ -27,51 +21,46 @@ namespace Microsoft.VisualStudioTools.Parsing
         {
             ValidateLocation(index, line, column);
 
-            this._index = index;
-            this._line = line;
-            this._column = column;
+            this.Index = index;
+            this.Line = line;
+            this.Column = column;
+        }
+
+        private SourceLocation(int index, int line, int column, bool noChecks)
+        {
+            this.Index = index;
+            this.Line = line;
+            this.Column = column;
         }
 
         private static void ValidateLocation(int index, int line, int column)
         {
             if (index < 0)
             {
-                throw ErrorOutOfRange("index", 0);
+                throw new ArgumentOutOfRangeException(nameof(index), $"'{nameof(index)}' must be greater than or equal to '0'.");
             }
             if (line < 1)
             {
-                throw ErrorOutOfRange("line", 1);
+                throw new ArgumentOutOfRangeException(nameof(line), $"'{nameof(line)}' must be greater than or equal to '1'.");
             }
             if (column < 1)
             {
-                throw ErrorOutOfRange("column", 1);
+                throw new ArgumentOutOfRangeException(nameof(column), $"'{nameof(column)}' must be greater than or equal to '1'.");
             }
-        }
-
-        private static Exception ErrorOutOfRange(object p0, object p1)
-        {
-            return new ArgumentOutOfRangeException(string.Format("{0} must be greater than or equal to {1}", p0, p1));
-        }
-
-        private SourceLocation(int index, int line, int column, bool noChecks)
-        {
-            this._index = index;
-            this._line = line;
-            this._column = column;
         }
 
         /// <summary>
         /// The index in the source stream the location represents (0-based).
         /// </summary>
-        public int Index => this._index;
+        public int Index { get; }
         /// <summary>
         /// The line in the source stream the location represents (1-based).
         /// </summary>
-        public int Line => this._line;
+        public int Line { get; }
         /// <summary>
         /// The column in the source stream the location represents (1-based).
         /// </summary>
-        public int Column => this._column;
+        public int Column { get; }
         /// <summary>
         /// Compares two specified location values to see if they are equal.
         /// </summary>
@@ -80,7 +69,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the locations are the same, False otherwise.</returns>
         public static bool operator ==(SourceLocation left, SourceLocation right)
         {
-            return left._index == right._index && left._line == right._line && left._column == right._column;
+            return left.Index == right.Index && left.Line == right.Line && left.Column == right.Column;
         }
 
         /// <summary>
@@ -91,7 +80,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the locations are not the same, False otherwise.</returns>
         public static bool operator !=(SourceLocation left, SourceLocation right)
         {
-            return left._index != right._index || left._line != right._line || left._column != right._column;
+            return left.Index != right.Index || left.Line != right.Line || left.Column != right.Column;
         }
 
         /// <summary>
@@ -102,7 +91,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the first location is before the other location, False otherwise.</returns>
         public static bool operator <(SourceLocation left, SourceLocation right)
         {
-            return left._index < right._index;
+            return left.Index < right.Index;
         }
 
         /// <summary>
@@ -113,7 +102,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the first location is after the other location, False otherwise.</returns>
         public static bool operator >(SourceLocation left, SourceLocation right)
         {
-            return left._index > right._index;
+            return left.Index > right.Index;
         }
 
         /// <summary>
@@ -124,7 +113,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the first location is before or the same as the other location, False otherwise.</returns>
         public static bool operator <=(SourceLocation left, SourceLocation right)
         {
-            return left._index <= right._index;
+            return left.Index <= right.Index;
         }
 
         /// <summary>
@@ -135,7 +124,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// <returns>True if the first location is after or the same as the other location, False otherwise.</returns>
         public static bool operator >=(SourceLocation left, SourceLocation right)
         {
-            return left._index >= right._index;
+            return left.Index >= right.Index;
         }
 
         /// <summary>
@@ -178,7 +167,7 @@ namespace Microsoft.VisualStudioTools.Parsing
         /// Whether the location is a valid location.
         /// </summary>
         /// <returns>True if the location is valid, False otherwise.</returns>
-        public bool IsValid => this._line != 0 && this._column != 0;
+        public bool IsValid => this.Line != 0 && this.Column != 0;
 
         public override bool Equals(object obj)
         {
@@ -188,22 +177,22 @@ namespace Microsoft.VisualStudioTools.Parsing
             }
 
             var other = (SourceLocation)obj;
-            return other._index == this._index && other._line == this._line && other._column == this._column;
+            return other.Index == this.Index && other.Line == this.Line && other.Column == this.Column;
         }
 
         public override int GetHashCode()
         {
-            return (this._line << 16) ^ this._column;
+            return (this.Line << 16) ^ this.Column;
         }
 
         public override string ToString()
         {
-            return "(" + this._line + "," + this._column + ")";
+            return "(" + this.Line + "," + this.Column + ")";
         }
 
         internal string ToDebugString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", this._index, this._line, this._column);
+            return string.Format(CultureInfo.CurrentCulture, "({0},{1},{2})", this.Index, this.Line, this.Column);
         }
     }
 }

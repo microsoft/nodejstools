@@ -158,9 +158,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>A project will only try to build if it can obtain a lock on this object</summary>
         private volatile static object BuildLock = new object();
 
-        /// <summary>Maps integer ids to project item instances</summary>
-        private HierarchyIdMap itemIdMap = new HierarchyIdMap();
-
         /// <summary>A service provider call back object provided by the IDE hosting the project manager</summary>
         private IServiceProvider site;
 
@@ -170,10 +167,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// MSBuild engine we are going to use 
         /// </summary>
         private MSBuild.ProjectCollection buildEngine;
-
-        private IDEBuildLogger buildLogger;
-
-        private bool useProvidedLogger;
 
         private MSBuild.Project buildProject;
 
@@ -592,9 +585,10 @@ namespace Microsoft.VisualStudioTools.Project
         }
 
         /// <summary>
-        /// Gets a collection of integer ids that maps to project item instances
+        /// Gets a collection of integer ids that maps to project item instances. 
+        /// This should be a new instance for each hierarchy.
         /// </summary>
-        internal HierarchyIdMap ItemIdMap => this.itemIdMap;
+        internal HierarchyIdMap ItemIdMap { get; } = new HierarchyIdMap();
 
         /// <summary>
         /// Get the helper object that track document changes.
@@ -604,18 +598,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <summary>
         /// Gets or sets the build logger.
         /// </summary>
-        protected IDEBuildLogger BuildLogger
-        {
-            get
-            {
-                return this.buildLogger;
-            }
-            set
-            {
-                this.buildLogger = value;
-                this.useProvidedLogger = value != null;
-            }
-        }
+        protected IDEBuildLogger BuildLogger { get; set; }
 
         /// <summary>
         /// Gets the taskprovider.
@@ -1001,12 +984,11 @@ namespace Microsoft.VisualStudioTools.Project
                     SetBuildProject(null);
                 }
 
-                var logger = this.BuildLogger as IDisposable;
-                this.BuildLogger = null;
-                if (logger != null)
+                if (this.BuildLogger is IDisposable logger)
                 {
                     logger.Dispose();
                 }
+                this.BuildLogger = null;
 
                 var tasks = this.taskProvider;
                 this.taskProvider = null;
@@ -1314,8 +1296,7 @@ namespace Microsoft.VisualStudioTools.Project
         /// <returns>S_OK if succeeded. Failure otherwise</returns>
         public int AddProjectReference()
         {
-            var referenceManager = this.GetService(typeof(SVsReferenceManager)) as IVsReferenceManager;
-            if (referenceManager != null)
+            if (this.GetService(typeof(SVsReferenceManager)) is IVsReferenceManager referenceManager)
             {
                 var contextGuids = new[] {
                     VSConstants.ProjectReferenceProvider_Guid,
@@ -1700,8 +1681,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.taskProvider.Tasks.Clear();
             }
 
-            var autoObject = GetAutomationObject() as Automation.OAProject;
-            if (autoObject != null)
+            if (GetAutomationObject() is Automation.OAProject autoObject)
             {
                 autoObject.Dispose();
             }
@@ -2198,8 +2178,7 @@ namespace Microsoft.VisualStudioTools.Project
             if (ErrorHandler.Succeeded(ParseCanonicalName(strFullPath, out var uiItemId)) &&
                 uiItemId != 0)
             {
-                var folder = this.NodeFromItemId(uiItemId) as FolderNode;
-                if (folder != null)
+                if (this.NodeFromItemId(uiItemId) is FolderNode folder)
                 {
                     // found the folder, return immediately
                     return folder;
@@ -2581,25 +2560,22 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual void SetOutputLogger(IVsOutputWindowPane output)
         {
             // Create our logger, if it was not specified
-            if (!this.useProvidedLogger || this.buildLogger == null)
+            if (this.BuildLogger == null)
             {
                 // Create the logger
-                var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>());
-                logger.ErrorString = this.ErrorString;
-                logger.WarningString = this.WarningString;
-                var oldLogger = this.BuildLogger as IDisposable;
-                this.BuildLogger = logger;
-                if (oldLogger != null)
+                var logger = new IDEBuildLogger(output, this.TaskProvider, GetOuterInterface<IVsHierarchy>())
                 {
-                    oldLogger.Dispose();
-                }
+                    ErrorString = this.ErrorString,
+                    WarningString = this.WarningString
+                };
+                this.BuildLogger = logger;
             }
             else
             {
                 this.BuildLogger.OutputWindowPane = output;
             }
 
-            this.buildLogger.RefreshVerbosity();
+            this.BuildLogger.RefreshVerbosity();
         }
 
         /// <summary>
@@ -2664,7 +2640,7 @@ namespace Microsoft.VisualStudioTools.Project
                     submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
                     if (accessor != null)
                     {
-                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.buildLogger));
+                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                     }
 
                     var buildResult = submission.Execute();
@@ -2721,16 +2697,16 @@ namespace Microsoft.VisualStudioTools.Project
             var submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
             try
             {
-                if (this.useProvidedLogger && this.buildLogger != null)
+                if (this.BuildLogger != null)
                 {
-                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.buildLogger));
+                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                 }
 
                 submission.ExecuteAsync(sub =>
                 {
                     this.Site.GetUIThread().Invoke(() =>
                     {
-                        var ideLogger = this.buildLogger;
+                        var ideLogger = this.BuildLogger;
                         if (ideLogger != null)
                         {
                             ideLogger.FlushBuildOutput();
@@ -2915,7 +2891,7 @@ namespace Microsoft.VisualStudioTools.Project
 
             this.buildProject.FullPath = newFileName;
 
-            this.DiskNodes.TryRemove(this.filename, out var _);
+            this.DiskNodes.TryRemove(this.filename, out _);
             this.filename = newFileName;
             this.DiskNodes[this.filename] = this;
 
@@ -3544,8 +3520,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                var queryEditQuerySave = this.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
-                if (queryEditQuerySave != null)
+                if (this.GetService(typeof(SVsQueryEditQuerySave)) is IVsQueryEditQuerySave2 queryEditQuerySave)
                 {
                     var qef = tagVSQueryEditFlags.QEF_AllowInMemoryEdits;
                     if (suppressUI)
@@ -3568,7 +3543,7 @@ namespace Microsoft.VisualStudioTools.Project
                         flags, // no per file flags
                         attributes, // no per file file attributes
                         out var verdict,
-                        out var _ // ignore additional results
+                        out _ // ignore additional results
                     );
 
                     var qer = (tagVSQueryEditResult)verdict;
@@ -3608,8 +3583,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (!this.disableQueryEdit)
             {
-                var queryTrack = this.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
-                if (queryTrack != null)
+                if (this.GetService(typeof(SVsTrackProjectDocuments)) is IVsTrackProjectDocuments2 queryTrack)
                 {
                     var res = new VSQUERYADDDIRECTORYRESULTS[1];
                     ErrorHandler.ThrowOnFailure(
@@ -3636,8 +3610,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (!this.disableQueryEdit)
             {
-                var queryTrack = this.GetService(typeof(SVsTrackProjectDocuments)) as IVsTrackProjectDocuments2;
-                if (queryTrack != null)
+                if (this.GetService(typeof(SVsTrackProjectDocuments)) is IVsTrackProjectDocuments2 queryTrack)
                 {
                     var res = new VSQUERYREMOVEDIRECTORYRESULTS[1];
                     ErrorHandler.ThrowOnFailure(
@@ -3771,9 +3744,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            var sccManager = this.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
 
-            if (sccManager != null)
+            if (this.Site.GetService(typeof(SVsSccManager)) is IVsSccManager2 sccManager)
             {
                 ErrorHandler.ThrowOnFailure(sccManager.RegisterSccProject(this, this.sccProjectName, this.sccAuxPath, this.sccLocalPath, this.sccProvider));
 
@@ -3791,9 +3763,8 @@ namespace Microsoft.VisualStudioTools.Project
                 return;
             }
 
-            var sccManager = this.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
 
-            if (sccManager != null)
+            if (this.Site.GetService(typeof(SVsSccManager)) is IVsSccManager2 sccManager)
             {
                 ErrorHandler.ThrowOnFailure(sccManager.UnregisterSccProject(this));
                 this.isRegisteredWithScc = false;
@@ -4910,8 +4881,7 @@ If the files in the existing folder have the same names as files in the folder y
                 return VSConstants.E_FAIL;
             }
 
-            var parentProject = parent as ProjectNode;
-            var destDirectory = parentProject != null ? parentProject.ProjectHome : parent.Url;
+            var destDirectory = parent is ProjectNode parentProject ? parentProject.ProjectHome : parent.Url;
 
             for (var count = 1; count < int.MaxValue; ++count)
             {
@@ -5981,8 +5951,7 @@ If the files in the existing folder have the same names as files in the folder y
             string solutionFile = null;
             string userOptionsFile = null;
 
-            var solution = this.Site.GetService(typeof(SVsSolution)) as IVsSolution;
-            if (solution != null)
+            if (this.Site.GetService(typeof(SVsSolution)) is IVsSolution solution)
             {
                 // We do not want to throw. If we cannot set the solution related constants we set them to empty string.
                 solution.GetSolutionInfo(out solutionDirectory, out solutionFile, out userOptionsFile);
@@ -6016,8 +5985,7 @@ If the files in the existing folder have the same names as files in the folder y
             // DevEnvDir property
             object installDirAsObject = null;
 
-            var shell = this.Site.GetService(typeof(SVsShell)) as IVsShell;
-            if (shell != null)
+            if (this.Site.GetService(typeof(SVsShell)) is IVsShell shell)
             {
                 // We do not want to throw. If we cannot set the solution related constants we set them to empty string.
                 shell.GetProperty((int)__VSSPROPID.VSSPROPID_InstallDirectory, out installDirAsObject);
@@ -6536,7 +6504,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             if (deletedItem is IDiskBasedNode diskNode)
             {
-                this.DiskNodes.TryRemove(diskNode.Url, out var _);
+                this.DiskNodes.TryRemove(diskNode.Url, out _);
             }
 
             this.RaiseItemDeleted(deletedItem);

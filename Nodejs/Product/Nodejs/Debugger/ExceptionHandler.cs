@@ -84,8 +84,7 @@ namespace Microsoft.NodejsTools.Debugger
             // Get exception names from in NodePackage.Debugger.cs
             foreach (var attr in System.Attribute.GetCustomAttributes(typeof(NodejsPackage)))
             {
-                var debugAttr = attr as ProvideNodeDebugExceptionAttribute;
-                if (debugAttr != null && !string.IsNullOrEmpty(debugAttr.ExceptionName))
+                if (attr is ProvideNodeDebugExceptionAttribute debugAttr && !string.IsNullOrEmpty(debugAttr.ExceptionName))
                 {
                     defaultExceptionTreatments[debugAttr.ExceptionName] = ExceptionHitTreatment.BreakNever;
                 }

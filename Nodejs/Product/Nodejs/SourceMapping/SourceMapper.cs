@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.SourceMapping
 {
-    internal class SourceMapper
+    public sealed class SourceMapper
     {
         private readonly Dictionary<string, ReverseSourceMap> _generatedFileToSourceMap = new Dictionary<string, ReverseSourceMap>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, JavaScriptSourceMapInfo> _originalFileToSourceMap = new Dictionary<string, JavaScriptSourceMapInfo>(StringComparer.OrdinalIgnoreCase);
@@ -34,16 +34,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                             {
                                 sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename) ?? string.Empty, Path.GetFileName(sourceMapFilename));
                             }
-                        }
-                        catch (ArgumentException)
-                        {
-                        }
-                        catch (PathTooLongException)
-                        {
-                        }
 
-                        try
-                        {
                             if (File.Exists(sourceMapFilename))
                             {
                                 using (var reader = new StreamReader(sourceMapFilename))
@@ -85,7 +76,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </returns>
         internal string MapToOriginal(string filename)
         {
-            var mapInfo = TryGetMapInfo(filename);
+            var mapInfo = this.TryGetMapInfo(filename);
             if (mapInfo != null && mapInfo.Map != null && mapInfo.Map.Sources.Count > 0)
             {
                 return mapInfo.Map.Sources[0];
@@ -98,7 +89,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         internal SourceMapInfo MapToOriginal(string filename, int line, int column = 0)
         {
-            var mapInfo = TryGetMapInfo(filename);
+            var mapInfo = this.TryGetMapInfo(filename);
             if (mapInfo != null)
             {
                 if (line < mapInfo.Lines.Length)
@@ -111,7 +102,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                     {
                         for (; column < lineText.Length; column++)
                         {
-                            if (!Char.IsWhiteSpace(lineText[column]))
+                            if (!char.IsWhiteSpace(lineText[column]))
                             {
                                 break;
                             }
@@ -135,7 +126,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             fileName = requestedFileName;
             lineNo = requestedLineNo;
             columnNo = requestedColumnNo;
-            var sourceMap = GetReverseSourceMap(requestedFileName);
+            var sourceMap = this.GetReverseSourceMap(requestedFileName);
 
             if (sourceMap != null)
             {
@@ -287,14 +278,9 @@ namespace Microsoft.NodejsTools.SourceMapping
             return sourceMap;
         }
 
-        private static char[] InvalidPathChars = Path.GetInvalidPathChars();
+        private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
 
-        internal static FunctionInformation MaybeMap(FunctionInformation funcInfo)
-        {
-            return MaybeMap(funcInfo, null);
-        }
-
-        internal static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps)
+        public static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps = null)
         {
             if (funcInfo.Filename != null &&
                 funcInfo.Filename.IndexOfAny(InvalidPathChars) == -1 &&

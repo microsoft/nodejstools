@@ -9,14 +9,15 @@
       xmlns:resx="clr-namespace:Microsoft.NodejsTools"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="500"
-      Title="Source Files"
+      Title="{x:Static resx:ImportWizardResources.StartupPageTitle}"
       FocusManager.FocusedElement="{Binding ElementName=SourcePathTextBox}">
     <Page.Resources>
         <ResourceDictionary Source="ImportWizardDictionary.xaml" />
     </Page.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition />
@@ -28,20 +29,49 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                <TextBox Grid.Column="0" Text="{Binding Path=SourcePath,Mode=TwoWay}" Name="SourcePathTextBox" />
-                <Button Grid.Column="1" Style="{StaticResource BrowseFolderButton}" CommandTarget="{Binding ElementName=SourcePathTextBox}" />
+                <TextBox Grid.Column="0" Text="{Binding Path=SourcePath,Mode=TwoWay}" Name="SourcePathTextBox" 
+                         AutomationProperties.Name="{x:Static resx:ImportWizardResources.SelectNodeCodeTitle}" 
+                         AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.SelectNodeCodeHelpText}"/>
+                <Button Grid.Column="1" Style="{StaticResource BrowseFolderButton}" CommandTarget="{Binding ElementName=SourcePathTextBox}" 
+                        AutomationProperties.Name="{x:Static resx:ImportWizardResources.BrowseNodeCodeAccessibleName}"/>
             </Grid>
+        </wpf:LabelledControl>
+
+        <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.LanguageTitle}" Grid.Row="1">
+            <StackPanel Margin="3">
+                <RadioButton Name="JavaScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=JavaScript}" 
+                             AutomationProperties.Name="{x:Static resx:ImportWizardResources.FromExistingJavaScriptAccessibleName}"
+                             AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.JavaScriptHelpText}">
+                    <StackPanel>
+                        <TextBlock Name="JavaScriptLabel">JavaScript</TextBlock>
+                        <TextBlock Text="{x:Static resx:ImportWizardResources.JavaScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton Name="TypeScriptRadioButton" GroupName="LanguageGroup" IsChecked="{Binding Path=ProjectLanguage,
+                    Mode=TwoWay, Converter={StaticResource projectLanguageBoolConverter}, ConverterParameter=TypeScript}" 
+                             AutomationProperties.Name="{x:Static resx:ImportWizardResources.FromExistingTypeScriptAccessibleName}"
+                             AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.TypeScriptHelpText}">
+                    <StackPanel>
+                        <TextBlock Name="TypeScriptLabel">TypeScript</TextBlock>
+                        <TextBlock Text="{x:Static resx:ImportWizardResources.TypeScriptHelpText}" Foreground="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
         </wpf:LabelledControl>
 
         <wpf:LabelledControl Title="{x:Static resx:ImportWizardResources.FileFilterTitle}"
                            HelpText="{x:Static resx:ImportWizardResources.FileFilterHelpText}"
-                           Grid.Row="1">
-            <TextBox Text="{Binding Path=Filters,Mode=TwoWay}" />
+                           Grid.Row="2">
+            <TextBox Text="{Binding Path=Filters,Mode=TwoWay}" 
+                     AutomationProperties.Name="{x:Static resx:ImportWizardResources.FileFilterTitle}" 
+                     AutomationProperties.HelpText="{x:Static resx:ImportWizardResources.FileFilterHelpText}" />
         </wpf:LabelledControl>
     </Grid>
 </Page>

@@ -25,8 +25,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         public int GetCount(out uint pceltCount)
         {
-            var coll = this._enumerable as ICollection<string>;
-            if (coll != null)
+            if (this._enumerable is ICollection<string> coll)
             {
                 pceltCount = checked((uint)coll.Count);
                 return VSConstants.S_OK;

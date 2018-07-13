@@ -23,7 +23,7 @@ using Microsoft.VisualStudioTools.Project;
 namespace Microsoft.NodejsTools.Repl
 {
     [Export(typeof(IInteractiveWindowCommand))]
-    [ContentType(ReplConstants.ContentType)]
+    [ContentType(InteractiveWindowContentType.ContentType)]
     internal class NpmReplCommand : InteractiveWindowCommand
     {
         public override async Task<ExecutionResult> Execute(IInteractiveWindow window, string arguments)
@@ -110,19 +110,21 @@ namespace Microsoft.NodejsTools.Repl
                 }
             }
 
-            NodejsProjectNode nodejsProject = null;
             (string ProjectPath, IVsHierarchy Hierarchy) projectInfo;
             if (string.IsNullOrEmpty(projectPath) && projectNameToDirectoryDictionary.Count == 1)
             {
                 projectInfo = projectNameToDirectoryDictionary.Values.First();
             }
-            else if (projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo))
+            else
             {
-                projectPath = projectInfo.ProjectPath;
-                if (projectInfo.Hierarchy != null)
-                {
-                    nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
-                }
+                projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
+            }
+
+            NodejsProjectNode nodejsProject = null;
+            projectPath = projectInfo.ProjectPath;
+            if (projectInfo.Hierarchy != null)
+            {
+                nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
             }
 
             var isGlobalCommand = false;
@@ -176,11 +178,6 @@ namespace Microsoft.NodejsTools.Repl
             else
             {
                 window.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, arguments));
-            }
-
-            if (nodejsProject != null)
-            {
-                await nodejsProject.CheckForLongPaths(npmArguments);
             }
 
             return ExecutionResult.Success;

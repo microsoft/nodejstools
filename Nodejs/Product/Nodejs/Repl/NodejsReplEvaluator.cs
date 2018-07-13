@@ -13,13 +13,13 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.InteractiveWindow;
 using Microsoft.VisualStudio.InteractiveWindow.Commands;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Repl
 {
@@ -242,7 +242,7 @@ namespace Microsoft.NodejsTools.Repl
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-            if (this.site.TryGetStartupFileAndDirectory(out var _, out var directory))
+            if (this.site.TryGetStartupFileAndDirectory(out _, out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
@@ -494,7 +494,6 @@ namespace Microsoft.NodejsTools.Repl
             public bool connected;
             private TaskCompletionSource<ExecutionResult> completion;
             private string executionText;
-            private readonly JavaScriptSerializer serializer = new JavaScriptSerializer();
             private bool disposed;
 #if DEBUG
             private Thread socketLockedThread;
@@ -633,7 +632,7 @@ namespace Microsoft.NodejsTools.Repl
 
             public void SendRequest(Dictionary<string, object> request)
             {
-                var json = this.serializer.Serialize(request);
+                var json = JsonConvert.SerializeObject(request);
 
                 var bytes = Encoding.UTF8.GetBytes(json);
                 var length = "Content-length: " + bytes.Length + "\r\n\r\n";
@@ -648,7 +647,7 @@ namespace Microsoft.NodejsTools.Repl
 
             protected override void ProcessPacket(JsonResponse response)
             {
-                var cmd = this.serializer.Deserialize<Dictionary<string, object>>(response.Body);
+                var cmd = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Body);
 
                 if (cmd.TryGetValue("type", out var type) && type is string)
                 {

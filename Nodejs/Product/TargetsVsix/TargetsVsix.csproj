@@ -54,7 +54,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
       <InstallRoot>MSBuild</InstallRoot>
-      <VSIXSubPath>Microsoft\VisualStudio\v15.0\Node.js Tools</VSIXSubPath>
+      <VSIXSubPath>Microsoft\VisualStudio\v16.0\Node.js Tools</VSIXSubPath>
     </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -68,7 +68,7 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
       <InstallRoot>MSBuild</InstallRoot>
-      <VSIXSubPath>Microsoft\VisualStudio\v15.0\Node.js Tools</VSIXSubPath>
+      <VSIXSubPath>Microsoft\VisualStudio\v16.0\Node.js Tools</VSIXSubPath>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
-      <Version>0.2.0</Version>
+      <Version>0.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

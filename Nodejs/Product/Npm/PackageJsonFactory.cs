@@ -13,7 +13,7 @@ namespace Microsoft.NodejsTools.Npm
     {
         public static IPackageJson Create(string fullPathToFile)
         {
-            if (fullPathToFile == null || !fullPathToFile.EndsWith("package.json", StringComparison.OrdinalIgnoreCase))
+            if (fullPathToFile == null || !IsPackageJsonFile(fullPathToFile) || !Path.IsPathRooted(fullPathToFile))
             {
                 throw new ArgumentException("Expected full path to 'package.json' file.", nameof(fullPathToFile));
             }
@@ -66,6 +66,17 @@ namespace Microsoft.NodejsTools.Npm
             }
 
             return null;
+        }
+
+        public static bool IsPackageJsonFile(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return false;
+            }
+
+            var fileName = Path.GetFileName(filePath);
+            return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.PackageJsonFile);
         }
     }
 }

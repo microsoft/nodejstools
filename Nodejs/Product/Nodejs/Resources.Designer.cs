@@ -653,114 +653,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy Full Path.
-        /// </summary>
-        internal static string LongPathClickToCopy {
-            get {
-                return ResourceManager.GetString("LongPathClickToCopy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do nothing and &amp;never warn me again.
-        /// </summary>
-        internal static string LongPathDoNothingAndDoNotWarnAgain {
-            get {
-                return ResourceManager.GetString("LongPathDoNothingAndDoNotWarnAgain", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You can re-enable the check in Tools → Options → Node.js Tools → General..
-        /// </summary>
-        internal static string LongPathDoNothingAndDoNotWarnAgainDetail {
-            get {
-                return ResourceManager.GetString("LongPathDoNothingAndDoNotWarnAgainDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do nothing, but &amp;warn me next time it happens.
-        /// </summary>
-        internal static string LongPathDoNothingButWarnNextTime {
-            get {
-                return ResourceManager.GetString("LongPathDoNothingButWarnNextTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;a href=&quot;#help&quot;&gt;Get more information&lt;/a&gt;.
-        /// </summary>
-        internal static string LongPathFooter {
-            get {
-                return ResourceManager.GetString("LongPathFooter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hide &amp;paths exceeding the limit.
-        /// </summary>
-        internal static string LongPathHidePathsExceedingTheLimit {
-            get {
-                return ResourceManager.GetString("LongPathHidePathsExceedingTheLimit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Run &apos;npm &amp;dedupe&apos; on the project.
-        /// </summary>
-        internal static string LongPathNpmDedupe {
-            get {
-                return ResourceManager.GetString("LongPathNpmDedupe", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue..
-        /// </summary>
-        internal static string LongPathNpmDedupeDetail {
-            get {
-                return ResourceManager.GetString("LongPathNpmDedupeDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unfortunately, running &apos;npm dedupe&apos; did not resolve the issue. Please consult the &lt;a href=&quot;#help&quot;&gt;documentation&lt;/a&gt; for other potential workarounds..
-        /// </summary>
-        internal static string LongPathNpmDedupeDidNotHelp {
-            get {
-                return ResourceManager.GetString("LongPathNpmDedupeDidNotHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show &amp;paths exceeding the limit.
-        /// </summary>
-        internal static string LongPathShowPathsExceedingTheLimit {
-            get {
-                return ResourceManager.GetString("LongPathShowPathsExceedingTheLimit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Your project folder contains one or more paths that exceed the &lt;a href=&quot;#msdn&quot;&gt;260 character limit&lt;/a&gt;. Visual Studio &lt;a href=&quot;#uservoice&quot;&gt;does not fully support&lt;/a&gt; such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features..
-        /// </summary>
-        internal static string LongPathWarningText {
-            get {
-                return ResourceManager.GetString("LongPathWarningText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Path Too Long Warning.
-        /// </summary>
-        internal static string LongPathWarningTitle {
-            get {
-                return ResourceManager.GetString("LongPathWarningTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Node.exe options.
         /// </summary>
         internal static string NodeExeArguments {
@@ -941,7 +833,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled.
+        ///   Looks up a localized string similar to {0} canceled.
         /// </summary>
         internal static string NpmCancelled {
             get {
@@ -950,7 +842,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cancelled with errors - see Output window for details.
+        ///   Looks up a localized string similar to {0} canceled with errors - see Output window for details.
         /// </summary>
         internal static string NpmCancelledWithErrors {
             get {
@@ -1031,15 +923,6 @@ namespace Microsoft.NodejsTools {
         internal static string NpmNotInstalledMessageText {
             get {
                 return ResourceManager.GetString("NpmNotInstalledMessageText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Npm.
-        /// </summary>
-        internal static string NpmOutputPaneTitle {
-            get {
-                return ResourceManager.GetString("NpmOutputPaneTitle", resourceCulture);
             }
         }
         
@@ -1557,6 +1440,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse for test root.
+        /// </summary>
+        internal static string PropertiesBrowseTestRootAccessibleName {
+            get {
+                return ResourceManager.GetString("PropertiesBrowseTestRootAccessibleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Local Package Properties.
         /// </summary>
         internal static string PropertiesClassLocalPackage {
@@ -1946,6 +1838,69 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specifies the framework used for the unit tests..
+        /// </summary>
+        internal static string TestFrameworkToolTip {
+            get {
+                return ResourceManager.GetString("TestFrameworkToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test Root.
+        /// </summary>
+        internal static string TestRoot {
+            get {
+                return ResourceManager.GetString("TestRoot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the directory where the unit tests are located..
+        /// </summary>
+        internal static string TestRootToolTip {
+            get {
+                return ResourceManager.GetString("TestRootToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Canceled.
+        /// </summary>
+        internal static string TscBuildCanceled {
+            get {
+                return ResourceManager.GetString("TscBuildCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Completed.
+        /// </summary>
+        internal static string TscBuildCompleted {
+            get {
+                return ResourceManager.GetString("TscBuildCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error - Failed to start &apos;{0}&apos;.
+        /// </summary>
+        internal static string TscBuildError {
+            get {
+                return ResourceManager.GetString("TscBuildError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build Started.
+        /// </summary>
+        internal static string TscBuildStarted {
+            get {
+                return ResourceManager.GetString("TscBuildStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed.
         /// </summary>
         internal static string TypeScriptMinVersionNotInstalled {
@@ -1955,83 +1910,11 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Node.js IntelliSense added a .
+        ///   Looks up a localized string similar to JavaScript Unit Test.
         /// </summary>
-        internal static string TypingsInfoBarSpan1 {
+        internal static string UnitTestHeader {
             get {
-                return ResourceManager.GetString("TypingsInfoBarSpan1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to typings folder.
-        /// </summary>
-        internal static string TypingsInfoBarSpan2 {
-            get {
-                return ResourceManager.GetString("TypingsInfoBarSpan2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  to your project.
-        /// </summary>
-        internal static string TypingsInfoBarSpan3 {
-            get {
-                return ResourceManager.GetString("TypingsInfoBarSpan3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Customize....
-        /// </summary>
-        internal static string TypingsOpenOptionsText {
-            get {
-                return ResourceManager.GetString("TypingsOpenOptionsText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not start Typings tool used for IntelliSense.
-        /// </summary>
-        internal static string TypingsToolCouldNotStart {
-            get {
-                return ResourceManager.GetString("TypingsToolCouldNotStart", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed.
-        /// </summary>
-        internal static string TypingsToolInstallFailed {
-            get {
-                return ResourceManager.GetString("TypingsToolInstallFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find Typings package manager tool used for IntelliSense.
-        /// </summary>
-        internal static string TypingsToolNotInstalledError {
-            get {
-                return ResourceManager.GetString("TypingsToolNotInstalledError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Successfully installed typing files for IntelliSense..
-        /// </summary>
-        internal static string TypingsToolTypingsInstallCompleted {
-            get {
-                return ResourceManager.GetString("TypingsToolTypingsInstallCompleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An error occurred installing typings used for IntelliSense..
-        /// </summary>
-        internal static string TypingsToolTypingsInstallErrorOccurred {
-            get {
-                return ResourceManager.GetString("TypingsToolTypingsInstallErrorOccurred", resourceCulture);
+                return ResourceManager.GetString("UnitTestHeader", resourceCulture);
             }
         }
         

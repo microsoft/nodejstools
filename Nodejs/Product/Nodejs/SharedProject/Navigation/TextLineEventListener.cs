@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -8,34 +8,31 @@ namespace Microsoft.VisualStudioTools.Navigation
 {
     internal class TextLineEventListener : IVsTextLinesEvents, IDisposable
     {
-        private const int _defaultDelay = 2000;
-        private string _fileName;
-        private ModuleId _fileId;
-        private IVsTextLines _buffer;
-        private bool _isDirty;
-        private IConnectionPoint _connectionPoint;
-        private uint _connectionCookie;
+        private const int DefaultDelay = 2000;
+        private ModuleId fileId;
+        private IVsTextLines buffer;
+        private bool isDirty;
+        private IConnectionPoint connectionPoint;
+        private uint connectionCookie;
 
         public TextLineEventListener(IVsTextLines buffer, string fileName, ModuleId id)
         {
-            this._buffer = buffer;
-            this._fileId = id;
-            this._fileName = fileName;
-            var container = buffer as IConnectionPointContainer;
-            if (null != container)
+            this.buffer = buffer;
+            this.fileId = id;
+            this.FileName = fileName;
+            if (buffer is IConnectionPointContainer container)
             {
                 var eventsGuid = typeof(IVsTextLinesEvents).GUID;
-                container.FindConnectionPoint(ref eventsGuid, out this._connectionPoint);
-                this._connectionPoint.Advise(this as IVsTextLinesEvents, out this._connectionCookie);
+                container.FindConnectionPoint(ref eventsGuid, out this.connectionPoint);
+                this.connectionPoint.Advise(this as IVsTextLinesEvents, out this.connectionCookie);
             }
         }
 
         #region Properties
-        public ModuleId FileID => this._fileId; public string FileName
-        {
-            get { return this._fileName; }
-            set { this._fileName = value; }
-        }
+        public ModuleId FileID => this.fileId;
+
+        public string FileName { get; set; }
+        public uint ConnectionCookie { get => this.connectionCookie; set => this.connectionCookie = value; }
         #endregion
 
         #region Events
@@ -53,47 +50,43 @@ namespace Microsoft.VisualStudioTools.Navigation
 
         void IVsTextLinesEvents.OnChangeLineText(TextLineChange[] pTextLineChange, int fLast)
         {
-            TextLineChangeEvent eh = OnFileChangedImmediate;
-            if (null != eh)
-            {
-                eh(this, pTextLineChange, fLast);
-            }
+            OnFileChangedImmediate?.Invoke(this, pTextLineChange, fLast);
 
-            this._isDirty = true;
+            this.isDirty = true;
         }
         #endregion
 
         #region IDisposable Members
         public void Dispose()
         {
-            if ((null != this._connectionPoint) && (0 != this._connectionCookie))
+            if ((null != this.connectionPoint) && (0 != this.connectionCookie))
             {
-                this._connectionPoint.Unadvise(this._connectionCookie);
+                this.connectionPoint.Unadvise(this.connectionCookie);
             }
-            this._connectionCookie = 0;
-            this._connectionPoint = null;
+            this.connectionCookie = 0;
+            this.connectionPoint = null;
 
-            this._buffer = null;
-            this._fileId = null;
+            this.buffer = null;
+            this.fileId = null;
         }
         #endregion
 
         #region Idle time processing
         public void OnIdle()
         {
-            if (!this._isDirty)
+            if (!this.isDirty)
             {
                 return;
             }
             var onFileChanged = OnFileChanged;
             if (null != onFileChanged)
             {
-                var args = new HierarchyEventArgs(this._fileId.ItemID, this._fileName);
-                args.TextBuffer = this._buffer;
-                onFileChanged(this._fileId.Hierarchy, args);
+                var args = new HierarchyEventArgs(this.fileId.ItemId, this.FileName);
+                args.TextBuffer = this.buffer;
+                onFileChanged(this.fileId.Hierarchy, args);
             }
 
-            this._isDirty = false;
+            this.isDirty = false;
         }
         #endregion
     }

@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudioTools.Project
             this.idleManager.OnIdle += this.OnIdle;
 
             this.fileWatcher = new FileChangeManager(serviceProvider);
-            this.fileWatcher.FolderChangedOnDisk += this.FolderChangedOnDisk;
+            this.fileWatcher.FileChangedOnDisk += this.FileChangedOnDisk;
         }
 
         public override int QueryService(ref Guid guidService, out object result)
@@ -462,7 +462,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.idleManager.OnIdle -= this.OnIdle;
                 this.idleManager.Dispose();
 
-                this.fileWatcher.FolderChangedOnDisk -= this.FolderChangedOnDisk;
+                this.fileWatcher.FileChangedOnDisk -= this.FileChangedOnDisk;
                 this.fileWatcher.Dispose();
             }
 
@@ -565,7 +565,7 @@ namespace Microsoft.VisualStudioTools.Project
                 RemoveSubTree(child);
             }
             node.Parent.RemoveChild(node);
-            this.DiskNodes.TryRemove(node.Url, out var _);
+            this.DiskNodes.TryRemove(node.Url, out _);
         }
 
         private static string GetFinalPathName(string dir)
@@ -693,10 +693,12 @@ namespace Microsoft.VisualStudioTools.Project
         /// </summary>
         private HierarchyNode AddAllFilesFolder(HierarchyNode curParent, string curDir, bool hierarchyCreated = true)
         {
-            var folderNode = FindNodeByFullPath(curDir);
+            var safePath = CommonUtils.EnsureEndSeparator(curDir);
+
+            var folderNode = FindNodeByFullPath(safePath);
             if (folderNode == null)
             {
-                folderNode = CreateFolderNode(new AllFilesProjectElement(curDir, "Folder", this));
+                folderNode = CreateFolderNode(new AllFilesProjectElement(safePath, "Folder", this));
                 AddAllFilesNode(curParent, folderNode);
 
                 if (hierarchyCreated)
@@ -728,17 +730,10 @@ namespace Microsoft.VisualStudioTools.Project
             return new CommonReferenceContainerNode(this);
         }
 
-        private void FolderChangedOnDisk(object sender, FolderChangedEventArgs e)
+        private void FileChangedOnDisk(object sender, FileChangedOnDiskEventArgs e)
         {
             var file = e.FileName;
-            if (File.Exists(file) || Directory.Exists(file))
-            {
-                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Changed, file));
-            }
-            else
-            {
-                this.QueueFileSystemChanges(new FileSystemChange(this, WatcherChangeTypes.Deleted, file));
-            }
+            this.QueueFileSystemChanges(new FileSystemChange(this, e.FileChange, file));
         }
 
         private void QueueFileSystemChanges(params FileSystemChange[] changes)
@@ -879,8 +874,7 @@ namespace Microsoft.VisualStudioTools.Project
                 this.projectDocListenerForStartupFileUpdates = null;
             }
 
-            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
-            if (null != libraryManager)
+            if (this.Site.GetService(GetLibraryManagerType()) is LibraryManager libraryManager)
             {
                 libraryManager.UnregisterHierarchy(this.InteropSafeHierarchy);
             }
@@ -894,8 +888,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             base.Load(filename, location, name, flags, ref iidProject, out canceled);
 
-            var libraryManager = this.Site.GetService(GetLibraryManagerType()) as LibraryManager;
-            if (null != libraryManager)
+            if (this.Site.GetService(GetLibraryManagerType()) is LibraryManager libraryManager)
             {
                 libraryManager.RegisterHierarchy(this.InteropSafeHierarchy);
             }
@@ -1441,8 +1434,7 @@ namespace Microsoft.VisualStudioTools.Project
                         );
                     }
 
-                    var diskNode = child as IDiskBasedNode;
-                    if (diskNode != null)
+                    if (child is IDiskBasedNode diskNode)
                     {
                         diskNode.RenameForDeferredSave(basePath, baseNewPath);
                     }

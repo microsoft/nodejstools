@@ -507,8 +507,7 @@ namespace Microsoft.VisualStudioTools.Project
                             return false;
                         }
                         additions.Add(addition);
-                        var folderAddition = addition as FolderAddition;
-                        if (folderAddition != null)
+                        if (addition is FolderAddition folderAddition)
                         {
                             folders.Add(folderAddition.SourceFolder);
                         }
@@ -528,9 +527,8 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             return false;
                         }
-                        var fileAddition = addition as FileAddition;
                         var add = true;
-                        if (fileAddition != null)
+                        if (addition is FileAddition fileAddition)
                         {
                             foreach (var folder in folders)
                             {
@@ -746,8 +744,7 @@ namespace Microsoft.VisualStudioTools.Project
 
                     ErrorHandler.ThrowOnFailure(sourceHierarchy.GetGuidProperty(itemId, (int)__VSHPROPID.VSHPROPID_TypeGuid, out var guidType));
 
-                    var solution = this.Project.GetService(typeof(IVsSolution)) as IVsSolution;
-                    if (solution != null)
+                    if (this.Project.GetService(typeof(IVsSolution)) is IVsSolution solution)
                     {
                         if (guidType == VSConstants.GUID_ItemType_PhysicalFile)
                         {

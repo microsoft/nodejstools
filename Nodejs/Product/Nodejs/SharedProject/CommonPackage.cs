@@ -44,8 +44,7 @@ namespace Microsoft.VisualStudioTools
             {
                 if (e.IsTerminating)
                 {
-                    var ex = e.ExceptionObject as Exception;
-                    if (ex != null)
+                    if (e.ExceptionObject is Exception ex)
                     {
                         Debug.Fail(
                             string.Format("An unhandled exception is about to terminate the process:\n\n{0}", ex.Message),
@@ -74,8 +73,7 @@ namespace Microsoft.VisualStudioTools
             {
                 if (this._componentID != 0)
                 {
-                    var mgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
-                    if (mgr != null)
+                    if (GetService(typeof(SOleComponentManager)) is IOleComponentManager mgr)
                     {
                         mgr.FRevokeComponent(this._componentID);
                     }
@@ -104,8 +102,7 @@ namespace Microsoft.VisualStudioTools
 
         internal void RegisterCommands(IEnumerable<Command> commands, Guid cmdSet)
         {
-            var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (null != mcs)
+            if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
             {
                 lock (_commandsLock)
                 {

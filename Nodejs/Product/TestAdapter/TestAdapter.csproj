@@ -14,11 +14,11 @@
     </NuGetPackageImportStamp>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NOVS;NO_WINDOWS</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
-      <HintPath>$(DevEnvDir)CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+    <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -29,16 +29,59 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonConstants.cs">
+      <Link>CommonConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\CommonUtils.cs">
+      <Link>CommonUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\Common\Product\SharedProject\ProcessOutput.cs">
+      <Link>ProcessOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\Nodejs\Nodejs.cs">
+      <Link>Nodejs.cs</Link>
+    </Compile>
+    <Compile Include="..\Nodejs\NodejsConstants.cs">
+      <Link>NodejsConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\nodejs\sourcemapping\FunctionInfo.cs">
+      <Link>SourceMapping\FunctionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\nodejs\sourcemapping\JavaScriptSourceMapInfo.cs">
+      <Link>SourceMapping\JavaScriptSourceMapInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\nodejs\sourcemapping\SourceMap.cs">
+      <Link>SourceMapping\SourceMap.cs</Link>
+    </Compile>
+    <Compile Include="..\nodejs\sourcemapping\SourceMapper.cs">
+      <Link>SourceMapping\SourceMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\nodejs\testframeworks\TestFrameworkDirectories.cs">
+      <Link>TestFrameworks\TestFrameworkDirectories.cs</Link>
+    </Compile>
+    <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
+      <Link>TypeScriptHelpers.cs</Link>
+    </Compile>
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="PackageJsonTestDiscoverer.cs" />
+    <Compile Include="PackageJsonTestExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShimTestExecutor.cs" />
-    <Compile Include="ShimTestDiscoverer.cs" />
+    <Compile Include="SerializationHelpers.cs" />
+    <Compile Include="JavaScriptTestExecutor.cs" />
+    <Compile Include="JavaScriptTestDiscoverer.cs" />
+    <Compile Include="JavaScriptTestDiscoverer.TestFileEntry.cs" />
+    <Compile Include="TestExecutorWorker.cs" />
+    <Compile Include="TestFrameworks\FrameworkDiscoverer.cs" />
+    <Compile Include="JavaScriptTestCaseProperties.cs" />
+    <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
+    <Compile Include="TestFrameworks\TestFramework.cs" />
+    <Compile Include="TestExecutorWorker.TestReceiver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TestAdapterImpl\TestAdapterImpl.csproj">
-      <Project>{5085df35-3a32-4894-835e-e5a3956d4f57}</Project>
-      <Name>TestAdapterImpl</Name>
-    </ProjectReference>
+    <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
+      <HintPath>$(DevEnvDir)CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).dll">
@@ -49,8 +92,41 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MicroBuild.Core">
-      <Version>0.2.0</Version>
+      <Version>0.3.0</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestFrameworks\ExportRunner\exportrunner.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\find_tests.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\Jasmine\jasmine.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\mocha\mocha.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\run_tests.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\Tape\tape.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Npm\Npm.csproj">
+      <Project>{e5ef4b0a-ab41-4b98-8fa8-98d6348003a8}</Project>
+      <Name>Npm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestAdapterImpl\TestAdapterImpl.csproj">
+      <Project>{5085df35-3a32-4894-835e-e5a3956d4f57}</Project>
+      <Name>TestAdapterImpl</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\ProjectAfter.targets" />

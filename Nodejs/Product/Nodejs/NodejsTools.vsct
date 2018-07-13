@@ -351,11 +351,6 @@
     <!-- This is the package guid. -->
     <GuidSymbol name="guidNodeToolsPkg" value="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" />
 
-    <!-- Solution Explorer folder mode GUIDs and IDs. -->
-    <GuidSymbol name="guidWorkspaceExplorerToolWindowCmdSet" value="{cfb400f1-5c60-4f3c-856e-180d28def0b7}">
-      <IDSymbol name="idmWSE_ContextMenu" value="0x0002"/>
-    </GuidSymbol>
-
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
       <IDSymbol name="cmdidReplWindow" value="0x200" />
@@ -404,7 +399,7 @@
       <IDSymbol name="nodeDebugRepl" value="6" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidNodeToolsWseContextMenuCmdSet" value="{985C4146-CE5D-4D56-912E-0EBBE2216FC1}">
+    <GuidSymbol name="guidNodeToolsWseContextMenuCmdSet" value="{0D701F33-94A3-421C-9865-6F65E7E4B689}">
       <IDSymbol name="idgWSE_ContextMenu_NodeToolsActions" value="0x100" />
       <IDSymbol name="idgNpm_PackageCommands" value="0x101"/>
       <IDSymbol name="idgNpm_DynamicCommands" value="0x102"/>

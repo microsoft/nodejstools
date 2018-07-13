@@ -62,16 +62,8 @@ namespace Microsoft.VisualStudioTools.Project
         private IEventSource<SinkType> source;
         internal ConnectionPoint(ConnectionPointContainer container, IEventSource<SinkType> source)
         {
-            if (null == container)
-            {
-                throw new ArgumentNullException(nameof(container));
-            }
-            if (null == source)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-            this.container = container;
-            this.source = source;
+            this.container = container ?? throw new ArgumentNullException(nameof(container));
+            this.source = source ?? throw new ArgumentNullException(nameof(source));
             this.sinks = new Dictionary<uint, SinkType>();
             this.nextCookie = 1;
         }
@@ -92,7 +84,6 @@ namespace Microsoft.VisualStudioTools.Project
         public void EnumConnections(out IEnumConnections ppEnum)
         {
             throw new NotImplementedException();
-            ;
         }
 
         public void GetConnectionInterface(out Guid pIID)

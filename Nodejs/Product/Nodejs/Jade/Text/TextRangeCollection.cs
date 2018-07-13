@@ -488,15 +488,13 @@ namespace Microsoft.NodejsTools.Jade
                     if (this[mid].Contains(position))
                     {
                         // Found: item contains start position
-                        var composite = this[mid] as ICompositeTextRange;
-                        if (composite != null)
+                        if (this[mid] is ICompositeTextRange composite)
                         {
                             composite.ShiftStartingFrom(position, offset);
                         }
                         else
                         {
-                            var expandable = this[mid] as IExpandableTextRange;
-                            if (expandable != null)
+                            if (this[mid] is IExpandableTextRange expandable)
                             {
                                 expandable.Expand(0, offset);
                             }

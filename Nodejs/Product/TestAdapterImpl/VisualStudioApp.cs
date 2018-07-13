@@ -3,24 +3,21 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudioTools.Project;
 using Process = System.Diagnostics.Process;
 
 namespace Microsoft.VisualStudioTools
 {
-    internal class VisualStudioApp : IDisposable
+    public sealed class VisualStudioApp
     {
         private static readonly Dictionary<int, VisualStudioApp> KnownInstances = new Dictionary<int, VisualStudioApp>();
         private readonly int processId;
-
-        public static VisualStudioApp FromProcessId(int processId)
+        private static VisualStudioApp FromProcessId(int processId)
         {
             VisualStudioApp inst;
             lock (KnownInstances)
@@ -33,20 +30,22 @@ namespace Microsoft.VisualStudioTools
             return inst;
         }
 
-        public static VisualStudioApp FromEnvironmentVariable(string variable)
+        public static bool AttachToProcessNode2DebugAdapter(int vsProcessId, int port)
         {
-            var pid = Environment.GetEnvironmentVariable(variable);
-            if (pid == null)
-            {
-                return null;
-            }
+            var app = FromProcessId(vsProcessId);
+            return app.AttachToProcessNode2DebugAdapter(port);
+        }
 
-            if (!int.TryParse(pid, out var processId))
-            {
-                return null;
-            }
+        public static bool AttachToProcess(Process testProcess, int vsProcessId, Guid portSupplier, string transportQualifierUri)
+        {
+            var app = FromProcessId(vsProcessId);
+            return app.AttachToProcess(testProcess, portSupplier, transportQualifierUri);
+        }
 
-            return FromProcessId(processId);
+        public static void DetachDebugger(int vsProcessId)
+        {
+            var app = FromProcessId(vsProcessId);
+            app.GetDTE().Debugger.DetachAll();
         }
 
         private VisualStudioApp(int processId)
@@ -54,20 +53,12 @@ namespace Microsoft.VisualStudioTools
             this.processId = processId;
         }
 
-        public void Dispose()
-        {
-            lock (KnownInstances)
-            {
-                KnownInstances.Remove(this.processId);
-            }
-        }
-
         // Source from
         //  http://blogs.msdn.com/b/kirillosenkov/archive/2011/08/10/how-to-get-dte-from-visual-studio-process-id.aspx
         [DllImport("ole32.dll")]
         private static extern int CreateBindCtx(uint reserved, out IBindCtx ppbc);
 
-        public DTE GetDTE()
+        private DTE GetDTE()
         {
             var dte = GetDTE(this.processId);
             if (dte == null)
@@ -175,9 +166,9 @@ namespace Microsoft.VisualStudioTools
         private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
         private static readonly Guid Node2AttachEngineGuid = Guid.Parse("3F14B534-C345-44B5-AF84-642246EEEB62");
 
-        public bool AttachToProcessNode2DebugAdapter(int port)
+        private bool AttachToProcessNode2DebugAdapter(int port)
         {
-            var dte = (VisualStudio.OLE.Interop.IServiceProvider)GetDTE();
+            var dte = (VisualStudio.OLE.Interop.IServiceProvider)this.GetDTE();
 
             var serviceProvider = new ServiceProvider(dte);
 
@@ -213,9 +204,10 @@ namespace Microsoft.VisualStudioTools
             return true;
         }
 
-        public bool AttachToProcess(ProcessOutput processOutput, Guid portSupplier, string transportQualifierUri)
+        private bool AttachToProcess(Process testProcess, Guid portSupplier, string transportQualifierUri)
         {
-            var debugger3 = (EnvDTE90.Debugger3)GetDTE().Debugger;
+            var dte = this.GetDTE();
+            var debugger3 = (EnvDTE90.Debugger3)dte.Debugger;
             var transports = debugger3.Transports;
             EnvDTE80.Transport transport = null;
             for (var i = 1; i <= transports.Count; ++i)
@@ -239,36 +231,20 @@ namespace Microsoft.VisualStudioTools
             }
 
             var process = processes.Item(1);
-            return AttachToProcess(processOutput, process);
-        }
 
-        public bool AttachToProcess(ProcessOutput processOutput, EnvDTE.Process process, Guid[] engines = null)
-        {
             // Retry the attach itself 3 times before displaying a Retry/Cancel
             // dialog to the user.
-            var dte = GetDTE();
+
             dte.SuppressUI = true;
 
             try
             {
-                if (engines == null)
-                {
-                    process.Attach();
-                }
-                else
-                {
-                    var process3 = process as EnvDTE90.Process3;
-                    if (process3 == null)
-                    {
-                        return false;
-                    }
-                    process3.Attach2(engines.Select(engine => engine.ToString("B")).ToArray());
-                }
+                process.Attach();
                 return true;
             }
             catch (COMException)
             {
-                if (processOutput.Wait(TimeSpan.FromMilliseconds(500)))
+                if (testProcess.WaitForExit(milliseconds: 500))
                 {
                     // Process exited while we were trying
                     return false;
@@ -283,59 +259,59 @@ namespace Microsoft.VisualStudioTools
             process.Attach();
             return true;
         }
-    }
 
-    public class MessageFilter : IOleMessageFilter
-    {
-        // Start the filter.
-        public static void Register()
+        private sealed class MessageFilter : IOleMessageFilter
         {
-            var newFilter = new MessageFilter();
-            CoRegisterMessageFilter(newFilter, out var oldFilter);
-        }
-
-        // Done with the filter, close it.
-        public static void Revoke()
-        {
-            CoRegisterMessageFilter(null, out var oldFilter);
-        }
-
-        private const int SERVERCALL_ISHANDLED = 0;
-        private const int SERVERCALL_RETRYLATER = 2;
-        private const int PENDINGMSG_WAITDEFPROCESS = 2;
-
-        private MessageFilter() { }
-
-        // IOleMessageFilter functions.
-        // Handle incoming thread requests.
-        int IOleMessageFilter.HandleInComingCall(int dwCallType,
-                                                 IntPtr hTaskCaller,
-                                                 int dwTickCount,
-                                                 IntPtr lpInterfaceInfo)
-        {
-            return SERVERCALL_ISHANDLED;
-        }
-
-        // Thread call was rejected, so try again.
-        int IOleMessageFilter.RetryRejectedCall(IntPtr hTaskCallee, int dwTickCount, int dwRejectType)
-        {
-            if (dwRejectType == SERVERCALL_RETRYLATER && dwTickCount < 10000)
+            // Start the filter.
+            public static void Register()
             {
-                // Retry the thread call after 250ms
-                return 250;
+                var newFilter = new MessageFilter();
+                CoRegisterMessageFilter(newFilter, out var oldFilter);
             }
-            // Too busy; cancel call.
-            return -1;
-        }
 
-        int IOleMessageFilter.MessagePending(System.IntPtr hTaskCallee, int dwTickCount, int dwPendingType)
-        {
-            return PENDINGMSG_WAITDEFPROCESS;
-        }
+            // Done with the filter, close it.
+            public static void Revoke()
+            {
+                CoRegisterMessageFilter(null, out var oldFilter);
+            }
 
-        // Implement the IOleMessageFilter interface.
-        [DllImport("Ole32.dll")]
-        private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
+            private const int SERVERCALL_ISHANDLED = 0;
+            private const int SERVERCALL_RETRYLATER = 2;
+            private const int PENDINGMSG_WAITDEFPROCESS = 2;
+
+            private MessageFilter() { }
+
+            // IOleMessageFilter functions.
+            // Handle incoming thread requests.
+            int IOleMessageFilter.HandleInComingCall(int dwCallType,
+                                                     IntPtr hTaskCaller,
+                                                     int dwTickCount,
+                                                     IntPtr lpInterfaceInfo)
+            {
+                return SERVERCALL_ISHANDLED;
+            }
+
+            // Thread call was rejected, so try again.
+            int IOleMessageFilter.RetryRejectedCall(IntPtr hTaskCallee, int dwTickCount, int dwRejectType)
+            {
+                if (dwRejectType == SERVERCALL_RETRYLATER && dwTickCount < 10000)
+                {
+                    // Retry the thread call after 250ms
+                    return 250;
+                }
+                // Too busy; cancel call.
+                return -1;
+            }
+
+            int IOleMessageFilter.MessagePending(System.IntPtr hTaskCallee, int dwTickCount, int dwPendingType)
+            {
+                return PENDINGMSG_WAITDEFPROCESS;
+            }
+
+            // Implement the IOleMessageFilter interface.
+            [DllImport("Ole32.dll")]
+            private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
+        }
     }
 
     [ComImport(), Guid("00000016-0000-0000-C000-000000000046"),

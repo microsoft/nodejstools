@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 namespace Microsoft.VisualStudioTools.Project
 {
@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudioTools.Project
     /// </summary>
     internal sealed class AllFilesProjectElement : VirtualProjectElement
     {
-        private string _itemType;
+        private string itemType;
 
         public AllFilesProjectElement(string path, string itemType, CommonProjectNode project)
             : base(project)
@@ -24,11 +24,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return this._itemType;
+                return this.itemType;
             }
             set
             {
-                this._itemType = value;
+                this.itemType = value;
                 OnItemTypeChanged();
             }
         }

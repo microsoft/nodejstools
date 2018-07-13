@@ -407,8 +407,7 @@ namespace Microsoft.VisualStudioTools.Project
                     //}
                 }
 
-                var queryEdit = this.site.GetService(typeof(SVsQueryEditQuerySave)) as IVsQueryEditQuerySave2;
-                if (queryEdit != null)
+                if (this.site.GetService(typeof(SVsQueryEditQuerySave)) is IVsQueryEditQuerySave2 queryEdit)
                 {
                     var tagVSQueryEditFlags_QEF_AllowUnopenedProjects = (tagVSQueryEditFlags)0x80;
 
@@ -598,7 +597,6 @@ namespace Microsoft.VisualStudioTools.Project
             return VSConstants.S_OK;
         }
 
-#if DEV11_OR_LATER
         void IVsProjectUpgradeViaFactory4.UpgradeProject_CheckOnly(
             string bstrFileName,
             IVsUpgradeLogger pLogger,
@@ -682,7 +680,7 @@ namespace Microsoft.VisualStudioTools.Project
                 pguidNewProjectFactory = Guid.Empty;
             }
         }
-#endif
+
         #endregion
     }
 

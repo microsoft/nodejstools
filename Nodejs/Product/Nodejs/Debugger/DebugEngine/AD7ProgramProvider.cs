@@ -34,8 +34,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
             {
                 if (ErrorHandler.Succeeded(port.GetServer(out var server)))
                 {
-                    var dbgServer = server as IDebugCoreServer90;
-                    if (dbgServer != null)
+                    if (server is IDebugCoreServer90 dbgServer)
                     {
                         var g = typeof(IDebugProgramProvider2).GUID;
 

@@ -13,7 +13,15 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             if (value is string state && parameter is string expected)
             {
-                return StringComparer.OrdinalIgnoreCase.Equals(state, expected) ? Visibility.Visible : Visibility.Hidden;
+                if (targetType == typeof(Visibility))
+                {
+                    return StringComparer.OrdinalIgnoreCase.Equals(state, expected) ? Visibility.Visible : Visibility.Hidden;
+                }
+
+                if (targetType == typeof(bool))
+                {
+                    return StringComparer.OrdinalIgnoreCase.Equals(state, expected);
+                }
             }
 
             throw new InvalidCastException("Wrong input type.");

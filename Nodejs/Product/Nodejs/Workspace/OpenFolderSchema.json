@@ -1,0 +1,55 @@
+﻿{
+  "debugExtensions": {
+    "nodeDbg": {
+      "vsDebugEngineGuid": "{0A638DAC-429B-4973-ADA0-E8DCDFB29B61}",
+      "VsDebugTargetInfo4": {
+        "bstrCurDir": "${workspaceRoot}",
+        "bstrExe": "${debugInfo.target}"
+      },
+      "templates": [
+        {
+          "templateId": "launchNode",
+          "displayName": "{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}:6000",
+          "description": "{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}:6001",
+          "fileExtensions": [ ".js" ]
+        }
+      ],
+      "schema": {
+        "definitions": {
+          "node_debug_schema": {
+            "type": "object",
+            "properties": {
+              "nodeExe": {
+                "type": "string",
+                "description": "Location of the Node.js exe."
+              },
+              "nodeArgs": {
+                "type": "string",
+                "description": "Arguments to pass to the Node.js exe."
+              },
+              "scriptArgs": {
+                "type": "string",
+                "description": "Arguments to pass to the script being executed."
+              },
+              "debuggerPort": {
+                "type": "number",
+                "description": "Port used for debugging."
+              }
+            }
+          },
+          "nodeDebugTemplateLayout": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/default"
+              },
+              {
+                "$ref": "#/definitions/node_debug_schema"
+              }
+            ]
+          }
+        },
+        "configuration": "#/definitions/nodeDebugTemplateLayout"
+      }
+    }
+  }
+}

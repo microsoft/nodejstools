@@ -1,10 +1,12 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
 using System.IO;
+#if !NOVS
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+#endif
 using Microsoft.VisualStudioTools;
 using MSBuild = Microsoft.Build.Evaluation;
 
@@ -20,21 +22,17 @@ namespace Microsoft.NodejsTools.TypeScript
                 || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptJsxExtension);
         }
 
+        internal static bool IsTsJsConfigJsonFile(string filePath)
+        {
+            var fileName = Path.GetFileName(filePath);
+            return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.TsConfigJsonFile) ||
+                StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
+        }
+
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
         {
             var typeScriptOutDir = project.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir);
             return GetTypeScriptBackedJavaScriptFile(project.DirectoryPath, typeScriptOutDir, pathToFile);
-        }
-
-        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
-        {
-            //Need to deal with the format being relative and explicit
-            var props = (IVsBuildPropertyStorage)project;
-            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out var outDir));
-
-            var projHome = GetProjectHome(project);
-
-            return GetTypeScriptBackedJavaScriptFile(projHome, outDir, pathToFile);
         }
 
         private static string GetTypeScriptBackedJavaScriptFile(string projectHome, string typeScriptOutDir, string pathToFile)
@@ -57,6 +55,18 @@ namespace Microsoft.NodejsTools.TypeScript
             var relativeJSFilePath = CommonUtils.GetRelativeFilePath(projectHome, jsFilePath);
 
             return Path.Combine(outDirPath, relativeJSFilePath);
+        }
+
+#if !NOVS
+        internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
+        {
+            //Need to deal with the format being relative and explicit
+            var props = (IVsBuildPropertyStorage)project;
+            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out var outDir));
+
+            var projHome = GetProjectHome(project);
+
+            return GetTypeScriptBackedJavaScriptFile(projHome, outDir, pathToFile);
         }
 
         private static string GetProjectHome(IVsProject project)
@@ -86,5 +96,6 @@ namespace Microsoft.NodejsTools.TypeScript
 
             return projHome.Value as string;
         }
+#endif
     }
 }

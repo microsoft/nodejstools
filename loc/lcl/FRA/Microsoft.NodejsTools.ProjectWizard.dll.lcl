@@ -482,7 +482,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Specifies environment variables to be set in the spawned process in the form:]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Spécifie les variables d'environnement à définir dans le processus engendré sous la forme :]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
+            <Val><![CDATA[Spécifie les variables d'environnement à définir dans le processus généré sous la forme :]D;]A;]D;]A;NAME1=value1]D;]A;NAME2=value2]D;]A;...]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -694,114 +694,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LongPathClickToCopy" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Copy Full Path]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Copier le chemin complet]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgain" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing and &never warn me again]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ne rien faire et &ne plus m'avertir]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgainDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[You can re-enable the check in Tools → Options → Node.js Tools → General.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Vous pouvez réactiver la vérification dans Outils → Options → Node.js Tools → Général.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingButWarnNextTime" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing, but &warn me next time it happens]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ne rien faire, mais &m'avertir la prochaine fois]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathFooter" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[<a href="#help">Get more information</a>]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[<a href="#help">Obtenir plus d'informations</a>]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathHidePathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Hide &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Masquer les &chemins dépassant la limite]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupe" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Run 'npm &dedupe' on the project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Exécuter 'npm &dedupe' sur le projet]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Dans certains cas, le dédoublement des packages peut réduire suffisamment le volume d'imbrication dans node_modules pour résoudre le problème.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDidNotHelp" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the <a href="#help">documentation</a> for other potential workarounds.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Malheureusement, l'exécution de 'npm dedupe' n'a pas résolu le problème. Consultez la <a href="#help">documentation</a> pour d'autres solutions de contournement possibles.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathShowPathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Show &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Afficher les &chemins dépassant la limite]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Your project folder contains one or more paths that exceed the <a href="#msdn">260 character limit</a>. Visual Studio <a href="#uservoice">does not fully support</a> such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Votre dossier de projet contient un ou plusieurs chemins qui dépassent la <a href="#msdn">limite de 260 caractères</a>. Visual Studio <a href="#uservoice">ne prend pas complètement en charge</a> ce type de projet. Vous pouvez rencontrer des problèmes pendant la génération et la publication de votre projet, ou des interférences avec d'autres fonctionnalités Visual Studio et Node.js Tools.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Path Too Long Warning]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Avertissement de chemin trop long]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NoKeywordsInPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[(This package has no keywords.)]]></Val>
@@ -990,19 +882,25 @@
       </Item>
       <Item ItemId=";NpmCancelled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled]]></Val>
+          <Val><![CDATA[{0} canceled]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[{0} annulé]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";NpmCancelledWithErrors" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          <Val><![CDATA[{0} canceled with errors - see Output window for details]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} annulé avec des erreurs - consulter la fenêtre Sortie pour plus de détails]]></Val>
+            <Val><![CDATA[{0} annulé avec des erreurs - Pour plus d'informations, consultez la fenêtre Sortie]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1074,15 +972,6 @@
           <Val><![CDATA[Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.]D;]A;]D;]A;The following error occurred trying to execute npm.cmd:]D;]A;]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[npm.cmd introuvable. Vérifiez que vous avez installé une version récente de node.js et que vous avez spécifié l'emplacement de node.exe dans les propriétés de projet, ou qu'il est disponible sur votre système PATH.]D;]A;]D;]A;L'erreur suivante s'est produite pendant la tentative d'exécution de npm.cmd :]D;]A;]D;]A;{0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmOutputPaneTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Npm]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Npm]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1600,6 +1489,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";PropertiesBrowseTestRootAccessibleName" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Browse for test root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Rechercher la racine de test]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";PropertiesClassLocalPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Local Package Properties]]></Val>
@@ -1993,6 +1891,69 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestFrameworkToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the framework used for the unit tests.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Spécifie le framework utilisé pour les tests unitaires.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRoot" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Test Root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Racine de test]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRootToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the directory where the unit tests are located.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Spécifie le répertoire des tests unitaires.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildCanceled" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Canceled]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Build annulée]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildCompleted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Completed]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Build achevée]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildError" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Error - Failed to start '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Erreur - Échec du démarrage de '{0}']]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildStarted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Started]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Build démarrée]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TypeScriptMinVersionNotInstalled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed]]></Val>
@@ -2002,83 +1963,11 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";TypingsInfoBarSpan1" ItemType="0" PsrId="211" Leaf="true">
+      <Item ItemId=";UnitTestHeader" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.js IntelliSense added a ]]></Val>
+          <Val><![CDATA[JavaScript Unit Test]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js IntelliSense a ajouté un ]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan2" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[typings folder]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[dossier de typages]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan3" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[ to your project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ à votre projet]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsOpenOptionsText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Customize...]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Personnaliser...]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolCouldNotStart" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not start Typings tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Impossible de démarrer l'outil Typages utilisé pour IntelliSense]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolInstallFailed" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Échec d'installation de l'outil Typages utilisé pour IntelliSense. Vérifiez que Node.js est correctement installé]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolNotInstalledError" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not find Typings package manager tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Outil du gestionnaire de package Typages utilisé pour IntelliSense introuvable]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallCompleted" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Successfully installed typing files for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Fichiers de typages installés pour IntelliSense.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallErrorOccurred" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[An error occurred installing typings used for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Une erreur s'est produite pendant l'installation des typages utilisés pour IntelliSense.]]></Val>
+            <Val><![CDATA[Test unitaire JavaScript]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3671,12 +3560,6 @@
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
-    <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft Corporation]]></Val>
@@ -3684,17 +3567,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Node.js Tools pour Visual Studio - Assistants]]></Val>
-        </Tgt>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11213.2]]></Val>
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3719,9 +3596,12 @@
       </Str>
       <Disp Icon="Str" />
     </Item>
-    <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11213.2 commit:1d0c8c89b0b3033900bb83853b33f4eb2f31e834]]></Val>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

@@ -133,8 +133,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (!this.ExcludeNodeFromScc)
                 {
-                    var sccManager = this.ProjectMgr.Site.GetService(typeof(SVsSccManager)) as IVsSccManager2;
-                    if (sccManager != null)
+                    if (this.ProjectMgr.Site.GetService(typeof(SVsSccManager)) is IVsSccManager2 sccManager)
                     {
                         var mkDocument = this.GetMkDocument();
                         if (!string.IsNullOrEmpty(mkDocument))
@@ -575,28 +574,28 @@ namespace Microsoft.VisualStudioTools.Project
             this.projectMgr.Site.GetUIThread().MustBeCalledFromUIThread();
             this.projectMgr.ItemIdMap.Remove(node);
 
-            HierarchyNode last = null;
-            for (var n = this.firstChild; n != null; n = n.nextSibling)
+            HierarchyNode previous = null;
+            for (var current = this.firstChild; current != null; current = current.nextSibling)
             {
-                if (n == node)
+                if (current == node)
                 {
-                    if (last != null)
+                    if (previous != null)
                     {
-                        last.nextSibling = n.nextSibling;
+                        previous.nextSibling = current.nextSibling;
                     }
-                    if (n == this.firstChild)
+                    if (current == this.firstChild)
                     {
-                        this.firstChild = n.nextSibling;
+                        this.firstChild = current.nextSibling;
                     }
                     if (object.ReferenceEquals(node, this.lastChild))
                     {
-                        this.lastChild = last;
+                        this.lastChild = previous;
                     }
                     return;
                 }
-                last = n;
+                previous = current;
             }
-            throw new InvalidOperationException("Node not found");
+            // Node is no longer in the tree
         }
 
         /// <summary>
@@ -1115,10 +1114,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                     ErrorHandler.ThrowOnFailure(pRdt.GetDocumentInfo(
                                          cookie[0],
-                                         out var _,
-                                         out var _,
-                                         out var _,
-                                         out var _,
+                                         out _,
+                                         out _,
+                                         out _,
+                                         out _,
                                          out var srpHier,
                                          out itemid,
                                          out var ppunkDocData));
@@ -1340,8 +1339,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
 
             var projref = string.Empty;
-            var solution = this.GetService(typeof(IVsSolution)) as IVsSolution;
-            if (solution != null)
+            if (this.GetService(typeof(IVsSolution)) is IVsSolution solution)
             {
                 ErrorHandler.ThrowOnFailure(solution.GetProjrefOfItem(this.ProjectMgr, this.hierarchyId, out projref));
                 if (string.IsNullOrEmpty(projref))
@@ -2073,8 +2071,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             for (var n = this.FirstChild; n != null; n = n.NextSibling)
             {
-                var nodeAsT = n as T;
-                if (nodeAsT != null)
+                if (n is T nodeAsT)
                 {
                     nodes.Add(nodeAsT);
                 }
@@ -2093,8 +2090,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             for (var n = this.FirstChild; n != null; n = n.NextSibling)
             {
-                var nodeAsT = n as T;
-                if (nodeAsT != null)
+                if (n is T nodeAsT)
                 {
                     yield return nodeAsT;
                 }

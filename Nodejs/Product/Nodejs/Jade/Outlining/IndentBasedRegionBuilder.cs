@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.Jade
             for (int i = line.Start; i < line.End; i++)
             {
                 var ch = line.Snapshot.GetText(i, 1)[0];
-                if (!Char.IsWhiteSpace(ch))
+                if (!char.IsWhiteSpace(ch))
                 {
                     return i - line.Start;
                 }

@@ -120,6 +120,9 @@
   <data name="BackButtonLabel" xml:space="preserve">
     <value>_Back</value>
   </data>
+  <data name="BrowseNodeCodeAccessibleName" xml:space="preserve">
+    <value>Browse to the folder containing your Node.js code</value>
+  </data>
   <data name="CancelButtonLabel" xml:space="preserve">
     <value>_Cancel</value>
   </data>
@@ -130,7 +133,7 @@
     <value>Choose which file to run when F5 is pressed.</value>
   </data>
   <data name="FileFilterHelpText" xml:space="preserve">
-    <value>Files with the .js extension are always included.</value>
+    <value>Files with these extensions are included in the project.</value>
   </data>
   <data name="FileFilterTitle" xml:space="preserve">
     <value>Enter the filter for files to include</value>
@@ -138,14 +141,26 @@
   <data name="FinishButtonLabel" xml:space="preserve">
     <value>_Finish</value>
   </data>
+  <data name="FromExistingJavaScriptAccessibleName" xml:space="preserve">
+    <value>Created project targets JavaScript.</value>
+  </data>
+  <data name="FromExistingTypeScriptAccessibleName" xml:space="preserve">
+    <value>Created project targets TypeScript.</value>
+  </data>
+  <data name="JavaScriptHelpText" xml:space="preserve">
+    <value>Files with a '.js', or a '.jsx' extension, and 'jsconfig.json' are automatically included.</value>
+  </data>
+  <data name="LanguageTitle" xml:space="preserve">
+    <value>Select the language this project primarily uses</value>
+  </data>
   <data name="NextButtonLabel" xml:space="preserve">
     <value>_Next</value>
   </data>
   <data name="SaveFileLocationHelpText" xml:space="preserve">
-    <value>We won't move any files, and you can use Save As to move the project file later.</value>
+    <value>The project file will be saved in the root of the folder that contains your Node.js code.</value>
   </data>
   <data name="SaveFileLocationTitle" xml:space="preserve">
-    <value>Select where to save your project file</value>
+    <value>Enter the name for your project</value>
   </data>
   <data name="SaveProjectPageTitle" xml:space="preserve">
     <value>Save Project</value>
@@ -158,6 +173,12 @@
   </data>
   <data name="SourceFilesPageTitle" xml:space="preserve">
     <value>Source Files</value>
+  </data>
+  <data name="StartupPageTitle" xml:space="preserve">
+    <value>Source Files</value>
+  </data>
+  <data name="TypeScriptHelpText" xml:space="preserve">
+    <value>Files with a '.ts', or a '.tsx' extension, and 'tsconfig.json' are automatically included.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to the Create New Project from Existing Node.js Code Wizard</value>

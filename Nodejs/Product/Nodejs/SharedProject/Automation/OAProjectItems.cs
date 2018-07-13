@@ -241,8 +241,7 @@ namespace Microsoft.VisualStudioTools.Project.Automation
                     if (nodeAdded != null)
                     {
                         EnvDTE.ProjectItem item = null;
-                        var fileNode = nodeAdded as FileNode;
-                        if (fileNode != null)
+                        if (nodeAdded is FileNode fileNode)
                         {
                             item = new OAFileItem(this.Project, fileNode);
                         }

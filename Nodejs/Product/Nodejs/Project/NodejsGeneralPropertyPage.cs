@@ -56,6 +56,8 @@ namespace Microsoft.NodejsTools.Project
             this.Project.SetProjectProperty(CommonConstants.WorkingDirectory, this.control.WorkingDirectory);
             this.Project.SetProjectProperty(NodeProjectProperty.LaunchUrl, this.control.LaunchUrl);
             this.Project.SetProjectProperty(NodeProjectProperty.Environment, this.control.Environment);
+            this.Project.SetProjectProperty(NodeProjectProperty.TestRoot, this.control.TestRoot);
+            this.Project.SetProjectProperty(NodeProjectProperty.TestFramework, this.control.TestFramework);
 
             var saveNodeSettingsInProject = this.control.SaveNodeSettingsInProject;
 
@@ -109,6 +111,8 @@ namespace Microsoft.NodejsTools.Project
             this.control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
             this.control.StartWebBrowser = GetBoolProperty(this.Project, NodeProjectProperty.StartWebBrowser);
             this.control.SaveNodeSettingsInProject = GetBoolProperty(this.Project, NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
+            this.control.TestRoot = this.Project.GetProjectProperty(NodeProjectProperty.TestRoot);
+            this.control.TestFramework = this.Project.GetProjectProperty(NodeProjectProperty.TestFramework);
 
             bool GetBoolProperty(ProjectNode node, string property)
             {

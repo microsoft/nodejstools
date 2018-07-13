@@ -694,114 +694,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";LongPathClickToCopy" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Copy Full Path]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[전체 경로 복사]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgain" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing and &never warn me again]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[아무 작업도 하지 않고 이 메시지를 다시 표시 안 함(&N)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingAndDoNotWarnAgainDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[You can re-enable the check in Tools → Options → Node.js Tools → General.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[[도구]5D; → [옵션]5D; → [Node.js 도구]5D; → [일반]5D;에서 확인을 다시 사용하도록 설정할 수 있습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathDoNothingButWarnNextTime" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Do nothing, but &warn me next time it happens]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[아무 작업도 수행하지 않지만, 다음에 발생할 경우 메시지를 표시함(&W)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathFooter" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[<a href="#help">Get more information</a>]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[<a href="#help">자세한 정보 보기</a>]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathHidePathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Hide &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[제한을 초과하는 경로 숨기기(&P)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupe" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Run 'npm &dedupe' on the project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[프로젝트에 대해 'npm dedupe' 실행(&D)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDetail" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[In some cases, deduplicating packages can reduce the amount of nesting in node_modules sufficiently to resolve the issue.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[일부 경우 패키지를 중복 제거하면 node_modules에 중첩되는 양이 충분히 줄어 문제가 해결될 수 있습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathNpmDedupeDidNotHelp" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Unfortunately, running 'npm dedupe' did not resolve the issue. Please consult the <a href="#help">documentation</a> for other potential workarounds.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[아쉽게도 'npm dedupe'를 실행하는 것으로 문제가 해결되지 않았습니다. 다른 잠재적 해결 방법은 <a href="#help">문서</a>를 확인하세요.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathShowPathsExceedingTheLimit" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Show &paths exceeding the limit]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[제한을 초과하는 경로 표시(&P)]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Your project folder contains one or more paths that exceed the <a href="#msdn">260 character limit</a>. Visual Studio <a href="#uservoice">does not fully support</a> such projects. You may run into issues building and publishing your project, or interference with other Visual Studio and Node.js Tools features.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[프로젝트 폴더에 <a href="#msdn">260자 제한</a>을 초과하는 하나 이상의 경로가 포함되어 있습니다. Visual Studio에서는 이러한 프로젝트를 <a href="#uservoice">완전히 지원하지는 않습니다</a>. 프로젝트 빌드 및 게시와 관련한 문제가 발생하거나 다른 Visual Studio 및 Node.js 도구 기능에 대한 방해가 발생할 수 있습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";LongPathWarningTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Path Too Long Warning]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[경로가 너무 김 경고]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NoKeywordsInPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[(This package has no keywords.)]]></Val>
@@ -990,19 +882,25 @@
       </Item>
       <Item ItemId=";NpmCancelled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled]]></Val>
+          <Val><![CDATA[{0} canceled]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0}이(가) 취소됨]]></Val>
+            <Val><![CDATA[{0}개 취소됨]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";NpmCancelledWithErrors" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          <Val><![CDATA[{0} canceled with errors - see Output window for details]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[오류가 발생하여 {0}이(가) 취소됨 - 자세한 내용은 출력 창 참조]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1074,15 +972,6 @@
           <Val><![CDATA[Could not find npm.cmd. Ensure you have a recent version of node.js installed and have specified the location of node.exe in the project properties, or that it is available on your system PATH.]D;]A;]D;]A;The following error occurred trying to execute npm.cmd:]D;]A;]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[npm.cmd를 찾을 수 없습니다. 최신 버전의 node.js가 설치되어 있고 프로젝트 속성에 node.exe 위치를 지정했는지 또는 시스템 경로에서 사용할 수 있는지 확인하세요.]D;]A;]D;]A;npm.cmd를 실행하는 동안 다음 오류가 발생했습니다.]D;]A;]D;]A;{0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmOutputPaneTitle" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Npm]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Npm]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1600,6 +1489,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";PropertiesBrowseTestRootAccessibleName" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Browse for test root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[테스트 루트 찾아보기]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";PropertiesClassLocalPackage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Local Package Properties]]></Val>
@@ -1993,6 +1891,69 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";TestFrameworkToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the framework used for the unit tests.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[단위 테스트에 사용되는 프레임워크를 지정합니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRoot" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Test Root]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[테스트 루트]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TestRootToolTip" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies the directory where the unit tests are located.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[단위 테스트가 있는 디렉터리를 지정합니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildCanceled" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Canceled]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[빌드가 취소됨]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildCompleted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Completed]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[빌드가 완료됨]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildError" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Error - Failed to start '{0}']]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[오류 - '{0}'을(를) 시작하지 못했습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TscBuildStarted" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Build Started]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[빌드가 시작됨]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";TypeScriptMinVersionNotInstalled" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Node.js Tools requires TypeScript for Visual Studio {0} or higher. Please ensure TypeScript is installed]]></Val>
@@ -2002,83 +1963,11 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";TypingsInfoBarSpan1" ItemType="0" PsrId="211" Leaf="true">
+      <Item ItemId=";UnitTestHeader" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Node.js IntelliSense added a ]]></Val>
+          <Val><![CDATA[JavaScript Unit Test]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js IntelliSense에서 ]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan2" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[typings folder]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[typings 폴더를]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsInfoBarSpan3" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[ to your project]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ 프로젝트에 추가했습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsOpenOptionsText" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Customize...]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[사용자 지정...]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolCouldNotStart" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not start Typings tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense에 사용되는 Typings 도구를 시작할 수 없습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolInstallFailed" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to install Typings tool used for IntelliSense. Please make sure Node.js is properly installed]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense에 사용되는 Typings 도구를 설치하지 못했습니다. Node.js가 제대로 설치되어 있는지 확인하세요.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolNotInstalledError" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not find Typings package manager tool used for IntelliSense]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense에 사용되는 Typings 패키지 관리자 도구를 찾을 수 없습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallCompleted" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Successfully installed typing files for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense용 typing 파일을 설치했습니다.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";TypingsToolTypingsInstallErrorOccurred" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[An error occurred installing typings used for IntelliSense.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[IntelliSense에 사용되는 typings를 설치하는 동안 오류가 발생했습니다.]]></Val>
+            <Val><![CDATA[JavaScript 단위 테스트]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3671,12 +3560,6 @@
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
-    <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft Corporation]]></Val>
@@ -3684,17 +3567,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Visual Studio용 Node.js 도구 - 마법사]]></Val>
-        </Tgt>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11211.4]]></Val>
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -3719,9 +3596,12 @@
       </Str>
       <Disp Icon="Str" />
     </Item>
-    <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.11211.4 commit:458eada4c30aad6251cfe357bb160a344d4170a8]]></Val>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

@@ -1087,8 +1087,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
                 var packageGuid = new Guid(Guids.NodejsPackageString);
                 shell.LoadPackage(ref packageGuid, out var package);
 
-                var nodejsPackage = package as NodejsPackage;
-                if (nodejsPackage != null)
+                if (package is NodejsPackage nodejsPackage)
                 {
                     this._trackFileChanges = nodejsPackage.GeneralOptionsPage.EditAndContinue;
 
@@ -1292,18 +1291,24 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
 
         private void OnBreakpointBound(object sender, BreakpointBindingEventArgs e)
         {
+            // This is a workaround for bug #604541. If that bug gets re-actived, or there is more information this should be re-visited.
+            // Current thinking is that this is caused by a timing issue between when Node wants to bind the breakpoint and VS creates the 
+            // unbound breakpoint.
             var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
-            var breakpointBinding = e.BreakpointBinding;
-            var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
-            var documentContext = new AD7DocumentContext(codeContext);
-            var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
-            var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
-            this._breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
-            Send(
-                new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
-                AD7BreakpointBoundEvent.IID,
-                null
-            );
+            if (pendingBreakpoint != null)
+            {
+                var breakpointBinding = e.BreakpointBinding;
+                var codeContext = new AD7MemoryAddress(this, pendingBreakpoint.DocumentName, breakpointBinding.Target.Line, breakpointBinding.Target.Column);
+                var documentContext = new AD7DocumentContext(codeContext);
+                var breakpointResolution = new AD7BreakpointResolution(this, breakpointBinding, documentContext);
+                var boundBreakpoint = new AD7BoundBreakpoint(breakpointBinding, pendingBreakpoint, breakpointResolution, breakpointBinding.Enabled);
+                this._breakpointManager.AddBoundBreakpoint(breakpointBinding, boundBreakpoint);
+                Send(
+                    new AD7BreakpointBoundEvent(pendingBreakpoint, boundBreakpoint),
+                    AD7BreakpointBoundEvent.IID,
+                    null
+                );
+            }
         }
 
         private void OnBreakpointUnbound(object sender, BreakpointBindingEventArgs e)
@@ -1324,9 +1329,12 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         private void OnBreakpointBindFailure(object sender, BreakpointBindingEventArgs e)
         {
             var pendingBreakpoint = this._breakpointManager.GetPendingBreakpoint(e.Breakpoint);
-            var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
-            pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
-            Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
+            if (pendingBreakpoint != null)
+            {
+                var breakpointErrorEvent = new AD7BreakpointErrorEvent(pendingBreakpoint, this);
+                pendingBreakpoint.AddBreakpointError(breakpointErrorEvent);
+                Send(breakpointErrorEvent, AD7BreakpointErrorEvent.IID, null);
+            }
         }
 
         private void OnAsyncBreakComplete(object sender, ThreadEventArgs e)
@@ -1403,8 +1411,7 @@ namespace Microsoft.NodejsTools.Debugger.DebugEngine
         /// <returns>File names collection.</returns>
         private IEnumerable<string> EnumerateSolutionFiles()
         {
-            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
-            if (solution != null)
+            if (Package.GetGlobalService(typeof(SVsSolution)) is IVsSolution solution)
             {
                 foreach (var project in solution.EnumerateLoadedProjects(false))
                 {

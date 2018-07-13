@@ -34,8 +34,7 @@ namespace Microsoft.NodejsTools.Project
                 var node = this.NpmNode;
                 if (null != node)
                 {
-                    var local = node as NodeModulesNode;
-                    if (null != local)
+                    if (node is NodeModulesNode local)
                     {
                         var root = local.RootPackage;
                         if (null != root)

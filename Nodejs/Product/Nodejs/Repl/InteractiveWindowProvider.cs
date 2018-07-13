@@ -21,7 +21,8 @@ namespace Microsoft.NodejsTools.Repl
 
         private readonly IServiceProvider serviceProvider;
         private readonly IVsInteractiveWindowFactory windowFactory;
-        private readonly IContentType contentType;
+        private readonly IContentType typeScriptContentType;
+        private readonly IContentType nodeInteractiveContentType;
 
         [ImportingConstructor]
         public InteractiveWindowProvider(
@@ -32,20 +33,21 @@ namespace Microsoft.NodejsTools.Repl
             this.serviceProvider = serviceProvider;
             this.windowFactory = factory;
 
-            this.contentType = contentTypeService.GetContentType(ReplConstants.ContentType);
+            this.typeScriptContentType = contentTypeService.GetContentType(NodejsConstants.TypeScript);
+            this.nodeInteractiveContentType = contentTypeService.GetContentType(InteractiveWindowContentType.ContentType);
         }
 
-        public IVsInteractiveWindow OpenOrCreateWindow()
+        public IVsInteractiveWindow OpenOrCreateWindow(int id)
         {
             if (this.window == null)
             {
-                this.window = CreateReplWindow();
+                this.window = CreateReplWindow(id);
             }
 
             return this.window;
         }
 
-        public IVsInteractiveWindow CreateReplWindow(int replId = -1)
+        private IVsInteractiveWindow CreateReplWindow(int replId)
         {
             if (replId < 0)
             {
@@ -68,7 +70,7 @@ namespace Microsoft.NodejsTools.Repl
 
         private IInteractiveEvaluator GetReplEvaluator()
         {
-            return new NodejsReplEvaluator(this.serviceProvider, this.contentType);
+            return new NodejsReplEvaluator(this.serviceProvider, this.nodeInteractiveContentType);
         }
 
         private IVsInteractiveWindow CreateReplWindowInternal(IInteractiveEvaluator evaluator, int id, string title, Guid languageServiceGuid)
@@ -89,7 +91,7 @@ namespace Microsoft.NodejsTools.Repl
             {
                 toolwindow.BitmapImageMoniker = KnownMonikers.JSInteractiveWindow;
             }
-            replWindow.SetLanguage(languageServiceGuid, this.contentType);
+            replWindow.SetLanguage(languageServiceGuid, this.typeScriptContentType);
             replWindow.InteractiveWindow.InitializeAsync();
 
             return replWindow;

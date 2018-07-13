@@ -1,24 +1,23 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.SourceMapping
 {
     /// <summary>
     /// Reads a V3 source map as documented at https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit?hl=en_US&pli=1&pli=1
     /// </summary>
-    internal class SourceMap
+    public sealed class SourceMap
     {
-        private readonly Dictionary<string, object> _mapInfo;
+        private readonly JObject _mapInfo;
         private readonly LineInfo[] _lines;
         private readonly string[] _names, _sources;
-        private static Dictionary<char, int> _base64Mapping = BuildBase64Mapping();
+        private static readonly Dictionary<char, int> _base64Mapping = BuildBase64Mapping();
 
         /// <summary>
         /// Index into the mappings for the starting column
@@ -48,21 +47,17 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <param name="input"></param>
         internal SourceMap(TextReader input)
         {
-            var serializer = new JavaScriptSerializer();
-            this._mapInfo = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
+            this._mapInfo = JObject.Parse(input.ReadToEnd());
             if (this.Version != 3)
             {
-                throw new NotSupportedException("Only V3 source maps are supported");
+                throw new NotSupportedException("Only V3 source maps are supported.");
             }
 
             if (this._mapInfo.TryGetValue("sources", out var value))
             {
                 var sourceRoot = this.SourceRoot;
 
-                var sources = value as ArrayList;
-                this._sources = sources.Cast<string>()
-                    .Select(x => sourceRoot + x)
-                    .ToArray();
+                this._sources = value.Select(x => sourceRoot + x.Value<string>()).ToArray();
             }
             else
             {
@@ -71,8 +66,7 @@ namespace Microsoft.NodejsTools.SourceMapping
 
             if (this._mapInfo.TryGetValue("names", out value))
             {
-                var names = value as ArrayList;
-                this._names = names.Cast<string>().ToArray();
+                this._names = value.Select(x => x.Value<string>()).ToArray();
             }
             else
             {
@@ -80,9 +74,9 @@ namespace Microsoft.NodejsTools.SourceMapping
             }
 
             var lineInfos = new List<LineInfo>();
-            if (this._mapInfo.TryGetValue("mappings", out var mappingsObj) && mappingsObj is string)
+            if (this._mapInfo.TryGetValue("mappings", out var mappingsObj))
             {
-                var mappings = (string)mappingsObj;
+                var mappings = mappingsObj.Value<string>();
                 var lines = mappings.Split(';');
 
                 // each ; separated section represents a line in the generated file
@@ -104,10 +98,10 @@ namespace Microsoft.NodejsTools.SourceMapping
                     {
                         // each segment is Base64 VLQ encoded
 
-                        var info = DecodeVLQ(segment);
+                        var info = this.DecodeVLQ(segment);
                         if (info.Length == 0)
                         {
-                            throw new InvalidOperationException("invalid data in source map, no starting column");
+                            throw new InvalidOperationException("invalid data in source map, no starting column.");
                         }
 
                         generatedColumn += info[SourceStartingIndex];
@@ -201,18 +195,18 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// <summary>
         /// Version number of the source map.
         /// </summary>
-        internal int Version => GetValue("version", -1);
+        internal int Version => this.GetValue("version", -1);
 
         /// <summary>
         /// Filename of the generated code
         /// </summary>
-        internal string File => GetValue("file", string.Empty);
+        internal string File => this.GetValue("file", string.Empty);
 
         /// <summary>
         /// Provides the root for the sources to save space, automatically
         /// included in the Sources array so it's not public.
         /// </summary>
-        private string SourceRoot => GetValue("sourceRoot", string.Empty);
+        private string SourceRoot => this.GetValue("sourceRoot", string.Empty);
 
         /// <summary>
         /// All of the filenames that were combined.
@@ -349,11 +343,20 @@ namespace Microsoft.NodejsTools.SourceMapping
             return false;
         }
 
-        private T GetValue<T>(string name, T defaultValue)
+        private string GetValue(string name, string defaultValue)
         {
-            if (this._mapInfo.TryGetValue(name, out var version) && version is T)
+            if (this._mapInfo.TryGetValue(name, StringComparison.OrdinalIgnoreCase, out var value))
             {
-                return (T)version;
+                return value.Value<string>();
+            }
+            return defaultValue;
+        }
+
+        private int GetValue(string name, int defaultValue)
+        {
+            if (this._mapInfo.TryGetValue(name, StringComparison.OrdinalIgnoreCase, out var value) && int.TryParse(value.Value<string>(), out var number))
+            {
+                return number;
             }
             return defaultValue;
         }
