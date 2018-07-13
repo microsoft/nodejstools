@@ -20,8 +20,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 #endif
             this.Cancel();
 
-            var unitTestSettings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
-
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(tests);
         }

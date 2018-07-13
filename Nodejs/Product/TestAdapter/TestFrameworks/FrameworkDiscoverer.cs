@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
         }
 
-        public TestFramework Get(string frameworkName)
+        public TestFramework GetFramework(string frameworkName)
         {
             this.frameworks.TryGetValue(frameworkName, out var testFX);
             return testFX;

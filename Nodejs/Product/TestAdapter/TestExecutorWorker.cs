@@ -42,10 +42,10 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.frameworkHandle = frameworkHandle;
             this.runContext = runContext;
 
-            var unittestsettings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
+            var settings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
 
             // todo: use unit test settings to initialize to correct folderr
-            this.frameworkDiscoverer = new FrameworkDiscoverer(unittestsettings.TestFrameworksLocation);
+            this.frameworkDiscoverer = new FrameworkDiscoverer(settings.TestFrameworksLocation);
         }
 
         public void Cancel()
@@ -351,7 +351,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return this.frameworkDiscoverer.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
+            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

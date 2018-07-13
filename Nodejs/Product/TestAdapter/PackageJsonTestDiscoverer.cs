@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.TestAdapter
     [DefaultExecutorUri(NodejsConstants.PackageJsonExecutorUriString)]
     public sealed class PackageJsonTestDiscoverer : ITestDiscoverer
     {
-        public FrameworkDiscoverer FrameworkDiscoverer { get; set; }
+        private FrameworkDiscoverer frameworkDiscoverer;
 
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
@@ -23,7 +23,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             var settings = new UnitTestSettings(discoveryContext.RunSettings);
 
-            this.FrameworkDiscoverer = this.FrameworkDiscoverer ?? new FrameworkDiscoverer(settings.TestFrameworksLocation);
+            this.frameworkDiscoverer = this.frameworkDiscoverer ?? new FrameworkDiscoverer(settings.TestFrameworksLocation);
 
             foreach (var source in sources)
             {
@@ -59,13 +59,13 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             foreach (var dep in packageJson.AllDependencies)
             {
-                testFx = this.FrameworkDiscoverer.Get(dep.Name);
+                testFx = this.frameworkDiscoverer.GetFramework(dep.Name);
                 if (testFx != null)
                 {
                     break;
                 }
             }
-            testFx = testFx ?? this.FrameworkDiscoverer.Get(TestFrameworkDirectories.ExportRunnerFrameworkName);
+            testFx = testFx ?? this.frameworkDiscoverer.GetFramework(TestFrameworkDirectories.ExportRunnerFrameworkName);
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
             var worker = new TestDiscovererWorker(packageJsonPath, NodejsConstants.PackageJsonExecutorUri, nodeExePath);

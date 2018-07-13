@@ -46,6 +46,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             // so we load the xml, and extract the properties we care about.
             // Downside is we only have the raw contents of the XmlElements, i.e. we don't
             // expand any variables.
+            // The issue we encountered is that the msbuild implementation was not able to 
+            // locate the SDK targets/props files. See: https://github.com/Microsoft/msbuild/issues/3434
             try
             {
                 foreach (var source in sources)
@@ -105,7 +107,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     if (testItems.Any())
                     {
 
-                        var testFx = frameworkDiscoverer.Get(testFramework);
+                        var testFx = frameworkDiscoverer.GetFramework(testFramework);
                         if (testFx == null)
                         {
                             logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFramework}'.");
@@ -141,12 +143,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DiscoverTests(HashSet<string> fileList, TestFramework testFramework, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath)
         {
-            if (!File.Exists(nodeExePath))
-            {
-                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
-                return;
-            }
-
             var discoverWorker = new TestDiscovererWorker(projectFullPath, NodejsConstants.ExecutorUri, nodeExePath);
             discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink);
         }

@@ -49,8 +49,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                 env["MSBuildExtensionsPath32"] = Path.Combine(root, "MSBuild");
             }
 
-            var frameworkDiscoverer = new FrameworkDiscoverer();
-
             using (var buildEngine = new MSBuild.ProjectCollection(env))
             {
                 try
@@ -61,6 +59,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                         var cleanPath = source.Trim('\'', '"');
                         buildEngine.LoadProject(cleanPath);
                     }
+
+
+                    FrameworkDiscoverer frameworkDiscoverer = null;
 
                     foreach (var proj in buildEngine.LoadedProjects)
                     {
@@ -122,6 +123,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                         if (testItems.Any())
                         {
+                            frameworkDiscoverer = frameworkDiscoverer ?? new FrameworkDiscoverer();
+
                             var nodeExePath =
                                 Nodejs.GetAbsoluteNodeExePath(
                                     projectHome,
@@ -147,15 +150,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DiscoverTests(Dictionary<string, HashSet<string>> testItems, FrameworkDiscoverer frameworkDiscoverer, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath)
         {
-            if (!File.Exists(nodeExePath))
-            {
-                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
-                return;
-            }
-
             foreach (var testFx in testItems.Keys)
             {
-                var testFramework = frameworkDiscoverer.Get(testFx);
+                var testFramework = frameworkDiscoverer.GetFramework(testFx);
                 if (testFramework == null)
                 {
                     logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");

@@ -30,25 +30,25 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void DiscoverTests(string testFolderPath, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            if (!File.Exists(this.nodeExePath))
-            {
-                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
-                return;
-            }
-
             var fileList = Directory.GetFiles(testFolderPath, "*.js", SearchOption.AllDirectories);
             this.DiscoverTests(fileList, testFx, logger, discoverySink);
         }
 
         public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
+            if (!File.Exists(this.nodeExePath))
+            {
+                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
+                return;
+            }
+
             var files = string.Join(";", fileList);
             logger.SendMessage(TestMessageLevel.Informational, $"Processing: {files}");
 
             var discoveredTestCases = testFx.FindTests(fileList, this.nodeExePath, logger, projectRoot: this.workingDir);
             if (!discoveredTestCases.Any())
             {
-                logger.SendMessage(TestMessageLevel.Warning, "Discovered 0 testcases.");
+                logger.SendMessage(TestMessageLevel.Warning, "Discovered 0 test cases.");
                 return;
             }
 
@@ -56,7 +56,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 var qualifiedName = discoveredTest.FullyQualifiedName;
                 const string indent = "  ";
-                logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
+                logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating Test Case:{qualifiedName}");
                 //figure out the test source info such as line number
                 var filePath = CommonUtils.GetAbsoluteFilePath(this.workingDir, discoveredTest.TestFile);
 
@@ -66,20 +66,20 @@ namespace Microsoft.NodejsTools.TestAdapter
                                                                           discoveredTest.SourceLine,
                                                                          filePath));
 
-                var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, this.testSource)
+                var testCase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, this.testSource)
                 {
                     CodeFilePath = fi?.Filename ?? filePath,
                     LineNumber = fi?.LineNumber ?? discoveredTest.SourceLine,
                     DisplayName = discoveredTest.TestName
                 };
 
-                testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx.Name);
-                testcase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, this.workingDir);
-                testcase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, this.workingDir);
-                testcase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, this.nodeExePath);
-                testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx.Name);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, this.workingDir);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, this.workingDir);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, this.nodeExePath);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
 
-                discoverySink.SendTestCase(testcase);
+                discoverySink.SendTestCase(testCase);
             }
 
             logger.SendMessage(TestMessageLevel.Informational, $"Processing finished for framework '{testFx.Name}'.");
