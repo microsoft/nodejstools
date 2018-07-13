@@ -2669,9 +2669,6 @@ namespace Microsoft.VisualStudioTools.Project
         {
             const bool designTime = false;
 
-            var accessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
-            Utilities.CheckNotNull(accessor);
-
             if (!TryBeginBuild(designTime, false))
             {
                 if (uiThreadCallback != null)
@@ -2701,7 +2698,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this.BuildLogger != null)
                 {
-                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
+                    ErrorHandler.ThrowOnFailure(this.buildManagerAccessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                 }
 
                 submission.ExecuteAsync(sub =>
@@ -6025,11 +6022,6 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private bool TryBeginBuild(bool designTime, bool requiresUIThread = false)
         {
-            if (this.Site != null && this.buildManagerAccessor == null)
-            {
-                this.buildManagerAccessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-            }
-
             var releaseUIThread = false;
 
             try
@@ -6094,11 +6086,6 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
         {
-            if (this.Site != null && this.buildManagerAccessor == null)
-            {
-                this.buildManagerAccessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-            }
-
             if (this.buildManagerAccessor != null)
             {
                 // It's very important that we try executing all three end-build steps, even if errors occur partway through.
