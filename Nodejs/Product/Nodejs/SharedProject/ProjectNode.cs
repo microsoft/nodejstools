@@ -2617,7 +2617,6 @@ namespace Microsoft.VisualStudioTools.Project
             var result = MSBuildResult.Failed;
             const bool designTime = true;
 
-            var accessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
             BuildSubmission submission = null;
 
             try
@@ -2640,9 +2639,9 @@ namespace Microsoft.VisualStudioTools.Project
 
                     var requestData = new BuildRequestData(this.currentConfig, targetsToBuild, this.BuildProject.ProjectCollection.HostServices, BuildRequestDataFlags.ReplaceExistingProjectInstance);
                     submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
-                    if (accessor != null)
+                    if (this.buildManagerAccessor != null)
                     {
-                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
+                        ErrorHandler.ThrowOnFailure(buildManagerAccessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                     }
 
                     var buildResult = submission.Execute();
