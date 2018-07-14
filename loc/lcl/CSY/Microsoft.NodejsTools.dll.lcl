@@ -5712,8 +5712,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" UsrLk="true">
-        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      <Str Cat="Text">
+        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
         </Prev>
@@ -5738,15 +5741,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
