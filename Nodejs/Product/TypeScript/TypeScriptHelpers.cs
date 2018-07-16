@@ -62,7 +62,7 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             //Need to deal with the format being relative and explicit
             var props = (IVsBuildPropertyStorage)project;
-            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, 0, out var outDir));
+            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, (uint)_PersistStorageType.PST_PROJECT_FILE, out var outDir));
 
             var projHome = GetProjectHome(project);
 
