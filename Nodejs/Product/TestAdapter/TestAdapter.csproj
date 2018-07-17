@@ -67,7 +67,7 @@
     <Compile Include="PackageJsonTestExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelpers.cs" />
-    <Compile Include="JavaScriptTestExecutor.cs" />
+    <Compile Include="ProjectTestExecutor.cs" />
     <Compile Include="ProjectTestDiscoverer.cs" />
     <Compile Include="TestDiscovererWorker.cs" />
     <Compile Include="TestExecutorWorker.cs" />

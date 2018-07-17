@@ -60,7 +60,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                         buildEngine.LoadProject(cleanPath);
                     }
 
-
                     FrameworkDiscoverer frameworkDiscoverer = null;
 
                     foreach (var proj in buildEngine.LoadedProjects)
@@ -125,10 +124,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                         {
                             frameworkDiscoverer = frameworkDiscoverer ?? new FrameworkDiscoverer();
 
-                            var nodeExePath =
-                                Nodejs.GetAbsoluteNodeExePath(
-                                    projectHome,
-                                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
+                            var nodeExePath = Nodejs.GetAbsoluteNodeExePath(projectHome, proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
+                            if (string.IsNullOrEmpty(nodeExePath))
+                            {
+                                // if nothing specified in the project fallback to environment
+                                nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
+                            }
 
                             this.DiscoverTests(testItems, frameworkDiscoverer, discoverySink, logger, nodeExePath, proj.FullPath);
                         }

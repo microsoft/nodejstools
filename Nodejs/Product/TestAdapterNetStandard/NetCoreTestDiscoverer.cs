@@ -115,6 +115,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                         }
 
                         var nodeExePath = Nodejs.GetAbsoluteNodeExePath(projectHome, propertyGroup.Descendants(NodeProjectProperty.NodeExePath).FirstOrDefault()?.Value);
+                        if (string.IsNullOrEmpty(nodeExePath))
+                        {
+                            // if nothing specified in the project fallback to environment
+                            nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
+                        }
+
                         this.DiscoverTests(testItems, testFx, discoverySink, logger, nodeExePath, projectFile);
                     }
 
