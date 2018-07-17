@@ -259,6 +259,8 @@ namespace Microsoft.VisualStudioTools.Project
         private List<HierarchyNode> itemsDraggedOrCutOrCopied;
         private readonly ExtensibilityEventsDispatcher extensibilityEventsDispatcher;
 
+        private IVsBuildManagerAccessor buildManagerAccessor;
+
         #endregion
 
         #region abstract properties
@@ -680,8 +682,8 @@ namespace Microsoft.VisualStudioTools.Project
         protected ProjectNode(IServiceProvider serviceProvider)
         {
             this.extensibilityEventsDispatcher = new ExtensibilityEventsDispatcher(this);
-            this.Initialize();
             this.site = serviceProvider;
+            this.Initialize();
             this.taskProvider = new TaskProvider(this.site);
         }
 
@@ -2615,7 +2617,6 @@ namespace Microsoft.VisualStudioTools.Project
             var result = MSBuildResult.Failed;
             const bool designTime = true;
 
-            var accessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
             BuildSubmission submission = null;
 
             try
@@ -2638,9 +2639,9 @@ namespace Microsoft.VisualStudioTools.Project
 
                     var requestData = new BuildRequestData(this.currentConfig, targetsToBuild, this.BuildProject.ProjectCollection.HostServices, BuildRequestDataFlags.ReplaceExistingProjectInstance);
                     submission = BuildManager.DefaultBuildManager.PendBuildRequest(requestData);
-                    if (accessor != null)
+                    if (this.buildManagerAccessor != null)
                     {
-                        ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
+                        ErrorHandler.ThrowOnFailure(buildManagerAccessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                     }
 
                     var buildResult = submission.Execute();
@@ -2666,9 +2667,6 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual BuildSubmission DoAsyncMSBuildSubmission(string target, Action<MSBuildResult, string> uiThreadCallback)
         {
             const bool designTime = false;
-
-            var accessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
-            Utilities.CheckNotNull(accessor);
 
             if (!TryBeginBuild(designTime, false))
             {
@@ -2699,7 +2697,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 if (this.BuildLogger != null)
                 {
-                    ErrorHandler.ThrowOnFailure(accessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
+                    ErrorHandler.ThrowOnFailure(this.buildManagerAccessor.RegisterLogger(submission.SubmissionId, this.BuildLogger));
                 }
 
                 submission.ExecuteAsync(sub =>
@@ -5686,6 +5684,11 @@ If the files in the existing folder have the same names as files in the folder y
         {
             this.ID = VSConstants.VSITEMID_ROOT;
             this.tracker = new TrackDocumentsHelper(this);
+
+            // Ensure the SVsBuildManagerAccessor is initialized, so there is an IVsUpdateSolutionEvents4 for
+            // solution update events (through Microsoft.VisualStudio.CommonIDE.BuildManager.BuildManagerAccessor).
+            // This ensures that the first build after project creation succeeds.
+            this.buildManagerAccessor = (IVsBuildManagerAccessor)this.Site.GetService(typeof(SVsBuildManagerAccessor));
         }
 
         /// <summary>
@@ -6018,23 +6021,16 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private bool TryBeginBuild(bool designTime, bool requiresUIThread = false)
         {
-            IVsBuildManagerAccessor accessor = null;
-
-            if (this.Site != null)
-            {
-                accessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-            }
-
             var releaseUIThread = false;
 
             try
             {
                 // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
-                if (accessor != null)
+                if (this.buildManagerAccessor != null)
                 {
                     if (requiresUIThread)
                     {
-                        var result = accessor.ClaimUIThreadForBuild();
+                        var result = this.buildManagerAccessor.ClaimUIThreadForBuild();
                         if (result < 0)
                         {
                             // Not allowed to claim the UI thread right now. Try again later.
@@ -6046,7 +6042,7 @@ If the files in the existing folder have the same names as files in the folder y
 
                     if (designTime)
                     {
-                        var result = accessor.BeginDesignTimeBuild();
+                        var result = this.buildManagerAccessor.BeginDesignTimeBuild();
                         if (result < 0)
                         {
                             // Not allowed to begin a design-time build at this time. Try again later.
@@ -6072,8 +6068,8 @@ If the files in the existing folder have the same names as files in the folder y
                 // we need to release the UI thread.
                 if (releaseUIThread)
                 {
-                    Debug.Assert(accessor != null, "We think we need to release the UI thread for an accessor we don't have!");
-                    accessor.ReleaseUIThreadForBuild();
+                    Debug.Assert(this.buildManagerAccessor != null, "We think we need to release the UI thread for an accessor we don't have!");
+                    this.buildManagerAccessor.ReleaseUIThreadForBuild();
                 }
             }
         }
@@ -6089,21 +6085,14 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
         {
-            IVsBuildManagerAccessor accessor = null;
-
-            if (this.Site != null)
-            {
-                accessor = this.Site.GetService(typeof(SVsBuildManagerAccessor)) as IVsBuildManagerAccessor;
-            }
-
-            if (accessor != null)
+            if (this.buildManagerAccessor != null)
             {
                 // It's very important that we try executing all three end-build steps, even if errors occur partway through.
                 try
                 {
                     if (submission != null)
                     {
-                        Marshal.ThrowExceptionForHR(accessor.UnregisterLoggers(submission.SubmissionId));
+                        Marshal.ThrowExceptionForHR(this.buildManagerAccessor.UnregisterLoggers(submission.SubmissionId));
                     }
                 }
                 catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
@@ -6115,7 +6104,7 @@ If the files in the existing folder have the same names as files in the folder y
                 {
                     if (designTime)
                     {
-                        Marshal.ThrowExceptionForHR(accessor.EndDesignTimeBuild());
+                        Marshal.ThrowExceptionForHR(this.buildManagerAccessor.EndDesignTimeBuild());
                     }
                 }
                 catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
@@ -6127,7 +6116,7 @@ If the files in the existing folder have the same names as files in the folder y
                 {
                     if (requiresUIThread)
                     {
-                        Marshal.ThrowExceptionForHR(accessor.ReleaseUIThreadForBuild());
+                        Marshal.ThrowExceptionForHR(this.buildManagerAccessor.ReleaseUIThreadForBuild());
                     }
                 }
                 catch (Exception ex) when (!ExceptionExtensions.IsCriticalException(ex))
