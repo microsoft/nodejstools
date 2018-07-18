@@ -2,12 +2,6 @@
 var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
-var result = {
-    'title': '',
-    'passed': false,
-    'stdOut': '',
-    'stdErr': ''
-};
 
 function append_stdout(string, encoding, fd) {
     result.stdOut += string;
@@ -57,19 +51,25 @@ function run_tests(testInfo, callback) {
         return;
     }
 
+    // Since the test events don't come in order we store all of them in this array
+    // in the 'onFinish' event we loop through them and process anything remaining.
+    var testState = [];
     var harness = tape.getHarness({ objectMode: true });
-    var capture = false; // Only capture between 'test' and 'end' events to avoid skipped test events.
+
     harness.createStream({ objectMode: true }).on('data', function (evt) {
         switch (evt.type) {
             case 'test':
-                capture = true;
-                // Test is starting. Reset the result object. Send a "test start" event.
-                result = {
+
+                var result = {
                     'title': evt.name,
-                    'passed': true,
+                    'passed': undefined,
                     'stdOut': '',
                     'stdErr': ''
                 };
+
+                testState[evt.id] = result;
+
+                // Test is starting. Reset the result object. Send a "test start" event.
                 callback({
                     'type': 'test start',
                     'title': result.title,
@@ -77,25 +77,29 @@ function run_tests(testInfo, callback) {
                 });
                 break;
             case 'assert':
-                if (!capture) break;
+                var result = testState[evt.test];
+                if (!result) { break; }
+
                 // Correlate the success/failure asserts for this test. There may be multiple per test
-                var msg = "Operator: " + evt.operator + ". Expected: " + evt.expected + ". Actual: " + evt.actual + "\n";
+                var msg = "Operator: " + evt.operator + ". Expected: " + evt.expected + ". Actual: " + evt.actual + ". evt: " + JSON.stringify(evt) + "\n";
                 if (evt.ok) {
                     result.stdOut += msg;
+                    result.passed = result.passed === undefined ? true : result.passed;
                 } else {
                     result.stdErr += msg + (evt.error.stack || evt.error.message) + "\n";
                     result.passed = false;
                 }
                 break;
             case 'end':
-                if (!capture) break;
+                var result = testState[evt.test];
+                if (!result) { break; }
                 // Test is done. Send a "result" event.
                 callback({
                     'type': 'result',
                     'title': result.title,
                     'result': result
                 });
-                capture = false;
+                testState[evt.test] = undefined;
                 break;
             default:
                 break;
@@ -112,14 +116,17 @@ function run_tests(testInfo, callback) {
     });
 
     harness.onFinish(function () {
-        if (capture) {
-            // Something didn't finish. Finish it now.
-            result.passed = false;
-            callback({
-                'type': 'result',
-                'title': result.title,
-                'result': result
-            });
+        // loop through items in testState
+        for (var i = 0; i < testState.length; i++) {
+            if (testState[i]) {
+                var result = testState[i];
+                if (!result.passed) { result.passed = false; }
+                callback({
+                    'type': 'result',
+                    'title': result.title,
+                    'result': result
+                });
+            }
         }
         process.exit(0);
     });
