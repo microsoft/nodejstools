@@ -161,7 +161,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (this.runContext.IsBeingDebugged && startedFromVs)
             {
                 this.DetachDebugger(vsProcessId);
-                // Ensure that --debug - brk or--inspect - brk is the first argument
+                // Ensure that --debug-brk or --inspect-brk is the first argument
                 nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
             }
 

@@ -84,7 +84,7 @@ function run_tests(testInfo, callback) {
                 var msg = "Operator: " + evt.operator + ". Expected: " + evt.expected + ". Actual: " + evt.actual + ". evt: " + JSON.stringify(evt) + "\n";
                 if (evt.ok) {
                     result.stdOut += msg;
-                    result.passed = true;
+                    result.passed = result.passed === undefined ? true : result.passed;
                 } else {
                     result.stdErr += msg + (evt.error.stack || evt.error.message) + "\n";
                     result.passed = false;
@@ -120,7 +120,7 @@ function run_tests(testInfo, callback) {
         for (var i = 0; i < testState.length; i++) {
             if (testState[i]) {
                 var result = testState[i];
-                if (result.passed == undefined) { result.passed = false; }
+                if (!result.passed) { result.passed = false; }
                 callback({
                     'type': 'result',
                     'title': result.title,
