@@ -20,6 +20,12 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     internal sealed partial class TestExecutorWorker
     {
+        private sealed class TestCaseResult
+        {
+            public TestCase TestCase;
+            public TestResult TestResult;
+        }
+
         private static readonly Version Node8Version = new Version(8, 0);
 
         //get from NodeRemoteDebugPortSupplier::PortSupplierId
@@ -30,9 +36,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private readonly IFrameworkHandle frameworkHandle;
         private readonly IRunContext runContext;
-        private List<TestCase> currentTests;
+        private List<TestCaseResult> currentTests;
         private ProcessOutput nodeProcess;
-        private TestResult currentResult;
         private ResultObject currentResultObject;
 
         private readonly FrameworkDiscoverer frameworkDiscoverer;
@@ -44,7 +49,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             var settings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
 
-            // todo: use unit test settings to initialize to correct folderr
             this.frameworkDiscoverer = new FrameworkDiscoverer(settings.TestFrameworksLocation);
         }
 
@@ -88,33 +92,32 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.cancelRequested.Reset();
 
             // .ts file path -> project settings
-            var fileToTests = new Dictionary<string, List<TestCase>>();
+            var fileToTests = new Dictionary<string, List<TestCaseResult>>();
 
             // put tests into dictionary where key is their source file
             foreach (var test in tests)
             {
                 if (!fileToTests.ContainsKey(test.CodeFilePath))
                 {
-                    fileToTests[test.CodeFilePath] = new List<TestCase>();
+                    fileToTests[test.CodeFilePath] = new List<TestCaseResult>();
                 }
-                fileToTests[test.CodeFilePath].Add(test);
+                fileToTests[test.CodeFilePath].Add(new TestCaseResult() { TestCase = test });
             }
 
             // where key is the file and value is a list of tests
-            foreach (var entry in fileToTests)
+            foreach (var testCaseList in fileToTests.Values)
             {
-                this.currentTests = entry.Value;
+                this.currentTests = testCaseList;
 
                 // Run all test cases in a given file
-                this.RunTestCases(entry.Value);
+                this.RunTestCases(testCaseList);
             }
         }
 
-        private void RunTestCases(IEnumerable<TestCase> tests)
+        private void RunTestCases(IEnumerable<TestCaseResult> tests)
         {
             // May be null, but this is handled by RunTestCase if it matters.
-            // No VS instance just means no debugging, but everything else is
-            // okay.
+            // No VS instance just means no debugging, but everything else is okay.
             if (!tests.Any())
             {
                 return;
@@ -127,7 +130,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var testObjects = new List<TestCaseObject>();
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
-            var firstTest = tests.First();
+            var firstTest = tests.First().TestCase;
             var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
@@ -148,7 +151,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     break;
                 }
 
-                var args = this.GetInterpreterArgs(test, workingDir, projectRootDir);
+                var args = this.GetInterpreterArgs(test.TestCase, workingDir, projectRootDir);
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
                 if (!nodeArgs.Any())
@@ -163,7 +166,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (this.runContext.IsBeingDebugged && startedFromVs)
             {
                 this.DetachDebugger(vsProcessId);
-                // Ensure that --debug-brk or --inspect-brk is the first argument
+                // Ensure that --debug - brk or--inspect - brk is the first argument
                 nodeArgs.Insert(0, GetDebugArgs(nodeVersion, out port));
             }
 
@@ -199,7 +202,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             // Automatically fail tests that haven't been run by this point (failures in before() hooks)
             foreach (var notRunTest in this.currentTests)
             {
-                var result = new TestResult(notRunTest)
+                var result = new TestResult(notRunTest.TestCase)
                 {
                     Outcome = TestOutcome.Failed
                 };
@@ -210,7 +213,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     result.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, this.currentResultObject.stderr));
                 }
                 this.frameworkHandle.RecordResult(result);
-                this.frameworkHandle.RecordEnd(notRunTest, TestOutcome.Failed);
+                this.frameworkHandle.RecordEnd(notRunTest.TestCase, TestOutcome.Failed);
             }
         }
 
@@ -220,30 +223,27 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 var testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
                 // Extract test from list of tests
-                var tests = this.currentTests.Where(n => n.DisplayName == testEvent.title);
-                if (tests.Any())
+                var test = this.currentTests
+                               .Where(n => n.TestCase.DisplayName == testEvent.title)
+                               .FirstOrDefault();
+
+                if (test != null)
                 {
                     switch (testEvent.type)
                     {
                         case "test start":
+                            test.TestResult = new TestResult(test.TestCase)
                             {
-                                this.currentResult = new TestResult(tests.First())
-                                {
-                                    StartTime = DateTimeOffset.Now
-                                };
-                                this.frameworkHandle.RecordStart(tests.First());
-                            }
+                                StartTime = DateTimeOffset.Now
+                            };
+                            this.frameworkHandle.RecordStart(test.TestCase);
                             break;
                         case "result":
-                            {
-                                RecordEnd(tests.First(), testEvent.result);
-                            }
+                            RecordEnd(test, testEvent.result);
                             break;
                         case "pending":
-                            {
-                                this.currentResult = new TestResult(tests.First());
-                                RecordEnd(tests.First(), testEvent.result);
-                            }
+                            test.TestResult = new TestResult(test.TestCase);
+                            RecordEnd(test, testEvent.result);
                             break;
                     }
                 }
@@ -258,27 +258,29 @@ namespace Microsoft.NodejsTools.TestAdapter
                 // Often lines emitted while running tests are not test results, and thus will fail to parse above
             }
 
-            void RecordEnd(TestCase test, ResultObject resultObject)
+            void RecordEnd(TestCaseResult test, ResultObject resultObject)
             {
                 var standardOutputLines = resultObject.stdout.Split('\n');
                 var standardErrorLines = resultObject.stderr.Split('\n');
 
                 if (resultObject.pending == true)
                 {
-                    this.currentResult.Outcome = TestOutcome.Skipped;
+                    test.TestResult.Outcome = TestOutcome.Skipped;
                 }
                 else
                 {
-                    this.currentResult.EndTime = DateTimeOffset.Now;
-                    this.currentResult.Duration = this.currentResult.EndTime - this.currentResult.StartTime;
-                    this.currentResult.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
+                    test.TestResult.EndTime = DateTimeOffset.Now;
+                    test.TestResult.Duration = test.TestResult.EndTime - test.TestResult.StartTime;
+                    test.TestResult.Outcome = resultObject.passed ? TestOutcome.Passed : TestOutcome.Failed;
                 }
 
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, string.Join(Environment.NewLine, standardErrorLines)));
-                this.currentResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, string.Join(Environment.NewLine, standardErrorLines)));
-                this.frameworkHandle.RecordResult(this.currentResult);
-                this.frameworkHandle.RecordEnd(test, this.currentResult.Outcome);
+                var errorMessage = string.Join(Environment.NewLine, standardErrorLines);
+
+                test.TestResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, string.Join(Environment.NewLine, standardOutputLines)));
+                test.TestResult.Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, errorMessage));
+                test.TestResult.Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, errorMessage));
+                this.frameworkHandle.RecordResult(test.TestResult);
+                this.frameworkHandle.RecordEnd(test.TestCase, test.TestResult.Outcome);
                 this.currentTests.Remove(test);
             }
         }
@@ -331,8 +333,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
             catch (COMException)
             {
-                frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
-                KillNodeProcess();
+                this.frameworkHandle.SendMessage(TestMessageLevel.Error, "Error occurred connecting to debuggee.");
+                this.KillNodeProcess();
             }
 #endif
 #endif
