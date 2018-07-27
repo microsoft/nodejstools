@@ -5,8 +5,6 @@ const os = require('os');
 const path = require('path');
 
 const find_tests = function (testFileList, discoverResultFile, projectFolder) {
-    // Jest package is not required for this tests to run, but it's still good to check 
-    // in case the user have a build system or an automation that requires Jest.
     const jest = detectPackage(projectFolder, 'jest');
     const jestEditorSupport = detectPackage(projectFolder, 'jest-editor-support');
 
@@ -29,7 +27,6 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
                     test: test.name
                 });
             }
-
         }
         catch (e) {
             // We would like continue discover other files, so swallow, log and continue;
@@ -82,7 +79,7 @@ function detectPackage(projectFolder, packageName) {
 }
 
 function logError() {
-    var errorArgs = Array.prototype.slice.call(arguments);
+    var errorArgs = Array.from(arguments);
     errorArgs.unshift("NTVS_ERROR:");
     console.error.apply(console, errorArgs);
 }

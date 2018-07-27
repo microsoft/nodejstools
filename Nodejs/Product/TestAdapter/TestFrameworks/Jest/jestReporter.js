@@ -21,7 +21,6 @@
             });
         }
 
-
         this._options.post({
             type: 'suite end',
             result: {}
