@@ -592,6 +592,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.js" />
+    <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

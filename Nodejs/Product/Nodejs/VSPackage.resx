@@ -453,6 +453,12 @@
   <data name="4016" xml:space="preserve">
     <value>A basic Vue.js Web application.</value>
   </data>
+  <data name="4017" xml:space="preserve">
+    <value>JavaScript Jest UnitTest file</value>
+  </data>
+  <data name="4018" xml:space="preserve">
+    <value>A JavaScript Jest UnitTest file</value>
+  </data>
   <data name="6000" xml:space="preserve">
     <value>Launch for Node.js</value>
   </data>
