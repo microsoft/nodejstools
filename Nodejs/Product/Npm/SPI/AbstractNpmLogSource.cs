@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    internal abstract class AbstractNpmLogSource : INpmLogSource
+    public abstract class AbstractNpmLogSource : INpmLogSource
     {
         public event EventHandler CommandStarted;
 

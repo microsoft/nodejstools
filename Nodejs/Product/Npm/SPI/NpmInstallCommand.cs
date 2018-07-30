@@ -2,8 +2,10 @@
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    internal class NpmInstallCommand : NpmCommand
+    public class NpmInstallCommand : NpmCommand
     {
+        public static bool IsInstalling { get; private set; } = false;
+
         public NpmInstallCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
@@ -11,6 +13,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             : base(fullPathToRootPackageDirectory, showConsole: false, pathToNpm: pathToNpm)
         {
             this.Arguments = "install";
+
+            this.CommandStarted += (sender, eventArgs) => { IsInstalling = true; };
+            this.CommandStarted += (sender, eventArgs) => { IsInstalling = false; };
         }
 
         public NpmInstallCommand(
