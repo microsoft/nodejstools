@@ -760,6 +760,6 @@ Error retrieving websocket debug proxy information from web.config.</value>
     <value>Specifies the directory where the unit tests are located.</value>
   </data>
   <data name="NpmIsInstalling" xml:space="preserve">
-    <value>Debugging could not be started because NPM is installing packages. Please wait untill NPM finishes and try again.</value>
+    <value>Debugging could not be started because npm is installing packages. Please wait untill npm finishes and try again.</value>
   </data>
 </root>

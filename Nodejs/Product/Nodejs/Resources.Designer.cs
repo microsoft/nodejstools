@@ -869,7 +869,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Debugging could not be started because NPM is installing packages. Please wait untill NPM finishes and try again..
+        ///   Looks up a localized string similar to Debugging could not be started because npm is installing packages. Please wait untill npm finishes and try again..
         /// </summary>
         internal static string NpmIsInstalling {
             get {
