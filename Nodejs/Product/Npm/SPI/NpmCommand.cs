@@ -74,38 +74,46 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public virtual async Task<bool> ExecuteAsync()
         {
-            OnCommandStarted();
+            this.OnCommandStarted();
+
             var redirector = this.showConsole ? null : new NpmCommandRedirector(this);
+            var cancelled = false;
 
             try
             {
-                GetPathToNpm();
+                this.GetPathToNpm();
+
+                redirector?.WriteLine(
+                    string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
+                    string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, this.Arguments)));
+
+                await NpmHelpers.ExecuteNpmCommandAsync(
+                    redirector,
+                    this.GetPathToNpm(),
+                    this.FullPathToRootPackageDirectory,
+                    new[] { this.Arguments },
+                    this.showConsole,
+                    cancellationResetEvent: this.cancellation);
             }
             catch (NpmNotFoundException)
             {
                 redirector?.WriteErrorLine(Resources.CouldNotFindNpm);
                 return false;
             }
-            redirector?.WriteLine(
-                string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
-                string.Format(CultureInfo.InvariantCulture, Resources.ExecutingCommand, this.Arguments)));
-
-            var cancelled = false;
-            try
-            {
-                await NpmHelpers.ExecuteNpmCommandAsync(
-                    redirector,
-                    GetPathToNpm(),
-                    this.FullPathToRootPackageDirectory,
-                    new[] { this.Arguments },
-                    this.showConsole,
-                    cancellationResetEvent: this.cancellation);
-            }
             catch (OperationCanceledException)
             {
                 cancelled = true;
             }
-            OnCommandCompleted(this.Arguments, redirector?.HasErrors ?? false, cancelled);
+            catch (Exception)
+            {
+                // Catch exception to run the finally block during an unhandled exception.
+                throw;
+            }
+            finally
+            {
+                this.OnCommandCompleted(this.Arguments, redirector?.HasErrors ?? false, cancelled);
+            }
+
             return redirector?.HasErrors != true; // return true when the command completed without errors, or redirector is null (which means we can't track)
         }
 

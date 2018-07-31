@@ -15,7 +15,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.Arguments = "install";
 
             this.CommandStarted += (sender, eventArgs) => { IsInstalling = true; };
-            this.CommandStarted += (sender, eventArgs) => { IsInstalling = false; };
+            this.CommandCompleted += (sender, eventArgs) => { IsInstalling = false; };
         }
 
         public NpmInstallCommand(

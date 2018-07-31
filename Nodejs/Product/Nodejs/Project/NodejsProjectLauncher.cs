@@ -59,7 +59,7 @@ namespace Microsoft.NodejsTools.Project
             if(NpmInstallCommand.IsInstalling)
             {
                 Nodejs.ShowNpmIsInstalling();
-                return VSConstants.E_ABORT;
+                return VSConstants.S_OK;
             }
 
             if (nodePath == null)
