@@ -5733,7 +5733,7 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
+      <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
         <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
