@@ -3567,7 +3567,7 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
+      <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
         <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[针对 Visual Studio 的 Node.js 工具 - 向导]]></Val>
