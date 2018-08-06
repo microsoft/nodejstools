@@ -10,7 +10,7 @@ using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    public abstract class NpmCommand : AbstractNpmLogSource
+    internal abstract class NpmCommand : AbstractNpmLogSource
     {
         private string pathToNpm;
 

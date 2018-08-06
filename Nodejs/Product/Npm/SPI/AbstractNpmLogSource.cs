@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    public abstract class AbstractNpmLogSource : INpmLogSource
+    internal abstract class AbstractNpmLogSource : INpmLogSource
     {
         public event EventHandler CommandStarted;
 

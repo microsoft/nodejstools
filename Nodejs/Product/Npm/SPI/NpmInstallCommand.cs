@@ -2,9 +2,9 @@
 
 namespace Microsoft.NodejsTools.Npm.SPI
 {
-    public class NpmInstallCommand : NpmCommand
+    internal class NpmInstallCommand : NpmCommand
     {
-        public NpmInstallCommand(
+        internal NpmInstallCommand(
             string fullPathToRootPackageDirectory,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
