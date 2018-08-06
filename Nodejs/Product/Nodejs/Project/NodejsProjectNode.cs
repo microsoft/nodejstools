@@ -37,6 +37,8 @@ namespace Microsoft.NodejsTools.Project
         private Timer _idleNodeModulesTimer;
 #pragma warning restore 0414
 
+        public bool IsInstallingMissingModules { get; private set; } = false;
+
         public NodejsProjectNode(NodejsProjectPackage package) : base(package, null)
         {
             var projectNodePropsType = typeof(NodejsProjectNodeProperties);
@@ -553,9 +555,11 @@ namespace Microsoft.NodejsTools.Project
 
         Task INodePackageModulesCommands.InstallMissingModulesAsync()
         {
-            //Fire off the command to update the missing modules
-            //  through NPM
-            return this.ModulesNode.InstallMissingModules();
+            this.IsInstallingMissingModules = true;
+
+            //Fire off the command to update the missing modules through NPM
+            return this.ModulesNode.InstallMissingModules()
+                .ContinueWith(task => this.IsInstallingMissingModules = false, TaskScheduler.Default);
         }
 
         internal event EventHandler OnDispose;

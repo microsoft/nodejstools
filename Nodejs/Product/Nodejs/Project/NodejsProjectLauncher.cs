@@ -56,9 +56,11 @@ namespace Microsoft.NodejsTools.Project
         {
             var nodePath = GetNodePath();
 
-            if(NpmInstallCommand.IsInstalling)
+            if(this._project.IsInstallingMissingModules)
             {
                 Nodejs.ShowNpmIsInstalling();
+                this._project.NpmOutputPane?.Show();
+
                 return VSConstants.S_OK;
             }
 
