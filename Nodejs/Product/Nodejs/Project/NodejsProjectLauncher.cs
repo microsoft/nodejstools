@@ -16,6 +16,7 @@ using System.Web;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TypeScript;
@@ -54,6 +55,14 @@ namespace Microsoft.NodejsTools.Project
         public int LaunchFile(string file, bool debug)
         {
             var nodePath = GetNodePath();
+
+            if(this._project.IsInstallingMissingModules)
+            {
+                Nodejs.ShowNpmIsInstalling();
+                this._project.NpmOutputPane?.Show();
+
+                return VSConstants.S_OK;
+            }
 
             if (nodePath == null)
             {
