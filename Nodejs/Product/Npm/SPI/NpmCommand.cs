@@ -81,7 +81,8 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             try
             {
-                this.GetPathToNpm();
+                // Call this method first to throw a NpmNotFoundException before writing anything to the output.
+                var pathToNpm = this.GetPathToNpm();
 
                 redirector?.WriteLine(
                     string.Format(CultureInfo.InvariantCulture, "===={0}====\r\n\r\n",
@@ -89,7 +90,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
                 await NpmHelpers.ExecuteNpmCommandAsync(
                     redirector,
-                    this.GetPathToNpm(),
+                    pathToNpm,
                     this.FullPathToRootPackageDirectory,
                     new[] { this.Arguments },
                     this.showConsole,
@@ -103,11 +104,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
             catch (OperationCanceledException)
             {
                 cancelled = true;
-            }
-            catch (Exception)
-            {
-                // Catch exception to run the finally block during an unhandled exception.
-                throw;
             }
             finally
             {
