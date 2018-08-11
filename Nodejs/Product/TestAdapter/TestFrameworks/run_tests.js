@@ -7,7 +7,7 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.on('line', (line) => {
+rl.on('line', function (line) {
     rl.close();
 
     // strip the BOM in case of UTF-8
