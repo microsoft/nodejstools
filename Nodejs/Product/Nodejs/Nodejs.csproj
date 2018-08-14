@@ -594,6 +594,7 @@
     </Content>
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
+    <Content Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
     <Content Include="ProjectTemplates\VuejsApp\babel.config.js" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
