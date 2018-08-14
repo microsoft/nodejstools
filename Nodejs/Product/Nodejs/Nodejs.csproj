@@ -594,6 +594,7 @@
     </Content>
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
+    <Content Include="ProjectTemplates\VuejsApp\babel.config.js" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -648,8 +649,6 @@
     <ZipItem Include="Templates\Files\EmptyPug\EmptyPug.pug" />
     <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
     <ZipItem Include="Templates\Files\TypeScriptJsConfig\jsconfig.json" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\.babelrc" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\.postcssrc.js" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\App.vue" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\favicon.ico" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\Home.vue" />
@@ -657,12 +656,9 @@
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\main.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\README.md" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.njsproj" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.vstemplate" />
-    <ZipProject Include="ProjectTemplates\VuejsApp\.babelrc" />
-    <ZipProject Include="ProjectTemplates\VuejsApp\.postcssrc.js" />
     <ZipProject Include="ProjectTemplates\VuejsApp\App.vue" />
     <ZipProject Include="ProjectTemplates\VuejsApp\favicon.ico" />
     <ZipProject Include="ProjectTemplates\VuejsApp\Home.vue" />
@@ -1277,6 +1273,10 @@
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\shims-tsx.d.ts" />
+    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\shims-vue.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--

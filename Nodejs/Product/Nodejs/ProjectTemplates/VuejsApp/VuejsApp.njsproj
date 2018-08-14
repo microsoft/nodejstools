@@ -30,7 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include=".babelrc" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
@@ -46,8 +45,8 @@
     <Folder Include="src\components\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="babel.config.js" />
     <Compile Include="src\main.js" />
-    <Compile Include=".postcssrc.js" />
   </ItemGroup>
 
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
