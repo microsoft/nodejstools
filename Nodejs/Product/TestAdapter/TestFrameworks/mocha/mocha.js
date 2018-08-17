@@ -111,7 +111,7 @@ var run_tests = function (testCases, callback) {
     mocha.addFile(testCases[0].testFile);
 
     var runner = mocha.run(function (code) {
-        process.exit(code);
+        process.exitCode = code ? code : 0;
     });
 
     // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57

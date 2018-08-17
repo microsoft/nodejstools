@@ -1396,6 +1396,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ladění nejde spustit, protože npm instaluje balíčky. Počkejte prosím, až to npm dokončí, a zkuste to znovu.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NpmNodePackageInstallation" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Package Installations]]></Val>
@@ -5579,7 +5588,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jasmine JavaScript]]></Val>
+            <Val><![CDATA[Javascriptový soubor Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5588,7 +5597,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jasmine JavaScript]]></Val>
+            <Val><![CDATA[Javascriptový soubor Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5597,7 +5606,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jasmine TypeScript]]></Val>
+            <Val><![CDATA[Typescriptový soubor Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5606,7 +5615,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jasmine TypeScript]]></Val>
+            <Val><![CDATA[Typescriptový soubor Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5687,7 +5696,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Jest UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jest pro JavaScript]]></Val>
+            <Val><![CDATA[Soubor JavaScript Jest UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5696,7 +5705,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Jest UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor testu jednotek Jest pro JavaScript]]></Val>
+            <Val><![CDATA[Soubor JavaScript Jest UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
