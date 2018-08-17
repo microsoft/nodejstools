@@ -35,7 +35,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include=".babelrc" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
@@ -53,10 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\main.ts" />
-    <TypeScriptCompile Include="src\shims.d.ts" />
+    <TypeScriptCompile Include="src\shims-vue.d.ts" />
+    <TypeScriptCompile Include="src\shims-tsx.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include=".postcssrc.js" />
+    <Compile Include="babel.config.js" />
   </ItemGroup>
 
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
