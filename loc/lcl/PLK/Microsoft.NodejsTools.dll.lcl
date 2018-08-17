@@ -1396,6 +1396,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można rozpocząć debugowania, ponieważ menedżer npm instaluje pakiety. Zaczekaj, aż menedżer npm zakończy działanie, i spróbuj ponownie.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NpmNodePackageInstallation" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Package Installations]]></Val>
@@ -4760,7 +4769,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4805,7 +4814,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic JavaScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego w języku JavaScript]]></Val>
+            <Val><![CDATA[Podstawowy plik JavaScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4814,7 +4823,7 @@
         <Str Cat="Text">
           <Val><![CDATA[UnitTest]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Test jednostkowy]]></Val>
+            <Val><![CDATA[UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5057,7 +5066,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic TypeScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego w języku TypeScript]]></Val>
+            <Val><![CDATA[Podstawowy plik TypeScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5066,7 +5075,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5084,7 +5093,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5093,7 +5102,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego środowiska Mocha w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5102,7 +5111,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5111,7 +5120,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5120,7 +5129,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5129,7 +5138,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5138,7 +5147,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5147,7 +5156,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5579,7 +5588,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5588,7 +5597,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5597,7 +5606,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5606,7 +5615,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5683,6 +5692,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";4017" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Plik JavaScript Jest UnitTest]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4018" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[A JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Plik JavaScript Jest UnitTest]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";6000" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Launch for Node.js]]></Val>
@@ -5715,11 +5742,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+        <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
-        </Tgt>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5741,6 +5768,15 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      </Str>
+      <Disp Icon="Str" />
+    </Item>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

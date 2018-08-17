@@ -31,7 +31,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public string GetCurrentTest(string filePath, int line, int lineCharOffset)
         {
-            var project = PathToProject(filePath);
+            var project = this.PathToProject(filePath);
             if (project != null && this.discoverer.IsProjectKnown(project))
             {
                 var buildEngine = new MSBuild.ProjectCollection();

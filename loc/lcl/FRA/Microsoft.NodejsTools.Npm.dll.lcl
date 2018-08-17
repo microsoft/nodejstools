@@ -242,12 +242,6 @@
   </Item>
   <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="false">
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
-    <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft Corporation]]></Val>
@@ -255,17 +249,14 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio - Npm]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
+        <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Node.js Tools pour Visual Studio - Npm]]></Val>
         </Tgt>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3]]></Val>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio - Npm]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -290,9 +281,12 @@
       </Str>
       <Disp Icon="Str" />
     </Item>
-    <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.4.10719.3 commit:78ad38f4a71b0327b97ae283494986e4e5f06e1d]]></Val>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

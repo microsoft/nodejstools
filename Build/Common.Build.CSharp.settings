@@ -29,8 +29,6 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <VSCTDefinitions>DEV15;DEV15_OR_LATER;DEV14_OR_LATER;DEV12_OR_LATER;DEV11_OR_LATER</VSCTDefinitions>
-    <DefineConstants>$(DefineConstants);DEV15;DEV15_OR_LATER;DEV14_OR_LATER;DEV12_OR_LATER;DEV11_OR_LATER</DefineConstants>
     <MicrosoftBuildAssemblyVersion>15.1.0.0</MicrosoftBuildAssemblyVersion>
     <MicrosoftBuildAssemblyVersionSuffix>Core</MicrosoftBuildAssemblyVersionSuffix>
   </PropertyGroup>
