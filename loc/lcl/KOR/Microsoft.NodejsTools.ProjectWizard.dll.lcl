@@ -922,15 +922,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[npm이 패키지를 설치하고 있으므로 디버깅을 시작할 수 없습니다. npm이 마칠 때까지 기다린 후 다시 시도하세요.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NpmNodePackageInstallation" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Package Installations]]></Val>
@@ -3576,8 +3567,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" UsrLk="true">
-        <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
+      <Str Cat="Text">
+        <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Visual Studio용 Node.js 도구 - 마법사]]></Val>
+        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
         </Prev>
@@ -3602,15 +3596,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

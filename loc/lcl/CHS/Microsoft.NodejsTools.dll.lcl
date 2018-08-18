@@ -1396,15 +1396,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[无法启动调试，因为 npm 正在安装包。请等到 npm 完成并重试。]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NpmNodePackageInstallation" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Package Installations]]></Val>
@@ -5742,8 +5733,11 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" UsrLk="true">
-        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      <Str Cat="Text">
+        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[针对 Visual Studio 的 Node.js 工具]]></Val>
+        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
         </Prev>
@@ -5768,15 +5762,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
