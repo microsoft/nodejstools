@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LCX SchemaVersion="6.0" Name="E:\A\_work\4\s\BuildOutput\Release\Binaries\Npm\Microsoft.NodejsTools.Npm.dll" PsrId="211" FileType="1" SrcCul="en-US" TgtCul="cs-CZ" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
@@ -249,9 +249,9 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" UsrLk="true">
-        <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
-        <Tgt Cat="Text" Stat="Update" Orig="New">
+      <Str Cat="Text">
+        <Val><![CDATA[Node.js Tools for Visual Studio - Npm]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
           <Val><![CDATA[Node.js Tools for Visual Studio – Npm]]></Val>
         </Tgt>
         <Prev Cat="Text">
@@ -278,15 +278,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
