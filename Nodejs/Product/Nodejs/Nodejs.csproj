@@ -594,8 +594,8 @@
     </Content>
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
-    <Content Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
-    <Content Include="ProjectTemplates\VuejsApp\babel.config.js" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\babel.config.js" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -1276,8 +1276,8 @@
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\shims-tsx.d.ts" />
-    <TypeScriptCompile Include="ProjectTemplates\TypeScriptVuejsApp\shims-vue.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims-tsx.d.ts" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims-vue.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <!--
