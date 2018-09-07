@@ -35,9 +35,15 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         {
             var testInfo = string.Empty;
             var discoverResultFile = Path.GetTempFileName();
+
+            // Create a temp file with the list of test files.
+            var testFilesString = string.Join(";", testFiles);
+            var testFilesListFile = Path.GetTempFileName();
+            File.WriteAllText(testFilesListFile, testFilesString, System.Text.Encoding.UTF8);
+
             try
             {
-                var stdout = EvaluateJavaScript(nodeExe, string.Join(";", testFiles), discoverResultFile, logger, projectRoot);
+                var stdout = EvaluateJavaScript(nodeExe, testFilesListFile, discoverResultFile, logger, projectRoot);
                 if (!string.IsNullOrWhiteSpace(stdout))
                 {
                     var stdoutLines = stdout.Split(new[] { Environment.NewLine },
@@ -74,6 +80,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 try
                 {
                     File.Delete(discoverResultFile);
+                    File.Delete(testFilesListFile);
                 }
                 catch (Exception)
                 {
