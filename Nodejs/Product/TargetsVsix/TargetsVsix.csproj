@@ -29,6 +29,7 @@
     <InstallRoot>MSBuild</InstallRoot>
     <!--For VSMAN authoring-->
     <IsProductComponent>true</IsProductComponent>
+    <IncludePackageReferencesInVSIXContainer>false</IncludePackageReferencesInVSIXContainer>
     <!--For F5 debugging-->
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
