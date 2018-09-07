@@ -39,7 +39,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             // Create a temp file with the list of test files.
             var testFilesString = string.Join(";", testFiles);
             var testFilesListFile = Path.GetTempFileName();
-            File.AppendAllText(testFilesListFile, testFilesString, System.Text.Encoding.UTF8);
+            File.WriteAllText(testFilesListFile, testFilesString, System.Text.Encoding.UTF8);
 
             try
             {
