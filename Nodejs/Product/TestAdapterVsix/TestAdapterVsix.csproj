@@ -29,6 +29,7 @@
     <IsProductComponent>true</IsProductComponent>
     <ExtensionInstallationRoot>Extensions</ExtensionInstallationRoot>
     <ExtensionInstallationFolder>Microsoft\NodeJsTools\TestAdapter</ExtensionInstallationFolder>
+    <IncludePackageReferencesInVSIXContainer>false</IncludePackageReferencesInVSIXContainer>
     <!--For F5 debugging-->
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
