@@ -1396,15 +1396,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Npm paketleri yüklemekte olduğundan hata ayıklama başlatılamadı. Lütfen npm yüklemeyi tamamlayana kadar bekleyin ve yeniden deneyin.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NpmNodePackageInstallation" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Package Installations]]></Val>
@@ -5742,9 +5733,9 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" UsrLk="true">
-        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
-        <Tgt Cat="Text" Stat="Update" Orig="New">
+      <Str Cat="Text">
+        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
           <Val><![CDATA[Visual Studio için Node.js Araçları]]></Val>
         </Tgt>
         <Prev Cat="Text">
@@ -5771,15 +5762,6 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
-      </Str>
-      <Disp Icon="Str" />
-    </Item>
-    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
-        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
