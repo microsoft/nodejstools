@@ -199,6 +199,7 @@
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
     <Compile Include="Repl\InteractiveWindowContentType.cs" />
+    <Compile Include="SharedProject\SystemUtilities.cs" />
     <Compile Include="TypeScriptHelpers\TsConfigJson.cs" />
     <Compile Include="TypeScriptHelpers\TsConfigJsonFactory.cs" />
     <Compile Include="TypeScriptHelpers\TypeScriptCompile.cs" />
