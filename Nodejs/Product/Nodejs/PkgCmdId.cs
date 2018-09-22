@@ -10,8 +10,6 @@ namespace Microsoft.NodejsTools
 
         public const int cmdidImportWizard = 0x205;
 
-        public const uint cmdidAzureExplorerAttachNodejsDebugger = 0x207;
-
         public const int cmdidDiagnostics = 0x208;
         public const int cmdidAddFileCommand = 0x211;
 

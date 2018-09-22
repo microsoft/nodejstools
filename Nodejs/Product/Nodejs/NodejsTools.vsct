@@ -224,18 +224,6 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidAzureExplorerAttachNodejsDebugger" priority="0x0110" type="Button">
-        <Parent guid="guidAzureExplorerCmdId" id="groupAzureDiagnostics"/>
-        <CommandFlag>DefaultInvisible</CommandFlag>
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <ButtonText>Attach Debugger (&amp;Node.js)</ButtonText>
-          <MenuText>Attach Debugger (&amp;Node.js)</MenuText>
-          <ToolTipText>Attach the Node.js debugger to the remote Microsoft Azure site</ToolTipText>
-          <CommandName>Attach Node.js Debugger</CommandName>
-        </Strings>
-      </Button>
-
       <!-- This button is invoked by code in the Import Wizard. So it's invisible, but still very much needed. -->
       <Button guid="guidNodeToolsCmdSet" id="cmdidImportWizard" priority="0x010" type="Button">
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -358,7 +346,6 @@
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
 
-      <IDSymbol name="cmdidAzureExplorerAttachNodejsDebugger" value="0x0207" />
       <IDSymbol name="cmdidAddNewFileCommand" value="0x0211" />
 
       <!-- Shared commands, defined in CommonConstants.cs -->
@@ -368,7 +355,6 @@
 
       <!-- Groups -->
       <IDSymbol name="CodeFileGroup" value="0x1012" />
-      <IDSymbol name="AzureExplorerCommandsGroup" value="0x1015" />
       <IDSymbol name="AddNewFileGroup" value="0x1016"/>
     </GuidSymbol>
 
@@ -408,10 +394,6 @@
       <IDSymbol name="cmdidWorkSpaceNpmInstallNew" value="0x0201"/>
       <IDSymbol name="cmdidWorkSpaceNpmUpdate" value="0x0202"/>
       <IDSymbol name="cmdidWorkSpaceNpmDynamicScript" value="0x1000"/>
-    </GuidSymbol>
-
-    <GuidSymbol name="guidAzureExplorerCmdId" value="{2F32C14E-B908-42E6-AE7E-B8B3E2DED633}">
-      <IDSymbol name="groupAzureDiagnostics" value="400" />
     </GuidSymbol>
 
     <!-- InteractiveWindow Guid -->
