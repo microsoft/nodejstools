@@ -466,7 +466,7 @@ namespace Microsoft.NodejsTools.Project
 
         private string GetBrowserPath()
         {
-            ThreadHelper.ThrowIfNotOnUIThread(nameof(GetBrowserPath));
+            ThreadHelper.ThrowIfNotOnUIThread();
 
             var uiShellOpenDocument = (IVsUIShellOpenDocument)ServiceProvider.GlobalProvider.GetService(typeof(SVsUIShellOpenDocument));
             uiShellOpenDocument.GetFirstDefaultPreviewer(out var defaultBrowserPath, out _, out _);
