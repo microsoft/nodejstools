@@ -192,9 +192,7 @@
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
-    <Compile Include="Azure\WebSiteServiceShims.cs" />
     <Compile Include="ClassifierProviderMetadata.cs" />
-    <Compile Include="Commands\AzureExplorerAttachDebuggerCommand.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
@@ -565,6 +563,7 @@
     <ConditionalEmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <LogicalName>VSPackage.Resources</LogicalName>
+      <SubType>Designer</SubType>
     </ConditionalEmbeddedResource>
   </ItemGroup>
   <ItemGroup>
