@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.TypeScript;
@@ -173,6 +174,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             if(!(project is IVsBuildPropertyStorage propStore))
             {
+                Debug.Fail($"Why is {nameof(project)} not of type {nameof(IVsBuildPropertyStorage)}?");
+
                 return false;
             }
 

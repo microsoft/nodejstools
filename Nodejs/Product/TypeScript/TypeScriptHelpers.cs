@@ -61,8 +61,16 @@ namespace Microsoft.NodejsTools.TypeScript
         internal static string GetTypeScriptBackedJavaScriptFile(IVsProject project, string pathToFile)
         {
             //Need to deal with the format being relative and explicit
-            var props = (IVsBuildPropertyStorage)project;
-            ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, (uint)_PersistStorageType.PST_PROJECT_FILE, out var outDir));
+            string outDir = null;
+
+            if (project is IVsBuildPropertyStorage props)
+            {
+                ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, (uint)_PersistStorageType.PST_PROJECT_FILE, out outDir));
+            }
+            else
+            {
+                Debug.Fail($"Why is {nameof(project)} not of type {nameof(IVsBuildPropertyStorage)}?");
+            }
 
             var projHome = GetProjectHome(project);
 
