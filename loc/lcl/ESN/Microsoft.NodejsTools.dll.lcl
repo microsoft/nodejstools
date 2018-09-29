@@ -583,42 +583,6 @@
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
     <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
       <Disp Icon="Str" Disp="true" LocTbl="false" />
-      <Item ItemId=";AzureRemoteDebugWaitCaption" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Azure remote debugging]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Depuración remota de Azure]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoteDebugWaitMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Attaching to Azure Website at {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Asociando al sitio web de Azure en {0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not attach to node.exe process on Azure Website at {0}.]D;]A;]D;]A;Error retrieving websocket debug proxy information from web.config.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se pudo asociar al proceso node.exe en el sitio web de Azure en {0}.]D;]A;]D;]A;Error al recuperar la información del proxy de depuración de WebSocket de web.config.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to attach to Azure Website: {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se pudo asociar al sitio web de Azure: {0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Select Working Dir]]></Val>
@@ -1392,6 +1356,15 @@
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Ejecuta el comando npm. Si la solución contiene varios proyectos, especifique el proyecto de destino con .npm [ProjectName]5D; <argumentos de npm>]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se pudo iniciar la depuración porque npm está instalando paquetes. Espere a que npm termine y vuelva a intentarlo.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4414,36 +4387,6 @@
           <Disp Icon="Str" Expand="true" />
         </Item>
       </Item>
-      <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button" IgnoreHK="true">
-            <Val><![CDATA[Attach Debugger (&Node.js)]]></Val>
-            <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[Asociar el depurador (&Node.js)]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";CommandName" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach Node.js Debugger]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Asociar el depurador de Node.js]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Tooltip" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach the Node.js debugger to the remote Microsoft Azure site]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Asociar el depurador de Node.js al sitio remoto de Microsoft Azure]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
       <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType="0" PsrId="240" Leaf="false">
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType=";Button" PsrId="240" Leaf="true">
@@ -5734,8 +5677,8 @@
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
+        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+        <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Herramientas de Node.js para Visual Studio]]></Val>
         </Tgt>
         <Prev Cat="Text">
@@ -5762,6 +5705,15 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      </Str>
+      <Disp Icon="Str" />
+    </Item>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
