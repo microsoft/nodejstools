@@ -249,7 +249,7 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
+      <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
         <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Visual Studio için Node.js Araçları - Npm]]></Val>
