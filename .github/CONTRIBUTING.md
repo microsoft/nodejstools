@@ -19,7 +19,7 @@ pull requests:
 - Clearly state what the pull request accomplishes.
     - If it's a bug fix, what was the bug and how has it been fixed?
     - If you're adding a new feature, explain the feature and its use cases.
-- Provide a high level explanation of your changes. This will help reviewers understand implementation choices
+- Provide a high-level explanation of your changes. This will help reviewers understand implementation choices
 and will speed up the review process.
     - Try to keep pull requests small and focused.
 - There is no formal code style-guide, but please try to match the style of any file you are editing. There is
