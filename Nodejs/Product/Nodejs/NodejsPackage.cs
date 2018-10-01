@@ -112,15 +112,7 @@ namespace Microsoft.NodejsTools
             var commands = new List<Command> {
                 new OpenReplWindowCommand(),
                 new ImportWizardCommand(),
-            };
-
-            try
-            {
-                commands.Add(new AzureExplorerAttachDebuggerCommand());
-            }
-            catch (NotSupportedException)
-            {
-            }
+            };            
 
             RegisterCommands(commands, Guids.NodejsCmdSet);
             MakeDebuggerContextAvailable();

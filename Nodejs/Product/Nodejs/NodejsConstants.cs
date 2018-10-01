@@ -82,6 +82,8 @@ namespace Microsoft.NodejsTools
         public readonly static Guid TestRootDataValueGuid = new Guid(TestRootDataValueGuidString);
 
         public const string TestRootDataValueName = nameof(TestRootDataValueName);
+
+        public const string ChromeApplicationName = "chrome.exe";
     }
 
     internal static class NodeProjectProperty

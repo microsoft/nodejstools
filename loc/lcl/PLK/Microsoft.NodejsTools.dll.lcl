@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LCX SchemaVersion="6.0" Name="E:\A\_work\4\s\BuildOutput\Release\Binaries\Nodejs\Microsoft.NodejsTools.dll" PsrId="211" FileType="1" SrcCul="en-US" TgtCul="pl-PL" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
@@ -583,42 +583,6 @@
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
     <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
       <Disp Icon="Str" Disp="true" LocTbl="false" />
-      <Item ItemId=";AzureRemoteDebugWaitCaption" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Azure remote debugging]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Zdalne debugowanie platformy Azure]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoteDebugWaitMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Attaching to Azure Website at {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Dołączanie do witryny internetowej platformy Azure w lokalizacji {0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not attach to node.exe process on Azure Website at {0}.]D;]A;]D;]A;Error retrieving websocket debug proxy information from web.config.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nie można dołączyć do procesu node.exe w witrynie internetowej platformy Azure w lokalizacji {0}.]D;]A;]D;]A;Wystąpił błąd podczas pobierania informacji dotyczących serwera proxy debugowania protokołu WebSocket z pliku web.config.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to attach to Azure Website: {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nie można dołączyć do witryny internetowej platformy Azure: {0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Select Working Dir]]></Val>
@@ -1392,6 +1356,15 @@
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Wykonuje polecenie npm. Jeśli rozwiązanie zawiera wiele projektów, określ projekt docelowy za pomocą polecenia .npm [nazwa_projektu]5D; <argumenty polecenia npm>]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można rozpocząć debugowania, ponieważ menedżer npm instaluje pakiety. Zaczekaj, aż menedżer npm zakończy działanie, i spróbuj ponownie.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4414,36 +4387,6 @@
           <Disp Icon="Str" Expand="true" />
         </Item>
       </Item>
-      <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button" IgnoreHK="true">
-            <Val><![CDATA[Attach Debugger (&Node.js)]]></Val>
-            <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[Dołącz debuger (&Node.js)]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";CommandName" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach Node.js Debugger]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Dołącz debuger środowiska Node.js]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Tooltip" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach the Node.js debugger to the remote Microsoft Azure site]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Dołącz debuger środowiska Node.js do zdalnej lokacji platformy Microsoft Azure]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
       <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType="0" PsrId="240" Leaf="false">
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType=";Button" PsrId="240" Leaf="true">
@@ -4760,7 +4703,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4805,7 +4748,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic JavaScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego w języku JavaScript]]></Val>
+            <Val><![CDATA[Podstawowy plik JavaScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4814,7 +4757,7 @@
         <Str Cat="Text">
           <Val><![CDATA[UnitTest]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Test jednostkowy]]></Val>
+            <Val><![CDATA[UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5057,7 +5000,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic TypeScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego w języku TypeScript]]></Val>
+            <Val><![CDATA[Podstawowy plik TypeScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5066,7 +5009,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5084,7 +5027,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5093,7 +5036,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Podstawowy plik testu jednostkowego środowiska Mocha w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5102,7 +5045,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5111,7 +5054,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Mocha UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego środowiska Mocha w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Mocha UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5120,7 +5063,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5129,7 +5072,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5138,7 +5081,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5147,7 +5090,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Tape UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Tape w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Tape UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5579,7 +5522,7 @@
         <Str Cat="Text">
           <Val><![CDATA[JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5588,7 +5531,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A JavaScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku JavaScript]]></Val>
+            <Val><![CDATA[Plik JavaScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5597,7 +5540,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5606,7 +5549,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A TypeScript Jasmine UnitTest file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Plik testu jednostkowego biblioteki Jasmine w języku TypeScript]]></Val>
+            <Val><![CDATA[Plik TypeScript Jasmine UnitTest]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5683,6 +5626,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";4017" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Plik JavaScript Jest UnitTest]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4018" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[A JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Plik JavaScript Jest UnitTest]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";6000" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Launch for Node.js]]></Val>
@@ -5715,11 +5676,14 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+        <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
         </Tgt>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5741,6 +5705,15 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      </Str>
+      <Disp Icon="Str" />
+    </Item>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

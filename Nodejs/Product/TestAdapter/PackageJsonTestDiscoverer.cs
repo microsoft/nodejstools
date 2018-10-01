@@ -29,7 +29,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void DiscoverTestFiles(string packageJsonPath, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        internal void DiscoverTestFiles(string packageJsonPath, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
             logger.SendMessage(TestMessageLevel.Informational, $"Parsing '{packageJsonPath}'.");
 

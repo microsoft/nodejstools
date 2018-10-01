@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LCX SchemaVersion="6.0" Name="E:\A\_work\4\s\BuildOutput\Release\Binaries\Nodejs\Microsoft.NodejsTools.dll" PsrId="211" FileType="1" SrcCul="en-US" TgtCul="tr-TR" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
@@ -583,42 +583,6 @@
     <Disp Icon="Expand" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
     <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
       <Disp Icon="Str" Disp="true" LocTbl="false" />
-      <Item ItemId=";AzureRemoteDebugWaitCaption" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Azure remote debugging]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Azure uzaktan hata ayıklama]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoteDebugWaitMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Attaching to Azure Website at {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} konumundaki Azure Web Sitesine iliştiriliyor]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Could not attach to node.exe process on Azure Website at {0}.]D;]A;]D;]A;Error retrieving websocket debug proxy information from web.config.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} konumunda bulunan Azure Web Sitesinde node.exe işlemine iliştirme başarısız oldu.]D;]A;]D;]A;Web.config'den websocket hata ayıklama proxy'si bilgileri alınamadı.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Failed to attach to Azure Website: {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Azure Web Sitesine iliştirme başarısız oldu: {0}]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";BrowseWorkingDirDialogTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Select Working Dir]]></Val>
@@ -1392,6 +1356,15 @@
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[npm komutunu çalıştırır. Çözüm birden fazla proje içeriyorsa, .npm [ProjeAdı]5D; <npm bağımsız değişkenleri> komutunu kullanarak hedef projeyi belirtin]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NpmIsInstalling" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Npm paketleri yüklemekte olduğundan hata ayıklama başlatılamadı. Lütfen npm yüklemeyi tamamlayana kadar bekleyin ve yeniden deneyin.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4414,36 +4387,6 @@
           <Disp Icon="Str" Expand="true" />
         </Item>
       </Item>
-      <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType="0" PsrId="240" Leaf="false">
-        <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Button" PsrId="240" Leaf="true">
-          <Str Cat="Button" IgnoreHK="true">
-            <Val><![CDATA[Attach Debugger (&Node.js)]]></Val>
-            <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[Hata Ayıklayıcısı İliştir (&Node.js)]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";CommandName" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach Node.js Debugger]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Node.js Hata Ayıklayıcısı İliştir]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-        <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},519" ItemType=";Tooltip" PsrId="240" Leaf="true">
-          <Str Cat="Button">
-            <Val><![CDATA[Attach the Node.js debugger to the remote Microsoft Azure site]]></Val>
-            <Tgt Cat="Button" Stat="Loc" Orig="New">
-              <Val><![CDATA[Node.js hata ayıklayıcısını uzak Microsoft Azure sitesine iliştirin]]></Val>
-            </Tgt>
-          </Str>
-          <Disp Icon="Str" Expand="true" />
-        </Item>
-      </Item>
       <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType="0" PsrId="240" Leaf="false">
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{695e37e2-c6df-4e0a-8833-f688e4c65f1f},529" ItemType=";Button" PsrId="240" Leaf="true">
@@ -5683,6 +5626,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";4017" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[JavaScript Jest UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";4018" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[A JavaScript Jest UnitTest file]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Bir JavaScript Jest UnitTest dosyası]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";6000" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Launch for Node.js]]></Val>
@@ -5715,11 +5676,14 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text">
-        <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
-        <Tgt Cat="Text" Stat="Loc" Orig="New">
+      <Str Cat="Text" UsrLk="true">
+        <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+        <Tgt Cat="Text" Stat="Update" Orig="New">
           <Val><![CDATA[Visual Studio için Node.js Araçları]]></Val>
         </Tgt>
+        <Prev Cat="Text">
+          <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -5741,6 +5705,15 @@
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
+      </Str>
+      <Disp Icon="Str" />
+    </Item>
+    <Item ItemId=";ProductName" ItemType="0" PsrId="211" Leaf="true">
+      <Str Cat="Text">
+        <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft® VisualStudio®]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>

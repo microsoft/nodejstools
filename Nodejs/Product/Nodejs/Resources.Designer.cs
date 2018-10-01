@@ -61,44 +61,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Azure remote debugging.
-        /// </summary>
-        internal static string AzureRemoteDebugWaitCaption {
-            get {
-                return ResourceManager.GetString("AzureRemoteDebugWaitCaption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attaching to Azure Website at {0}.
-        /// </summary>
-        internal static string AzureRemoteDebugWaitMessage {
-            get {
-                return ResourceManager.GetString("AzureRemoteDebugWaitMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not attach to node.exe process on Azure Website at {0}.
-        ///
-        ///Error retrieving websocket debug proxy information from web.config..
-        /// </summary>
-        internal static string AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage {
-            get {
-                return ResourceManager.GetString("AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to attach to Azure Website: {0}.
-        /// </summary>
-        internal static string AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage {
-            get {
-                return ResourceManager.GetString("AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Select Working Dir.
         /// </summary>
         internal static string BrowseWorkingDirDialogTitle {
@@ -865,6 +827,15 @@ namespace Microsoft.NodejsTools {
         internal static string NpmExecuteCommand {
             get {
                 return ResourceManager.GetString("NpmExecuteCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again..
+        /// </summary>
+        internal static string NpmIsInstalling {
+            get {
+                return ResourceManager.GetString("NpmIsInstalling", resourceCulture);
             }
         }
         

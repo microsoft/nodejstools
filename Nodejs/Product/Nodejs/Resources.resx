@@ -498,20 +498,6 @@ The following error occurred trying to execute npm.cmd:
 
 {0}</value>
   </data>
-  <data name="AzureRemoteDebugWaitCaption" xml:space="preserve">
-    <value>Azure remote debugging</value>
-  </data>
-  <data name="AzureRemoteDebugWaitMessage" xml:space="preserve">
-    <value>Attaching to Azure Website at {0}</value>
-  </data>
-  <data name="AzureRemoveDebugCouldNotAttachToWebsiteErrorMessage" xml:space="preserve">
-    <value>Could not attach to node.exe process on Azure Website at {0}.
-
-Error retrieving websocket debug proxy information from web.config.</value>
-  </data>
-  <data name="AzureRemoveDebugCouldNotAttachToWebsiteExceptionErrorMessage" xml:space="preserve">
-    <value>Failed to attach to Azure Website: {0}</value>
-  </data>
   <data name="RemoteDebugCheckProxyAndPortErrorMessage" xml:space="preserve">
     <value>Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.</value>
   </data>
@@ -758,5 +744,8 @@ Error retrieving websocket debug proxy information from web.config.</value>
   </data>
   <data name="TestRootToolTip" xml:space="preserve">
     <value>Specifies the directory where the unit tests are located.</value>
+  </data>
+  <data name="NpmIsInstalling" xml:space="preserve">
+    <value>Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.</value>
   </data>
 </root>

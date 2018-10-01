@@ -16,7 +16,9 @@ using System.Web;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
+using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.Options;
+using Microsoft.NodejsTools.SharedProject;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
@@ -55,6 +57,14 @@ namespace Microsoft.NodejsTools.Project
         {
             var nodePath = GetNodePath();
 
+            if (this._project.IsInstallingMissingModules)
+            {
+                Nodejs.ShowNpmIsInstalling();
+                this._project.NpmOutputPane?.Show();
+
+                return VSConstants.S_OK;
+            }
+
             if (nodePath == null)
             {
                 Nodejs.ShowNodejsNotInstalled();
@@ -62,14 +72,15 @@ namespace Microsoft.NodejsTools.Project
             }
 
             var nodeVersion = Nodejs.GetNodeVersion(nodePath);
-            var startBrowser = ShouldStartBrowser();
+            var shouldStartBrowser = ShouldStartBrowser();
+            var browserPath = this.GetBrowserPath();
 
             // The call to Version.ToString() is safe, since changes to the ToString method are very unlikely, as the current output is widely documented.
             if (debug)
             {
                 if (nodeVersion >= new Version(8, 0))
                 {
-                    StartWithChromeV2Debugger(file, nodePath, startBrowser);
+                    StartWithChromeV2Debugger(file, nodePath, shouldStartBrowser, browserPath);
                     TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
                 }
                 else
@@ -80,7 +91,7 @@ namespace Microsoft.NodejsTools.Project
             }
             else
             {
-                StartNodeProcess(file, nodePath, startBrowser);
+                StartNodeProcess(file, nodePath, shouldStartBrowser, browserPath);
                 TelemetryHelper.LogDebuggingStarted("None", nodeVersion.ToString());
             }
 
@@ -96,7 +107,7 @@ namespace Microsoft.NodejsTools.Project
             return !StringComparer.OrdinalIgnoreCase.Equals(optionString, "false");
         }
 
-        private void StartNodeProcess(string file, string nodePath, bool startBrowser)
+        private void StartNodeProcess(string file, string nodePath, bool shouldStartBrowser, string browserPath)
         {
             //TODO: looks like this duplicates a bunch of code in NodeDebugger
             var psi = new ProcessStartInfo()
@@ -128,15 +139,12 @@ namespace Microsoft.NodejsTools.Project
 
             this._project.OnDispose += process.ResponseToTerminateEvent;
 
-            if (startBrowser && uri != null)
+            if (shouldStartBrowser && uri != null)
             {
                 OnPortOpenedHandler.CreateHandler(
                     uri.Port,
                     shortCircuitPredicate: () => process.HasExited,
-                    action: () =>
-                    {
-                        VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                    }
+                    action: () => OpenBrowser(browserPath, webBrowserUrl)
                 );
             }
         }
@@ -232,7 +240,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        private void StartWithChromeV2Debugger(string file, string nodePath, bool startBrowser)
+        private void StartWithChromeV2Debugger(string file, string nodePath, bool shouldStartBrowser, string browserPath)
         {
             var serviceProvider = _project.Site;
 
@@ -284,16 +292,13 @@ namespace Microsoft.NodejsTools.Project
             debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
 
             // Launch browser 
-            if (startBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
+            if (shouldStartBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
             {
                 var uri = new Uri(webBrowserUrl);
                 OnPortOpenedHandler.CreateHandler(
                     uri.Port,
                     timeout: 5_000, // 5 seconds
-                    action: () =>
-                    {
-                        VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-                    }
+                    action: () => OpenBrowser(browserPath, webBrowserUrl)
                 );
             }
         }
@@ -457,6 +462,29 @@ namespace Microsoft.NodejsTools.Project
             }
 
             return true;
+        }
+
+        private string GetBrowserPath()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var uiShellOpenDocument = (IVsUIShellOpenDocument)ServiceProvider.GlobalProvider.GetService(typeof(SVsUIShellOpenDocument));
+            uiShellOpenDocument.GetFirstDefaultPreviewer(out var defaultBrowserPath, out _, out _);
+
+            return defaultBrowserPath;
+        }
+
+        private static void OpenBrowser(string browserPath, string webBrowserUrl)
+        {
+            // Chrome has known issues with being launched as admin.
+            if (!string.IsNullOrEmpty(browserPath) && browserPath.EndsWith(NodejsConstants.ChromeApplicationName))
+            {
+                SystemUtility.ExecuteProcessUnElevated(browserPath, webBrowserUrl);
+            }
+            else
+            {
+                VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
+            }
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()

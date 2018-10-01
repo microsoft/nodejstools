@@ -179,6 +179,16 @@ namespace Microsoft.NodejsTools
             );
         }
 
+        public static void ShowNpmIsInstalling()
+        {
+            MessageBox.Show(
+                SR.GetString(SR.NpmIsInstalling),
+                SR.ProductName,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
         public static void ShowNodejsPathNotFound(string path)
         {
             MessageBox.Show(

@@ -205,52 +205,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         #region helper methods
 
-#if !DEV12_OR_LATER
-        /// <summary>
-        /// Get document properties from RDT
-        /// </summary>
-        private void GetDocInfo(
-            out bool isOpen,     // true if the doc is opened
-            out bool isDirty,    // true if the doc is dirty
-            out bool isOpenedByUs, // true if opened by our project
-            out uint docCookie, // VSDOCCOOKIE if open
-            out IVsPersistDocData persistDocData)
-        {
-            isOpen = isDirty = isOpenedByUs = false;
-            docCookie = (uint)ShellConstants.VSDOCCOOKIE_NIL;
-            persistDocData = null;
-
-            if (this.node == null || this.node.ProjectMgr == null || this.node.ProjectMgr.IsClosed)
-            {
-                return;
-            }
-
-            IVsHierarchy hierarchy;
-            uint vsitemid = VSConstants.VSITEMID_NIL;
-
-            VsShellUtilities.GetRDTDocumentInfo(this.node.ProjectMgr.Site, this.node.Url, out hierarchy, out vsitemid, out persistDocData, out docCookie);
-
-            if (hierarchy == null || docCookie == (uint)ShellConstants.VSDOCCOOKIE_NIL)
-            {
-                return;
-            }
-
-            isOpen = true;
-            // check if the doc is opened by another project
-            if (Utilities.IsSameComObject(this.node.ProjectMgr, hierarchy))
-            {
-                isOpenedByUs = true;
-            }
-
-            if (persistDocData != null)
-            {
-                int isDocDataDirty;
-                ErrorHandler.ThrowOnFailure(persistDocData.IsDocDataDirty(out isDocDataDirty));
-                isDirty = (isDocDataDirty != 0);
-            }
-        }
-#endif
-
         protected string GetOwnerCaption()
         {
             Debug.Assert(this.node != null, "No node has been initialized for the document manager");

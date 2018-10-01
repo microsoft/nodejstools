@@ -34,16 +34,7 @@ namespace Microsoft.NodejsTools.SourceMapping
                             {
                                 sourceMapFilename = Path.Combine(Path.GetDirectoryName(filename) ?? string.Empty, Path.GetFileName(sourceMapFilename));
                             }
-                        }
-                        catch (ArgumentException)
-                        {
-                        }
-                        catch (PathTooLongException)
-                        {
-                        }
 
-                        try
-                        {
                             if (File.Exists(sourceMapFilename))
                             {
                                 using (var reader = new StreamReader(sourceMapFilename))
@@ -85,7 +76,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </returns>
         internal string MapToOriginal(string filename)
         {
-            var mapInfo = TryGetMapInfo(filename);
+            var mapInfo = this.TryGetMapInfo(filename);
             if (mapInfo != null && mapInfo.Map != null && mapInfo.Map.Sources.Count > 0)
             {
                 return mapInfo.Map.Sources[0];
@@ -98,7 +89,7 @@ namespace Microsoft.NodejsTools.SourceMapping
         /// </summary>
         internal SourceMapInfo MapToOriginal(string filename, int line, int column = 0)
         {
-            var mapInfo = TryGetMapInfo(filename);
+            var mapInfo = this.TryGetMapInfo(filename);
             if (mapInfo != null)
             {
                 if (line < mapInfo.Lines.Length)
@@ -135,7 +126,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             fileName = requestedFileName;
             lineNo = requestedLineNo;
             columnNo = requestedColumnNo;
-            var sourceMap = GetReverseSourceMap(requestedFileName);
+            var sourceMap = this.GetReverseSourceMap(requestedFileName);
 
             if (sourceMap != null)
             {
@@ -287,7 +278,7 @@ namespace Microsoft.NodejsTools.SourceMapping
             return sourceMap;
         }
 
-        private static char[] InvalidPathChars = Path.GetInvalidPathChars();
+        private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
 
         public static FunctionInformation MaybeMap(FunctionInformation funcInfo, Dictionary<string, SourceMap> sourceMaps = null)
         {

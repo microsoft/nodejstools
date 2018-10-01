@@ -75,77 +75,9 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private static IEnumerable<uint> GetProjectItemIds(IVsHierarchy project, uint itemId)
-        {
-            var pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_FirstChild, itemId, project);
-
-            var childId = GetItemId(pVar);
-            while (childId != VSConstants.VSITEMID_NIL)
-            {
-                yield return childId;
-
-                foreach (var childNodePathId in GetProjectItemIds(project, childId))
-                {
-                    yield return childNodePathId;
-                }
-
-                pVar = GetPropertyValue((int)__VSHPROPID.VSHPROPID_NextSibling, childId, project);
-                childId = GetItemId(pVar);
-            }
-        }
-
-        public static uint GetItemId(object pvar)
-        {
-            if (pvar == null)
-            {
-                return VSConstants.VSITEMID_NIL;
-            }
-
-            if (pvar is int)
-            {
-                return (uint)(int)pvar;
-            }
-
-            if (pvar is uint)
-            {
-                return (uint)pvar;
-            }
-
-            if (pvar is short)
-            {
-                return (uint)(short)pvar;
-            }
-
-            if (pvar is ushort)
-            {
-                return (uint)(ushort)pvar;
-            }
-
-            if (pvar is long)
-            {
-                return (uint)(long)pvar;
-            }
-
-            return VSConstants.VSITEMID_NIL;
-        }
-
-        public static object GetPropertyValue(int propid, uint itemId, IVsHierarchy vsHierarchy)
-        {
-            if (itemId == VSConstants.VSITEMID_NIL)
-            {
-                return null;
-            }
-
-            if (ErrorHandler.Succeeded(vsHierarchy.GetProperty(itemId, propid, out var result)))
-            {
-                return result;
-            }
-            return null;
-        }
-
         internal bool IsTestFile(string pathToFile)
         {
-            var project = GetTestProjectFromFile(pathToFile);
+            var project = this.GetTestProjectFromFile(pathToFile);
             if (project == null)
             {
                 //The file is not included in the project. 
@@ -219,12 +151,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             try
             {
                 var testFile = props.Item("TestFramework");
-                if (testFile == null || !(testFile.Value is string))
-                {
-                    return false;
-                }
-
-                return !string.IsNullOrEmpty((string)testFile.Value);
+                return !string.IsNullOrEmpty(testFile?.Value as string);
             }
             catch (ArgumentException)
             {
@@ -255,7 +182,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             var solution = (IVsSolution)this.serviceProvider.GetService(typeof(SVsSolution));
             foreach (var project in EnumerateLoadedProjects(solution))
             {
-                if (OnTestContainersChanged(project))
+                if (this.OnTestContainersChanged(project))
                 {
                     // We only need to fire the event once as the event 
                     // is not per-project, but we shouldn't fire it if 
@@ -299,14 +226,14 @@ namespace Microsoft.NodejsTools.TestAdapter
                     this.firstLoad = false;
                     foreach (var project in EnumerateLoadedProjects(solution))
                     {
-                        OnProjectLoaded(null, new ProjectEventArgs(project));
+                        this.OnProjectLoaded(null, new ProjectEventArgs(project));
                     }
                     this.testFilesAddRemoveListener.StartListeningForTestFileChanges();
                     this.solutionListener.StartListeningForChanges();
                 }
 
                 // Get all loaded projects
-                return EnumerateLoadedProjects(solution).SelectMany(p => GetTestContainers(p));
+                return EnumerateLoadedProjects(solution).SelectMany(p => this.GetTestContainers(p));
             }
         }
         #endregion
@@ -320,7 +247,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             if (this.detectingChanges)
             {
-                SaveModifiedFiles(project);
+                this.SaveModifiedFiles(project);
             }
 
             if (!this.knownProjects.TryGetValue(path, out var projectInfo))
@@ -383,7 +310,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return true;
             }
 
-            if (IsTestFile(pathToItem))
+            if (this.IsTestFile(pathToItem))
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -441,7 +368,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
             }
 
-            OnTestContainersChanged(e.Project);
+            this.OnTestContainersChanged(e.Project);
         }
 
         private void OnProjectUnloaded(object sender, ProjectEventArgs e)
@@ -483,13 +410,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
             }
 
-            OnTestContainersChanged(e.Project);
+            this.OnTestContainersChanged(e.Project);
         }
 
         private void OnProjectRenamed(object sender, ProjectEventArgs e)
         {
-            OnProjectUnloaded(this, e);
-            OnProjectLoaded(this, e);
+            this.OnProjectUnloaded(this, e);
+            this.OnProjectLoaded(this, e);
         }
 
         /// <summary>
@@ -497,10 +424,10 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// </summary>
         private void OnProjectItemChanged(object sender, TestFileChangedEventArgs e)
         {
-            if (e != null && ShouldDiscover(e.File))
+            if (e != null && this.ShouldDiscover(e.File))
             {
                 string root = null;
-                var project = e.Project ?? GetTestProjectFromFile(e.File);
+                var project = e.Project ?? this.GetTestProjectFromFile(e.File);
                 switch (e.ChangedReason)
                 {
                     case WatcherChangeTypes.Created:
@@ -516,7 +443,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             this.testFilesUpdateWatcher.AddFileWatch(e.File);
                         }
 
-                        OnTestContainersChanged(project);
+                        this.OnTestContainersChanged(project);
                         break;
                     case WatcherChangeTypes.Deleted:
                         if (this.fileRootMap.TryGetValue(e.File, out root))
@@ -536,7 +463,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         // track the last delete as an update as our file system scan won't see it
                         this.lastWrite = DateTime.Now.ToUniversalTime();
 
-                        OnTestContainersChanged(project);
+                        this.OnTestContainersChanged(project);
                         break;
 
                     // Dev12 renames files instead of overwriting them when
@@ -544,7 +471,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // path is part of the project.
                     case WatcherChangeTypes.Renamed:
                     case WatcherChangeTypes.Changed:
-                        OnTestContainersChanged(project);
+                        this.OnTestContainersChanged(project);
                         break;
                 }
             }
