@@ -27,10 +27,10 @@
         </Folder>
         <ProjectItem>App.vue</ProjectItem>
         <ProjectItem OpenInEditor="true">main.ts</ProjectItem>
-        <ProjectItem>shims.d.ts</ProjectItem>
+        <ProjectItem>shims-tsx.d.ts</ProjectItem>
+        <ProjectItem>shims-vue.d.ts</ProjectItem>
       </Folder>
-      <ProjectItem>.babelrc</ProjectItem>
-      <ProjectItem>.postcssrc.js</ProjectItem>
+      <ProjectItem>babel.config.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>tsconfig.json</ProjectItem>      
