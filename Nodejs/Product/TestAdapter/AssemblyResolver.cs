@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.probePaths = new[] {
                 Path.Combine(ideFolder, "PrivateAssemblies"),
                 Path.Combine(ideFolder, "PublicAssemblies"),
-                Path.Combine(installPath, "MSBuild","15.0","Bin"),
+                Path.Combine(installPath, "MSBuild","15.0","Bin"), // TODO: Update this to version 16.0 when the folder exists.
                 Path.Combine(ideFolder, "CommonExtensions","Microsoft","TestWindow"),
                 Path.Combine(ideFolder, "CommonExtensions","Microsoft","WebClient","Project System") };
 

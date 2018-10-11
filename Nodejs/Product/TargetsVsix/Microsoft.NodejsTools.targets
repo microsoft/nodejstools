@@ -57,7 +57,7 @@
   <Target Name="CopyFilesToOutputDirectory"/>
 
   <Target Name="CoreCompile">
-    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true' And '$(VisualStudioVersion)' != '15.0'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
+    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true' And '$(VisualStudioVersion)' != '16.0'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
     <PropertyGroup>
       <_NodeModulesContentProperty>@(NodeModulesContent)</_NodeModulesContentProperty>
     </PropertyGroup>

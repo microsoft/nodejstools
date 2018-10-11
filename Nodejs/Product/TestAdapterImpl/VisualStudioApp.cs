@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudioTools
                 prefix = "VisualStudio";
             }
 
-            var progId = $"!{prefix}.DTE.15.0:{processId}";
+            var progId = $"!{prefix}.DTE.16.0:{processId}";
             object runningObject = null;
 
             IBindCtx bindCtx = null;
