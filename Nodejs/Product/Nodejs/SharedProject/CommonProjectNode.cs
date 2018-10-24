@@ -399,7 +399,13 @@ namespace Microsoft.VisualStudioTools.Project
 
         private void BoldStartupItem()
         {
-            var startupPath = GetStartupFile();
+            string startupPath = null;
+            try
+            {
+                startupPath = GetStartupFile();
+            }
+            catch (ObjectDisposedException) { } // Supress the exception as VS crashes when closing a solution.
+
             if (!string.IsNullOrEmpty(startupPath))
             {
                 var startup = FindNodeByFullPath(startupPath);
