@@ -1834,12 +1834,8 @@ namespace Microsoft.VisualStudioTools.Project
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
             var property = GetMsBuildProperty(propertyName, resetCache);
-            if (property == null)
-            {
-                return null;
-            }
 
-            return property.EvaluatedValue;
+            return property?.EvaluatedValue;
         }
 
         /// <summary>
