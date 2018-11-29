@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Flavor;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -43,6 +45,21 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(project, "project");
 
             return ErrorHandler.Succeeded(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path)) && !string.IsNullOrEmpty(path);
+        }
+
+        public static bool TryGetProjectDirectory(this IVsProject project, out string path)
+        {
+            ValidateArg.NotNull(project, "project");
+
+            var succeeded = ErrorHandler.Succeeded(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path)) && !string.IsNullOrEmpty(path);
+
+            if (succeeded && TypeScriptHelpers.IsProjectFile(path))
+            {
+                // remove project name from the path.
+                path = Path.GetDirectoryName(path);
+            }
+
+            return succeeded;
         }
 
         private static string GetAggregateProjectTypeGuids(this IVsProject project)

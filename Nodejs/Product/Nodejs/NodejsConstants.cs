@@ -13,7 +13,10 @@ namespace Microsoft.NodejsTools
         public const string TypeScriptJsxExtension = ".tsx";
         public const string TypeScriptDeclarationExtension = ".d.ts";
         public const string MapExtension = ".map";
+
         public const string NodejsProjectExtension = ".njsproj";
+        public const string CSharpProjectExtension = ".csproj";
+        public const string VisualBasicProjectExtension = ".vsproj";
 
         public const string JavaScript = "JavaScript";
         public const string CSS = "CSS";

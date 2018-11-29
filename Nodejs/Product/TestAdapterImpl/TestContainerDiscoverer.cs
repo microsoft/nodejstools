@@ -99,27 +99,17 @@ namespace Microsoft.NodejsTools.TestAdapter
                     return false;
                 }
             }
-            else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(pathToFile), NodejsConstants.JavaScriptExtension))
+            else if (!TypeScriptHelpers.IsJavaScriptFile(pathToFile))
             {
                 return false;
             }
 
-            if(!(project is IVsBuildPropertyStorage propStore))
+            if (TryGetProjectUnitTestProperties(project, out var testRoot, out _) && !string.IsNullOrEmpty(testRoot))
             {
-                Debug.Fail($"Why is {nameof(project)} not of type {nameof(IVsBuildPropertyStorage)}?");
-
-                return false;
-            }
-
-            var hr = propStore.GetPropertyValue(NodeProjectProperty.TestRoot,/*configuration*/ "", (uint)_PersistStorageType.PST_PROJECT_FILE, out var testRoot);
-
-            // if test root is specified check if the file is contained, otherwise fall back to old logic
-            if (ErrorHandler.Succeeded(hr) && !string.IsNullOrEmpty(testRoot))
-            {
-                project.TryGetProjectPath(out var root);
+                project.TryGetProjectDirectory(out var root);
                 var testRootPath = Path.Combine(root, testRoot);
 
-                return CommonUtils.IsSubpathOf(root, pathToFile);
+                return CommonUtils.IsSubpathOf(testRootPath, pathToFile);
             }
 
             ErrorHandler.Succeeded(((IVsHierarchy)project).ParseCanonicalName(pathToFile, out var itemId));
@@ -127,9 +117,33 @@ namespace Microsoft.NodejsTools.TestAdapter
             return IsTestFile(itemId, project);
         }
 
+        private static bool TryGetProjectUnitTestProperties(IVsProject project, out string testRoot, out string testFramework)
+        {
+            if (!(project is IVsBuildPropertyStorage propStore))
+            {
+                Debug.Fail($"Why is {nameof(project)} not of type {nameof(IVsBuildPropertyStorage)}?");
+
+                testRoot = null;
+                testFramework = null;
+
+                return false;
+            }
+
+            // .NET Framework returns error, .NET Core returns success with "" as output, NTVS returns success with null as output
+            var hrTestRoot = propStore.GetPropertyValue(NodeProjectProperty.TestRoot, /*configuration*/"", (uint)_PersistStorageType.PST_PROJECT_FILE, out testRoot);
+            var hrTestFramework = propStore.GetPropertyValue(NodeProjectProperty.TestFramework, /*configuration*/"", (uint)_PersistStorageType.PST_PROJECT_FILE, out testFramework);
+
+            if (ErrorHandler.Failed(hrTestRoot) && ErrorHandler.Failed(hrTestFramework)
+                || testRoot == string.Empty && testFramework == string.Empty)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private static bool IsTestFile(uint itemId, IVsProject project)
         {
-
             if (!(project is IVsHierarchy hierarchy))
             {
                 return false;
@@ -194,7 +208,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.building = false;
         }
 
-        #region IDispoable
+        #region IDisposable
         void IDisposable.Dispose()
         {
             if (!this.isDisposed)
@@ -208,6 +222,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         #endregion
 
         #region ITestContainerDiscoverer
+
         public event EventHandler TestContainersUpdated;
 
         public Uri ExecutorUri => NodejsConstants.ExecutorUri;
@@ -236,11 +251,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return EnumerateLoadedProjects(solution).SelectMany(p => this.GetTestContainers(p));
             }
         }
+
         #endregion
 
         public IEnumerable<ITestContainer> GetTestContainers(IVsProject project)
         {
-            if (ErrorHandler.Failed(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out var path)) || string.IsNullOrEmpty(path))
+            if (!project.TryGetProjectPath(out var path))
             {
                 yield break;
             }
@@ -250,9 +266,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 this.SaveModifiedFiles(project);
             }
 
-            if (!this.knownProjects.TryGetValue(path, out var projectInfo))
+            if (!this.knownProjects.TryGetValue(path, out var projectInfo) || !TryGetProjectUnitTestProperties(projectInfo.Project, out _, out _))
             {
-                // Don't return any containers for projects we don't know about.
+                // Don't return any containers for projects we don't know about or that we know that they are not configured for JavaScript unit tests.
                 yield break;
             }
             projectInfo.HasRequestedContainers = true;
@@ -304,8 +320,8 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
-            //so we need to re-discover when file change happens. Since we support all project files, this is a safe check
-            if (pathToItem.EndsWith("proj", StringComparison.OrdinalIgnoreCase))
+            //so we need to re-discover when file change happens.
+            if (TypeScriptHelpers.IsProjectFile(pathToItem))
             {
                 return true;
             }
@@ -316,8 +332,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                 {
                     EqtTrace.Verbose("TestContainerDiscoverer: Found a test {0}.", pathToItem);
                 }
+
                 return true;
             }
+
             return false;
         }
 
@@ -341,14 +359,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // watchers into a single recursive watcher.
                 }
 
-                if (e.Project.TryGetProjectPath(out var path) &&
-                    !this.knownProjects.ContainsKey(path))
+                if (e.Project.TryGetProjectPath(out var path) && !this.knownProjects.ContainsKey(path))
                 {
                     var dteProject = ((IVsHierarchy)e.Project).GetProject();
 
                     var projectInfo = new ProjectInfo(
                         e.Project,
-                        this
+                        discoverer: this
                     );
 
                     this.knownProjects.Add(path, projectInfo);
@@ -390,8 +407,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // project. We just won't get the benefits of merging
                     // watchers into a single recursive watcher.
                 }
-                if (e.Project.TryGetProjectPath(out var projectPath) &&
-                    this.knownProjects.TryGetValue(projectPath, out var projectInfo))
+
+                if (e.Project.TryGetProjectPath(out var projectPath) && this.knownProjects.TryGetValue(projectPath, out var projectInfo))
                 {
                     this.knownProjects.Remove(projectPath);
 
@@ -401,8 +418,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                         {
                             this.testFilesUpdateWatcher.RemoveFileWatch(p);
                         }
+
                         this.fileRootMap.Remove(p);
                     }
+
                     if (!string.IsNullOrEmpty(root))
                     {
                         this.testFilesUpdateWatcher.RemoveFolderWatch(root);
@@ -449,6 +468,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         if (this.fileRootMap.TryGetValue(e.File, out root))
                         {
                             this.fileRootMap.Remove(e.File);
+
                             if (!this.fileRootMap.Values.Contains(root))
                             {
                                 this.testFilesUpdateWatcher.RemoveFolderWatch(root);
