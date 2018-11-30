@@ -15,7 +15,8 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [FileExtension(".njsproj"), FileExtension(".csproj"), FileExtension(".vbproj")]
+    // Keep in sync the method TypeScriptHelpers.IsSupportedTestProjectFile if there's a change on the supported projects.
+    [FileExtension(NodejsConstants.NodejsProjectExtension), FileExtension(NodejsConstants.CSharpProjectExtension), FileExtension(NodejsConstants.VisualBasicProjectExtension)]
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class JavaScriptTestDiscoverer : ITestDiscoverer
     {

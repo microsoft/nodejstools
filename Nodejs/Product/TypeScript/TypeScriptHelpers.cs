@@ -22,11 +22,28 @@ namespace Microsoft.NodejsTools.TypeScript
                 || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.TypeScriptJsxExtension);
         }
 
+        internal static bool IsJavaScriptFile(string filename)
+        {
+            var extension = Path.GetExtension(filename);
+
+            return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.JavaScriptExtension);
+        }
+
         internal static bool IsTsJsConfigJsonFile(string filePath)
         {
             var fileName = Path.GetFileName(filePath);
             return StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.TsConfigJsonFile) ||
                 StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
+        }
+
+        // Keep in sync the JavaScriptTestDiscoverer class if there's a change on the supported projects.
+        internal static bool IsSupportedTestProjectFile(string filePath)
+        {
+            var extension = Path.GetExtension(filePath);
+
+            return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.NodejsProjectExtension)
+                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.CSharpProjectExtension)
+                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.VisualBasicProjectExtension);
         }
 
         internal static string GetTypeScriptBackedJavaScriptFile(MSBuild.Project project, string pathToFile)
