@@ -104,9 +104,10 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return false;
             }
 
-            if (TryGetProjectUnitTestProperties(project, out var testRoot, out _) && !string.IsNullOrEmpty(testRoot))
+            if (TryGetProjectUnitTestProperties(project, out var testRoot, out _)
+                && !string.IsNullOrEmpty(testRoot)
+                && project.TryGetProjectDirectory(out var root))
             {
-                project.TryGetProjectDirectory(out var root);
                 var testRootPath = Path.Combine(root, testRoot);
 
                 return CommonUtils.IsSubpathOf(testRootPath, pathToFile);
@@ -321,7 +322,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             //Setting/updating "TestFramework" property on a file item will cause metedata change in the project file,
             //so we need to re-discover when file change happens.
-            if (TypeScriptHelpers.IsProjectFile(pathToItem))
+            if (TypeScriptHelpers.IsSupportedTestProjectFile(pathToItem))
             {
                 return true;
             }

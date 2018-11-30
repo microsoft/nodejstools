@@ -36,7 +36,7 @@ namespace Microsoft.NodejsTools.TypeScript
                 StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
         }
 
-        internal static bool IsProjectFile(string filePath)
+        internal static bool IsSupportedTestProjectFile(string filePath)
         {
             var extension = Path.GetExtension(filePath);
 

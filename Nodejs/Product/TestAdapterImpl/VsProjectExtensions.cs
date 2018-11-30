@@ -49,11 +49,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public static bool TryGetProjectDirectory(this IVsProject project, out string path)
         {
-            ValidateArg.NotNull(project, "project");
+            var succeeded = TryGetProjectPath(project, out path);
 
-            var succeeded = ErrorHandler.Succeeded(project.GetMkDocument(VSConstants.VSITEMID_ROOT, out path)) && !string.IsNullOrEmpty(path);
-
-            if (succeeded && TypeScriptHelpers.IsProjectFile(path))
+            if (succeeded && TypeScriptHelpers.IsSupportedTestProjectFile(path))
             {
                 // remove project name from the path.
                 path = Path.GetDirectoryName(path);
