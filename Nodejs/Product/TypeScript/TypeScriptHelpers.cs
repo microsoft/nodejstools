@@ -36,6 +36,7 @@ namespace Microsoft.NodejsTools.TypeScript
                 StringComparer.OrdinalIgnoreCase.Equals(fileName, NodejsConstants.JsConfigJsonFile);
         }
 
+        // Keep in sync the JavaScriptTestDiscoverer class if there's a change on the supported projects.
         internal static bool IsSupportedTestProjectFile(string filePath)
         {
             var extension = Path.GetExtension(filePath);
