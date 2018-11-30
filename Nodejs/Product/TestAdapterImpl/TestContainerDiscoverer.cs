@@ -130,17 +130,16 @@ namespace Microsoft.NodejsTools.TestAdapter
                 return false;
             }
 
-            // .NET Framework returns error, .NET Core returns success with "" as output, NTVS returns success with null as output
+            // If a property has not been configured, depending on the project type the result and output will be diffent.
+            // .NET Framework returns a failure code and null as output, .NET Core returns a success code and "" as output, NTVS returns success code and null as output
             var hrTestRoot = propStore.GetPropertyValue(NodeProjectProperty.TestRoot, /*configuration*/"", (uint)_PersistStorageType.PST_PROJECT_FILE, out testRoot);
             var hrTestFramework = propStore.GetPropertyValue(NodeProjectProperty.TestFramework, /*configuration*/"", (uint)_PersistStorageType.PST_PROJECT_FILE, out testFramework);
 
-            if (ErrorHandler.Failed(hrTestRoot) && ErrorHandler.Failed(hrTestFramework)
-                || testRoot == string.Empty && testFramework == string.Empty)
-            {
-                return false;
-            }
-
-            return true;
+            // If it doesnt succeed it's a .NET Framework project not configured.
+            // If it succeeds but it's empty, it might be a .NET Core project not configured or a misconfigured project.
+            // Anything else can be a NTVS project, in which case, we want to always return true.
+            return ErrorHandler.Succeeded(hrTestRoot) && testRoot != string.Empty
+                || ErrorHandler.Succeeded(hrTestFramework) && testFramework != string.Empty;
         }
 
         private static bool IsTestFile(uint itemId, IVsProject project)
