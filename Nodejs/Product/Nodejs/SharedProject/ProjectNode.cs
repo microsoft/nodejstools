@@ -6473,6 +6473,12 @@ If the files in the existing folder have the same names as files in the folder y
 
             var prev = previousVisible ?? child.PreviousVisibleSibling;
             var prevId = (prev != null) ? prev.HierarchyId : VSConstants.VSITEMID_NIL;
+
+            if (string.IsNullOrWhiteSpace(parent.GetItemName()))
+            {
+                Environment.FailFast("Parent name should not be null or whitespace.");
+            }
+
             foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = sink.OnItemAdded(parent.HierarchyId, prevId, child.HierarchyId);
