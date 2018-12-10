@@ -6476,6 +6476,8 @@ If the files in the existing folder have the same names as files in the folder y
 
             if (string.IsNullOrWhiteSpace(parent.GetItemName()))
             {
+                // We suspect that `npm install` is launching a Hierarchy change that throws and exception causing VS to crash (it's not common but happens every now and then).
+                // FailFast will allow us to capture better information when this error happens.
                 Environment.FailFast("Parent name should not be null or whitespace.");
             }
 
