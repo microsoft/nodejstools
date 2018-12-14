@@ -1,9 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.NodejsTools.Diagnostics
 {
@@ -41,10 +41,16 @@ namespace Microsoft.NodejsTools.Diagnostics
             this.WriteEvent(2, message);
         }
 
-        [Event(3, Message = "Hierarchy event failed. \"{0}\". Result: {1}. Sink.OnItemAdded({2}, {3}, {4})", Keywords = Keywords.HierarchyEvent, Level = EventLevel.Error)]
-        internal void HierarchyEventException(string message, int result, uint parentHierarchyId, uint prevId, uint childHierarchyId)
+        [Event(3, Message = "Hierarchy event failed. \"{0}\". Result: {1}. Sink.OnItemAdded({2}, {3}, {4}).\r\nHierarchy\r\nItemId\tName\tParentId\r\n{5}", Keywords = Keywords.HierarchyEvent, Level = EventLevel.Error)]
+        internal void HierarchyEventException(string message, int result, uint parentHierarchyId, uint prevId, uint childHierarchyId, IEnumerable<HierarchyItem> hierarchyItems)
         {
-            this.WriteEvent(3, message, result, parentHierarchyId, prevId, childHierarchyId);
+            var builder = new StringBuilder();
+            foreach (var item in hierarchyItems)
+            {
+                builder.AppendLine($"{item.ItemId}\t{this.GetSuppressedMessage(item.Name)}\t{item.ParentId}");
+            }
+
+            this.WriteEvent(3, message, result, parentHierarchyId, prevId, childHierarchyId, builder.ToString());
         }
 
         private string GetSuppressedMessage(string msg)

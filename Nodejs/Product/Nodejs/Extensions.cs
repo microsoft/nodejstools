@@ -1,7 +1,8 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
+using Microsoft.NodejsTools.Diagnostics;
 using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -42,7 +43,7 @@ namespace Microsoft.NodejsTools
             }
         }
 
-        internal static IEnumerable<uint> EnumerateProjectItems(this IVsProject project)
+        internal static IEnumerable<uint> EnumerateProjectItems(this IVsProject project, uint grfItems = (uint)(__VSEHI.VSEHI_Leaf | __VSEHI.VSEHI_Nest | __VSEHI.VSEHI_OmitHier))
         {
             var hierarchy = (IVsHierarchy)project;
             if (Package.GetGlobalService(typeof(SVsEnumHierarchyItemsFactory)) is IVsEnumHierarchyItemsFactory enumHierarchyItemsFactory && project != null)
@@ -50,7 +51,7 @@ namespace Microsoft.NodejsTools
                 if (ErrorHandler.Succeeded(
                     enumHierarchyItemsFactory.EnumHierarchyItems(
                         hierarchy,
-                        (uint)(__VSEHI.VSEHI_Leaf | __VSEHI.VSEHI_Nest | __VSEHI.VSEHI_OmitHier),
+                        grfItems,
                         (uint)VSConstants.VSITEMID_ROOT,
                         out var enumHierarchyItems)))
                 {
@@ -62,6 +63,27 @@ namespace Microsoft.NodejsTools
                             yield return rgelt[0].itemid;
                         }
                     }
+                }
+            }
+        }
+
+        internal static IEnumerable<HierarchyItem> EnumerateHierarchyItems(this IVsSolution solution)
+        {
+            var loadedProjects = solution.EnumerateLoadedProjects(onlyNodeProjects: false);
+            foreach (var project in loadedProjects)
+            {
+                var hierarchy = (IVsHierarchy)project;
+                foreach (var projectItem in project.EnumerateProjectItems((uint)(__VSEHI.VSEHI_Leaf | __VSEHI.VSEHI_Nest | __VSEHI.VSEHI_OmitHier | __VSEHI.VSEHI_Branch)))
+                {
+                    ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(projectItem, (int)__VSHPROPID.VSHPROPID_Name, out var name));
+                    ErrorHandler.ThrowOnFailure(hierarchy.GetProperty(projectItem, (int)__VSHPROPID.VSHPROPID_Parent, out var parentId));
+
+                    yield return new HierarchyItem()
+                    {
+                        ItemId = projectItem,
+                        Name = (string)name,
+                        ParentId = (int)parentId
+                    };
                 }
             }
         }

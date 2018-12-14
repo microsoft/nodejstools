@@ -196,6 +196,7 @@
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Diagnostics\HierarchyItem.cs" />
     <Compile Include="Diagnostics\NodeJsToolsEventSource.cs" />
     <Compile Include="Repl\InteractiveWindowContentType.cs" />
     <Compile Include="SharedProject\SystemUtilities.cs" />

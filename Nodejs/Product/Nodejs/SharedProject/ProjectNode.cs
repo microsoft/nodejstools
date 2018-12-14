@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Xml;
 using EnvDTE;
 using Microsoft.Build.Execution;
+using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -6480,6 +6481,7 @@ If the files in the existing folder have the same names as files in the folder y
 
             var prev = previousVisible ?? child.PreviousVisibleSibling;
             var prevId = (prev != null) ? prev.HierarchyId : VSConstants.VSITEMID_NIL;
+
             foreach (IVsHierarchyEvents sink in this.hierarchyEventSinks)
             {
                 var result = 0;
@@ -6488,19 +6490,25 @@ If the files in the existing folder have the same names as files in the folder y
                     result = sink.OnItemAdded(parent.HierarchyId, prevId, child.HierarchyId);
                     if (ErrorHandler.Failed(result) && result != VSConstants.E_NOTIMPL)
                     {
-                        NodejsToolsEventSource.Instance.HierarchyEventException("OnItemAdded failed.", result, parent.HierarchyId, prevId, child.HierarchyId);
+                        NodejsToolsEventSource.Instance.HierarchyEventException("OnItemAdded failed.", result, parent.HierarchyId, prevId, child.HierarchyId, this.GetHierarchyItems());
                         ErrorHandler.ThrowOnFailure(result);
                     }
                 }
                 catch (InvalidOperationException ex)
                 {
-                    // TODO: Get the whole hierarchy nodes information.
-                    NodejsToolsEventSource.Instance.HierarchyEventException(ex.Message, result, parent.HierarchyId, prevId, child.HierarchyId);
+                    NodejsToolsEventSource.Instance.HierarchyEventException(ex.Message, result, parent.HierarchyId, prevId, child.HierarchyId, this.GetHierarchyItems());
                     throw;
                 }
             }
 
             NodejsToolsEventSource.Instance.HierarchyEventStop("OnItemAdded successful.");
+        }
+
+        private IEnumerable<HierarchyItem> GetHierarchyItems()
+        {
+            var solution = Package.GetGlobalService(typeof(SVsSolution)) as IVsSolution;
+
+            return solution.EnumerateHierarchyItems();
         }
 
         internal void OnItemDeleted(HierarchyNode deletedItem)
