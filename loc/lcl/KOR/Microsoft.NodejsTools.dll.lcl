@@ -1283,7 +1283,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Application port]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[응용 프로그램 포트]]></Val>
+            <Val><![CDATA[애플리케이션 포트]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Node.js Port]]></Val>
@@ -2021,7 +2021,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Applica&tion port:]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[응용 프로그램 포트(&T):]]></Val>
+            <Val><![CDATA[애플리케이션 포트(&T):]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Node.&js port:]]></Val>
@@ -2114,7 +2114,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Remote debugging of node.js Microsoft Azure applications is only supported on Windows 8 and above.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[node.js Microsoft Azure 응용 프로그램의 원격 디버깅은 Windows 8 이상에서만 지원됩니다.]]></Val>
+            <Val><![CDATA[node.js Microsoft Azure 애플리케이션의 원격 디버깅은 Windows 8 이상에서만 지원됩니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2828,7 +2828,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Specifies the tool that transforms a file at design time and places the output of that transformation into another file. For example, a dataset (.xsd) file comes with a default custom tool.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[디자인 타임에 파일을 변환하고 변환 결과를 다른 파일에 저장하는 도구를 지정합니다. 데이터 집합 파일(.xsd)의 경우 기본 사용자 지정 도구가 제공됩니다.]]></Val>
+            <Val><![CDATA[디자인 타임에 파일을 변환하고 변환 결과를 다른 파일에 저장하는 도구를 지정합니다. 데이터 세트 파일(.xsd)의 경우 기본 사용자 지정 도구가 제공됩니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3044,7 +3044,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Console Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[콘솔 응용 프로그램]]></Val>
+            <Val><![CDATA[콘솔 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3665,7 +3665,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The project location is not trusted:{0}{0}{1}{0}{0}Running the application may result in security exceptions when it {0}attempts to perform actions which require full trust.{0}{0}Click OK to ignore and continue.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[프로젝트 위치를 신뢰할 수 없습니다.{0}{0}{1}{0}{0}응용 프로그램을 실행하면 완전 신뢰가 필요한 작업을 {0}수행할 때 보안 예외가 발생할 수 있습니다.{0}{0}무시하고 계속하려면 [확인]5D;을 클릭하십시오.]]></Val>
+            <Val><![CDATA[프로젝트 위치를 신뢰할 수 없습니다.{0}{0}{1}{0}{0}애플리케이션을 실행하면 완전 신뢰가 필요한 작업을 {0}수행할 때 보안 예외가 발생할 수 있습니다.{0}{0}무시하고 계속하려면 [확인]5D;을 클릭하십시오.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4043,7 +4043,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Windows Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Windows 응용 프로그램]]></Val>
+            <Val><![CDATA[Windows 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5099,7 +5099,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Azure Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Azure Node.js Express 4 응용 프로그램]]></Val>
+            <Val><![CDATA[기본 Azure Node.js Express 4 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5108,7 +5108,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft Azure용 기본 Azure Node.js Express 4 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[Microsoft Azure용 기본 Azure Node.js Express 4 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5117,7 +5117,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Azure Node.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Azure Node.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Azure Node.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5126,7 +5126,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft Azure용 빈 Node.js 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[Microsoft Azure용 빈 Node.js 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5174,7 +5174,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Node.js Express 4 응용 프로그램]]></Val>
+            <Val><![CDATA[기본 Node.js Express 4 애플리케이션]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
@@ -5186,7 +5186,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Node.js Express 4 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[기본 Node.js Express 4 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5213,7 +5213,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Node.js Console Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 콘솔 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Node.js 콘솔 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5222,7 +5222,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[빈 Node.js 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5231,7 +5231,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Node.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Node.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5240,7 +5240,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js Web application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 웹 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[빈 Node.js 웹 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5249,7 +5249,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Azure Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Azure Node.js Express 4 응용 프로그램]]></Val>
+            <Val><![CDATA[기본 Azure Node.js Express 4 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5258,7 +5258,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft Azure용 기본 Azure Node.js Express 4 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[Microsoft Azure용 기본 Azure Node.js Express 4 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5303,7 +5303,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Azure Node.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Azure Node.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Azure Node.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5312,7 +5312,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft Azure용 빈 Node.js 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[Microsoft Azure용 빈 Node.js 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5321,7 +5321,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Azure Node.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Azure Node.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Azure Node.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5330,7 +5330,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js application for Microsoft Azure.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft Azure용 빈 Node.js 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[Microsoft Azure용 빈 Node.js 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5339,7 +5339,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Node.js Console Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 콘솔 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Node.js 콘솔 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5348,7 +5348,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[빈 Node.js 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5357,7 +5357,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Node.js Express 4 Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Node.js Express 4 응용 프로그램]]></Val>
+            <Val><![CDATA[기본 Node.js Express 4 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5366,7 +5366,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Node.js Express 4 application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Node.js Express 4 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[기본 Node.js Express 4 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5393,7 +5393,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Blank Node.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[빈 Node.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5402,7 +5402,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty Node.js Web application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[빈 Node.js 웹 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[빈 Node.js 웹 애플리케이션입니다.]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[An empty Node.js application.]]></Val>
@@ -5612,7 +5612,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Basic Vue.js Web Application]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Vue.js 웹 응용 프로그램]]></Val>
+            <Val><![CDATA[기본 Vue.js 웹 애플리케이션]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5621,7 +5621,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A basic Vue.js Web application.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[기본 Vue.js 웹 응용 프로그램입니다.]]></Val>
+            <Val><![CDATA[기본 Vue.js 웹 애플리케이션입니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5678,9 +5678,6 @@
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.dll]]></Val>
-        <Tgt Cat="Text" Stat="Update" Orig="New">
-          <Val><![CDATA[Visual Studio용 Node.js 도구]]></Val>
-        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio]]></Val>
         </Prev>
