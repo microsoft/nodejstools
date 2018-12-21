@@ -72,12 +72,9 @@ namespace Microsoft.NodejsTools.TypeScript
                 {
                     ErrorHandler.ThrowOnFailure(props.GetPropertyValue(NodeProjectProperty.TypeScriptOutDir, null, (uint)_PersistStorageType.PST_PROJECT_FILE, out outDir));
                 }
-                catch (System.Runtime.InteropServices.COMException e)
+                catch (System.Runtime.InteropServices.COMException e) when (e.ErrorCode == ERR_XML_ATTRIBUTE_NOT_FOUND)
                 {
-                    if (e.ErrorCode == ERR_XML_ATTRIBUTE_NOT_FOUND)
-                    {
-                        return null;
-                    }
+                    return null;
                 }
             }
             else
