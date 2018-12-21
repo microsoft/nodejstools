@@ -494,6 +494,11 @@ namespace Microsoft.NodejsTools.Project
             if (TypeScriptHelpers.IsTypeScriptFile(startupFile))
             {
                 startupFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(this._project, startupFile);
+                if (startupFile == null)
+                {
+                    // Expected to find a JS file
+                    throw new ArgumentException();
+                }
             }
             return startupFile;
         }

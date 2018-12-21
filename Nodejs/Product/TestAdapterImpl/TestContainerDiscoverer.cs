@@ -160,7 +160,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (TypeScriptHelpers.IsTypeScriptFile(pathToFile))
             {
                 var jsFile = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, pathToFile);
-                if (!File.Exists(jsFile))
+                if (jsFile == null || !File.Exists(jsFile))
                 {
                     //Ignore the file for now.  On the next build event the typescript compiler will generate the file
                     //  at that point this function gets invoked again on the .ts file and we'll see the newly created .js file
