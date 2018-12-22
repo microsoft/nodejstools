@@ -1916,8 +1916,9 @@ namespace Microsoft.VisualStudioTools.Project
                 return false;
             }
 
-            // Check out the project file.
-            if (!this.QueryEditProjectFile(false))
+            // Check out the project or user file.
+            var editFile = userProjectFile ? this.UserProjectFilename : this.filename;
+            if (!this.QueryEditFiles(false, editFile))
             {
                 throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
             }
@@ -1929,7 +1930,7 @@ namespace Microsoft.VisualStudioTools.Project
             }
             else
             {
-                var newProp = this.buildProject.SetProperty(propertyName, propertyValue);
+                this.buildProject.SetProperty(propertyName, propertyValue);
             }
             RaiseProjectPropertyChanged(propertyName, oldValue, propertyValue);
 
@@ -5657,10 +5658,16 @@ If the files in the existing folder have the same names as files in the folder y
         /// <returns>HRESULT</returns>
         int IVsBuildPropertyStorage.SetPropertyValue(string propertyName, string configName, uint storage, string propertyValue)
         {
-            // TODO: when adding support for User files, we need to update this method
             if (string.IsNullOrEmpty(configName))
             {
-                this.SetProjectProperty(propertyName, propertyValue);
+                if (storage == (uint)_PersistStorageType.PST_PROJECT_FILE)
+                {
+                    this.SetProjectProperty(propertyName, propertyValue);
+                }
+                else
+                {
+                    this.SetUserProjectProperty(propertyName, propertyValue);
+                }
             }
             else
             {
