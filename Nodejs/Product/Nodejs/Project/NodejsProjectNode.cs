@@ -132,12 +132,6 @@ namespace Microsoft.NodejsTools.Project
             {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
-                SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
-
-                if (string.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind)))
-                {
-                    SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
-                }
             }
         }
 
@@ -161,10 +155,6 @@ namespace Microsoft.NodejsTools.Project
                 return node.ItemNode.ItemTypeName;
             }
 
-            if (TypeScriptHelpers.IsTypeScriptFile(filename))
-            {
-                return NodejsConstants.TypeScriptCompileItemType;
-            }
             return base.GetItemType(filename);
         }
 

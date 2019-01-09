@@ -45,17 +45,16 @@
     <Folder Include="src\components\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="babel.config.js" />
-    <Compile Include="src\main.js" />
+    <Content Include="babel.config.js" />
+    <Content Include="src\main.js" />
   </ItemGroup>
 
-  <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
   <PropertyGroup>
     <PostBuildEvent>
       npm run build
     </PostBuildEvent>
   </PropertyGroup>
+
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
 
   <ProjectExtensions>

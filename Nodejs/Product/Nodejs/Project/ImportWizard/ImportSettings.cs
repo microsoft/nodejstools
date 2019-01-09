@@ -300,14 +300,12 @@ $@"{{
                 var success = false;
                 try
                 {
-                    var typeScriptVersion = GetLatestAvailableTypeScriptVersionFromSetup();
-
                     //ensure package.json
                     EnsurePackageJson(sourcePath, projectName);
 
                     using (var writer = GetDefaultWriter(projectPath))
                     {
-                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, typeScriptVersion, projectLanguage);
+                        WriteProjectXml(writer, projectPath, sourcePath, filters, startupFile, projectLanguage);
                     }
                     TelemetryHelper.LogProjectImported();
                     success = true;
@@ -353,7 +351,6 @@ $@"{{
             string sourcePath,
             string filters,
             string startupFile,
-            string typeScriptVersion,
             ProjectLanguage projectLanguage
         )
         {
@@ -392,13 +389,7 @@ $@"{{
 
             if (typeScriptSupport)
             {
-                writer.WriteElementString("TypeScriptSourceMap", "true");
-                writer.WriteElementString("TypeScriptModuleKind", "CommonJS");
                 writer.WriteElementString("EnableTypeScript", "true");
-                if (typeScriptVersion != null)
-                {
-                    writer.WriteElementString("TypeScriptToolsVersion", typeScriptVersion);
-                }
             }
 
             writer.WriteStartElement("VisualStudioVersion");
@@ -454,7 +445,7 @@ $@"{{
             {
                 if (TypeScriptHelpers.IsTypeScriptFile(file))
                 {
-                    writer.WriteStartElement("TypeScriptCompile");
+                    writer.WriteStartElement("Compile");
                 }
                 else
                 {
@@ -477,12 +468,6 @@ $@"{{
             writer.WriteStartElement("Import");
             writer.WriteAttributeString("Project", @"$(MSBuildToolsPath)\Microsoft.Common.targets");
             writer.WriteAttributeString("Condition", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')");
-            writer.WriteEndElement();
-
-            writer.WriteComment("Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.");
-            writer.WriteStartElement("Import");
-            writer.WriteAttributeString("Project", @"$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets");
-            writer.WriteAttributeString("Condition", @"False");
             writer.WriteEndElement();
 
             writer.WriteStartElement("Import");
@@ -584,32 +569,6 @@ $@"{{
                 default:
                     return res.Where(f => !f.EndsWith("tsconfig.json"));
             }
-        }
-
-        private const string tsSdkSetupPackageIdPrefix = "Microsoft.VisualStudio.Component.TypeScript.";
-
-        private static string GetLatestAvailableTypeScriptVersionFromSetup()
-        {
-            var setupCompositionService = (IVsSetupCompositionService)CommonPackage.GetGlobalService(typeof(SVsSetupCompositionService));
-
-            // figure out the size of required array
-            setupCompositionService.GetSetupPackagesInfo(0, null, out var sizeNeeded);
-
-            if (sizeNeeded > 0)
-            {
-                var packages = new IVsSetupPackageInfo[sizeNeeded];
-                var count = sizeNeeded;
-                setupCompositionService.GetSetupPackagesInfo(count, packages, out _);
-
-                return packages.Where(p => (__VsSetupPackageState)p.CurrentState == __VsSetupPackageState.INSTALL_PACKAGE_PRESENT)
-                    .Select(p => p.PackageId)
-                    .Where(p => p.StartsWith(tsSdkSetupPackageIdPrefix))
-                    .Select(p => p.Substring(tsSdkSetupPackageIdPrefix.Length, p.Length - tsSdkSetupPackageIdPrefix.Length))
-                    .OrderByDescending(v => v)
-                    .First();
-            }
-
-            return "";
         }
     }
 }

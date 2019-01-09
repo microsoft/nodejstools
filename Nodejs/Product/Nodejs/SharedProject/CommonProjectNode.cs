@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
@@ -1108,7 +1109,7 @@ namespace Microsoft.VisualStudioTools.Project
 
         internal virtual string GetItemType(string filename)
         {
-            if (IsCodeFile(filename))
+            if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
                 return "Compile";
             }

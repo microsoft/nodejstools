@@ -44,8 +44,6 @@ namespace Microsoft.NodejsTools
 
         public const ushort DefaultDebuggerPort = 5858;
 
-        public const string TypeScriptCompileItemType = "TypeScriptCompile";
-        public const string CommonJSModuleKind = "CommonJS";
         public const string TypeScript = "TypeScript";
 
         public const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
@@ -102,9 +100,9 @@ namespace Microsoft.NodejsTools
         public const string ScriptArguments = "ScriptArguments";
         public const string StartWebBrowser = "StartWebBrowser";
         public const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
-        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
-        public const string TypeScriptOutDir = "TypeScriptOutDir";
-        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
+        // This property is used by the SDK and should be removed. Nevertheless, this is also used by the TestAdapter to find the JS tests. 
+        // My preference is to get the ts configuration to find out the location but might be easier to just repurpose the property.
+        public const string TypeScriptOutDir = "TypeScriptOutDir"; 
         public const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
         public const string TestRoot = "JavaScriptTestRoot";
         public const string TestFramework = "JavaScriptTestFramework";
