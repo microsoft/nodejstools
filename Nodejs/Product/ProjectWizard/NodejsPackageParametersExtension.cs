@@ -13,8 +13,6 @@ namespace Microsoft.NodejsTools.ProjectWizard
 {
     internal class NodejsPackageParametersExtension : IWizard
     {
-        //private const string tsSdkSetupPackageIdPrefix = "Microsoft.VisualStudio.Component.TypeScript.";
-
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             var projectName = replacementsDictionary["$projectname$"];
