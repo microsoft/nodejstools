@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -86,11 +87,17 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public int FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            for (var i = 0; i < cChanges; i++)
+            return ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
-            }
-            return VSConstants.S_OK;
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                for (var i = 0; i < cChanges; i++)
+                {
+                    this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
+                }
+
+                return VSConstants.S_OK;
+            });
         }
 
         public int DirectoryChanged(string directory)
@@ -115,11 +122,17 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public int DirectoryChangedEx2(string directory, uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
         {
-            for (var i = 0; i < numberOfFilesChanged; i++)
+            return ThreadHelper.JoinableTaskFactory.Run(async () =>
             {
-                this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
-            }
-            return VSConstants.S_OK;
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                for (var i = 0; i < numberOfFilesChanged; i++)
+                {
+                    this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
+                }
+
+                return VSConstants.S_OK;
+            });
         }
 
         private static WatcherChangeTypes ConvertVSFILECHANGEFLAGS(uint flag)
