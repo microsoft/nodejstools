@@ -59,7 +59,6 @@
   </Target>
   
   <Target Name="AfterCompile">
-    <Message Text="AfterCompile executed" />
     <Exec Condition="'$(EnableTypeScript)' == 'true'" Command="&quot;$(Tsc)&quot; --build" />
   </Target>
 
