@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using Microsoft.NodejsTools;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -1111,11 +1112,11 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
-                return "Compile";
+                return NodejsConstants.CompileItemType;
             }
             else
             {
-                return "Content";
+                return NodejsConstants.ContentItemType;
             }
         }
 

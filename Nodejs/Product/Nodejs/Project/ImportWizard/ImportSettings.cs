@@ -471,7 +471,7 @@ $@"{{
             writer.WriteEndElement();
 
             writer.WriteStartElement("Import");
-            writer.WriteAttributeString("Project", @"$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets");
+            writer.WriteAttributeString("Project", @"$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets");
             writer.WriteEndElement();
 
             writer.WriteRaw(@"

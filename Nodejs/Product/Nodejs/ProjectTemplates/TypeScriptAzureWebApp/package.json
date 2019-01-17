@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "description": "$projectname$",
   "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
     "start": "node server"
   },
   "author": {

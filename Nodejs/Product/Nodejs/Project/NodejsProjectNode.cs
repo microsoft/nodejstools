@@ -132,6 +132,12 @@ namespace Microsoft.NodejsTools.Project
             {
                 // enable TypeScript on the project automatically...
                 SetProjectProperty(NodeProjectProperty.EnableTypeScript, "true");
+                SetProjectProperty(NodeProjectProperty.TypeScriptSourceMap, "true");
+
+                if (string.IsNullOrWhiteSpace(GetProjectProperty(NodeProjectProperty.TypeScriptModuleKind)))
+                {
+                    SetProjectProperty(NodeProjectProperty.TypeScriptModuleKind, NodejsConstants.CommonJSModuleKind);
+                }
             }
         }
 
@@ -153,6 +159,12 @@ namespace Microsoft.NodejsTools.Project
             if (node?.ItemNode?.ItemTypeName != null)
             {
                 return node.ItemNode.ItemTypeName;
+            }
+
+            // We need to return TypeScriptCompile for now to maintain backwards compatibility. In the future we will return "Compile" once the TypeScript SDK has been removed.
+            if (TypeScriptHelpers.IsTypeScriptFile(filename))
+            {
+                return NodejsConstants.TypeScriptCompileItemType;
             }
 
             return base.GetItemType(filename);

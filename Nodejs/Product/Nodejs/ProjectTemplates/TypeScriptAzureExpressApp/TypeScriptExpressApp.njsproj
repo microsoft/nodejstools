@@ -50,7 +50,7 @@
     <Folder Include="views\" />
   </ItemGroup>
 
-  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 
   <ProjectExtensions>
     <VisualStudio>

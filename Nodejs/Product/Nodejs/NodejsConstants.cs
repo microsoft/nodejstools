@@ -44,6 +44,13 @@ namespace Microsoft.NodejsTools
 
         public const ushort DefaultDebuggerPort = 5858;
 
+        public const string CompileItemType = "Compile";
+        public const string ContentItemType = "Content";
+
+        [Obsolete("This property will be removed as an effort to eliminate the TypeScript SDK. Use \"Compile\" item type instead.")]
+        public const string TypeScriptCompileItemType = "TypeScriptCompile";
+        [Obsolete("This property will be removed as an effort to eliminate the TypeScript SDK. Consider designing for tsconfig.json instead.")]
+        public const string CommonJSModuleKind = "CommonJS";
         public const string TypeScript = "TypeScript";
 
         public const string NodeToolsProcessIdEnvironmentVariable = "_NTVS_PID";
@@ -100,11 +107,18 @@ namespace Microsoft.NodejsTools
         public const string ScriptArguments = "ScriptArguments";
         public const string StartWebBrowser = "StartWebBrowser";
         public const string TypeScriptCfgProperty = "CfgPropertyPagesGuidsAddTypeScript";
-        // This property is used by the SDK and should be removed. Nevertheless, this is also used by the TestAdapter to find the JS tests. 
-        // My preference is to get the ts configuration to find out the location but might be easier to just repurpose the property.
-        public const string TypeScriptOutDir = "TypeScriptOutDir"; 
+        [Obsolete("This property is part of the TypeScript SDK which is planned for removal. Instead consider designing for using tsconfig.json")]
+        public const string TypeScriptModuleKind = "TypeScriptModuleKind";
+        [Obsolete("This property is part of the TypeScript SDK which is planned for removal. Instead consider designing for using tsconfig.json. Note that this property is also used on the TestAdapter.")]
+        public const string TypeScriptOutDir = "TypeScriptOutDir";
+        [Obsolete("This property is part of the TypeScript SDK which is planned for removal. Instead consider designing for using tsconfig.json")]
+        public const string TypeScriptSourceMap = "TypeScriptSourceMap";
         public const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
         public const string TestRoot = "JavaScriptTestRoot";
         public const string TestFramework = "JavaScriptTestFramework";
+
+        
+        
+        
     }
 }

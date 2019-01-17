@@ -19,8 +19,8 @@
     <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
     <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
     <DebugSymbols>false</DebugSymbols>
-    <FakesImported>true</FakesImported> <!-- disables quality tools fakes imports -->
-    <TypeScriptTarget Condition="'$(TypeScriptTarget)' == ''">ES5</TypeScriptTarget>
+    <FakesImported>true</FakesImported>
+    <!-- disables quality tools fakes imports -->
   </PropertyGroup>
 
   <!-- Gets the fully qualified path to the project home.  -->
@@ -30,10 +30,6 @@
     <QualifiedProjectHome Condition="!HasTrailingSlash('$(QualifiedProjectHome)')">$(QualifiedProjectHome)\</QualifiedProjectHome>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
-    <AvailableItemName Include="TypeScriptCompile" Condition="'$(EnableTypeScript)' == 'true'"/>
-  </ItemGroup>
-
   <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
   <Target Name="GetTargetFrameworkDirectories" Returns="" />
   <Target Name="GetTargetFrameworkMoniker" Returns="" />
@@ -41,7 +37,6 @@
   <Target Name="CreateManifestResourceNames" Returns=""/>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
-  <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true'" />
   <Import Project="$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets" Condition="Exists('$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets')"/>
 
   <Target
@@ -56,8 +51,16 @@
 
   <Target Name="CopyFilesToOutputDirectory"/>
 
+  <Target Name="AfterClean">
+    <Exec Condition="'$(EnableTypeScript)' == 'true'" Command="npm run clean" />
+  </Target>
+
+  <Target Name="AfterCompile">
+    <Exec Condition="'$(EnableTypeScript)' == 'true'" Command="npm run build" />
+  </Target>
+
   <Target Name="CoreCompile">
-    <Error Condition="!Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets') And '$(EnableTypeScript)' == 'true' And '$(VisualStudioVersion)' != '16.0'" Text="TypeScript is not installed but TypeScript support is enabled in this project.  Please download and install TypeScript http://go.microsoft.com/fwlink/?LinkID=393159&amp;clcid=0x409."></Error>
+    <Error Condition="'$(EnableTypeScript)' == 'true' And !Exists('$(QualifiedProjectHome)node_modules\.bin\tsc')" Text="TypeScript compiler is not installed. Please execute 'npm install --save-dev typescript'"></Error>
     <PropertyGroup>
       <_NodeModulesContentProperty>@(NodeModulesContent)</_NodeModulesContentProperty>
     </PropertyGroup>
@@ -88,7 +91,7 @@
            the paths for the generated code here.  We also don't get to rely upon 
            TypeScriptCollectPublishFiles to include the files for publishing because 
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
-      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js')"
+      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js');@(Compile->'%(RelativeDir)%(Filename).js')"
                             Condition="'%(Filename)' != '' and '$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
 
       <!-- Building scripts results in the scripts -->
@@ -112,7 +115,7 @@
       Returns="@(SourceFilesProjectOutputGroupOutput)"
       DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
 
-    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptCompile);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
+    <AssignTargetPath Files="@(Compile);@(Content);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
     <ItemGroup>
@@ -152,7 +155,7 @@
     <ItemGroup>
       <ScriptAndWebDeployFilesWithoutMetadata Include="$(ScriptAndWebDeployFileList)" />
     </ItemGroup>
-    
+
     <Message Text="ScriptAndWebDeployFilesWithoutMetadata=@(ScriptAndWebDeployFilesWithoutMetadata)"  Importance="low"/>
   </Target>
   <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
@@ -178,7 +181,7 @@
       <_NodejsDeploymentMethod>WebDeploy</_NodejsDeploymentMethod>
     </PropertyGroup>
   </Target>
-  
+
   <PropertyGroup>
     <DockerPublishDependsOn>
       _DetectDockerPublish;
@@ -191,7 +194,7 @@
       <_IsDockerPublish>True</_IsDockerPublish>
     </PropertyGroup>
   </Target>
-  
+
 
   <Target
     Name="CollectNodejsFiles"
@@ -205,7 +208,6 @@
     <ItemGroup>
       <ContentFiles Include="@(Content)" />
       <ContentFiles Include="@(Include)" />
-      <ContentFiles Include="@(Compile)" />
       <ContentFiles Include="@(NodeModulesContent)" />
       <Content Include="@(NodeModulesContent)"/>
       <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
@@ -276,8 +278,9 @@
   </Target>
 
   <ItemGroup>
-    <!-- Node.js compile files are actually content -->
-    <Content Include="@(Compile)" />
+    <!-- JS files are actually content -->
+    <Content Include="@(Compile->'%(RelativeDir)%(Filename).js')" />
+    <Content Include="@(Compile->'%(RelativeDir)%(Filename).js.map')" Condition="Exists(@(Compile->'%(RootDir)%(Directory)%(Filename).js.map'))" />
   </ItemGroup>
 
   <!-- Override content collection to look in the intermediate directory where we've copied

@@ -57,6 +57,9 @@
       <InstallRoot>MSBuild</InstallRoot>
       <VSIXSubPath>Microsoft\VisualStudio\v16.0\Node.js Tools</VSIXSubPath>
     </Content>
+    <Content Include="Microsoft.NodejsToolsV2.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

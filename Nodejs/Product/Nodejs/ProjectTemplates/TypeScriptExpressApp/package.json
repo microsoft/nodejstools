@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
     "start": "node app"
   },
   "description": "$projectname$",
