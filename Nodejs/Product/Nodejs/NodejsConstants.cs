@@ -116,9 +116,5 @@ namespace Microsoft.NodejsTools
         public const string SaveNodeJsSettingsInProjectFile = "SaveNodeJsSettingsInProjectFile";
         public const string TestRoot = "JavaScriptTestRoot";
         public const string TestFramework = "JavaScriptTestFramework";
-
-        
-        
-        
     }
 }
