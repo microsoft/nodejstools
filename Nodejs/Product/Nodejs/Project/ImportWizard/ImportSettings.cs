@@ -394,7 +394,7 @@ $@"{{
 
             writer.WriteStartElement("VisualStudioVersion");
             writer.WriteAttributeString("Condition", "'$(VisualStudioVersion)' == ''");
-            writer.WriteString("14.0");
+            writer.WriteString("16.0");
             writer.WriteEndElement();
 
             writer.WriteStartElement("VSToolsPath");
