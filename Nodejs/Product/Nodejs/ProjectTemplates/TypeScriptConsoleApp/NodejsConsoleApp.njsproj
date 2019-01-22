@@ -33,7 +33,7 @@
     <Compile Include="app.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="tsconfig.json" />
+    <Compile Include="tsconfig.json" />
   </ItemGroup>
 
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />

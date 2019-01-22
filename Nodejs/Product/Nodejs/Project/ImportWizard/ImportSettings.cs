@@ -443,13 +443,13 @@ $@"{{
 
             foreach (var file in EnumerateAllFiles(sourcePath, projectFileFilters, projectLanguage))
             {
-                if (TypeScriptHelpers.IsTypeScriptFile(file))
+                if (TypeScriptHelpers.IsTypeScriptFile(file) || TypeScriptHelpers.IsTsJsConfigJsonFile(file))
                 {
-                    writer.WriteStartElement("Compile");
+                    writer.WriteStartElement(NodejsConstants.CompileItemType);
                 }
                 else
                 {
-                    writer.WriteStartElement("Content");
+                    writer.WriteStartElement(NodejsConstants.ContentItemType);
                 }
                 writer.WriteAttributeString("Include", file);
                 writer.WriteEndElement();

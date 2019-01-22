@@ -31,7 +31,7 @@
     <Compile Include="app.ts" />
     <Compile Include="routes\index.ts" />
     <Compile Include="routes\user.ts" />
-    <Content Include="tsconfig.json" />
+    <Compile Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />

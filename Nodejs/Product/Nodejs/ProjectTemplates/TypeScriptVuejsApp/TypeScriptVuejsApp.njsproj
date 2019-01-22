@@ -36,7 +36,7 @@
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
     <Content Include="src\components\Home.vue" />
-    <Content Include="tsconfig.json" />
+    <Compile Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
@@ -55,12 +55,7 @@
   <ItemGroup>
     <Content Include="babel.config.js" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <PostBuildEvent>
-      npm run build
-    </PostBuildEvent>
-  </PropertyGroup>
+  
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 
   <ProjectExtensions>
