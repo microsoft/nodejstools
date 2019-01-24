@@ -1112,7 +1112,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
-                return NodejsConstants.CompileItemType;
+                return NodejsConstants.NoneItemType;
             }
             else
             {

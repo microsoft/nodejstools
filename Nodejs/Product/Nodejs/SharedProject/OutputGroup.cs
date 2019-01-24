@@ -113,12 +113,6 @@ namespace Microsoft.VisualStudioTools.Project
             this._project.OnProjectPropertyChanged += new EventHandler<ProjectPropertyChangedArgs>(this.OnProjectPropertyChanged);
         }
 
-        public virtual IList<Output> EnumerateOutputs()
-        {
-            this._project.Site.GetUIThread().Invoke(this.Refresh);
-            return this._outputs;
-        }
-
         public virtual void InvalidateGroup()
         {
             // Set keyOutput to null so that a refresh will be performed the next time

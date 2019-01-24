@@ -36,7 +36,7 @@
     <Content Include="public\index.html" />
     <Content Include="src\App.vue" />
     <Content Include="src\components\Home.vue" />
-    <Compile Include="tsconfig.json" />
+    <None Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
@@ -48,9 +48,9 @@
     <Folder Include="src\components\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\main.ts" />
-    <Compile Include="src\shims-vue.d.ts" />
-    <Compile Include="src\shims-tsx.d.ts" />
+    <None Include="src\main.ts" />
+    <None Include="src\shims-vue.d.ts" />
+    <None Include="src\shims-tsx.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="babel.config.js" />

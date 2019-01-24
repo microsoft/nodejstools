@@ -30,10 +30,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="app.ts" />
+    <None Include="app.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Compile Include="tsconfig.json" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
 
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />

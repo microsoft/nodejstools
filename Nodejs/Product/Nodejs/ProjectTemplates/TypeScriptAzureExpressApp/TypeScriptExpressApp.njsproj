@@ -28,10 +28,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app.ts" />
-    <Compile Include="routes\index.ts" />
-    <Compile Include="routes\user.ts" />
-    <Compile Include="tsconfig.json" />
+    <None Include="app.ts" />
+    <None Include="routes\index.ts" />
+    <None Include="routes\user.ts" />
+    <None Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />

@@ -46,7 +46,8 @@
   </Target>
 
   <ItemGroup>
-    <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*"/>
+    <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*" />
+    <TypeScriptSource Exclude="$(ProjectHome)\node_modules\**\*.*;$(ProjectHome)\obj\**\*.*;$(ProjectHome)\bin\**\*.*;$(ProjectHome)\**\*.d.ts" Include="$(ProjectHome)\**\*.ts;$(ProjectHome)\**\*.tsx;$(ProjectHome)\**\*.jsx;" />
   </ItemGroup>
 
   <Target Name="CopyFilesToOutputDirectory"/>
@@ -91,8 +92,7 @@
            the paths for the generated code here.  We also don't get to rely upon 
            TypeScriptCollectPublishFiles to include the files for publishing because 
            Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
-      <_GeneratedJavascript Include="@(TypeScriptCompile->'%(RelativeDir)%(Filename).js');@(Compile->'%(RelativeDir)%(Filename).js')"
-                            Condition="'%(Filename)' != '' and '$([System.IO.Path]::GetExtension(%(Filename)))' != '.d'"/>
+      <_GeneratedJavascript Include="@(TypeScriptSource->'%(RelativeDir)%(Filename).js')" />
 
       <!-- Building scripts results in the scripts -->
       <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
@@ -115,7 +115,7 @@
       Returns="@(SourceFilesProjectOutputGroupOutput)"
       DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
 
-    <AssignTargetPath Files="@(Compile);@(Content);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
+    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptSource);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
     </AssignTargetPath>
     <ItemGroup>
@@ -279,8 +279,7 @@
 
   <ItemGroup>
     <!-- JS files are actually content -->
-    <Content Include="@(Compile->'%(RelativeDir)%(Filename).js')" />
-    <Content Include="@(Compile->'%(RelativeDir)%(Filename).js.map')" Condition="Exists(@(Compile->'%(RootDir)%(Directory)%(Filename).js.map'))" />
+    <Content Include="@(TypeScriptSource->'%(RelativeDir)%(Filename).js');@(TypeScriptSource->'%(RelativeDir)%(Filename).js.map')" />
   </ItemGroup>
 
   <!-- Override content collection to look in the intermediate directory where we've copied
@@ -290,7 +289,7 @@
         DependsOnTargets="$(CollectFilesFromContentDependsOn)"
         Condition="'@(Content)'!=''">
     <ItemGroup>
-      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'==''">
+      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'=='' and Exists(@(Content->'%(FullPath)'))">
         <DestinationRelativePath>%(Content.Identity)</DestinationRelativePath>
         <FromTarget>CollectFilesFromContent</FromTarget>
         <Category>Run</Category>

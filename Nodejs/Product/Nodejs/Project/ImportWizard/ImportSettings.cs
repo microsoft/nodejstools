@@ -445,7 +445,7 @@ $@"{{
             {
                 if (TypeScriptHelpers.IsTypeScriptFile(file) || TypeScriptHelpers.IsTsJsConfigJsonFile(file))
                 {
-                    writer.WriteStartElement(NodejsConstants.CompileItemType);
+                    writer.WriteStartElement(NodejsConstants.NoneItemType);
                 }
                 else
                 {

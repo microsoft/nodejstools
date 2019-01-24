@@ -44,10 +44,10 @@ namespace Microsoft.NodejsTools
 
         public const ushort DefaultDebuggerPort = 5858;
 
-        public const string CompileItemType = "Compile";
+        public const string NoneItemType = "None";
         public const string ContentItemType = "Content";
 
-        [Obsolete("This property will be removed as an effort to eliminate the TypeScript SDK. Use \"Compile\" item type instead.")]
+        [Obsolete("This property will be removed as an effort to eliminate the TypeScript SDK. Use \"None\" item type instead.")]
         public const string TypeScriptCompileItemType = "TypeScriptCompile";
         [Obsolete("This property will be removed as an effort to eliminate the TypeScript SDK. Consider designing for tsconfig.json instead.")]
         public const string CommonJSModuleKind = "CommonJS";

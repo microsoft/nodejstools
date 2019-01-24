@@ -31,8 +31,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="server.ts" />
-    <Compile Include="startup.ts" />
+    <None Include="server.ts" />
+    <None Include="startup.ts" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
