@@ -13,13 +13,10 @@ namespace Microsoft.NodejsTools.ProjectWizard
 {
     internal class NodejsPackageParametersExtension : IWizard
     {
-        private const string tsSdkSetupPackageIdPrefix = "Microsoft.VisualStudio.Component.TypeScript.";
-
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             var projectName = replacementsDictionary["$projectname$"];
             replacementsDictionary.Add("$npmsafeprojectname$", NormalizeNpmPackageName(projectName));
-            replacementsDictionary.Add("$typescriptversion$", GetLatestAvailableTypeScriptVersionFromSetup());
         }
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
@@ -65,50 +62,6 @@ namespace Microsoft.NodejsTools.ProjectWizard
             npmProjectNameTransform = Regex.Replace(npmProjectNameTransform, "([a-z0-9])([A-Z])", "$1-$2").ToLowerInvariant();
 
             return npmProjectNameTransform.Substring(0, Math.Min(npmProjectNameTransform.Length, NpmPackageNameMaxLength));
-        }
-
-        private static string GetLatestAvailableTypeScriptVersionFromSetup()
-        {
-            var setupCompositionService = (IVsSetupCompositionService)Microsoft.VisualStudio.Shell.ServiceProvider.GlobalProvider.GetService(typeof(SVsSetupCompositionService));
-
-            // Populate the package status
-            setupCompositionService.GetSetupPackagesInfo(0, null, out var sizeNeeded);
-
-            if (sizeNeeded > 0)
-            {
-                var packages = new IVsSetupPackageInfo[sizeNeeded];
-                setupCompositionService.GetSetupPackagesInfo(sizeNeeded, packages, out _);
-
-                var typeScriptSdkPackageGroups = packages.Where(p => p.PackageId.StartsWith(tsSdkSetupPackageIdPrefix, StringComparison.OrdinalIgnoreCase))
-                    .GroupBy(p => p.CurrentState, p => p.PackageId);
-
-                var installed = typeScriptSdkPackageGroups.Where(g => g.Key == (uint)__VsSetupPackageState.INSTALL_PACKAGE_PRESENT);
-                if (installed.Any())
-                {
-                    return GetVersion(installed.First());
-                }
-
-                // There is an issue in the installer where components aren't registered as 'Present', however they do show up as unknown.
-                // So use that as a fallback.
-                var unknown = typeScriptSdkPackageGroups.Where(g => g.Key == (uint)__VsSetupPackageState.INSTALL_PACKAGE_UNKNOWN);
-                if (unknown.Any())
-                {
-                    return GetVersion(unknown.First());
-                }
-
-                // This should not happen, since TS should be installed as a required component, however we should guard against
-                // bugs in the installer, and use a good default for the user. 
-                Debug.Fail("Failed to find a valid install of the TypeScript SDK.");
-            }
-
-            return "";
-
-            string GetVersion(IEnumerable<string> installed)
-            {
-                return installed.Select(p => p.Substring(tsSdkSetupPackageIdPrefix.Length, p.Length - tsSdkSetupPackageIdPrefix.Length))
-                         .OrderByDescending(v => v)
-                         .First();
-            }
         }
     }
 }

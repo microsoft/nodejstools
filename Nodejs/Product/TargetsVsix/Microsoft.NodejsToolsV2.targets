@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Specifies the directories which are ignored.  Any paths which contain these directory names
+         will be ignored.  The directory name must completely match and no wild cards are allowed
+     -->
+    <AnalysisIgnoredDirectories Condition="'$(AnalysisIgnoredDirectories)' == ''">bower_components;node_modules\core-js</AnalysisIgnoredDirectories>
+    <DockerExtraPublishProfileProperties>ExcludeFoldersFromDeployment=node_modules</DockerExtraPublishProfileProperties>
+  </PropertyGroup>
+  <!-- *********************************************************************************** -->
+  <!-- Normal install environment, use the current version -->
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <NodejsSupportPath>$(MSBuildThisFileDirectory)</NodejsSupportPath>
+    <ProjectHome Condition="'$(ProjectHome)' == ''">.</ProjectHome>
+    <DebugSymbols>false</DebugSymbols>
+    <FakesImported>true</FakesImported>
+    <!-- disables quality tools fakes imports -->
+  </PropertyGroup>
+
+  <!-- Gets the fully qualified path to the project home.  -->
+  <PropertyGroup>
+    <QualifiedProjectHome>$(MSBuildProjectDirectory)</QualifiedProjectHome>
+    <QualifiedProjectHome Condition="'$(ProjectHome)' != '' and '$(ProjectHome)' != '.'">$([System.IO.Path]::GetFullPath($([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(ProjectHome)))))</QualifiedProjectHome>
+    <QualifiedProjectHome Condition="!HasTrailingSlash('$(QualifiedProjectHome)')">$(QualifiedProjectHome)\</QualifiedProjectHome>
+  </PropertyGroup>
+
+  <Target Name="GetTargetFrameworkVersion" Returns="$(TargetFrameworkVersion)" />
+  <Target Name="GetTargetFrameworkDirectories" Returns="" />
+  <Target Name="GetTargetFrameworkMoniker" Returns="" />
+  <Target Name="GetTargetFrameworkMonikerDisplayName" Returns="" />
+  <Target Name="CreateManifestResourceNames" Returns=""/>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets"/>
+  <Import Project="$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets" Condition="Exists('$(VSToolsPath)\Docker Tools\Microsoft.DockerTools.Publish.targets')"/>
+
+  <Target
+    Name="GetReferenceAssemblyPaths"
+    DependsOnTargets="$(GetReferenceAssemblyPathsDependsOn)">
+    <!-- We have no reference assembly paths -->
+  </Target>
+
+  <ItemGroup>
+    <NodeModulesContent Include="$(ProjectHome)\node_modules\**\*.*" />
+    <TypeScriptSource Exclude="$(ProjectHome)\node_modules\**\*.*;$(ProjectHome)\obj\**\*.*;$(ProjectHome)\bin\**\*.*;$(ProjectHome)\**\*.d.ts" Include="$(ProjectHome)\**\*.ts;$(ProjectHome)\**\*.tsx;$(ProjectHome)\**\*.jsx;" />
+  </ItemGroup>
+
+  <Target Name="CopyFilesToOutputDirectory"/>
+
+  <Target Name="AfterClean">
+    <Exec Condition="'$(EnableTypeScript)' == 'true'" Command="npm run clean" />
+  </Target>
+
+  <Target Name="AfterCompile">
+    <Exec Condition="'$(EnableTypeScript)' == 'true'" Command="npm run build" />
+  </Target>
+
+  <Target Name="CoreCompile">
+    <Error Condition="'$(EnableTypeScript)' == 'true' And !Exists('$(QualifiedProjectHome)node_modules\.bin\tsc')" Text="TypeScript compiler is not installed. Please execute 'npm install --save-dev typescript'"></Error>
+    <PropertyGroup>
+      <_NodeModulesContentProperty>@(NodeModulesContent)</_NodeModulesContentProperty>
+    </PropertyGroup>
+    <Error Condition="$(_NodeModulesContentProperty.IndexOf('*')) != -1"
+           Text="Files in your project exceed MAX_PATH, please move your project to a location with a shorter path."></Error>
+
+    <!-- Target used for generating a package which can be uploaded to web server -->
+    <ItemGroup>
+      <_FoundWebConfig Include="@(Content)" Condition=" '%(Content.Filename)%(Content.Extension)' == 'web.config' " />
+      <_FoundWebConfig Include="@(Include)" Condition=" '%(Include.Filename)%(Include.Extension)' == 'web.config' " />
+    </ItemGroup>
+
+    <Copy
+      SourceFiles="@(NodejsAzureDeploymentFile)"
+      DestinationFolder="bin"
+      SkipUnchangedFiles="true">
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+      <Output TaskParameter="DestinationFiles" ItemName="FilesCopiedToIntermediate"/>
+    </Copy>
+  </Target>
+
+  <Target Name="BuiltProjectOutputGroup"
+          Returns="@(BuiltProjectOutputGroupOutput)"
+          DependsOnTargets="$(BuiltProjectOutputGroupDependsOn)">
+    <ItemGroup>
+      <!-- We can't depend upon GeneratedJavascript defined by TypeScript because it 
+           doesn't occur when we're publishing, just when building.  So we calculate
+           the paths for the generated code here.  We also don't get to rely upon 
+           TypeScriptCollectPublishFiles to include the files for publishing because 
+           Worker Roles won't invoke PublishPipeline, they invoke some targets directly -->
+      <_GeneratedJavascript Include="@(TypeScriptSource->'%(RelativeDir)%(Filename).js')" />
+
+      <!-- Building scripts results in the scripts -->
+      <_TempBuiltProjectOutputGroup Include="@(Compile->'%(FullPath)');@(Content->'%(FullPath)');@(_GeneratedJavascript->'%(FullPath)');@(NodeModulesContent->'%(FullPath)')"/>
+
+      <!-- Include the project file -->
+      <_TempBuiltProjectOutputGroup Include="$(MSBuildProjectFullPath)">
+        <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
+        <TargetPath>$(ProjectFileName)</TargetPath>
+      </_TempBuiltProjectOutputGroup>
+
+    </ItemGroup>
+
+    <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="BuiltProjectOutputGroupOutput" />
+    </AssignTargetPath>
+  </Target>
+
+  <Target
+      Name="SourceFilesProjectOutputGroup"
+      Returns="@(SourceFilesProjectOutputGroupOutput)"
+      DependsOnTargets="$(SourceFilesProjectOutputGroupDependsOn)">
+
+    <AssignTargetPath Files="@(Compile);@(Content);@(TypeScriptSource);@(NodeModulesContent)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="_CompileWithTargetPath" />
+    </AssignTargetPath>
+    <ItemGroup>
+      <!-- First we deal with Compile, EmbeddedResource and AppConfig -->
+      <SourceFilesProjectOutputGroupOutput Include="@(_CompileWithTargetPath->'%(FullPath)')"/>
+
+      <!-- Include the project file -->
+      <SourceFilesProjectOutputGroupOutput Include="$(MSBuildProjectFullPath)">
+        <!-- For compatibility with 2.0 -->
+        <OriginalItemSpec>$(MSBuildProjectFullPath)</OriginalItemSpec>
+        <TargetPath>$(ProjectFileName)</TargetPath>
+      </SourceFilesProjectOutputGroupOutput>
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="DebugSymbolsProjectOutputGroup" />
+
+  <ItemGroup>
+    <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>
+  </ItemGroup>
+  <Target
+    Name="GetTargetPath"
+    DependsOnTargets="CoreCompile"
+    Returns="@(ScriptAndWebDeployFilesWithoutMetadata)"
+    >
+    <ItemGroup>
+      <NodejsBinFiles Include="bin\**\*"  Exclude="bin\Microsoft.NodejsTools.WebRole.dll"/>
+      <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
+      <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <ScriptAndWebDeployFileList>@(ScriptAndWebDeployFiles)</ScriptAndWebDeployFileList>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ScriptAndWebDeployFilesWithoutMetadata Include="$(ScriptAndWebDeployFileList)" />
+    </ItemGroup>
+
+    <Message Text="ScriptAndWebDeployFilesWithoutMetadata=@(ScriptAndWebDeployFilesWithoutMetadata)"  Importance="low"/>
+  </Target>
+  <Target Name="WatGetTargetFrameworkDirectories" Returns="" />
+  <Target Name="BuiltProjectOutputGroupDependencies" Returns="" />
+  <Target Name="WatGetTargetFrameworkMoniker" Returns="" />
+  <Target Name="WatGetTargetFrameworkMonikerDisplayName" Returns="" />
+
+  <PropertyGroup>
+    <CleanWPPAllFilesInSingleFolder Condition="'$(CleanWPPAllFilesInSingleFolder)' == ''">false</CleanWPPAllFilesInSingleFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishPipelineCollectFilesCore>$(PublishPipelineCollectFilesCore);CollectNodejsFiles</PublishPipelineCollectFilesCore>
+  </PropertyGroup>
+
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+
+  <!--- Detects if we're deploying via web deploy, and sets _NodejsDeploymentMethod appropriately.
+        Otherwise we'll assume we're deploying to cloud service. -->
+  <Target Name="_HostDeployDetectTarget" BeforeTargets="GenerateGlobalPublishSetting">
+    <PropertyGroup>
+      <!-- We are deploying via web deploy to a shared host -->
+      <_NodejsDeploymentMethod>WebDeploy</_NodejsDeploymentMethod>
+    </PropertyGroup>
+  </Target>
+
+  <PropertyGroup>
+    <DockerPublishDependsOn>
+      _DetectDockerPublish;
+      $(DockerPublishDependsOn);
+    </DockerPublishDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_DetectDockerPublish">
+    <PropertyGroup>
+      <_IsDockerPublish>True</_IsDockerPublish>
+    </PropertyGroup>
+  </Target>
+
+
+  <Target
+    Name="CollectNodejsFiles"
+    DependsOnTargets="CoreCompile"
+    Returns="@(TransformedFilenames)"
+    >
+    <Error
+      Text="web.config not found in project, to create a project to deploy to Microsoft Azure you must create an Azure Node.js project."
+      Condition="'@(_FoundWebConfig)' == '' and '@(_IsDockerPublish)' != 'True'"/>
+
+    <ItemGroup>
+      <ContentFiles Include="@(Content)" />
+      <ContentFiles Include="@(Include)" />
+      <ContentFiles Include="@(NodeModulesContent)" />
+      <Content Include="@(NodeModulesContent)"/>
+      <GeneratedFiles Include="@(NodejsAzureDeploymentFile)" />
+      <TransformedFilenames Include="@(ContentFiles->'%(FullPath)')">
+        <DestinationRelativePath>%(RelativeDir)%(Filename)%(Extension)</DestinationRelativePath>
+        <Exclude>false</Exclude>
+        <FromTarget>Unknown</FromTarget>
+        <Category>Run</Category>
+        <ProjectFileType>Default</ProjectFileType>
+      </TransformedFilenames>
+
+      <TransformedFilenames Include="@(GeneratedFiles)">
+        <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
+        <Exclude>false</Exclude>
+        <FromTarget>Unknown</FromTarget>
+        <Category>Run</Category>
+        <ProjectFileType>Default</ProjectFileType>
+      </TransformedFilenames>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GenerateManifests" Returns="" />
+  <Target Name="PrepareForBuild" DependsOnTargets="$(PrepareForBuildDependsOn)" >
+    <!-- 
+        These CreateProperty calls are required because TargetDir and TargetPath are defined 
+        to contain an item list. We want that item list to be expanded so that it can be used
+        as a regular property value and not as an item-list-with-transform.
+        -->
+    <!-- 
+        Choose exactly one app.config to be the main app.config that is copied to the destination folder. 
+        
+        The search order is:
+        
+            (1) Choose the value $(AppConfig) set in the main project.
+            (2) Choose @(None) App.Config in the same folder as the project.
+            (3) Choose @(Content) App.Config in the same folder as the project.
+            (4) Choose @(None) App.Config in any subfolder in the project.
+            (5) Choose @(Content) App.Config in any subfolder in the project.
+        
+        If an app.config is not found in one of these locations then there is no app.config for this project.
+        -->
+    <CreateProperty Value="%(None.Identity)" Condition="'$(AppConfig)'=='' and '%(RelativeDir)%(Filename)%(Extension)'=='App.Config'">
+      <Output TaskParameter="Value" PropertyName="AppConfig" />
+    </CreateProperty>
+    <CreateProperty Value="%(Content.Identity)" Condition="'$(AppConfig)'=='' and '%(RelativeDir)%(Filename)%(Extension)'=='App.Config'">
+      <Output TaskParameter="Value" PropertyName="AppConfig" />
+    </CreateProperty>
+    <CreateProperty Value="%(None.Identity)" Condition="'$(AppConfig)'=='' and '%(Filename)%(Extension)'=='App.Config'">
+      <Output TaskParameter="Value" PropertyName="AppConfig" />
+    </CreateProperty>
+    <CreateProperty Value="%(Content.Identity)" Condition="'$(AppConfig)'=='' and '%(Filename)%(Extension)'=='App.Config'">
+      <Output TaskParameter="Value" PropertyName="AppConfig" />
+    </CreateProperty>
+    <!-- Dump the single app.config into an item list with TargetPath set. -->
+    <CreateItem Include="$(AppConfig)" AdditionalMetadata="TargetPath=$(TargetFileName).config">
+      <Output TaskParameter="Include" ItemName="AppConfigWithTargetPath" />
+    </CreateItem>
+    <!-- Create the directories for intermediate and final build products. -->
+    <MakeDir Directories="$(OutDir);$(IntermediateOutputPath);@(DocFileItem->'%(RelativeDir)')" />
+  </Target>
+
+  <!-- ##################################################################################### -->
+  <!-- Web Publishing support -->
+  <!-- Web applications use this for publishing, but we don't have an intermediate assembly. -->
+  <Target Name="CollectFilesFromIntermediateAssembly"
+      DependsOnTargets="$(CollectFilesFromIntermediateAssemblyDependsOn)"
+      Condition="'@(IntermediateAssembly)'!=''">
+  </Target>
+
+  <ItemGroup>
+    <!-- JS files are actually content -->
+    <Content Include="@(TypeScriptSource->'%(RelativeDir)%(Filename).js');@(TypeScriptSource->'%(RelativeDir)%(Filename).js.map')" />
+  </ItemGroup>
+
+  <!-- Override content collection to look in the intermediate directory where we've copied
+      all of our items.  This enables us to pick the correct web.config when doing a deployment.
+    -->
+  <Target Name="CollectFilesFromContent"
+        DependsOnTargets="$(CollectFilesFromContentDependsOn)"
+        Condition="'@(Content)'!=''">
+    <ItemGroup>
+      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'=='' and Exists(@(Content->'%(FullPath)'))">
+        <DestinationRelativePath>%(Content.Identity)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="@(NodejsAzureDeploymentFile)">
+        <DestinationRelativePath>bin\%(Filename)%(Extension)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="@(Content)" Condition="'%(Content.Link)'!='' And $(EnableCollectLinkFilesInProject)">
+        <DestinationRelativePath>%(Content.Link)</DestinationRelativePath>
+        <FromTarget>CollectFilesFromContent</FromTarget>
+        <Category>Run</Category>
+        <Exclude>$(ExcludeLinkFilesInProject)</Exclude>
+        <ProjectFileType>Link</ProjectFileType>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+    <CallTarget Targets="$(OnAfterCollectFilesFromContent)" RunEachTargetSeparately="false" />
+  </Target>
+</Project>

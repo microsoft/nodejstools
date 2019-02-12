@@ -161,10 +161,12 @@ namespace Microsoft.NodejsTools.Project
                 return node.ItemNode.ItemTypeName;
             }
 
+            // We need to return TypeScriptCompile for now to maintain backwards compatibility. In the future we will return "None" once the TypeScript SDK has been removed.
             if (TypeScriptHelpers.IsTypeScriptFile(filename))
             {
                 return NodejsConstants.TypeScriptCompileItemType;
             }
+
             return base.GetItemType(filename);
         }
 
