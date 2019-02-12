@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -33,12 +33,6 @@ namespace Microsoft.VisualStudioTools.Project
 
         [DllImport(ExternDll.User32, ExactSpelling = true, CharSet = CharSet.Unicode)]
         internal static extern int CloseClipboard();
-
-        [DllImport(ExternDll.Comctl32, CharSet = CharSet.Auto)]
-        internal static extern int ImageList_GetImageCount(HandleRef himl);
-
-        [DllImport(ExternDll.Comctl32, CharSet = CharSet.Auto)]
-        internal static extern bool ImageList_Draw(HandleRef himl, int i, HandleRef hdcDst, int x, int y, int fStyle);
 
         [DllImport(ExternDll.Shell32, EntryPoint = "DragQueryFileW", SetLastError = true, CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
         internal static extern uint DragQueryFile(IntPtr hDrop, uint iFile, char[] lpszFile, uint cch);
