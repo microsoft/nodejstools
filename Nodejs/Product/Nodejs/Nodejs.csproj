@@ -1201,7 +1201,6 @@
     <Compile Include="SharedProject\Wpf\LabelledButton.cs" />
     <Compile Include="SharedProject\Wpf\LabelledControl.cs" />
     <Compile Include="SharedProject\Wpf\Controls.cs" />
-    <Compile Include="SharedProject\Wpf\NativeMethods.cs" />
     <Compile Include="SharedProject\Wpf\Dialogs.cs" />
     <Page Include="SharedProject\Wpf\Controls.xaml">
       <Generator>MSBuild:Compile</Generator>
