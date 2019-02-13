@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -121,10 +120,6 @@ namespace Microsoft.VisualStudioTools.Project
         /// <param name="quoteArgs">
         /// True to ensure each argument is correctly quoted.
         /// </param>
-        /// <param name="elevate">
-        /// True to run the process as an administrator. See
-        /// <see cref="RunElevated"/>.
-        /// </param>
         /// <returns>A <see cref="ProcessOutput"/> object.</returns>
         public static ProcessOutput Run(
             string filename,
@@ -134,7 +129,6 @@ namespace Microsoft.VisualStudioTools.Project
             bool visible,
             Redirector redirector,
             bool quoteArgs = true,
-            bool elevate = false,
             Encoding outputEncoding = null,
             Encoding errorEncoding = null
         )
@@ -142,17 +136,6 @@ namespace Microsoft.VisualStudioTools.Project
             if (string.IsNullOrEmpty(filename))
             {
                 throw new ArgumentException("Filename required", nameof(filename));
-            }
-            if (elevate)
-            {
-                return RunElevated(
-                    filename,
-                    arguments,
-                    workingDirectory,
-                    redirector,
-                    quoteArgs,
-                    outputEncoding,
-                    errorEncoding);
             }
 
             var psi = new ProcessStartInfo("cmd.exe")
@@ -185,126 +168,6 @@ namespace Microsoft.VisualStudioTools.Project
 
             var process = new Process { StartInfo = psi };
             return new ProcessOutput(process, redirector);
-        }
-
-        /// <summary>
-        /// Runs the file with the provided settings as a user with
-        /// administrative permissions. The window is always hidden and output
-        /// is provided to the redirector when the process terminates.
-        /// </summary>
-        /// <param name="filename">Executable file to run.</param>
-        /// <param name="arguments">Arguments to pass.</param>
-        /// <param name="workingDirectory">Starting directory.</param>
-        /// <param name="redirector">
-        /// An object to receive redirected output.
-        /// </param>
-        /// <param name="quoteArgs"></param>
-        /// <returns>A <see cref="ProcessOutput"/> object.</returns>
-        public static ProcessOutput RunElevated(
-            string filename,
-            IEnumerable<string> arguments,
-            string workingDirectory,
-            Redirector redirector,
-            bool quoteArgs = true,
-            Encoding outputEncoding = null,
-            Encoding errorEncoding = null
-        )
-        {
-            var outFile = Path.GetTempFileName();
-            var errFile = Path.GetTempFileName();
-            var psi = new ProcessStartInfo("cmd.exe")
-            {
-                WindowStyle = ProcessWindowStyle.Hidden,
-                Verb = "runas",
-                CreateNoWindow = true,
-                UseShellExecute = true,
-                Arguments = string.Format(@"/S /C pushd {0} & ""{1} {2} >>{3} 2>>{4}""",
-                    QuoteSingleArgument(workingDirectory),
-                    QuoteSingleArgument(filename),
-                    GetArguments(arguments, quoteArgs),
-                    QuoteSingleArgument(outFile),
-                    QuoteSingleArgument(errFile))
-            };
-
-            var process = new Process
-            {
-                StartInfo = psi
-            };
-
-            var result = new ProcessOutput(process, redirector);
-            if (redirector != null)
-            {
-                result.Exited += (s, e) =>
-                {
-                    try
-                    {
-                        try
-                        {
-                            var lines = File.ReadAllLines(outFile, outputEncoding ?? Encoding.Default);
-                            foreach (var line in lines)
-                            {
-                                redirector.WriteLine(line);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            if (IsCriticalException(ex))
-                            {
-                                throw;
-                            }
-                            redirector.WriteErrorLine("Failed to obtain standard output from elevated process.");
-#if DEBUG
-                            foreach (var line in SplitLines(ex.ToString()))
-                            {
-                                redirector.WriteErrorLine(line);
-                            }
-#else
-                            Trace.TraceError("Failed to obtain standard output from elevated process.");
-                            Trace.TraceError(ex.ToString());
-#endif
-                        }
-                        try
-                        {
-                            var lines = File.ReadAllLines(errFile, errorEncoding ?? outputEncoding ?? Encoding.Default);
-                            foreach (var line in lines)
-                            {
-                                redirector.WriteErrorLine(line);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            if (IsCriticalException(ex))
-                            {
-                                throw;
-                            }
-                            redirector.WriteErrorLine("Failed to obtain standard error from elevated process.");
-#if DEBUG
-                            foreach (var line in SplitLines(ex.ToString()))
-                            {
-                                redirector.WriteErrorLine(line);
-                            }
-#else
-                            Trace.TraceError("Failed to obtain standard error from elevated process.");
-                            Trace.TraceError(ex.ToString());
-#endif
-                        }
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            File.Delete(outFile);
-                        }
-                        catch { }
-                        try
-                        {
-                            File.Delete(errFile);
-                        }
-                        catch { }
-                    }
-                };
-            }
-            return result;
         }
 
         public static string GetArguments(IEnumerable<string> arguments, bool quoteArgs)
