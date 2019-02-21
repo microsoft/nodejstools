@@ -138,14 +138,12 @@ namespace Microsoft.VisualStudioTools.Project
                 throw new ArgumentException("Filename required", nameof(filename));
             }
 
-            var psi = new ProcessStartInfo("cmd.exe")
+            var psi = new ProcessStartInfo(filename)
             {
-                Arguments = string.Format(@"/S /C pushd {0} & {1} {2}",
-                    QuoteSingleArgument(workingDirectory),
-                    QuoteSingleArgument(filename),
-                    GetArguments(arguments, quoteArgs)),
+                Arguments = GetArguments(arguments, quoteArgs),
                 CreateNoWindow = !visible,
-                UseShellExecute = false
+                UseShellExecute = false,
+                WorkingDirectory = workingDirectory
             };
 
             if (!visible || (redirector != null))
