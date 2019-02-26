@@ -365,7 +365,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Uzaktan hata ayıklama proxy'sinde (RemoteDebug.js) çalışan Node.js işlemlerine iliştirmeye izin verir. İlgili belgeler 'Araçlar\Node.js Aracı\Uzak Hata Ayıklama Proxy'si' menüsü altında bulunabilir. 'Niteleyici' metin kutusunda, hedef konak adını ve hata ayıklayıcısı bağlantı noktasını belirtin, ör. 'targethost: {0}'. Bu aktarım güvenli değildir ve saldırı trafiğine sahip olabilecek bir ağ üzerinde kullanılmamalıdır.]]></Val>
+            <Val><![CDATA[Uzaktan hata ayıklama ara sunucusunda (RemoteDebug.js) çalışan Node.js işlemlerine iliştirmeye izin verir. İlgili belgeler 'Araçlar\Node.js Aracı\Uzak Hata Ayıklama Ara Sunucusu' menüsü altında bulunabilir. 'Niteleyici' metin kutusunda, hedef konak adını ve hata ayıklayıcısı bağlantı noktasını belirtin, ör. 'targethost: {0}'. Bu aktarım güvenli değildir ve saldırı trafiğine sahip olabilecek bir ağ üzerinde kullanılmamalıdır.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1595,7 +1595,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Make sure that the process is running behind the remote debug proxy (RemoteDebug.js), and the debugger port (default {0}) is open on the target host.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[İşlemin uzaktan hata ayıklama proxy'si (RemoteDebug.js) arkasında çalıştığından ve hedef ana bilgisayarda hata ayıklayıcısı bağlantı noktasının (varsayılan: {0}) açık olduğundan emin olun.]]></Val>
+            <Val><![CDATA[İşlemin uzaktan hata ayıklama ara sunucusu (RemoteDebug.js) arkasında çalıştığından ve hedef ana bilgisayarda hata ayıklayıcısı bağlantı noktasının (varsayılan: {0}) açık olduğundan emin olun.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1622,7 +1622,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Remote Debug Proxy "{0}" does not exist.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Uzaktan Hata Ayıklama Proxy'si "{0}" yok.]]></Val>
+            <Val><![CDATA[Uzaktan Hata Ayıklama Ara Sunucusu "{0}" yok.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3542,9 +3542,6 @@
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.ProjectWizard.dll]]></Val>
-        <Tgt Cat="Text" Stat="Update" Orig="New">
-          <Val><![CDATA[Visual Studio için Node.js Araçları - Sihirbazlar]]></Val>
-        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio - Wizards]]></Val>
         </Prev>
