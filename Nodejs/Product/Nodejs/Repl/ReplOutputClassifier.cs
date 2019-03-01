@@ -48,6 +48,9 @@ namespace Microsoft.NodejsTools.Repl
             if (startIndex < 0)
             {
                 startIndex = ~startIndex - 1;
+                if (startIndex < 0) {
+                    startIndex = 0;
+                }
             }
 
             var spanEnd = span.End.Position;
