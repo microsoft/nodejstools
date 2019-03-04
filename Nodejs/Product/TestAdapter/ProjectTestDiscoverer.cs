@@ -77,7 +77,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                         }
 
                         // Provide all files to the test analyzer
-                        foreach (var item in proj.Items.Where(item => item.ItemType != "None"))
+                        foreach (var item in proj.Items)
                         {
                             string testFrameworkName;
                             string fileAbsolutePath;
