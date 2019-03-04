@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 namespace Microsoft.NodejsTools.TestAdapter
 {
     [ExtensionUri(NodejsConstants.ExecutorUriString)]
-    public class JavaScriptTestExecutor : ITestExecutor
+    public class ProjectTestExecutor : ITestExecutor
     {
         private TestExecutorWorker worker;
 
@@ -16,6 +16,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             AssemblyResolver.SetupHandler();
 
             this.Cancel();
+
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
             this.worker.RunTests(tests);
         }
@@ -26,7 +27,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             this.Cancel();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
-            this.worker.RunTests(sources, new JavaScriptTestDiscoverer());
+            this.worker.RunTests(sources, new ProjectTestDiscoverer());
         }
 
         public void Cancel()

@@ -2,10 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using Microsoft.NodejsTools.SourceMapping;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -18,7 +16,7 @@ namespace Microsoft.NodejsTools.TestAdapter
     // Keep in sync the method TypeScriptHelpers.IsSupportedTestProjectFile if there's a change on the supported projects.
     [FileExtension(NodejsConstants.NodejsProjectExtension), FileExtension(NodejsConstants.CSharpProjectExtension), FileExtension(NodejsConstants.VisualBasicProjectExtension)]
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
-    public partial class JavaScriptTestDiscoverer : ITestDiscoverer
+    public partial class ProjectTestDiscoverer : ITestDiscoverer
     {
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
@@ -58,14 +56,17 @@ namespace Microsoft.NodejsTools.TestAdapter
                     // Load all the test containers passed in (.njsproj msbuild files)
                     foreach (var source in sources)
                     {
-                        buildEngine.LoadProject(source);
+                        var cleanPath = source.Trim('\'', '"');
+                        buildEngine.LoadProject(cleanPath);
                     }
+
+                    FrameworkDiscoverer frameworkDiscoverer = null;
 
                     foreach (var proj in buildEngine.LoadedProjects)
                     {
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        var testItems = new Dictionary<string, HashSet<TestFileEntry>>(StringComparer.OrdinalIgnoreCase);
+                        var testItems = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
                         var testRoot = proj.GetProperty(NodeProjectProperty.TestRoot)?.EvaluatedValue;
                         var testFramework = proj.GetProperty(NodeProjectProperty.TestFramework)?.EvaluatedValue;
@@ -113,15 +114,24 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                             if (!testItems.TryGetValue(testFrameworkName, out var fileList))
                             {
-                                fileList = new HashSet<TestFileEntry>(TestFileEntryComparer.Instance);
+                                fileList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                                 testItems.Add(testFrameworkName, fileList);
                             }
-                            fileList.Add(new TestFileEntry(fileAbsolutePath, typeScriptTest));
+                            fileList.Add(fileAbsolutePath);
                         }
 
                         if (testItems.Any())
                         {
-                            this.DiscoverTests(testItems, proj, discoverySink, logger);
+                            frameworkDiscoverer = frameworkDiscoverer ?? new FrameworkDiscoverer();
+
+                            var nodeExePath = Nodejs.GetAbsoluteNodeExePath(projectHome, proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
+                            if (string.IsNullOrEmpty(nodeExePath))
+                            {
+                                // if nothing specified in the project fallback to environment
+                                nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
+                            }
+
+                            this.DiscoverTests(testItems, frameworkDiscoverer, discoverySink, logger, nodeExePath, proj.FullPath);
                         }
                     }
                 }
@@ -139,27 +149,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void DiscoverTests(Dictionary<string, HashSet<TestFileEntry>> testItems, MSBuild.Project proj, ITestCaseDiscoverySink discoverySink, IMessageLogger logger)
+        private void DiscoverTests(Dictionary<string, HashSet<string>> testItems, FrameworkDiscoverer frameworkDiscoverer, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath)
         {
-            var result = new List<NodejsTestInfo>();
-            var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
-            var projSource = proj.FullPath;
-
-            var nodeExePath =
-                Nodejs.GetAbsoluteNodeExePath(
-                    projectHome,
-                    proj.GetPropertyValue(NodeProjectProperty.NodeExePath));
-
-            if (!File.Exists(nodeExePath))
-            {
-                logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
-                return;
-            }
-
-            var testCount = 0;
             foreach (var testFx in testItems.Keys)
             {
-                var testFramework = FrameworkDiscoverer.Instance.Get(testFx);
+                var testFramework = frameworkDiscoverer.GetFramework(testFx);
                 if (testFramework == null)
                 {
                     logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");
@@ -167,44 +161,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
 
                 var fileList = testItems[testFx];
-                var files = string.Join(";", fileList.Select(p => p.FullPath));
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing: {0}", files));
 
-                var discoveredTestCases = testFramework.FindTests(fileList.Select(p => p.FullPath), nodeExePath, logger, projectRoot: projectHome);
-                testCount += discoveredTestCases.Count();
-                foreach (var discoveredTest in discoveredTestCases)
-                {
-                    var qualifiedName = discoveredTest.FullyQualifiedName;
-                    const string indent = "  ";
-                    logger.SendMessage(TestMessageLevel.Informational, $"{indent}Creating TestCase:{qualifiedName}");
-                    //figure out the test source info such as line number
-                    var filePath = discoveredTest.TestPath;
-                    var entry = fileList.First(p => StringComparer.OrdinalIgnoreCase.Equals(p.FullPath, filePath));
-                    FunctionInformation fi = null;
-                    if (entry.IsTypeScriptTest)
-                    {
-                        fi = SourceMapper.MaybeMap(new FunctionInformation(string.Empty,
-                                                                           discoveredTest.TestName,
-                                                                           discoveredTest.SourceLine,
-                                                                           entry.FullPath));
-                    }
-
-                    var testcase = new TestCase(qualifiedName, NodejsConstants.ExecutorUri, projSource)
-                    {
-                        CodeFilePath = fi?.Filename ?? filePath,
-                        LineNumber = fi?.LineNumber ?? discoveredTest.SourceLine,
-                        DisplayName = discoveredTest.TestName
-                    };
-
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testFx);
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, nodeExePath);
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, projectHome);
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, projectHome);
-                    testcase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
-
-                    discoverySink.SendTestCase(testcase);
-                }
-                logger.SendMessage(TestMessageLevel.Informational, string.Format(CultureInfo.CurrentCulture, "Processing finished for framework '{0}'.", testFx));
+                var discoverWorker = new TestDiscovererWorker(projectFullPath, NodejsConstants.ExecutorUri, nodeExePath);
+                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink);
             }
         }
     }

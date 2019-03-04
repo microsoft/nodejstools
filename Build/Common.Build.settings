@@ -8,6 +8,11 @@
     </MSBuildAllProjects>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == ''">
+    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkMoniker>.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
 
@@ -22,9 +27,6 @@
     <VSTarget Condition="$(VSTarget)==''">15.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
 
-    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.6.1</TargetFrameworkVersion>
-    <TargetFrameworkMoniker>.NETFramework,Version=$(TargetFrameworkVersion)</TargetFrameworkMoniker>
-
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
 
     <BuildRoot Condition="'$(BuildRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
@@ -32,7 +34,7 @@
     <TargetsPath>$(BuildRoot)Build</TargetsPath>
 
     <PackagesPath Condition="'$(PackagesPath)' == ''">$(BUILD_BINARIESDIRECTORY)</PackagesPath>
-    <PackagesPath Condition="'$(PackagesPath)' == ''">$(BuildRoot)\packages\</PackagesPath>
+    <PackagesPath Condition="'$(PackagesPath)' == ''">$(BuildRoot)packages\</PackagesPath>
     <PackagesPath Condition="!HasTrailingSlash($(PackagesPath))">$(PackagesPath)\</PackagesPath>
 
     <!-- BuildOutputRoot contains all build files.
@@ -40,7 +42,7 @@
     Rather than customizing OutputPath or IntermediateOutputPath in projects,
     $(OutputPathSuffix) and $(IntermediateOutputPathSuffix) should be set.
     -->
-    <BuildOutputRoot Condition="'$(BuildOutputRoot)' == ''">$(BuildRoot)\BuildOutput\$(Configuration)\</BuildOutputRoot>
+    <BuildOutputRoot Condition="'$(BuildOutputRoot)' == ''">$(BuildRoot)BuildOutput\$(Configuration)\</BuildOutputRoot>
     <BuildOutputRoot Condition="!HasTrailingSlash($(BuildOutputRoot))">$(BuildOutputRoot)\</BuildOutputRoot>
 
     <OutputPathSuffix Condition="'$(OutputPathSuffix)' != '' and !HasTrailingSlash($(OutputPathSuffix))">$(OutputPathSuffix)\</OutputPathSuffix>

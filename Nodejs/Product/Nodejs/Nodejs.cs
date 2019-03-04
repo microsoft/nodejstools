@@ -5,12 +5,9 @@ using System.Diagnostics;
 using System.IO;
 #if !NO_WINDOWS
 using System.Windows.Forms;
-#endif
-using Microsoft.Win32;
-
-#if !NO_WINDOWS
 using Microsoft.NodejsTools.Project;
 #endif
+using Microsoft.Win32;
 using Microsoft.VisualStudioTools;
 //using Microsoft.VisualStudio.Shell;
 //using Microsoft.VisualStudio.Shell.Interop;
@@ -58,6 +55,7 @@ namespace Microsoft.NodejsTools
 
         public static string GetPathToNodeExecutableFromEnvironment(string executable = "node.exe")
         {
+#if !NO_WINDOWS
             // Attempt to find Node.js/NPM in the Registry. (Currrent User)
             using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default))
             using (var node = baseKey.OpenSubKey(NodejsRegPath))
@@ -105,7 +103,7 @@ namespace Microsoft.NodejsTools
                     }
                 }
             }
-
+#endif
             // If we didn't find node.js in the registry we should look at the user's path.
             foreach (var dir in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator))
             {

@@ -10,11 +10,9 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
     {
         private readonly Dictionary<string, TestFramework> frameworks = new Dictionary<string, TestFramework>(StringComparer.OrdinalIgnoreCase);
 
-        public static FrameworkDiscoverer Instance = new FrameworkDiscoverer();
-
-        private FrameworkDiscoverer()
+        public FrameworkDiscoverer(string testFrameworkRootDirectory = null)
         {
-            var testFrameworkDirectories = TestFrameworkDirectories.GetFrameworkDirectories();
+            var testFrameworkDirectories = TestFrameworkDirectories.GetFrameworkDirectories(testFrameworkRootDirectory);
 
             foreach (var directory in testFrameworkDirectories)
             {
@@ -23,7 +21,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             }
         }
 
-        public TestFramework Get(string frameworkName)
+        public TestFramework GetFramework(string frameworkName)
         {
             this.frameworks.TryGetValue(frameworkName, out var testFX);
             return testFX;

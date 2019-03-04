@@ -24,10 +24,10 @@ namespace Microsoft.NodejsTools.TestFrameworks
             return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).ToArray();
         }
 
-        public static string[] GetFrameworkDirectories()
+        public static string[] GetFrameworkDirectories(string testFrameworkRoot = null)
         {
+            testFrameworkRoot = testFrameworkRoot ?? GetTestframeworkFolderRoot();
 
-            var testFrameworkRoot = GetTestframeworkFolderRoot();
             if (!Directory.Exists(testFrameworkRoot))
             {
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
@@ -70,6 +70,10 @@ namespace Microsoft.NodejsTools.TestFrameworks
                     return Path.Combine(microsoftRoot, "Node.js Test Adapter", version, TestFrameworksFolderName);
                 }
 #endif
+            }
+            else if(currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("'TestFrameworkRoot' should have been set in the targets file in the nuget package.");
             }
             else
             {
