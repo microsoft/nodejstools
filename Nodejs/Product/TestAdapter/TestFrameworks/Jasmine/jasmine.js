@@ -113,7 +113,7 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
         return;
     }
     var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
-    jasmineInstance.env.specFilter = _ => false;
+    setSpecFilter(jasmineInstance, _ => false);
 
     var testList = [];
     testFileList.split(";").forEach((testFile) => {
@@ -222,9 +222,7 @@ function run_tests(testCases, callback) {
     try {
         var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
         jasmineInstance.configureDefaultReporter({ showColors: false });
-        jasmineInstance.env.specFilter = (spec) => {
-            return testNameList.hasOwnProperty(spec.getSpecName(spec));
-        };
+        setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
         jasmineInstance.addReporter(createCustomReporter(callback));
         jasmineInstance.execute(testFileList);
     }
@@ -232,4 +230,13 @@ function run_tests(testCases, callback) {
         logError("Execute test error:", ex);
     }
 }
+
+function setSpecFilter(jasmineInstance, specFilter) {
+    if (jasmineInstance.env.configure) {
+        jasmineInstance.env.configure({ specFilter });
+    } else {
+        jasmineInstance.env.specFilter = specFilter;
+    }
+}
+
 exports.run_tests = run_tests;
