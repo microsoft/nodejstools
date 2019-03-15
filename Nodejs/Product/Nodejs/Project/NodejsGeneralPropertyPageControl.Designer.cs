@@ -67,14 +67,12 @@
             this._testFrameworkLabel = new System.Windows.Forms.Label();
             this._frameworkSelector = new System.Windows.Forms.ComboBox();
             this._tooltip = new System.Windows.Forms.ToolTip(this.components);
-            this._nodeExeErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
             startActionTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             nodeHeaderTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             startActionTableLayoutPanel.SuspendLayout();
             nodeHeaderTableLayoutPanel.SuspendLayout();
             this.overallPanel.SuspendLayout();
             this.testHeaderTableLayoutPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // startActionTableLayoutPanel
@@ -330,7 +328,7 @@
             this._workingDir.Name = "_workingDir";
             this._workingDir.Size = new System.Drawing.Size(620, 20);
             this._workingDir.TabIndex = 7;
-            this._workingDir.TextChanged += new System.EventHandler(this.WorkingDirChanged);
+            this._workingDir.LostFocus += new System.EventHandler(this.WorkingDirChanged);
             // 
             // _browseDirectory
             // 
@@ -359,7 +357,7 @@
             this._nodejsPort.Name = "_nodejsPort";
             this._nodejsPort.Size = new System.Drawing.Size(105, 20);
             this._nodejsPort.TabIndex = 12;
-            this._nodejsPort.TextChanged += new System.EventHandler(this.PortChanged);
+            this._nodejsPort.LostFocus += new System.EventHandler(this.PortChanged);
             // 
             // _envVars
             // 
@@ -419,7 +417,7 @@
             this._nodeExePath.Name = "_nodeExePath";
             this._nodeExePath.Size = new System.Drawing.Size(620, 20);
             this._nodeExePath.TabIndex = 17;
-            this._nodeExePath.TextChanged += new System.EventHandler(this.NodeExePathChanged);
+            this._nodeExePath.LostFocus += new System.EventHandler(this.NodeExePathChanged);
             // 
             // _browsePath
             // 
@@ -448,7 +446,7 @@
             this._debuggerPort.Name = "_debuggerPort";
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
             this._debuggerPort.TabIndex = 20;
-            this._debuggerPort.TextChanged += new System.EventHandler(this.PortChanged);
+            this._debuggerPort.LostFocus += new System.EventHandler(this.PortChanged);
             // 
             // testHeaderTableLayoutPanel
             // 
@@ -541,10 +539,6 @@
             this._frameworkSelector.TabIndex = 28;
             this._frameworkSelector.SelectedIndexChanged += new System.EventHandler(this.Changed);
             // 
-            // _nodeExeErrorProvider
-            // 
-            this._nodeExeErrorProvider.ContainerControl = this;
-            // 
             // NodejsGeneralPropertyPageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -562,7 +556,6 @@
             this.overallPanel.PerformLayout();
             this.testHeaderTableLayoutPanel.ResumeLayout(false);
             this.testHeaderTableLayoutPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._nodeExeErrorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -584,7 +577,6 @@
         private System.Windows.Forms.TextBox _envVars;
         private System.Windows.Forms.CheckBox _startBrowserCheckBox;
         private System.Windows.Forms.ToolTip _tooltip;
-        private System.Windows.Forms.ErrorProvider _nodeExeErrorProvider;
         private System.Windows.Forms.Label _nodeArgumentsLabel;
         private System.Windows.Forms.Label _scriptLabel;
         private System.Windows.Forms.Label _scriptArgsLabel;

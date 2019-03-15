@@ -565,7 +565,7 @@ The following error occurred trying to execute npm.cmd:
     <value>Script ar&amp;guments:</value>
   </data>
   <data name="PropertiesStartBrowser" xml:space="preserve">
-    <value>St&amp;art web browser on launch</value>
+    <value>Sta&amp;rt web browser on launch</value>
   </data>
   <data name="PropertiesWorkingDir" xml:space="preserve">
     <value>Working director&amp;y:</value>
@@ -747,5 +747,9 @@ The following error occurred trying to execute npm.cmd:
   </data>
   <data name="NpmIsInstalling" xml:space="preserve">
     <value>Debugging could not be started because npm is installing packages. Please wait until npm finishes and try again.</value>
+  </data>
+  <data name="WarningDialogCaption" xml:space="preserve">
+    <value>Microsoft Visual Studio</value>
+    <comment>Caption displayed on the error dialog of the project properties.</comment>
   </data>
 </root>

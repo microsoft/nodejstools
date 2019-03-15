@@ -25,9 +25,6 @@ namespace Microsoft.NodejsTools.Project
 
             LocalizeLabels();
             AddToolTips();
-
-            this._nodeExeErrorProvider.SetIconAlignment(this._nodeExePath, ErrorIconAlignment.MiddleLeft);
-            this._nodeExeErrorProvider.SetIconAlignment(this._workingDir, ErrorIconAlignment.MiddleLeft);
         }
 
         public NodejsGeneralPropertyPageControl(NodejsGeneralPropertyPage page) : this()
@@ -250,14 +247,11 @@ namespace Microsoft.NodejsTools.Project
 
         private void NodeExePathChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(this._nodeExePath.Text) || this._nodeExePath.Text.Contains("$(") ||
-                File.Exists(Nodejs.GetAbsoluteNodeExePath(this._propPage.Project.ProjectHome, this._nodeExePath.Text)))
+            if (!string.IsNullOrEmpty(this._nodeExePath.Text)
+                && !this._nodeExePath.Text.Contains("$(")
+                && !File.Exists(Nodejs.GetAbsoluteNodeExePath(this._propPage.Project.ProjectHome, this._nodeExePath.Text)))
             {
-                this._nodeExeErrorProvider.SetError(this._nodeExePath, string.Empty);
-            }
-            else
-            {
-                this._nodeExeErrorProvider.SetError(this._nodeExePath, Resources.NodeExePathNotFound);
+                DisplayWarning(Resources.NodeExePathNotFound);
             }
             Changed(sender, e);
         }
@@ -308,23 +302,26 @@ namespace Microsoft.NodejsTools.Project
             if (!textSender.Text.Contains("$(") &&
                 textSender.Text.Any(ch => !char.IsDigit(ch)))
             {
-                this._nodeExeErrorProvider.SetError(textSender, Resources.InvalidPortNumber);
-            }
-            else
-            {
-                this._nodeExeErrorProvider.SetError(textSender, string.Empty);
+                DisplayWarning(Resources.InvalidPortNumber);
             }
             Changed(sender, e);
         }
 
+        private static void DisplayWarning(string text)
+        {
+            MessageBox.Show(text, Resources.WarningDialogCaption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
         private void WorkingDirChanged(object sender, EventArgs e)
         {
-            var errorMessage = ValidateWorkingDir(this._workingDir.Text) ? "" : Resources.WorkingDirInvalidOrMissing;
-            this._nodeExeErrorProvider.SetError(this._workingDir, errorMessage);
+            if (!IsValidWorkingDir(this._workingDir.Text))
+            {
+                DisplayWarning(Resources.WorkingDirInvalidOrMissing);
+            }
 
             Changed(sender, e);
 
-            bool ValidateWorkingDir(string workingDir)
+            bool IsValidWorkingDir(string workingDir)
             {
                 if (workingDir.Contains("$("))
                 {
