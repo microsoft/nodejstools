@@ -271,11 +271,11 @@
             this.overallPanel.Controls.Add(this._debuggerPortLabel, 0, 12);
             this.overallPanel.Controls.Add(this._debuggerPort, 1, 12);
             this.overallPanel.Controls.Add(this.testHeaderTableLayoutPanel, 0, 13);
-            this.overallPanel.Controls.Add(this._testRootLabel, 0, 14);
-            this.overallPanel.Controls.Add(this._testRoot, 1, 14);
-            this.overallPanel.Controls.Add(this._browseTestroot, 2, 14);
-            this.overallPanel.Controls.Add(this._testFrameworkLabel, 0, 15);
-            this.overallPanel.Controls.Add(this._frameworkSelector, 1, 15);
+            this.overallPanel.Controls.Add(this._testFrameworkLabel, 0, 14);
+            this.overallPanel.Controls.Add(this._frameworkSelector, 1, 14);
+            this.overallPanel.Controls.Add(this._testRootLabel, 0, 15);
+            this.overallPanel.Controls.Add(this._testRoot, 1, 15);
+            this.overallPanel.Controls.Add(this._browseTestroot, 2, 15);
             this.overallPanel.Location = new System.Drawing.Point(0, 0);
             this.overallPanel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.overallPanel.Name = "overallPanel";
@@ -484,46 +484,15 @@
             this.testHeaderLabelLine.Size = new System.Drawing.Size(730, 1);
             this.testHeaderLabelLine.TabIndex = 1;
             // 
-            // _testRootLabel
-            // 
-            this._testRootLabel.AutoSize = true;
-            this._testRootLabel.Location = new System.Drawing.Point(3, 398);
-            this._testRootLabel.Margin = new System.Windows.Forms.Padding(3);
-            this._testRootLabel.Name = "_testRootLabel";
-            this._testRootLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
-            this._testRootLabel.Size = new System.Drawing.Size(89, 13);
-            this._testRootLabel.TabIndex = 23;
-            this._testRootLabel.Text = "_testRootLabel";
-            // 
-            // _testRoot
-            // 
-            this._testRoot.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._testRoot.Location = new System.Drawing.Point(181, 398);
-            this._testRoot.Name = "_testRoot";
-            this._testRoot.Size = new System.Drawing.Size(620, 20);
-            this._testRoot.TabIndex = 24;
-            // 
-            // _browseTestroot
-            // 
-            this._browseTestroot.AutoSize = true;
-            this._browseTestroot.Location = new System.Drawing.Point(807, 398);
-            this._browseTestroot.Name = "_browseTestroot";
-            this._browseTestroot.Size = new System.Drawing.Size(26, 23);
-            this._browseTestroot.TabIndex = 25;
-            this._browseTestroot.Text = "...";
-            this._browseTestroot.UseVisualStyleBackColor = true;
-            this._browseTestroot.Click += new System.EventHandler(this.BrowseTestRootClick);
-            // 
             // _testFrameworkLabel
             // 
             this._testFrameworkLabel.AutoSize = true;
-            this._testFrameworkLabel.Location = new System.Drawing.Point(3, 427);
+            this._testFrameworkLabel.Location = new System.Drawing.Point(3, 398);
             this._testFrameworkLabel.Margin = new System.Windows.Forms.Padding(3);
             this._testFrameworkLabel.Name = "_testFrameworkLabel";
             this._testFrameworkLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this._testFrameworkLabel.Size = new System.Drawing.Size(118, 13);
-            this._testFrameworkLabel.TabIndex = 26;
+            this._testFrameworkLabel.TabIndex = 23;
             this._testFrameworkLabel.Text = "_testFrameworkLabel";
             // 
             // _frameworkSelector
@@ -532,12 +501,43 @@
             this._frameworkSelector.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this._frameworkSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._frameworkSelector.FormattingEnabled = true;
-            this._frameworkSelector.Location = new System.Drawing.Point(181, 427);
+            this._frameworkSelector.Location = new System.Drawing.Point(181, 398);
             this._frameworkSelector.Name = "_frameworkSelector";
             this._frameworkSelector.Size = new System.Drawing.Size(196, 21);
             this._frameworkSelector.Sorted = true;
-            this._frameworkSelector.TabIndex = 28;
+            this._frameworkSelector.TabIndex = 24;
             this._frameworkSelector.SelectedIndexChanged += new System.EventHandler(this.Changed);
+            // 
+            // _testRootLabel
+            // 
+            this._testRootLabel.AutoSize = true;
+            this._testRootLabel.Location = new System.Drawing.Point(3, 425);
+            this._testRootLabel.Margin = new System.Windows.Forms.Padding(3);
+            this._testRootLabel.Name = "_testRootLabel";
+            this._testRootLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this._testRootLabel.Size = new System.Drawing.Size(89, 13);
+            this._testRootLabel.TabIndex = 26;
+            this._testRootLabel.Text = "_testRootLabel";
+            // 
+            // _testRoot
+            // 
+            this._testRoot.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._testRoot.Location = new System.Drawing.Point(181, 425);
+            this._testRoot.Name = "_testRoot";
+            this._testRoot.Size = new System.Drawing.Size(620, 20);
+            this._testRoot.TabIndex = 27;
+            // 
+            // _browseTestroot
+            // 
+            this._browseTestroot.AutoSize = true;
+            this._browseTestroot.Location = new System.Drawing.Point(807, 425);
+            this._browseTestroot.Name = "_browseTestroot";
+            this._browseTestroot.Size = new System.Drawing.Size(26, 23);
+            this._browseTestroot.TabIndex = 28;
+            this._browseTestroot.Text = "...";
+            this._browseTestroot.UseVisualStyleBackColor = true;
+            this._browseTestroot.Click += new System.EventHandler(this.BrowseTestRootClick);
             // 
             // NodejsGeneralPropertyPageControl
             // 
