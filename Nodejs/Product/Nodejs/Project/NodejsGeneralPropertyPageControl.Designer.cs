@@ -225,7 +225,7 @@
             this._debuggerPortLabel.Name = "_debuggerPortLabel";
             this._debuggerPortLabel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this._debuggerPortLabel.Size = new System.Drawing.Size(113, 13);
-            this._debuggerPortLabel.TabIndex = 21;
+            this._debuggerPortLabel.TabIndex = 20;
             this._debuggerPortLabel.Text = "_debuggerPortLabel";
             // 
             // _envVarsLabel
@@ -445,7 +445,7 @@
             this._debuggerPort.Location = new System.Drawing.Point(181, 353);
             this._debuggerPort.Name = "_debuggerPort";
             this._debuggerPort.Size = new System.Drawing.Size(105, 20);
-            this._debuggerPort.TabIndex = 20;
+            this._debuggerPort.TabIndex = 21;
             this._debuggerPort.LostFocus += new System.EventHandler(this.PortChanged);
             // 
             // testHeaderTableLayoutPanel
