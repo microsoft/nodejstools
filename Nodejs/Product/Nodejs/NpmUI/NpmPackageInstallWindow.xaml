@@ -82,7 +82,6 @@
                                                     KeyboardNavigation.TabIndex="8"
                                                     Margin="0"
                                                     Padding="0" />
-
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
