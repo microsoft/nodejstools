@@ -752,4 +752,8 @@ The following error occurred trying to execute npm.cmd:
     <value>Microsoft Visual Studio</value>
     <comment>Caption displayed on the error dialog of the project properties.</comment>
   </data>
+  <data name="NpmCommandStarted" xml:space="preserve">
+    <value>{0} started.</value>
+    <comment>Parameter would be an npm command parameters.</comment>
+  </data>
 </root>

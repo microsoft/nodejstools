@@ -813,6 +813,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} started..
+        /// </summary>
+        internal static string NpmCommandStarted {
+            get {
+                return ResourceManager.GetString("NpmCommandStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
         /// </summary>
         internal static string NpmCompletedWithErrors {

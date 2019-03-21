@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:s="clr-namespace:System;assembly=mscorlib"
-                    xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf">
+                    xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
+                    xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0">
 
     <Style x:Key="FocusVisualStyle" TargetType="{x:Type Control}">
         <Setter Property="Control.Template">
@@ -246,10 +247,8 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="NavigationButton" TargetType="{x:Type Button}">
+    <Style x:Key="HyperlinkButton" TargetType="{x:Type vsui:HyperlinkButton}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HyperlinkKey}}" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -257,59 +256,13 @@
                     <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}" RecognizesAccessKey="True" Height="Auto">
                         <ContentPresenter.Resources>
                             <Style TargetType="{x:Type TextBlock}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="TextDecorations">
-                                            <Setter.Value>
-                                                <TextDecorationCollection>
-                                                    <TextDecoration Location="Underline" />
-                                                </TextDecorationCollection>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Trigger>
-                                </Style.Triggers>
+                                <Setter Property="TextDecorations" Value="Underline" />
                             </Style>
                         </ContentPresenter.Resources>
                     </ContentPresenter>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="FocusVisualStyle">
-            <Setter.Value>
-                <Style TargetType="Control">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate>
-                                <Rectangle Margin="0"
-                                           RenderOptions.EdgeMode="Aliased"
-                                           Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
-                                           StrokeThickness="1"
-                                           StrokeDashArray="1 1" />
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HyperlinkHoverKey}}" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    
-    <Style x:Key="NavigationButtonInList" BasedOn="{StaticResource NavigationButton}" TargetType="{x:Type Button}">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HighlightTextKey}}" />
-            </DataTrigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.GrayTextKey}}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <Style x:Key="PopupExpander" TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Control}}">
