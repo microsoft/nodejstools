@@ -71,7 +71,7 @@
                                 Visibility="{Binding HomepagesVisibility}"
                                 Orientation="Horizontal">
                                 <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.HomepageLabel}" />
-                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}" IsTabStop="False">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <vsui:HyperlinkButton
