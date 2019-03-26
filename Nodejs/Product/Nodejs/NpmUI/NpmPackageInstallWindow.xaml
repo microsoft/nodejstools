@@ -33,11 +33,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+
             <x:Array Type="ComboBoxItem" x:Key="LatestVersionComboItem">
                 <ComboBoxItem Content="{x:Static resx:NpmInstallWindowResources.LatestVersion }" />
             </x:Array>
-            
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -71,16 +71,17 @@
                                 Visibility="{Binding HomepagesVisibility}"
                                 Orientation="Horizontal">
                                 <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.HomepageLabel}" />
-                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}" IsTabStop="False">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource NavigationButton}"
+                                            <vsui:HyperlinkButton
+                                                    Style="{StaticResource HyperlinkButton}"
                                                     Content="{Binding Mode=OneWay}"
                                                     Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
                                                     CommandParameter="{Binding}"
                                                     KeyboardNavigation.TabIndex="8"
                                                     Margin="0"
-                                                    Padding="0"/>
+                                                    Padding="0" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -160,7 +161,7 @@
                                            FontWeight="Bold"
                                            Foreground="Red"
                                            Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
-                                
+
                                 <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
@@ -432,7 +433,7 @@
                                 IsDefault="True"
                                 Content="{x:Static resx:NpmInstallWindowResources.InstallPackageButtonLabel}" />
 
-                        <Button Style="{StaticResource NavigationButton}" VerticalAlignment="Center" Margin="5 0 0 0" 
+                        <Button VerticalAlignment="Center" Margin="5 0 0 0" 
                                 Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="14"
                                 Content="{x:Static resx:NpmInstallWindowResources.ResetOptionsButtonLabel}" />
                     </StackPanel>

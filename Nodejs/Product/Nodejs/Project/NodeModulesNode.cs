@@ -248,12 +248,15 @@ namespace Microsoft.NodejsTools.Project
             WriteNpmLogToOutputWindow(TrimLastNewline(args.LogText));
         }
 
-        private void NpmController_CommandStarted(object sender, EventArgs e)
+        private void NpmController_CommandStarted(object sender, NpmCommandStartedEventArgs e)
         {
             StopNpmIdleTimer();
             lock (this._commandCountLock)
             {
                 ++this._npmCommandsExecuting;
+
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmCommandStarted, e.CommandText);
+                ForceUpdateStatusBarWithNpmActivitySafe(message);
             }
         }
 

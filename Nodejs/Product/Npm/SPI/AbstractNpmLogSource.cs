@@ -6,15 +6,11 @@ namespace Microsoft.NodejsTools.Npm.SPI
 {
     internal abstract class AbstractNpmLogSource : INpmLogSource
     {
-        public event EventHandler CommandStarted;
+        public event EventHandler<NpmCommandStartedEventArgs> CommandStarted;
 
-        protected void OnCommandStarted()
+        protected void OnCommandStarted(string arguments)
         {
-            var handlers = CommandStarted;
-            if (null != handlers)
-            {
-                handlers(this, EventArgs.Empty);
-            }
+            CommandStarted?.Invoke(this, new NpmCommandStartedEventArgs(arguments));
         }
 
         protected void FireNpmLogEvent(string logText, EventHandler<NpmLogEventArgs> handlers)

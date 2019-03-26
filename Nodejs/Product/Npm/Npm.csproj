@@ -51,6 +51,7 @@
     <Compile Include="IPackageJsonScript.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NpmArgumentBuilder.cs" />
+    <Compile Include="NpmCommandStartedEventArgs.cs" />
     <Compile Include="NpmHelpers.cs" />
     <Compile Include="SemverVersionComparer.cs" />
     <Compile Include="SPI\AbstractNpmSearchComparer.cs" />

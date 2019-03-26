@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
         public virtual async Task<bool> ExecuteAsync()
         {
-            this.OnCommandStarted();
+            this.OnCommandStarted(this.Arguments);
 
             var redirector = this.showConsole ? null : new NpmCommandRedirector(this);
             var cancelled = false;
