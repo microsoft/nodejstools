@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -70,22 +71,9 @@ namespace Microsoft.VisualStudioTools
                 path = path.Substring(MdhaPrefix.Length);
             }
 
-            var uri = MakeUri(path, false, UriKind.RelativeOrAbsolute);
-            if (uri.IsAbsoluteUri)
-            {
-                if (uri.IsFile)
-                {
-                    return uri.LocalPath;
-                }
-                else
-                {
-                    return uri.AbsoluteUri.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                }
-            }
-            else
-            {
-                return Uri.UnescapeDataString(uri.ToString()).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
+            return !HasStartSeparator(path) && Path.IsPathRooted(path)
+                ? Path.GetFullPath(path)
+                : path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
         }
 
         /// <summary>
@@ -94,27 +82,9 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public static string NormalizeDirectoryPath(string path)
         {
-            if (string.IsNullOrEmpty(path))
-            {
-                return null;
-            }
+            var normalizedPath = NormalizePath(path);
 
-            var uri = MakeUri(path, true, UriKind.RelativeOrAbsolute);
-            if (uri.IsAbsoluteUri)
-            {
-                if (uri.IsFile)
-                {
-                    return uri.LocalPath;
-                }
-                else
-                {
-                    return uri.AbsoluteUri.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                }
-            }
-            else
-            {
-                return Uri.UnescapeDataString(uri.ToString()).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
+            return string.IsNullOrEmpty(normalizedPath) || HasEndSeparator(normalizedPath) ? normalizedPath : normalizedPath + Path.DirectorySeparatorChar;
         }
 
         /// <summary>
@@ -195,41 +165,11 @@ namespace Microsoft.VisualStudioTools
         /// created.</exception>
         public static string GetAbsoluteDirectoryPath(string root, string relativePath)
         {
-            string absPath;
+            var absolutePath = GetAbsoluteFilePath(root, relativePath);
 
-            if (string.IsNullOrEmpty(relativePath))
-            {
-                return NormalizeDirectoryPath(root);
-            }
-
-            var relUri = MakeUri(relativePath, true, UriKind.RelativeOrAbsolute, "relativePath");
-            Uri absUri;
-
-            if (relUri.IsAbsoluteUri)
-            {
-                absUri = relUri;
-            }
-            else
-            {
-                var rootUri = MakeUri(root, true, UriKind.Absolute, "root");
-                try
-                {
-                    absUri = new Uri(rootUri, relUri);
-                }
-                catch (UriFormatException ex)
-                {
-                    throw new InvalidOperationException("Cannot create absolute path", ex);
-                }
-            }
-
-            absPath = absUri.IsFile ? absUri.LocalPath : absUri.AbsoluteUri;
-
-            if (!string.IsNullOrEmpty(absPath) && !HasEndSeparator(absPath))
-            {
-                absPath += absUri.IsFile ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
-            }
-
-            return absPath;
+            return string.IsNullOrEmpty(absolutePath) || HasEndSeparator(absolutePath)
+                ? absolutePath
+                : absolutePath + Path.DirectorySeparatorChar;
         }
 
         /// <summary>
@@ -240,28 +180,28 @@ namespace Microsoft.VisualStudioTools
         /// either path is invalid.</exception>
         public static string GetAbsoluteFilePath(string root, string relativePath)
         {
-            var rootUri = MakeUri(root, true, UriKind.Absolute, "root");
-            var relUri = MakeUri(relativePath, false, UriKind.RelativeOrAbsolute, "relativePath");
+            var absolutePath = HasStartSeparator(relativePath)
+                ? Path.GetFullPath(relativePath)
+                : Path.Combine(root, relativePath);
 
-            Uri absUri;
+            var split = absolutePath.Split(DirectorySeparators);
+            var segments = new List<string>();
 
-            if (relUri.IsAbsoluteUri)
+            for (var i = split.Length - 1; i >= 0; i--)
             {
-                absUri = relUri;
-            }
-            else
-            {
-                try
+                var segment = split[i];
+
+                if (segment == "..")
                 {
-                    absUri = new Uri(rootUri, relUri);
+                    i--;
                 }
-                catch (UriFormatException ex)
+                else if(segment != ".")
                 {
-                    throw new InvalidOperationException("Cannot create absolute path", ex);
+                    segments.Insert(0, segment);
                 }
             }
 
-            return absUri.IsFile ? absUri.LocalPath : absUri.AbsoluteUri;
+            return string.Join(Path.DirectorySeparatorChar.ToString(), segments);
         }
 
         /// <summary>
@@ -273,44 +213,11 @@ namespace Microsoft.VisualStudioTools
         /// relative path.</exception>
         public static string GetRelativeDirectoryPath(string fromDirectory, string toDirectory)
         {
-            var fromUri = MakeUri(fromDirectory, true, UriKind.Absolute, "fromDirectory");
-            var toUri = MakeUri(toDirectory, true, UriKind.Absolute, "toDirectory");
+            var relativePath = GetRelativeFilePath(fromDirectory, toDirectory);
 
-            string relPath;
-            var sep = toUri.IsFile ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
-
-            try
-            {
-                var relUri = fromUri.MakeRelativeUri(toUri);
-                if (relUri.IsAbsoluteUri)
-                {
-                    relPath = relUri.IsFile ? relUri.LocalPath : relUri.AbsoluteUri;
-                }
-                else
-                {
-                    relPath = Uri.UnescapeDataString(relUri.ToString());
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                Trace.WriteLine(string.Format("Error finding path from {0} to {1}", fromUri, toUri));
-                Trace.WriteLine(ex);
-                relPath = toUri.IsFile ? toUri.LocalPath : toUri.AbsoluteUri;
-            }
-
-            if (!string.IsNullOrEmpty(relPath) && !HasEndSeparator(relPath))
-            {
-                relPath += Path.DirectorySeparatorChar;
-            }
-
-            if (toUri.IsFile)
-            {
-                return relPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
-            else
-            {
-                return relPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            }
+            return string.IsNullOrEmpty(relativePath) || HasEndSeparator(relativePath)
+                ? relativePath
+                : relativePath + Path.DirectorySeparatorChar;
         }
 
         /// <summary>
@@ -320,39 +227,31 @@ namespace Microsoft.VisualStudioTools
         /// </summary>
         public static string GetRelativeFilePath(string fromDirectory, string toFile)
         {
-            var fromUri = MakeUri(fromDirectory, true, UriKind.Absolute, "fromDirectory");
-            var toUri = MakeUri(toFile, false, UriKind.Absolute, "toFile");
+            var splitDirectory = Path.GetFullPath(TrimEndSeparator(fromDirectory)).Split(DirectorySeparators);
+            var splitFile = Path.GetFullPath(toFile).Split(DirectorySeparators);
 
-            string relPath;
-            var sep = toUri.IsFile ? Path.DirectorySeparatorChar : Path.AltDirectorySeparatorChar;
+            var relativePath = new List<string>();
+            var dirIndex = 0;
 
-            try
+            var minIndex = Math.Min(splitDirectory.Length, splitFile.Length);
+
+            while (dirIndex < minIndex
+                && string.Equals(splitDirectory[dirIndex], splitFile[dirIndex], StringComparison.OrdinalIgnoreCase))
             {
-                var relUri = fromUri.MakeRelativeUri(toUri);
-                if (relUri.IsAbsoluteUri)
-                {
-                    relPath = relUri.IsFile ? relUri.LocalPath : relUri.AbsoluteUri;
-                }
-                else
-                {
-                    relPath = Uri.UnescapeDataString(relUri.ToString());
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                Trace.WriteLine(string.Format("Error finding path from {0} to {1}", fromUri, toUri));
-                Trace.WriteLine(ex);
-                relPath = toUri.IsFile ? toUri.LocalPath : toUri.AbsoluteUri;
+                dirIndex++;
             }
 
-            if (toUri.IsFile)
+            for (var i = splitDirectory.Length; i > dirIndex; i--)
             {
-                return relPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+                relativePath.Add("..");
             }
-            else
+
+            for (var i = dirIndex; i < splitFile.Length; i++)
             {
-                return relPath.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                relativePath.Add(splitFile[i]);
             }
+
+            return string.Join(Path.DirectorySeparatorChar.ToString(), relativePath);
         }
 
         /// <summary>
@@ -514,6 +413,11 @@ namespace Microsoft.VisualStudioTools
         public static bool HasEndSeparator(string path)
         {
             return !string.IsNullOrEmpty(path) && DirectorySeparators.Contains(path[path.Length - 1]);
+        }
+
+        public static bool HasStartSeparator(string path)
+        {
+            return !string.IsNullOrEmpty(path) && DirectorySeparators.Contains(path[0]);
         }
 
         /// <summary>
