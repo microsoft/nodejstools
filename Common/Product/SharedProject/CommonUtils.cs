@@ -83,8 +83,7 @@ namespace Microsoft.VisualStudioTools
         public static string NormalizeDirectoryPath(string path)
         {
             var normalizedPath = NormalizePath(path);
-
-            return string.IsNullOrEmpty(normalizedPath) || HasEndSeparator(normalizedPath) ? normalizedPath : normalizedPath + Path.DirectorySeparatorChar;
+            return EnsureEndSeparator(normalizedPath);
         }
 
         /// <summary>
@@ -166,10 +165,7 @@ namespace Microsoft.VisualStudioTools
         public static string GetAbsoluteDirectoryPath(string root, string relativePath)
         {
             var absolutePath = GetAbsoluteFilePath(root, relativePath);
-
-            return string.IsNullOrEmpty(absolutePath) || HasEndSeparator(absolutePath)
-                ? absolutePath
-                : absolutePath + Path.DirectorySeparatorChar;
+            return EnsureEndSeparator(absolutePath);
         }
 
         /// <summary>
@@ -185,7 +181,7 @@ namespace Microsoft.VisualStudioTools
                 : Path.Combine(root, relativePath);
 
             var split = absolutePath.Split(DirectorySeparators);
-            var segments = new List<string>();
+            var segments = new LinkedList<string>();
 
             for (var i = split.Length - 1; i >= 0; i--)
             {
@@ -197,7 +193,7 @@ namespace Microsoft.VisualStudioTools
                 }
                 else if(segment != ".")
                 {
-                    segments.Insert(0, segment);
+                    segments.AddFirst(segment);
                 }
             }
 
@@ -214,28 +210,35 @@ namespace Microsoft.VisualStudioTools
         public static string GetRelativeDirectoryPath(string fromDirectory, string toDirectory)
         {
             var relativePath = GetRelativeFilePath(fromDirectory, toDirectory);
-
-            return string.IsNullOrEmpty(relativePath) || HasEndSeparator(relativePath)
-                ? relativePath
-                : relativePath + Path.DirectorySeparatorChar;
+            return EnsureEndSeparator(relativePath);
         }
 
         /// <summary>
         /// Returns a relative path from the base path to the file. This is
         /// intended for serialization rather than UI. See CreateFriendlyFilePath
         /// for UI strings.
+        /// Retunrs the file fullpath if the roots are different.
         /// </summary>
         public static string GetRelativeFilePath(string fromDirectory, string toFile)
         {
-            var splitDirectory = Path.GetFullPath(TrimEndSeparator(fromDirectory)).Split(DirectorySeparators);
-            var splitFile = Path.GetFullPath(toFile).Split(DirectorySeparators);
+            var dirFullPath = Path.GetFullPath(TrimEndSeparator(fromDirectory));
+            var fileFullPath = Path.GetFullPath(toFile);
+
+            // If the root paths doesn't match return the file full path.
+            if(!string.Equals(Path.GetPathRoot(dirFullPath), Path.GetPathRoot(fileFullPath), StringComparison.OrdinalIgnoreCase))
+            {
+                return fileFullPath;
+            }
+
+            var splitDirectory = dirFullPath.Split(DirectorySeparators);
+            var splitFile = fileFullPath.Split(DirectorySeparators);
 
             var relativePath = new List<string>();
             var dirIndex = 0;
 
-            var minIndex = Math.Min(splitDirectory.Length, splitFile.Length);
+            var minLegth = Math.Min(splitDirectory.Length, splitFile.Length);
 
-            while (dirIndex < minIndex
+            while (dirIndex < minLegth
                 && string.Equals(splitDirectory[dirIndex], splitFile[dirIndex], StringComparison.OrdinalIgnoreCase))
             {
                 dirIndex++;
@@ -454,7 +457,6 @@ namespace Microsoft.VisualStudioTools
         {
             if (string.IsNullOrEmpty(path))
             {
-                Debug.Fail("what??");
                 return path;
             }
             else if (!HasEndSeparator(path))
