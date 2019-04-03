@@ -871,6 +871,9 @@
       <Item ItemId=";NpmCommandStarted" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[{0} started.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} başlatıldı.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1582,7 +1585,7 @@
       <Item ItemId=";PropertiesStartBrowser" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Sta&rt web browser on launch]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[B&aşlatma sırasında web tarayıcısını başlat]]></Val>
           </Tgt>
           <Prev Cat="Text">
