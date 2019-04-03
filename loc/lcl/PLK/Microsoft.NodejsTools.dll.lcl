@@ -1345,6 +1345,9 @@
       <Item ItemId=";NpmCommandStarted" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[{0} started.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Uruchomiono polecenie {0}.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -2056,8 +2059,8 @@
       <Item ItemId=";PropertiesStartBrowser" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Sta&rt web browser on launch]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Uruchom przegląd&arkę internetową podczas uruchamiania]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[U&ruchom przeglądarkę internetową podczas uruchamiania]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[St&art web browser on launch]]></Val>
