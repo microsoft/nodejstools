@@ -214,6 +214,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One result found.
+        /// </summary>
+        public static string OneResultFoundMessage {
+            get {
+                return ResourceManager.GetString("OneResultFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options.
         /// </summary>
         public static string OptionsLabel {
@@ -246,6 +255,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         public static string ResetOptionsButtonLabel {
             get {
                 return ResourceManager.GetString("ResetOptionsButtonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} results found.
+        /// </summary>
+        public static string ResultsFoundMessage {
+            get {
+                return ResourceManager.GetString("ResultsFoundMessage", resourceCulture);
             }
         }
         

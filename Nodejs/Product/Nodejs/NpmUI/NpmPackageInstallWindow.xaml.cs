@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Windows;
@@ -15,10 +15,23 @@ namespace Microsoft.NodejsTools.NpmUI
     public sealed partial class NpmPackageInstallWindow : DialogWindow, IDisposable
     {
         private readonly NpmPackageInstallViewModel viewModel;
+        private const string NpmResultGuid = "2A7B6678-DFC9-40AA-BF2C-AD08B40A3031";
 
         internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Standard)
         {
-            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(npmWorker, this.Dispatcher);
+            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(
+                npmWorker,
+                this.Dispatcher,
+                (count) =>
+                {
+                    var notification = count == 0 ? NpmInstallWindowResources.NoResultsFoundMessage
+                        : count == 1 ? NpmInstallWindowResources.OneResultFoundMessage
+                        : string.Format(NpmInstallWindowResources.ResultsFoundMessage, count);
+
+                    this.FilterTextBox.RaiseNotificationEvent(notification, NpmResultGuid);
+                });
+
+
             this.viewModel.NpmController = controller;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;

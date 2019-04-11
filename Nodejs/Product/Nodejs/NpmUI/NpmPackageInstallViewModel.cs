@@ -53,12 +53,14 @@ namespace Microsoft.NodejsTools.NpmUI
         private readonly Timer filterTimer;
         private readonly Dispatcher dispatcher;
         private readonly NpmWorker npmWorker;
+        private readonly Action<int> searchResultCallback;
 
         private bool disposed = false;
 
         public NpmPackageInstallViewModel(
             NpmWorker npmWorker,
-            Dispatcher dispatcher
+            Dispatcher dispatcher,
+            Action<int> searchResultCallback
         )
         {
             this.dispatcher = dispatcher;
@@ -67,6 +69,7 @@ namespace Microsoft.NodejsTools.NpmUI
             this.npmWorker.CommandStarted += this.NpmWorker_CommandStarted;
             this.npmWorker.CommandCompleted += this.NpmWorker_CommandCompleted;
             this.filterTimer = new Timer(this.FilterTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+            this.searchResultCallback = searchResultCallback;
         }
 
         private void NpmWorker_CommandStarted(object sender, EventArgs e)
@@ -243,6 +246,11 @@ namespace Microsoft.NodejsTools.NpmUI
                 if (filterText != GetTrimmedTextSafe(this.filterText))
                 {
                     return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(filterText))
+                {
+                    this.searchResultCallback(filtered.Count());
                 }
 
                 var originalSelectedPackage = this.SelectedPackage;
