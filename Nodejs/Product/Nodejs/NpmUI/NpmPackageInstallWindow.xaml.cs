@@ -19,20 +19,10 @@ namespace Microsoft.NodejsTools.NpmUI
 
         internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Standard)
         {
-            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(
-                npmWorker,
-                this.Dispatcher,
-                (count) =>
-                {
-                    var notification = count == 0 ? NpmInstallWindowResources.NoResultsFoundMessage
-                        : count == 1 ? NpmInstallWindowResources.OneResultFoundMessage
-                        : string.Format(NpmInstallWindowResources.ResultsFoundMessage, count);
-
-                    this.FilterTextBox.RaiseNotificationEvent(notification, NpmResultGuid);
-                });
-
+            this.DataContext = this.viewModel = new NpmPackageInstallViewModel(npmWorker, this.Dispatcher);
 
             this.viewModel.NpmController = controller;
+            this.viewModel.OnSearchResultEnded += this.RaiseNotification_OnSearchResultEnded;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;
         }
@@ -44,6 +34,15 @@ namespace Microsoft.NodejsTools.NpmUI
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
             GC.Collect();
+        }
+
+        private void RaiseNotification_OnSearchResultEnded(object sender, int e)
+        {
+            var notification = e == 0 ? NpmInstallWindowResources.NoResultsFoundMessage
+                        : e == 1 ? NpmInstallWindowResources.OneResultFoundMessage
+                        : string.Format(NpmInstallWindowResources.ResultsFoundMessage, e);
+
+            this.FilterTextBox.RaiseNotificationEvent(notification, NpmResultGuid);
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e)

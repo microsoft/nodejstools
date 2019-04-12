@@ -12,22 +12,6 @@ namespace Microsoft.NodejsTools.SharedProject.Wpf
         // This control's AutomationPeer is the object that actually raises the UIA Notification event.
         private NotificationTextBoxAutomationPeer notificationTextBoxAutomationPeer;
 
-        // Assume the UIA Notification event is available until we learn otherwise.
-        // If we learn that the UIA Notification event is not available, no instance
-        // of the NotificationTextBox should attempt to raise it.
-        private static bool notificationEventAvailable = true;
-        public bool NotificationEventAvailable
-        {
-            get
-            {
-                return notificationEventAvailable;
-            }
-            set
-            {
-                notificationEventAvailable = value;
-            }
-        }
-
         protected override AutomationPeer OnCreateAutomationPeer()
         {
             this.notificationTextBoxAutomationPeer = new NotificationTextBoxAutomationPeer(this);
@@ -47,7 +31,12 @@ namespace Microsoft.NodejsTools.SharedProject.Wpf
 
     internal class NotificationTextBoxAutomationPeer : TextBoxAutomationPeer
     {
-        private NotificationTextBox notificationTextBox;
+        private readonly NotificationTextBox notificationTextBox;
+
+        // Assume the UIA Notification event is available until we learn otherwise.
+        // If we learn that the UIA Notification event is not available, no instance
+        // of the NotificationTextBox should attempt to raise it.
+        public bool NotificationEventAvailable { get; set; } = true;
 
         // The UIA Notification event requires the IRawElementProviderSimple
         // associated with this AutomationPeer.
@@ -62,7 +51,7 @@ namespace Microsoft.NodejsTools.SharedProject.Wpf
         {
             // If we already know that the UIA Notification event is not available, do not
             // attempt to raise it.
-            if (this.notificationTextBox.NotificationEventAvailable)
+            if (this.NotificationEventAvailable)
             {
                 // If no UIA clients are listening for events, don't bother raising one.
                 if (UiaAutomationNativeMethods.UiaClientsAreListening())
@@ -93,7 +82,7 @@ namespace Microsoft.NodejsTools.SharedProject.Wpf
                         {
                             // The UIA Notification event is not not available, so don't attempt
                             // to raise it again.
-                            this.notificationTextBox.NotificationEventAvailable = false;
+                            this.NotificationEventAvailable = false;
                         }
                     }
                 }
