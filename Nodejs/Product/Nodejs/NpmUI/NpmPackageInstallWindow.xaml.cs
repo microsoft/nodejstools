@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Windows;
@@ -15,11 +15,14 @@ namespace Microsoft.NodejsTools.NpmUI
     public sealed partial class NpmPackageInstallWindow : DialogWindow, IDisposable
     {
         private readonly NpmPackageInstallViewModel viewModel;
+        private const string NpmResultGuid = "2A7B6678-DFC9-40AA-BF2C-AD08B40A3031";
 
         internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Standard)
         {
             this.DataContext = this.viewModel = new NpmPackageInstallViewModel(npmWorker, this.Dispatcher);
+
             this.viewModel.NpmController = controller;
+            this.viewModel.OnSearchResultEnded += this.RaiseNotification_OnSearchResultEnded;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;
         }
@@ -31,6 +34,15 @@ namespace Microsoft.NodejsTools.NpmUI
             // The catalog refresh operation spawns many long-lived Gen 2 objects,
             // so the garbage collector will take a while to get to them otherwise.
             GC.Collect();
+        }
+
+        private void RaiseNotification_OnSearchResultEnded(object sender, int e)
+        {
+            var notification = e == 0 ? NpmInstallWindowResources.NoResultsFoundMessage
+                        : e == 1 ? NpmInstallWindowResources.OneResultFoundMessage
+                        : string.Format(NpmInstallWindowResources.ResultsFoundMessage, e);
+
+            this.FilterTextBox.RaiseNotificationEvent(notification, NpmResultGuid);
         }
 
         private void Close_Executed(object sender, ExecutedRoutedEventArgs e)

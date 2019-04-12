@@ -340,7 +340,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type Control}}">
+    <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type Control}}">
         <Setter Property="CaretBrush" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">

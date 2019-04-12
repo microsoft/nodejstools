@@ -4,11 +4,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
-    xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
+    xmlns:ntvs="clr-namespace:Microsoft.NodejsTools.SharedProject.Wpf"
     Title="{x:Static resx:NpmInstallWindowResources.WindowTitle}"
     Height="500"
     MinHeight="500"
@@ -262,7 +261,8 @@
                 <ColumnDefinition Width="7*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Grid.Column="0">
-                <TextBox x:Name="FilterTextBox"
+                <ntvs:NotificationTextBox x:Name="FilterTextBox"
+                         Style="{StaticResource TextBoxStyle}"
                          IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                          Height="24"
                          Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
