@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <None Include="server.ts" />
-    <None Include="tsconfig.json" />
+    <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
