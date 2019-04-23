@@ -36,7 +36,7 @@
     <Content Include="README.md" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config" />
-    <None Include="tsconfig.json" />
+    <Content Include="tsconfig.json" />
   </ItemGroup>
 
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
