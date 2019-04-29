@@ -56,6 +56,8 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private bool disposed = false;
 
+        public event EventHandler<int> OnSearchResultEnded;
+
         public NpmPackageInstallViewModel(
             NpmWorker npmWorker,
             Dispatcher dispatcher
@@ -243,6 +245,11 @@ namespace Microsoft.NodejsTools.NpmUI
                 if (filterText != GetTrimmedTextSafe(this.filterText))
                 {
                     return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(filterText))
+                {
+                    this.OnSearchResultEnded(this, filtered.Count());
                 }
 
                 var originalSelectedPackage = this.SelectedPackage;

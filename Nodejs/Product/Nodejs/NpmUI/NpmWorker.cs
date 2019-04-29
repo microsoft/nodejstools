@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.NpmUI
                 cmdr.CommandCompleted -= Cmdr_CommandCompleted;
             }
 
-            void Cmdr_CommandStarted(object sender, EventArgs e)
+            void Cmdr_CommandStarted(object sender, NpmCommandStartedEventArgs e)
             {
                 this.CommandStarted?.Invoke(this, e);
             }

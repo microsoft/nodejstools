@@ -78,9 +78,9 @@ namespace Microsoft.NodejsTools.Npm.SPI
             }
         }
 
-        private void command_CommandStarted(object sender, EventArgs e)
+        private void command_CommandStarted(object sender, NpmCommandStartedEventArgs e)
         {
-            OnCommandStarted();
+            OnCommandStarted(e.Arguments);
         }
 
         private void command_ExceptionLogged(object sender, NpmExceptionEventArgs e)

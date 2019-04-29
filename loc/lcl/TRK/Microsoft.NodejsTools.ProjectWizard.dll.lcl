@@ -868,6 +868,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NpmCommandStarted" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} started.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} başlatıldı.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";NpmCompletedWithErrors" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[{0} completed with errors - see Output window for details]]></Val>
@@ -1575,10 +1584,13 @@
       </Item>
       <Item ItemId=";PropertiesStartBrowser" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[St&art web browser on launch]]></Val>
+          <Val><![CDATA[Sta&rt web browser on launch]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[B&aşlatma sırasında web tarayıcısını başlat]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[St&art web browser on launch]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1950,6 +1962,15 @@
           <Val><![CDATA[Replaced <EnvironmentVariables> property with <Environment>. This project will no longer work with NTVS 1.0 beta 2 or below.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[<EnvironmentVariables> özelliği <Environment> ile değiştirildi. Bu proje artık NTVS 1.0 beta 2 veya daha düşük sürümler ile çalışmayacak.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";WarningDialogCaption" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Microsoft Visual Studio]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Microsoft Visual Studio]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

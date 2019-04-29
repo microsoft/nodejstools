@@ -813,6 +813,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} started..
+        /// </summary>
+        internal static string NpmCommandStarted {
+            get {
+                return ResourceManager.GetString("NpmCommandStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
         /// </summary>
         internal static string NpmCompletedWithErrors {
@@ -1519,7 +1528,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to St&amp;art web browser on launch.
+        ///   Looks up a localized string similar to Sta&amp;rt web browser on launch.
         /// </summary>
         internal static string PropertiesStartBrowser {
             get {
@@ -1895,6 +1904,15 @@ namespace Microsoft.NodejsTools {
         internal static string UpgradedEnvironmentVariables {
             get {
                 return ResourceManager.GetString("UpgradedEnvironmentVariables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft Visual Studio.
+        /// </summary>
+        internal static string WarningDialogCaption {
+            get {
+                return ResourceManager.GetString("WarningDialogCaption", resourceCulture);
             }
         }
         

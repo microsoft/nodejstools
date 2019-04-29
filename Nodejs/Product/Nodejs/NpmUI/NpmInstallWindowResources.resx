@@ -192,4 +192,11 @@
   <data name="LatestVersion" xml:space="preserve">
     <value>(latest)</value>
   </data>
+  <data name="OneResultFoundMessage" xml:space="preserve">
+    <value>One result found</value>
+  </data>
+  <data name="ResultsFoundMessage" xml:space="preserve">
+    <value>{0} results found</value>
+    <comment>Parameter is a number representing the amount of results.</comment>
+  </data>
 </root>

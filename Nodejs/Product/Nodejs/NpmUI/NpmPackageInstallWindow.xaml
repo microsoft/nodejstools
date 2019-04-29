@@ -4,11 +4,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
-    xmlns:ui="clr-namespace:Microsoft.VisualStudioTools"
     xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
     xmlns:wpf="clr-namespace:Microsoft.VisualStudioTools.Wpf"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
+    xmlns:ntvs="clr-namespace:Microsoft.NodejsTools.SharedProject.Wpf"
     Title="{x:Static resx:NpmInstallWindowResources.WindowTitle}"
     Height="500"
     MinHeight="500"
@@ -33,11 +32,11 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+
             <x:Array Type="ComboBoxItem" x:Key="LatestVersionComboItem">
                 <ComboBoxItem Content="{x:Static resx:NpmInstallWindowResources.LatestVersion }" />
             </x:Array>
-            
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Microsoft.NodejsTools;component/SharedProject/Wpf/Controls.xaml" />
                 <ResourceDictionary>
@@ -71,16 +70,17 @@
                                 Visibility="{Binding HomepagesVisibility}"
                                 Orientation="Horizontal">
                                 <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.HomepageLabel}" />
-                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}">
+                                <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}" IsTabStop="False">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource NavigationButton}"
+                                            <vsui:HyperlinkButton
+                                                    Style="{StaticResource HyperlinkButton}"
                                                     Content="{Binding Mode=OneWay}"
                                                     Command="{x:Static npmUi:NpmPackageInstallViewModel.OpenHomepageCommand}"
                                                     CommandParameter="{Binding}"
                                                     KeyboardNavigation.TabIndex="8"
                                                     Margin="0"
-                                                    Padding="0"/>
+                                                    Padding="0" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -160,7 +160,7 @@
                                            FontWeight="Bold"
                                            Foreground="Red"
                                            Text="{x:Static resx:NpmInstallWindowResources.MissingLocallyMessage}" />
-                                
+
                                 <TextBlock Grid.Column="1"
                                            x:Name="LocalInstallOutOfDateMessage"
                                            Visibility="Collapsed"
@@ -261,7 +261,8 @@
                 <ColumnDefinition Width="7*" MinWidth="100"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Grid.Column="0">
-                <TextBox x:Name="FilterTextBox"
+                <ntvs:NotificationTextBox x:Name="FilterTextBox"
+                         Style="{StaticResource TextBoxStyle}"
                          IsVisibleChanged="FilterTextBox_IsVisibleChanged"
                          Height="24"
                          Text="{Binding FilterText,UpdateSourceTrigger=PropertyChanged}"
@@ -432,7 +433,7 @@
                                 IsDefault="True"
                                 Content="{x:Static resx:NpmInstallWindowResources.InstallPackageButtonLabel}" />
 
-                        <Button Style="{StaticResource NavigationButton}" VerticalAlignment="Center" Margin="5 0 0 0" 
+                        <Button VerticalAlignment="Center" Margin="5 0 0 0" 
                                 Click="ResetOptionsButton_Click" KeyboardNavigation.TabIndex="14"
                                 Content="{x:Static resx:NpmInstallWindowResources.ResetOptionsButtonLabel}" />
                     </StackPanel>
