@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.NodejsTools.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -19,7 +20,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     internal sealed partial class TestExecutorWorker
     {
-        private class TestCaseResult
+        private sealed class TestCaseResult
         {
             public TestCase TestCase;
             public TestResult TestResult;
@@ -39,10 +40,16 @@ namespace Microsoft.NodejsTools.TestAdapter
         private ProcessOutput nodeProcess;
         private ResultObject currentResultObject;
 
+        private readonly FrameworkDiscoverer frameworkDiscoverer;
+
         public TestExecutorWorker(IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             this.frameworkHandle = frameworkHandle;
             this.runContext = runContext;
+
+            var settings = new UnitTestSettings(runContext.RunSettings, runContext.IsBeingDebugged);
+
+            this.frameworkDiscoverer = new FrameworkDiscoverer(settings.TestFrameworksLocation);
         }
 
         public void Cancel()
@@ -57,15 +64,15 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// This is the equivalent of "RunAll" functionality
         /// </summary>
         /// <param name="sources">Refers to the list of test sources passed to the test adapter from the client.  (Client could be VS or command line)</param>
-        /// <param name="runContext">Defines the settings related to the current run</param>
-        /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
         public void RunTests(IEnumerable<string> sources, ITestDiscoverer discoverer)
         {
             ValidateArg.NotNull(sources, nameof(sources));
             ValidateArg.NotNull(discoverer, nameof(discoverer));
 
+            this.cancelRequested.Reset();
+
             var receiver = new TestReceiver();
-            discoverer.DiscoverTests(sources, /*discoveryContext*/null, this.frameworkHandle, receiver);
+            discoverer.DiscoverTests(sources, this.runContext, this.frameworkHandle, receiver);
 
             if (this.cancelRequested.WaitOne(0))
             {
@@ -79,11 +86,10 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// This is the equivalent of "Run Selected Tests" functionality.
         /// </summary>
         /// <param name="tests">The list of TestCases selected to run</param>
-        /// <param name="runContext">Defines the settings related to the current run</param>
-        /// <param name="frameworkHandle">Handle to framework.  Used for recording results</param>
         public void RunTests(IEnumerable<TestCase> tests)
         {
             ValidateArg.NotNull(tests, nameof(tests));
+            this.cancelRequested.Reset();
 
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCaseResult>>();
@@ -99,12 +105,12 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             // where key is the file and value is a list of tests
-            foreach (var testcaseList in fileToTests.Values)
+            foreach (var testCaseList in fileToTests.Values)
             {
-                this.currentTests = testcaseList;
+                this.currentTests = testCaseList;
 
                 // Run all test cases in a given file
-                this.RunTestCases(testcaseList);
+                this.RunTestCases(testCaseList);
             }
         }
 
@@ -125,7 +131,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First().TestCase;
-            var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: "ExportRunner");
+            var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
             var projectRootDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
@@ -142,14 +148,13 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 if (this.cancelRequested.WaitOne(0))
                 {
-                    this.frameworkHandle.SendMessage(TestMessageLevel.Warning, "Test run was cancelled.");
                     break;
                 }
 
-                var args = GetInterpreterArgs(test.TestCase, workingDir, projectRootDir);
+                var args = this.GetInterpreterArgs(test.TestCase, workingDir, projectRootDir);
 
                 // Fetch the run_tests argument for starting node.exe if not specified yet
-                if (nodeArgs.Count == 0)
+                if (!nodeArgs.Any())
                 {
                     nodeArgs.Add(args.RunTestsScriptFile);
                 }
@@ -168,32 +173,30 @@ namespace Microsoft.NodejsTools.TestAdapter
             // make sure the tests completed is not signalled.
             this.testsCompleted.Reset();
 
-            using (this.nodeProcess = ProcessOutput.Run(
-                   nodeExePath,
-                   nodeArgs,
-                   workingDir,
-                   env: null,
-                   visible: false,
-                   redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                   quoteArgs: false))
+            this.nodeProcess = ProcessOutput.Run(
+                nodeExePath,
+                nodeArgs,
+                workingDir,
+                env: null,
+                visible: false,
+                redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
+                quoteArgs: false);
+
+            if (this.runContext.IsBeingDebugged && startedFromVs)
             {
+                this.AttachDebugger(vsProcessId, port, nodeVersion);
+            }
 
-                if (this.runContext.IsBeingDebugged && startedFromVs)
-                {
-                    this.AttachDebugger(vsProcessId, port, nodeVersion);
-                }
+            var serializedObjects = JsonConvert.SerializeObject(testObjects);
 
-                var serializedObjects = JsonConvert.SerializeObject(testObjects);
+            // Send the process the list of tests to run and wait for it to complete
+            this.nodeProcess.WriteInputLine(serializedObjects);
 
-                // Send the process the list of tests to run and wait for it to complete
-                this.nodeProcess.WriteInputLine(serializedObjects);
-
-                // for node 8 the process doesn't automatically exit when debugging, so always detach
-                WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted, this.cancelRequested });
-                if (this.runContext.IsBeingDebugged && startedFromVs)
-                {
-                    this.DetachDebugger(vsProcessId);
-                }
+            // for node 8 the process doesn't automatically exit when debugging, so always detach
+            WaitHandle.WaitAny(new[] { this.nodeProcess.WaitHandle, this.testsCompleted });
+            if (this.runContext.IsBeingDebugged && startedFromVs)
+            {
+                this.DetachDebugger(vsProcessId);
             }
 
             // Automatically fail tests that haven't been run by this point (failures in before() hooks)
@@ -291,11 +294,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DetachDebugger(int vsProcessId)
         {
+#if !NETSTANDARD2_0
             VisualStudioApp.DetachDebugger(vsProcessId);
+#endif
         }
 
         private void AttachDebugger(int vsProcessId, int port, Version nodeVersion)
         {
+#if !NETSTANDARD2_0
             try
             {
                 if (nodeVersion >= Node8Version)
@@ -331,7 +337,9 @@ namespace Microsoft.NodejsTools.TestAdapter
                 this.KillNodeProcess();
             }
 #endif
+#endif
         }
+
 
         private static int GetFreePort()
         {
@@ -341,11 +349,11 @@ namespace Microsoft.NodejsTools.TestAdapter
             ).First();
         }
 
-        private static TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
+        private TestFramework.ArgumentsToRunTests GetInterpreterArgs(TestCase test, string workingDir, string projectRootDir)
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return FrameworkDiscoverer.Instance.Get(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
+            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)
@@ -358,22 +366,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         private void KillNodeProcess()
         {
             this.nodeProcess?.Kill();
-        }
-
-        internal sealed class TestExecutionRedirector : Redirector
-        {
-            private readonly Action<string> writer;
-
-            public TestExecutionRedirector(Action<string> onWriteLine)
-            {
-                this.writer = onWriteLine;
-            }
-
-            public override void WriteErrorLine(string line) => this.writer(line);
-
-            public override void WriteLine(string line) => this.writer(line);
-
-            public override bool CloseStandardInput() => false;
         }
     }
 }
