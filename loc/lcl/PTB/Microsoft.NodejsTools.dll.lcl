@@ -391,6 +391,9 @@
       <Item ItemId=";OneResultFoundMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[One result found]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Um resultado encontrado]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
