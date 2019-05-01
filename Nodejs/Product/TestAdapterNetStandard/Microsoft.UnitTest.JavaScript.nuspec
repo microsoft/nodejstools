@@ -18,7 +18,7 @@
     <tags>TypeScript;JavaScript;UnitTest</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="9.0.1" />
-      <dependency id="Microsoft.TestPlatform.ObjectModel" version="15.7.2" />
+      <dependency id="Microsoft.TestPlatform.ObjectModel" version="16.0.1" />
     </dependencies>
   </metadata>
   <files>
