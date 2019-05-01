@@ -14,8 +14,11 @@
   </PropertyGroup>
   <Import Project="..\ProjectBefore.settings" />
   <PropertyGroup>
+    <VersionPrefix>$(VSIXBuildVersion)</VersionPrefix>
+    <Version>$(VersionPrefix)</Version>
+    <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
     <PackageOutputPath>$(BuildOutputRoot)Setup\$(MSBuildProjectName)\</PackageOutputPath>
-    <PackageVersion>$(VSIXBuildVersion)</PackageVersion>
+    <PackageVersion>$(Version)</PackageVersion>
     <PackageId>Microsoft.UnitTest.JavaScript</PackageId>
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
@@ -97,7 +100,7 @@
 
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);version=$(VSIXBuildVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);version=$(Version)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);outDir=$(OutDir)</NuspecProperties>
     </PropertyGroup>
   </Target>
