@@ -44,7 +44,7 @@
         <Str Cat="Text">
           <Val><![CDATA[If it is not in this list, you can right-click any file in your project and choose "Set as startup file"]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[この一覧にない場合は、プロジェクト内の任意のファイルを右クリックして、[スタートアップ ファイルとして設定]5D; を選択します]]></Val>
+            <Val><![CDATA[目的のファイルが一覧に含まれていない場合は、プロジェクト内の任意のファイルを右クリックして、[スタートアップ ファイルとして設定]5D; を選択します]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -641,7 +641,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Status]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[状態]]></Val>
+            <Val><![CDATA[ステータス]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -902,7 +902,7 @@
         <Str Cat="Text">
           <Val><![CDATA[missing]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[不足]]></Val>
+            <Val><![CDATA[見つかりません]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1553,7 +1553,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Missing]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[不足]]></Val>
+            <Val><![CDATA[見つかりません]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2984,7 +2984,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ディレクトリが既に存在します]]></Val>
+            <Val><![CDATA[ディレクトリは既に存在します]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3137,7 +3137,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A file named '{0}' is already part of the project. Do you want to overwrite it?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' という名前のファイルは既にプロジェクトの一部として含まれています。上書きしますか?]]></Val>
+            <Val><![CDATA['{0}' という名前のファイルは既にプロジェクトの一部です。上書きしますか?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3227,7 +3227,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The folder '{0}' does not exist on disk and could not be created.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[フォルダー '{0}' はディスク上に存在せず、作成することもできませんでした。]]></Val>
+            <Val><![CDATA[フォルダー '{0}' はディスク上に存在しないため、作成できませんでした。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3731,7 +3731,7 @@
         <Str Cat="Text">
           <Val><![CDATA[If the file should be included in the files which are published.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ファイルを発行対象のファイルに含めるかどうか。]]></Val>
+            <Val><![CDATA[ファイルを発行対象のファイルに含める場合。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3956,7 +3956,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An unexpected error occurred while attempting to upgrade a project: {0}]D;]A;Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクトのアップグレードを試行中に予期しないエラーが発生しました: {0}]D;]A;/Log オプションを指定して Visual Studio を実行し、ActivityLog.xml で詳細をご確認ください。]]></Val>
+            <Val><![CDATA[プロジェクトのアップグレード中に予期しないエラーが発生しました: {0}]D;]A;/Log オプションを指定して Visual Studio を実行し、ActivityLog.xml で詳細をご確認ください。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3983,7 +3983,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The project could not be upgraded because it could not be checked out from source control.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクトをソース管理からチェックアウトできなかったため、アップグレードできませんでした。]]></Val>
+            <Val><![CDATA[プロジェクトはソース管理からチェック アウトできないため、アップグレードできませんでした。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4495,7 +4495,7 @@
           <Str Cat="Button" IgnoreHK="true">
             <Val><![CDATA[Copy F&ull Path]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[完全なパスのコピー(&U)]]></Val>
+              <Val><![CDATA[完全パスのコピー(&U)]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -5543,7 +5543,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Worker Role]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[worker ロール]]></Val>
+            <Val><![CDATA[ワーカー ロール]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

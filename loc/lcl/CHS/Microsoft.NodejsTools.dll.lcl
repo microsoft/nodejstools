@@ -170,7 +170,7 @@
         <Str Cat="Text">
           <Val><![CDATA[We won't move any files from where they are now.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[我们不会将任何文件从其现在所在的位置移走。]]></Val>
+            <Val><![CDATA[我们不会将任何文件从其现在所在的位置移动。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3866,7 +3866,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Arguments passed to the script on launch]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[启动时传递给脚本的参数]]></Val>
+            <Val><![CDATA[启动时传递到脚本的参数]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3956,7 +3956,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An unexpected error occurred while attempting to upgrade a project: {0}]D;]A;Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[尝试升级项目时出现意外错误: {0}]D;]A;使用 /Log 选项运行 Visual Studio 并查看 ActivityLog.xml，了解详细信息。]]></Val>
+            <Val><![CDATA[尝试升级项目时出现意外错误: {0}]D;]A;使用 /Log 选项运行 Visual Studio 并查看 ActivityLog.xml 了解详细信息。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3992,7 +3992,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The project could not be loaded.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[无法加载项目。]]></Val>
+            <Val><![CDATA[无法加载该项目。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

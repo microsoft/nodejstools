@@ -293,7 +293,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Description: ]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[描述: ]]></Val>
+            <Val><![CDATA[說明: ]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -311,7 +311,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Optional]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[選擇性]]></Val>
+            <Val><![CDATA[選用]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[無法移動資料夾 '{0}'。目的目錄中已經有使用該名稱的資料夾。]]></Val>
+            <Val><![CDATA[無法移動資料夾 '{0}'。使用該名稱的資料夾已經存在於目的目錄中。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3722,7 +3722,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Publish]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[發佈]]></Val>
+            <Val><![CDATA[發行]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3830,7 +3830,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Save?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[儲存嗎?]]></Val>
+            <Val><![CDATA[儲存?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4760,7 +4760,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty text file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[空白的文字檔]]></Val>
+            <Val><![CDATA[空白文字檔]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4868,7 +4868,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty JSON file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[空白的 JSON 檔案]]></Val>
+            <Val><![CDATA[空的 JSON 檔案]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5733,7 +5733,7 @@
       <Str Cat="Text">
         <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[(C) Microsoft Corporation. 著作權所有，並保留一切權利。]]></Val>
+          <Val><![CDATA[© Microsoft Corporation. 著作權所有，並保留一切權利。]]></Val>
         </Tgt>
       </Str>
       <Disp Icon="Str" />

@@ -653,7 +653,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unknown]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Нет данных]]></Val>
+            <Val><![CDATA[Неизвестно]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1358,7 +1358,7 @@
         <Str Cat="Text">
           <Val><![CDATA[{0} days ago]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} дн. назад]]></Val>
+            <Val><![CDATA[{0} дн. назад]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1412,7 +1412,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Local]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Локально]]></Val>
+            <Val><![CDATA[Локальные]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1439,7 +1439,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Local]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Локальный]]></Val>
+            <Val><![CDATA[Локальные]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2111,7 +2111,7 @@
         <Str Cat="Text">
           <Val><![CDATA[&Cancel]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[&Отмена]]></Val>
+            <Val><![CDATA[От&мена]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2168,7 +2168,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Невозможно переместить папку {0}. Папка с таким именем уже существует в каталоге назначения.]]></Val>
+            <Val><![CDATA[Невозможно переместить папку {0}. Папка с таким именем уже существует в указанном каталоге.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2177,7 +2177,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is the same as the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Невозможно переместить {0}. Папка назначения совпадает с исходной папкой.]]></Val>
+            <Val><![CDATA[Невозможно переместить {0}. Конечная папка совпадает с исходной папкой.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2186,7 +2186,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is a subfolder of the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Невозможно переместить {0}. Папка назначения является вложенной папкой исходной папки.]]></Val>
+            <Val><![CDATA[Невозможно переместить {0}. Папка назначения является дочерней по отношению к текущей.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2366,7 +2366,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Каталог уже существует]]></Val>
+            <Val><![CDATA[Каталог с таким именем уже существует]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2672,7 +2672,7 @@
         <Str Cat="Text">
           <Val><![CDATA[General]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Общие]]></Val>
+            <Val><![CDATA[Общее]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3266,7 +3266,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Settings]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Параметры]]></Val>
+            <Val><![CDATA[Настройки]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3356,7 +3356,7 @@
         <Str Cat="Text">
           <Val><![CDATA[(Unknown)]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[(Нет данных)]]></Val>
+            <Val><![CDATA[(неизвестно)]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3558,7 +3558,7 @@
       <Str Cat="Text">
         <Val><![CDATA[Microsoft Corporation]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Microsoft Corporation]]></Val>
+          <Val><![CDATA[Корпорация Майкрософт]]></Val>
         </Tgt>
       </Str>
       <Disp Icon="Str" />

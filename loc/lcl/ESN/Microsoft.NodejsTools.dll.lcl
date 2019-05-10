@@ -1145,7 +1145,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unknown]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Se desconoce]]></Val>
+            <Val><![CDATA[Desconocido]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1418,7 +1418,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Path]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ruta de acceso]]></Val>
+            <Val><![CDATA[Ruta]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1661,7 +1661,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Path]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ruta de acceso]]></Val>
+            <Val><![CDATA[Ruta]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1805,7 +1805,7 @@
         <Str Cat="Text">
           <Val><![CDATA[{0} successfully completed]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} se completó correctamente.]]></Val>
+            <Val><![CDATA[{0} se completó correctamente]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1949,7 +1949,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Browse for working directory]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Buscar el directorio de trabajo]]></Val>
+            <Val><![CDATA[Buscar directorio de trabajo]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se puede mover la carpeta "{0}". Ya existe una carpeta con ese nombre en el directorio de destino.]]></Val>
+            <Val><![CDATA[No se puede mover la carpeta '{0}'. Ya existe una carpeta con ese nombre en el directorio de destino.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2795,7 +2795,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is the same as the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se puede mover "{0}". La carpeta de destino es la misma que la carpeta de origen.]]></Val>
+            <Val><![CDATA[No se puede mover '{0}'. La carpeta de destino es la misma que la carpeta de origen.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2804,7 +2804,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is a subfolder of the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[No se puede mover "{0}". La carpeta de destino es una subcarpeta de la carpeta de origen.]]></Val>
+            <Val><![CDATA[No se puede mover '{0}'. La carpeta de destino es una subcarpeta de la carpeta de origen.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2984,7 +2984,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[El directorio ya existe]]></Val>
+            <Val><![CDATA[El directorio ya existe.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3884,7 +3884,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Settings]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Configuración]]></Val>
+            <Val><![CDATA[Opciones]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4288,7 +4288,7 @@
           <Str Cat="Menu Item">
             <Val><![CDATA[Npm]]></Val>
             <Tgt Cat="Menu Item" Stat="Loc" Orig="New">
-              <Val><![CDATA[npm]]></Val>
+              <Val><![CDATA[Npm]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -4760,7 +4760,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty text file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Un archivo de texto vacío]]></Val>
+            <Val><![CDATA[Archivo de texto vacío]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4805,7 +4805,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Archivo de TypeScript]]></Val>
+            <Val><![CDATA[Archivo TypeScript]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5057,7 +5057,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Advanced]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Avanzadas]]></Val>
+            <Val><![CDATA[Avanzado]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5201,7 +5201,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Azure Cloud Service]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Servicio en la nube de Azure]]></Val>
+            <Val><![CDATA[Servicio de nube de Azure]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>

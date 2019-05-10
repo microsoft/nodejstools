@@ -311,7 +311,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Optional]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Volitelné]]></Val>
+            <Val><![CDATA[Nepovinné]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -320,7 +320,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Standard]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Standardní]]></Val>
+            <Val><![CDATA[Standard]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -542,7 +542,7 @@
         <Str Cat="Dialog Title">
           <Val><![CDATA[Specify Name for Item]]></Val>
           <Tgt Cat="Dialog Title" Stat="Loc" Orig="New">
-            <Val><![CDATA[Zadejte název položky.]]></Val>
+            <Val><![CDATA[Zadejte název položky]]></Val>
           </Tgt>
         </Str>
         <Bin BinId="1">
@@ -1145,7 +1145,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unknown]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Neznámý]]></Val>
+            <Val><![CDATA[Neznámé]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1949,7 +1949,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Browse for working directory]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Vyhledat pracovní adresář]]></Val>
+            <Val><![CDATA[Vybrat pracovní adresář]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2264,7 +2264,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Žádný]]></Val>
+            <Val><![CDATA[Žádné]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Složku {0} nelze přesunout. Složka s tímto názvem už v cílovém adresáři existuje.]]></Val>
+            <Val><![CDATA[Složku {0} nelze přesunout. Složka s tímto názvem již v cílovém adresáři existuje.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3335,7 +3335,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Launch URL]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Adresa URL pro spuštění]]></Val>
+            <Val><![CDATA[Spustit adresu URL]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3956,7 +3956,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An unexpected error occurred while attempting to upgrade a project: {0}]D;]A;Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Při pokusu o upgrade projektu došlo k neočekávané chybě: {0}]D;]A;Spusťte Visual Studio s parametrem /Log a v souboru ActivityLog.xml se podívejte na podrobnosti.]]></Val>
+            <Val><![CDATA[Při pokusu o upgrade projektu došlo k neočekávané chybě: {0}]D;]A;Spusťte Visual Studio s možností /Log a v souboru ActivityLog.xml se podívejte na podrobnosti.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3974,7 +3974,7 @@
         <Str Cat="Text">
           <Val><![CDATA[(Unknown)]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[(neznámé)]]></Val>
+            <Val><![CDATA[(Neznámý)]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4495,7 +4495,7 @@
           <Str Cat="Button" IgnoreHK="true">
             <Val><![CDATA[Copy F&ull Path]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[&Zkopírovat úplnou cestu]]></Val>
+              <Val><![CDATA[&Kopírovat úplnou cestu]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -4805,7 +4805,7 @@
         <Str Cat="Text">
           <Val><![CDATA[TypeScript file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Soubor TypeScript]]></Val>
+            <Val><![CDATA[Soubor TypeScriptu]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

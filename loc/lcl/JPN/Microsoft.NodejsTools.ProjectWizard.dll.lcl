@@ -35,7 +35,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Your project can still be created, but some manual configuration of your project will be required and features may be missing or limited.]D;]A;]D;]A;We recommend installing the latest version of Microsoft Azure Tools for Visual Studio.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[このままでもプロジェクトを作成できますが、プロジェクトの手動構成が必要な場合があり、機能が失われたり制限されたりする可能性があります。]D;]A;]D;]A;最新バージョンの Microsoft Azure Tools for Visual Studio をインストールすることをお勧めします。]]></Val>
+            <Val><![CDATA[引き続きプロジェクトを作成できますが、プロジェクトの手動構成が必要な場合があり、機能が失われたり制限されたりする可能性があります。]D;]A;]D;]A;最新バージョンの Microsoft Azure Tools for Visual Studio をインストールすることをお勧めします。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -53,7 +53,7 @@
         <Str Cat="Text">
           <Val><![CDATA[&Continue]D;]A;Some manual steps will be required to configure your project.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[続行(&C)]D;]A;プロジェクトを構成するには、手動操作の手順が必要になる場合があります。]]></Val>
+            <Val><![CDATA[続行(&C)]D;]A;プロジェクトを構成するには、手動操作が必要になる場合があります。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -149,7 +149,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Status]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[状態]]></Val>
+            <Val><![CDATA[ステータス]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -410,7 +410,7 @@
         <Str Cat="Text">
           <Val><![CDATA[missing]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[不足]]></Val>
+            <Val><![CDATA[見つかりません]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -746,7 +746,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ノード]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1061,7 +1061,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Missing]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[不足]]></Val>
+            <Val><![CDATA[見つかりません]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2366,7 +2366,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ディレクトリが既に存在します]]></Val>
+            <Val><![CDATA[ディレクトリは既に存在します]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2519,7 +2519,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A file named '{0}' is already part of the project. Do you want to overwrite it?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' という名前のファイルは既にプロジェクトの一部として含まれています。上書きしますか?]]></Val>
+            <Val><![CDATA['{0}' という名前のファイルは既にプロジェクトの一部です。上書きしますか?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2609,7 +2609,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The folder '{0}' does not exist on disk and could not be created.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[フォルダー '{0}' はディスク上に存在せず、作成することもできませんでした。]]></Val>
+            <Val><![CDATA[フォルダー '{0}' はディスク上に存在しないため、作成できませんでした。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3113,7 +3113,7 @@
         <Str Cat="Text">
           <Val><![CDATA[If the file should be included in the files which are published.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ファイルを発行対象のファイルに含めるかどうか。]]></Val>
+            <Val><![CDATA[ファイルを発行対象のファイルに含める場合。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3338,7 +3338,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An unexpected error occurred while attempting to upgrade a project: {0}]D;]A;Run Visual Studio with the /Log option and check ActivityLog.xml for more detail.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクトのアップグレードを試行中に予期しないエラーが発生しました: {0}]D;]A;/Log オプションを指定して Visual Studio を実行し、ActivityLog.xml で詳細をご確認ください。]]></Val>
+            <Val><![CDATA[プロジェクトのアップグレード中に予期しないエラーが発生しました: {0}]D;]A;/Log オプションを指定して Visual Studio を実行し、ActivityLog.xml で詳細をご確認ください。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3365,7 +3365,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The project could not be upgraded because it could not be checked out from source control.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[プロジェクトをソース管理からチェックアウトできなかったため、アップグレードできませんでした。]]></Val>
+            <Val><![CDATA[プロジェクトはソース管理からチェック アウトできないため、アップグレードできませんでした。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

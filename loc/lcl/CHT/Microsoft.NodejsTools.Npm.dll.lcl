@@ -251,9 +251,6 @@
     <Item ItemId=";FileDescription" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
-        <Tgt Cat="Text" Stat="Update" Orig="New">
-          <Val><![CDATA[適用於 Visual Studio 的 Node.js 工具 - Npm]]></Val>
-        </Tgt>
         <Prev Cat="Text">
           <Val><![CDATA[Node.js Tools for Visual Studio - Npm]]></Val>
         </Prev>
@@ -270,7 +267,7 @@
       <Str Cat="Text">
         <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[(C) Microsoft Corporation. 著作權所有，並保留一切權利。]]></Val>
+          <Val><![CDATA[© Microsoft Corporation. 著作權所有，並保留一切權利。]]></Val>
         </Tgt>
       </Str>
       <Disp Icon="Str" />

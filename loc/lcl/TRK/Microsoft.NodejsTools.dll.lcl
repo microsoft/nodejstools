@@ -35,7 +35,7 @@
         <Str Cat="Text">
           <Val><![CDATA[_Cancel]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[İ_ptal]]></Val>
+            <Val><![CDATA[_İptal]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -128,7 +128,7 @@
         <Str Cat="Text">
           <Val><![CDATA[_Next]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[İle_ri]]></Val>
+            <Val><![CDATA[_İleri]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -293,7 +293,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Description: ]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Açıklama: ]]></Val>
+            <Val><![CDATA[Açıklama]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -542,7 +542,7 @@
         <Str Cat="Dialog Title">
           <Val><![CDATA[Specify Name for Item]]></Val>
           <Tgt Cat="Dialog Title" Stat="Loc" Orig="New">
-            <Val><![CDATA[Öğe için Ad Belirtin]]></Val>
+            <Val><![CDATA[Öğe Adı Belirt]]></Val>
           </Tgt>
         </Str>
         <Bin BinId="1">
@@ -566,7 +566,7 @@
         <Str Cat="Static Text">
           <Val><![CDATA[Item name:]]></Val>
           <Tgt Cat="Static Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Öğe adı:]]></Val>
+            <Val><![CDATA[öğe adı:]]></Val>
           </Tgt>
         </Str>
         <Bin BinId="1">
@@ -1949,7 +1949,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Browse for working directory]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Çalışma dizini için gözat]]></Val>
+            <Val><![CDATA[Çalışma dizinine gözat]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2264,7 +2264,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Hiçbiri]]></Val>
+            <Val><![CDATA[Yok]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2729,7 +2729,7 @@
         <Str Cat="Text">
           <Val><![CDATA[&Cancel]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[İ&ptal]]></Val>
+            <Val><![CDATA[&İptal]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2804,7 +2804,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is a subfolder of the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' taşınamıyor. Hedef klasör, kaynak klasörün alt klasörü.]]></Val>
+            <Val><![CDATA['{0}' taşınamıyor. Hedef klasör kaynak klasörün alt klasörü.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2984,7 +2984,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Dizin zaten var]]></Val>
+            <Val><![CDATA[Dizin zaten var.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3335,7 +3335,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Launch URL]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Başlatma URL'si]]></Val>
+            <Val><![CDATA[URL'yi Başlat]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3830,7 +3830,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Save?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Kaydedilsin mi?]]></Val>
+            <Val><![CDATA[Kaydet?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4760,7 +4760,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty text file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Boş bir metin dosyası]]></Val>
+            <Val><![CDATA[Boş metin dosyası]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4868,7 +4868,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An empty JSON file]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Boş bir JSON dosyası]]></Val>
+            <Val><![CDATA[Boş JSON dosyası]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5012,7 +5012,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Braces]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Küme Ayraçları]]></Val>
+            <Val><![CDATA[Küme ayraçları]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
