@@ -35,7 +35,7 @@
         <Str Cat="Text">
           <Val><![CDATA[_Cancel]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[A_nnulla]]></Val>
+            <Val><![CDATA[_Annulla]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2264,7 +2264,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nessuno]]></Val>
+            <Val><![CDATA[Nessuna]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2684,7 +2684,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Build]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Compila]]></Val>
+            <Val><![CDATA[Compilazione]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Non è possibile spostare la cartella '{0}'. Nella directory di destinazione esiste già una cartella con lo stesso nome.]]></Val>
+            <Val><![CDATA[Impossibile spostare la cartella '{0}'. Una cartella con lo stesso nome esiste già nella directory di destinazione.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2795,7 +2795,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is the same as the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Non è possibile spostare '{0}'. La cartella di destinazione è uguale alla cartella di origine.]]></Val>
+            <Val><![CDATA[Impossibile spostare '{0}'. La cartella di destinazione corrisponde alla cartella di origine.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2804,7 +2804,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is a subfolder of the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Non è possibile spostare '{0}'. La cartella di destinazione è una sottocartella della cartella di origine.]]></Val>
+            <Val><![CDATA[Impossibile spostare '{0}'. La cartella di destinazione è una sottocartella della cartella di origine.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3209,7 +3209,7 @@
         <Str Cat="Text">
           <Val><![CDATA[The item '{0}' cannot be found on disk, either because it has been renamed, deleted, or moved to a new location.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[L'elemento '{0}' non è stato trovato nel disco perché è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
+            <Val><![CDATA[Impossibile trovare l'elemento '{0}' sul disco in quanto è stato rinominato, eliminato o spostato in un nuovo percorso.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

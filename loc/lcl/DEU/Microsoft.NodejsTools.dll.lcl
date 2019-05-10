@@ -374,7 +374,7 @@
         <Str Cat="Text">
           <Val><![CDATA[No results found.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Keine Ergebnisse gefunden.]]></Val>
+            <Val><![CDATA[Es wurden keine Ergebnisse gefunden.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2264,7 +2264,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ohne]]></Val>
+            <Val><![CDATA[Keine]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4715,7 +4715,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Npm]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[NPM]]></Val>
+            <Val><![CDATA[npm]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

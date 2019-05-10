@@ -746,7 +746,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Düğüm]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1457,7 +1457,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Browse for working directory]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Çalışma dizini için gözat]]></Val>
+            <Val><![CDATA[Çalışma dizinine gözat]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1772,7 +1772,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Hiçbiri]]></Val>
+            <Val><![CDATA[Yok]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2111,7 +2111,7 @@
         <Str Cat="Text">
           <Val><![CDATA[&Cancel]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[İ&ptal]]></Val>
+            <Val><![CDATA[&İptal]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2186,7 +2186,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move '{0}'. The destination folder is a subfolder of the source folder.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' taşınamıyor. Hedef klasör, kaynak klasörün alt klasörü.]]></Val>
+            <Val><![CDATA['{0}' taşınamıyor. Hedef klasör kaynak klasörün alt klasörü.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2366,7 +2366,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Directory already exists]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Dizin zaten var]]></Val>
+            <Val><![CDATA[Dizin zaten var.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2717,7 +2717,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Launch URL]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Başlatma URL'si]]></Val>
+            <Val><![CDATA[URL'yi Başlat]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3212,7 +3212,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Save?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Kaydedilsin mi?]]></Val>
+            <Val><![CDATA[Kaydet?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

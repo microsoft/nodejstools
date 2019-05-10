@@ -746,7 +746,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[노드]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -962,7 +962,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Author]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[작성자]]></Val>
+            <Val><![CDATA[만든 이]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2168,7 +2168,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA['{0}' 폴더를 이동할 수 없습니다. 같은 이름의 폴더가 이미 대상 디렉터리에 있습니다.]]></Val>
+            <Val><![CDATA['{0}' 폴더를 이동할 수 없습니다. 이름이 같은 폴더가 대상 디렉터리에 이미 있습니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

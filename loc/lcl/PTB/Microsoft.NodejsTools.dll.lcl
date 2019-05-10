@@ -128,7 +128,7 @@
         <Str Cat="Text">
           <Val><![CDATA[_Next]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[_Avançar]]></Val>
+            <Val><![CDATA[_Próximo]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -542,7 +542,7 @@
         <Str Cat="Dialog Title">
           <Val><![CDATA[Specify Name for Item]]></Val>
           <Tgt Cat="Dialog Title" Stat="Loc" Orig="New">
-            <Val><![CDATA[Especificar Nome do Item]]></Val>
+            <Val><![CDATA[Especifique o nome do Item]]></Val>
           </Tgt>
         </Str>
         <Bin BinId="1">
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Não é possível mover a pasta '{0}'. Já existe uma pasta com esse nome no diretório de destino.]]></Val>
+            <Val><![CDATA[Não é possível mover a pasta "{0}". Já existe uma pasta com esse nome no diretório de destino.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3335,7 +3335,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Launch URL]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[URL de Inicialização]]></Val>
+            <Val><![CDATA[Iniciar URL]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4118,7 +4118,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Microsoft .NET Framework v1.0]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft .NET Framework v1.0]]></Val>
+            <Val><![CDATA[Microsoft .Net Framework v1.0]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4127,7 +4127,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Microsoft .NET Framework v1.1]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft .NET Framework v1.1]]></Val>
+            <Val><![CDATA[Microsoft .Net Framework v1.1]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4136,7 +4136,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Microsoft .NET Framework v2.0]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Microsoft .NET Framework v2.0]]></Val>
+            <Val><![CDATA[Microsoft .Net Framework v2.0]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

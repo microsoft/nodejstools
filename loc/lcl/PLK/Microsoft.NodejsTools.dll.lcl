@@ -161,7 +161,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Save Project]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Zapisywanie projektu]]></Val>
+            <Val><![CDATA[Zachowaj projekt]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -302,7 +302,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Development]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Programistyczna]]></Val>
+            <Val><![CDATA[Programowanie]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -311,7 +311,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Optional]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Opcjonalna]]></Val>
+            <Val><![CDATA[Opcjonalnie]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -542,7 +542,7 @@
         <Str Cat="Dialog Title">
           <Val><![CDATA[Specify Name for Item]]></Val>
           <Tgt Cat="Dialog Title" Stat="Loc" Orig="New">
-            <Val><![CDATA[Określ nazwę elementu]]></Val>
+            <Val><![CDATA[Określ nazwę dla elementu]]></Val>
           </Tgt>
         </Str>
         <Bin BinId="1">
@@ -1553,7 +1553,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Missing]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Brakujący]]></Val>
+            <Val><![CDATA[Brak]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1607,7 +1607,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Link Status]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Stan linku]]></Val>
+            <Val><![CDATA[Stan konsolidacji]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2786,7 +2786,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nie można przenieść folderu „{0}”. Folder o tej samej nazwie istnieje już w katalogu docelowym.]]></Val>
+            <Val><![CDATA[Nie można przenieść folderu "{0}". Folder o tej samej nazwie istnieje już w katalogu docelowym.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3290,7 +3290,7 @@
         <Str Cat="Text">
           <Val><![CDATA[General]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ogólne]]></Val>
+            <Val><![CDATA[Ogólny]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4028,7 +4028,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Feed]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Kanał informacyjny]]></Val>
+            <Val><![CDATA[Źródło danych]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -4495,7 +4495,7 @@
           <Str Cat="Button" IgnoreHK="true">
             <Val><![CDATA[Copy F&ull Path]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[Kopiuj p&ełną ścieżkę]]></Val>
+              <Val><![CDATA[&Kopiuj pełną ścieżkę]]></Val>
             </Tgt>
           </Str>
           <Disp Icon="Str" Expand="true" />
@@ -5525,7 +5525,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Web Role]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Rola internetowa]]></Val>
+            <Val><![CDATA[Rola Sieć Web]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -5543,7 +5543,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Worker Role]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Rola procesu roboczego]]></Val>
+            <Val><![CDATA[Rola Proces roboczy]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

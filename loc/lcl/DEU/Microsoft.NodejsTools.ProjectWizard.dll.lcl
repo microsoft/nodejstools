@@ -746,7 +746,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Knoten]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1772,7 +1772,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ohne]]></Val>
+            <Val><![CDATA[Keine]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

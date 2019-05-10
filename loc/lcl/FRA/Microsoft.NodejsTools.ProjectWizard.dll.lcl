@@ -746,7 +746,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nœud]]></Val>
+            <Val><![CDATA[Node]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -926,7 +926,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Path]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Chemin]]></Val>
+            <Val><![CDATA[Chemin d'accès]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1169,7 +1169,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Path]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Chemin]]></Val>
+            <Val><![CDATA[Chemin d'accès]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1358,7 +1358,7 @@
         <Str Cat="Text">
           <Val><![CDATA[{0} days ago]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Il y a {0} jours]]></Val>
+            <Val><![CDATA[il y a {0} jours]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1772,7 +1772,7 @@
         <Str Cat="Text">
           <Val><![CDATA[None]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Aucune]]></Val>
+            <Val><![CDATA[Aucun]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1817,7 +1817,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Start Action]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Action de démarrage]]></Val>
+            <Val><![CDATA[Action de démarrage ]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2168,7 +2168,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Cannot move the folder '{0}'. A folder with that name already exists in the destination directory.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Impossible de déplacer le dossier '{0}'. Un dossier du même nom existe déjà dans le répertoire de destination.]]></Val>
+            <Val><![CDATA[Impossible de déplacer le dossier '{0}'. Un dossier de nom identique existe déjà dans le répertoire de destination.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3579,7 +3579,7 @@
       <Str Cat="Text">
         <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[© Microsoft Corporation. Tous droits réservés.]]></Val>
+          <Val><![CDATA[© Microsoft Corporation. Tous droits réservés.]]></Val>
         </Tgt>
       </Str>
       <Disp Icon="Str" />
