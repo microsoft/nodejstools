@@ -1028,7 +1028,7 @@
         <Str Cat="Text">
           <Val><![CDATA[<a href="http://go.microsoft.com/fwlink/?LinkID=518083">More Information</a>]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[<a href="http://go.microsoft.com/fwlink/?LinkID=518083">Подробнее</a>]]></Val>
+            <Val><![CDATA[<a href="http://go.microsoft.com/fwlink/?LinkID=518083">Дополнительные сведения</a>]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
