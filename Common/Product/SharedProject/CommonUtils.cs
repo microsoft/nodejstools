@@ -191,13 +191,33 @@ namespace Microsoft.VisualStudioTools
                 {
                     i--;
                 }
-                else if(segment != ".")
+                else if (segment != ".")
                 {
                     segments.AddFirst(segment);
                 }
             }
 
             return string.Join(Path.DirectorySeparatorChar.ToString(), segments);
+        }
+
+        /// <summary>
+        /// Returns a normalized file path created by joining relativePath to root.
+        /// The result is not guaranteed to end with a backslash.
+        /// </summary>
+        /// <returns>True, if the absolut path is returned successfully; otherwise false, 
+        /// if root is not an absolute path, or either path is invalid.</returns>
+        public static bool TryGetAbsoluteFilePath(string root, string relativePath, out string absoluteFilePath)
+        {
+            try
+            {
+                absoluteFilePath = GetAbsoluteFilePath(root, relativePath);
+                return true;
+            }
+            catch
+            {
+                absoluteFilePath = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -225,7 +245,7 @@ namespace Microsoft.VisualStudioTools
             var fileFullPath = Path.GetFullPath(toFile);
 
             // If the root paths doesn't match return the file full path.
-            if(!string.Equals(Path.GetPathRoot(dirFullPath), Path.GetPathRoot(fileFullPath), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(Path.GetPathRoot(dirFullPath), Path.GetPathRoot(fileFullPath), StringComparison.OrdinalIgnoreCase))
             {
                 return fileFullPath;
             }

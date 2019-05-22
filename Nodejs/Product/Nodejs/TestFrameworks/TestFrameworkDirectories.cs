@@ -38,11 +38,11 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         private static string GetTestframeworkFolderRoot()
         {
-            // This class is used in 2 different assemblies, installed in 2 locations:
+            // This class is used i3 2 different assemblies, installed in 3 locations:
             //
-            // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll"
-            // and
+            // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll",
             // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll"
+            // and <NuGetRoot>\microsoft.unittest.javascript\<version>\build\netstandard2.0\Microsoft.JavaScript.TestAdapter.dll
 
             string testAdapterAssemblyFolder;
 
@@ -71,9 +71,11 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 }
 #endif
             }
-            else if(currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase))
+            else if (currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException("'TestFrameworkRoot' should have been set in the targets file in the nuget package.");
+                // This case only happens when running tests on a .Net Core project from Visual Studio's Test Explorer. 
+                // For the dotnet cli, the setting should have already been set on Microsoft.UnitTest.Javascript.targets file.
+                testAdapterAssemblyFolder = Path.Combine(Path.GetDirectoryName(currentAssembly.Location), "..", "_common");
             }
             else
             {

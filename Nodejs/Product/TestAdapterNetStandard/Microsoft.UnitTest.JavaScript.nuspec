@@ -28,6 +28,8 @@
     <file src="$outdir$TestFrameworks\Jasmine\Jasmine.js" target="build\_common\TestFrameworks\Jasmine\" />
     <file src="$outdir$TestFrameworks\Mocha\Mocha.js" target="build\_common\TestFrameworks\Mocha\" />
     <file src="$outdir$TestFrameworks\Tape\Tape.js" target="build\_common\TestFrameworks\Tape\" />
+    <file src="$outdir$TestFrameworks\Jest\jest.js" target="build\_common\TestFrameworks\Jest\" />
+    <file src="$outdir$TestFrameworks\Jest\jestReporter.js" target="build\_common\TestFrameworks\Jest\" />
      <!--net standard library--> 
     <file src="$outdir$Microsoft.UnitTest.JavaScript.props" target="build\netstandard2.0\" />
     <file src="$outdir$Microsoft.UnitTest.JavaScript.targets" target="build\netstandard2.0\" />

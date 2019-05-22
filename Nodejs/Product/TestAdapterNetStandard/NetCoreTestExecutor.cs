@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            // If we have a source file specified in the runtContext we should use that, otherwise sources should've been set.
+            // If we have a source file specified in the runContext we should use that, otherwise sources should've been set.
             // This happens in the case of .NET Core where the source is the output dll for the project, 
             // so we set the projectfile for the current project in the props file we import.
 

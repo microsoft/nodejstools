@@ -72,6 +72,12 @@
     <Content Include="..\TestAdapter\TestFrameworks\Tape\tape.js" Link="TestFrameworks\Tape\tape.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Jest\jest.js" Link="TestFrameworks\Jest\jest.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Jest\jestReporter.js" Link="TestFrameworks\Jest\jestReporter.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
