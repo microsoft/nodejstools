@@ -38,7 +38,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 
         private static string GetTestframeworkFolderRoot()
         {
-            // This class is used i3 2 different assemblies, installed in 3 locations:
+            // This class is used in 3 different assemblies, installed in 3 locations:
             //
             // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll",
             // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll"
