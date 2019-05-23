@@ -197,14 +197,14 @@ namespace Microsoft.VisualStudioTools
                 }
             }
 
-            return string.Join(Path.DirectorySeparatorChar.ToString(), segments);
+            return Path.Combine(segments.ToArray());
         }
 
         /// <summary>
         /// Returns a normalized file path created by joining relativePath to root.
         /// The result is not guaranteed to end with a backslash.
         /// </summary>
-        /// <returns>True, if the absolut path is returned successfully; otherwise false, 
+        /// <returns>True, if the absolute path is returned successfully; otherwise false, 
         /// if root is not an absolute path, or either path is invalid.</returns>
         public static bool TryGetAbsoluteFilePath(string root, string relativePath, out string absoluteFilePath)
         {
