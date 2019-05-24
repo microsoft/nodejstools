@@ -86,9 +86,17 @@ namespace Microsoft.NodejsTools.TestAdapter
                                 testFrameworkName = testFramework;
                                 var testRootPath = Path.GetFullPath(Path.Combine(proj.DirectoryPath, testRoot));
 
-                                // .Net core projects include invalid paths, ignore them and continue checking the items.
-                                if (!CommonUtils.TryGetAbsoluteFilePath(projectHome, item.EvaluatedInclude, out fileAbsolutePath)
-                                    || !fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase))
+                                try
+                                {
+                                    fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
+                                }
+                                catch (ArgumentException)
+                                {
+                                    // .Net core projects include invalid paths, ignore them and continue checking the items.
+                                    continue;
+                                }
+
+                                if (!fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase))
                                 {
                                     continue;
                                 }
