@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.Workspace
 
                 var tsconfig = await TsConfigJsonFactory.CreateAsync(filePath);
 
-                if (string.IsNullOrEmpty(tsconfig.OutFile))
+                if (string.IsNullOrEmpty(tsconfig?.OutFile))
                 {
                     return new List<FileReferenceInfo>();
                 }
@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.Workspace
 
                 // Only use the tsconfig.json determine the debug target when there is an outfile specified,
                 // otherwise each .ts file can (in theory) be the entry point.
-                if (string.IsNullOrEmpty(tsconfig.OutFile))
+                if (string.IsNullOrEmpty(tsconfig?.OutFile))
                 {
                     return new List<FileDataValue> {
                         new FileDataValue(BuildConfigurationContext.ContextTypeGuid, filePath, null,
