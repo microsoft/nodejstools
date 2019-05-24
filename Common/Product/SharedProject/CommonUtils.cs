@@ -191,13 +191,13 @@ namespace Microsoft.VisualStudioTools
                 {
                     i--;
                 }
-                else if(segment != ".")
+                else if (segment != ".")
                 {
                     segments.AddFirst(segment);
                 }
             }
 
-            return string.Join(Path.DirectorySeparatorChar.ToString(), segments);
+            return Path.Combine(segments.ToArray());
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudioTools
             var fileFullPath = Path.GetFullPath(toFile);
 
             // If the root paths doesn't match return the file full path.
-            if(!string.Equals(Path.GetPathRoot(dirFullPath), Path.GetPathRoot(fileFullPath), StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(Path.GetPathRoot(dirFullPath), Path.GetPathRoot(fileFullPath), StringComparison.OrdinalIgnoreCase))
             {
                 return fileFullPath;
             }
