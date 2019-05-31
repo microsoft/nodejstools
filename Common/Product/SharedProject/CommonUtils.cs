@@ -197,7 +197,9 @@ namespace Microsoft.VisualStudioTools
                 }
             }
 
-            return Path.Combine(segments.ToArray());
+            // Cannot use Path.Combine because the result will not return an absolute path.
+            // This happens because the root has missing the trailing slash.
+            return string.Join(Path.DirectorySeparatorChar.ToString(), segments);
         }
 
         /// <summary>
