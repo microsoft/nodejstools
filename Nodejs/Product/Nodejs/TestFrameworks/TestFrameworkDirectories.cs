@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
             //
             // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\NodeJsTools\Microsoft.NodejsTools.dll",
             // "<VSROOT>\Common7\IDE\Extensions\Microsoft\NodeJsTools\TestAdapter\Microsoft.NodejsTools.TestAdapter.dll"
-            // and <NuGetRoot>\microsoft.unittest.javascript\<version>\build\netstandard2.0\Microsoft.JavaScript.TestAdapter.dll
+            // and <NuGetRoot>\microsoft.javascript.unittest\<version>\build\netstandard2.0\Microsoft.JavaScript.TestAdapter.dll
 
             string testAdapterAssemblyFolder;
 
@@ -74,7 +74,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
             else if (currentAssembly.FullName.StartsWith("Microsoft.JavaScript.TestAdapter", StringComparison.OrdinalIgnoreCase))
             {
                 // This case only happens when running tests on a .Net Core project from Visual Studio's Test Explorer. 
-                // For the dotnet cli, the setting should have already been set on Microsoft.UnitTest.Javascript.targets file.
+                // For the dotnet cli, the setting should have already been set on Microsoft.Javascript.UnitTest.targets file.
                 testAdapterAssemblyFolder = Path.Combine(Path.GetDirectoryName(currentAssembly.Location), "..", "_common");
             }
             else

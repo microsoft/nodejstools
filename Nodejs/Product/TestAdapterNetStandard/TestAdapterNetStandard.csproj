@@ -5,7 +5,7 @@
     <AssemblyName>Microsoft.JavaScript.TestAdapter</AssemblyName>
     <RootNamespace>Microsoft.NodejsTools.TestAdapter</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>Microsoft.UnitTest.JavaScript.nuspec</NuspecFile>
+    <NuspecFile>Microsoft.JavaScript.UnitTest.nuspec</NuspecFile>
     <!-- 
           Disable default assemblyinfo generation and replace with custom from 
           fileversion.targets imported below
@@ -19,7 +19,7 @@
     <Version Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</Version>
     <PackageOutputPath>$(BuildOutputRoot)Setup\$(MSBuildProjectName)\</PackageOutputPath>
     <PackageVersion>$(Version)</PackageVersion>
-    <PackageId>Microsoft.UnitTest.JavaScript</PackageId>
+    <PackageId>Microsoft.JavaScript.UnitTest</PackageId>
     <DefineConstants>NO_WINDOWS;NOVS</DefineConstants>
   </PropertyGroup>
 
@@ -48,10 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Microsoft.UnitTest.JavaScript.targets">
+    <Content Include="Microsoft.JavaScript.UnitTest.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Microsoft.UnitTest.JavaScript.props">
+    <Content Include="Microsoft.JavaScript.UnitTest.props">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\TestAdapter\TestFrameworks\find_tests.js" Link="TestFrameworks\find_tests.js">

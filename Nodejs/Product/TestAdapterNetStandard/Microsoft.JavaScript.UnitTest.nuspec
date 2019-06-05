@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Microsoft.UnitTest.JavaScript</id>
+    <id>Microsoft.JavaScript.UnitTest</id>
     <!-- build updates the version -->
     <version>$version$</version>
-    <title>Microsoft.UnitTest.JavaScript</title>
+    <title>Microsoft.JavaScript.UnitTest</title>
     <authors>Microsoft</authors>
-    <owners>TypeScript Team</owners>
+    <!-- microsoft compliance specifies to leave this field empty -->
+    <owners></owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <developmentDependency>true</developmentDependency>
     <licenseUrl>http://go.microsoft.com/fwlink/?LinkID=698879</licenseUrl>
     <projectUrl>https://github.com/Microsoft/nodejstools</projectUrl>
     <iconUrl>http://www.typescriptlang.org/assets/images/icons/nuget-icon-128x128.png</iconUrl>
-    <description>Nuget package to enable unit testing in ASP.NET Core projects.</description>
+    <description>Nuget package to enable JavaScript and TypeScript unit testing in ASP.NET Core projects.</description>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <language>en-US</language>
     <tags>TypeScript;JavaScript;UnitTest</tags>
@@ -31,8 +32,8 @@
     <file src="$outdir$TestFrameworks\Jest\jest.js" target="build\_common\TestFrameworks\Jest\" />
     <file src="$outdir$TestFrameworks\Jest\jestReporter.js" target="build\_common\TestFrameworks\Jest\" />
      <!--net standard library--> 
-    <file src="$outdir$Microsoft.UnitTest.JavaScript.props" target="build\netstandard2.0\" />
-    <file src="$outdir$Microsoft.UnitTest.JavaScript.targets" target="build\netstandard2.0\" />
+    <file src="$outdir$Microsoft.JavaScript.UnitTest.props" target="build\netstandard2.0\" />
+    <file src="$outdir$Microsoft.JavaScript.UnitTest.targets" target="build\netstandard2.0\" />
     <file src="$outdir$Microsoft.JavaScript.TestAdapter.dll" target="build\netstandard2.0\" />
   </files>
 </package>
