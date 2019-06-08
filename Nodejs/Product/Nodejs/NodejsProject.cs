@@ -34,6 +34,7 @@ namespace Microsoft.NodejsTools
 
         protected override void Close()
         {
+            // Disregard this branch. There's no change, this is only used for testing the Pull Request Validation.
             if (this._menuService != null)
             {
                 foreach (var command in this._commands)
