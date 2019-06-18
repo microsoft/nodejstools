@@ -1,4 +1,4 @@
-﻿import assert = require('assert');
+import assert = require('assert');
 
 describe("Test Suite 1", () => {
     it("Test A", () => {
