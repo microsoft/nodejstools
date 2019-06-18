@@ -1,4 +1,4 @@
-﻿var assert = require('assert');
+var assert = require('assert');
 
 describe('Test Suite 1', function () {
     it('Test 1', function () {

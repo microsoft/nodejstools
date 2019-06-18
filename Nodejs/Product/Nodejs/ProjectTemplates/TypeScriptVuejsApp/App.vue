@@ -1,4 +1,4 @@
-﻿<template>
+<template>
     <div id="app">
         <Home msg="Hello world!" />
     </div>

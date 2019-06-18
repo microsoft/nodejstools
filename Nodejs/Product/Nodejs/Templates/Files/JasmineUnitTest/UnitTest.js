@@ -1,4 +1,4 @@
-﻿describe('Test Suite 1', function () {
+describe('Test Suite 1', function () {
     it('Test 1', function () {
 
         expect(1).toBe(1);

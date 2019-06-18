@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GET home page.
  */
 import express = require('express');

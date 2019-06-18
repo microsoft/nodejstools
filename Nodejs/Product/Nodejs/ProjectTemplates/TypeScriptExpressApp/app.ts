@@ -1,4 +1,4 @@
-﻿import debug = require('debug');
+import debug = require('debug');
 import express = require('express');
 import path = require('path');
 

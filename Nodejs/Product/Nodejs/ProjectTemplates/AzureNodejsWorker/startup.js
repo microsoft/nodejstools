@@ -1,2 +1,2 @@
-﻿/** Placeholder for role startup **/
+/** Placeholder for role startup **/
 'use strict';

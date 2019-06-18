@@ -1,4 +1,4 @@
-﻿<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
   <TemplateData>
     <Name Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4005"/>
     <Description Package="{FE8A8C3D-328A-476D-99F9-2A24B75F8C7F}" ID="4006"/>

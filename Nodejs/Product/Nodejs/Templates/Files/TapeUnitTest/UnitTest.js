@@ -1,4 +1,4 @@
-﻿var test = require("tape");
+var test = require("tape");
 
 test("Test A", function (t) {
     t.plan(1);

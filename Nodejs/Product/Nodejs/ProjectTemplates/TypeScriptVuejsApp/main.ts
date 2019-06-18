@@ -1,4 +1,4 @@
-﻿import Vue from 'vue';
+wimport Vue from 'vue';
 import App from './App.vue';
 
 Vue.config.productionTip = true;

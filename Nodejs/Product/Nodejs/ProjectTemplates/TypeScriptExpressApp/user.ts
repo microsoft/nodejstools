@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GET users listing.
  */
 import express = require('express');

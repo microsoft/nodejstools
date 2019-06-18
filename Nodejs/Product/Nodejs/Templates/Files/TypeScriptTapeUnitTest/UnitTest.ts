@@ -1,4 +1,4 @@
-﻿import test = require("tape");
+import test = require("tape");
 
 test("Test A", function (t) {
     t.plan(1);
