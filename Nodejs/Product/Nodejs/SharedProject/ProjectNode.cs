@@ -2619,9 +2619,8 @@ namespace Microsoft.VisualStudioTools.Project
             if (this.buildProject != null)
             {
                 const bool designTime = true;
-                const bool requiresUIThread = true;
 
-                if (!TryBeginBuild(designTime, requiresUIThread))
+                if (!TryBeginBuild(designTime))
                 {
                     throw new InvalidOperationException("A build is already in progress.");
                 }
@@ -2650,7 +2649,7 @@ namespace Microsoft.VisualStudioTools.Project
                 }
                 finally
                 {
-                    EndBuild(submission, designTime, requiresUIThread);
+                    EndBuild(submission, designTime);
                 }
             }
 
@@ -2667,9 +2666,8 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual BuildSubmission DoAsyncMSBuildSubmission(string target, Action<MSBuildResult, string> uiThreadCallback)
         {
             const bool designTime = false;
-            const bool requiresUIThread = false;
 
-            if (!TryBeginBuild(designTime, requiresUIThread))
+            if (!TryBeginBuild(designTime))
             {
                 if (uiThreadCallback != null)
                 {
@@ -2710,7 +2708,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             ideLogger.FlushBuildOutput();
                         }
-                        EndBuild(sub, designTime, requiresUIThread);
+                        EndBuild(sub, designTime);
                         uiThreadCallback((sub.BuildResult.OverallResult == BuildResultCode.Success) ? MSBuildResult.Successful : MSBuildResult.Failed, target);
                     });
                 }, null);
@@ -2718,7 +2716,7 @@ namespace Microsoft.VisualStudioTools.Project
             catch (Exception e)
             {
                 Debug.Fail(e.ToString());
-                EndBuild(submission, designTime, requiresUIThread);
+                EndBuild(submission, designTime);
                 if (uiThreadCallback != null)
                 {
                     uiThreadCallback(MSBuildResult.Failed, target);
@@ -6011,23 +6009,23 @@ If the files in the existing folder have the same names as files in the folder y
         /// Attempts to lock in the privilege of running a build in Visual Studio.
         /// </summary>
         /// <param name="designTime"><c>false</c> if this build was called for by the Solution Build Manager; <c>true</c> otherwise.</param>
-        /// <param name="requiresUIThread">
-        /// Need to claim the UI thread for build under the following conditions:
-        /// 1. The build must use a resource that uses the UI thread, such as
-        /// - you set HostServices and you have a host object which requires (even indirectly) the UI thread (VB and C# compilers do this for instance.)
-        /// or,
-        /// 2. The build requires the in-proc node AND waits on the UI thread for the build to complete, such as:
-        /// - you use a ProjectInstance to build, or
-        /// - you have specified a host object, whether or not it requires the UI thread, or
-        /// - you set HostServices and you have specified a node affinity.
-        /// - In addition to the above you also call submission.Execute(), or you call submission.ExecuteAsync() and then also submission.WaitHandle.Wait*().
-        /// </param>
         /// <returns>A value indicating whether a build may proceed.</returns>
         /// <remarks>
         /// This method must be called on the UI thread.
         /// </remarks>
-        private bool TryBeginBuild(bool designTime, bool requiresUIThread = false)
+        private bool TryBeginBuild(bool designTime)
         {
+            // Need to claim the UI thread for build under the following conditions:
+            // 1. The build must use a resource that uses the UI thread, such as
+            // - you set HostServices and you have a host object which requires (even indirectly) the UI thread (VB and C# compilers do this for instance.)
+            // or,
+            // 2. The build requires the in-proc node AND waits on the UI thread for the build to complete, such as:
+            // - you use a ProjectInstance to build, or
+            // - you have specified a host object, whether or not it requires the UI thread, or
+            // - you set HostServices and you have specified a node affinity.
+            // - In addition to the above you also call submission.Execute(), or you call submission.ExecuteAsync() and then also submission.WaitHandle.Wait*().
+            bool requiresUIThread = designTime;
+
             // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
             if (this.buildManagerAccessor != null)
             {
@@ -6073,13 +6071,14 @@ If the files in the existing folder have the same names as files in the folder y
         /// </summary>
         /// <param name="submission">The build submission that built, if any.</param>
         /// <param name="designTime">This must be the same value as the one passed to <see cref="TryBeginBuild"/>.</param>
-        /// <param name="requiresUIThread">This must be the same value as the one passed to <see cref="TryBeginBuild"/>.</param>
         /// <remarks>
         /// This method must be called on the UI thread.
         /// </remarks>
-        private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
+        private void EndBuild(BuildSubmission submission, bool designTime)
         {
             Debug.Assert(this.buildInProcess);
+
+            bool requiresUIThread = designTime;
 
             if (this.buildManagerAccessor != null)
             {
