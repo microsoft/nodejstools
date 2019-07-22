@@ -2614,20 +2614,21 @@ namespace Microsoft.VisualStudioTools.Project
             this.Site.GetUIThread().MustBeCalledFromUIThread();
 
             var result = MSBuildResult.Failed;
-            const bool designTime = true;
 
-            BuildSubmission submission = null;
-
-            try
+            // Do the actual Build
+            if (this.buildProject != null)
             {
-                // Do the actual Build
-                if (this.buildProject != null)
-                {
-                    if (!TryBeginBuild(designTime, true))
-                    {
-                        throw new InvalidOperationException("A build is already in progress.");
-                    }
+                const bool designTime = true;
+                const bool requiresUIThread = true;
 
+                if (!TryBeginBuild(designTime, requiresUIThread))
+                {
+                    throw new InvalidOperationException("A build is already in progress.");
+                }
+
+                BuildSubmission submission = null;
+                try
+                {
                     var targetsToBuild = new string[target != null ? 1 : 0];
                     if (target != null)
                     {
@@ -2647,10 +2648,10 @@ namespace Microsoft.VisualStudioTools.Project
 
                     result = (buildResult.OverallResult == BuildResultCode.Success) ? MSBuildResult.Successful : MSBuildResult.Failed;
                 }
-            }
-            finally
-            {
-                EndBuild(submission, designTime, true);
+                finally
+                {
+                    EndBuild(submission, designTime, requiresUIThread);
+                }
             }
 
             return result;
@@ -2666,8 +2667,9 @@ namespace Microsoft.VisualStudioTools.Project
         protected virtual BuildSubmission DoAsyncMSBuildSubmission(string target, Action<MSBuildResult, string> uiThreadCallback)
         {
             const bool designTime = false;
+            const bool requiresUIThread = false;
 
-            if (!TryBeginBuild(designTime, false))
+            if (!TryBeginBuild(designTime, requiresUIThread))
             {
                 if (uiThreadCallback != null)
                 {
@@ -2708,7 +2710,7 @@ namespace Microsoft.VisualStudioTools.Project
                         {
                             ideLogger.FlushBuildOutput();
                         }
-                        EndBuild(sub, designTime, false);
+                        EndBuild(sub, designTime, requiresUIThread);
                         uiThreadCallback((sub.BuildResult.OverallResult == BuildResultCode.Success) ? MSBuildResult.Successful : MSBuildResult.Failed, target);
                     });
                 }, null);
@@ -2716,7 +2718,7 @@ namespace Microsoft.VisualStudioTools.Project
             catch (Exception e)
             {
                 Debug.Fail(e.ToString());
-                EndBuild(submission, designTime, false);
+                EndBuild(submission, designTime, requiresUIThread);
                 if (uiThreadCallback != null)
                 {
                     uiThreadCallback(MSBuildResult.Failed, target);
@@ -6026,57 +6028,44 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private bool TryBeginBuild(bool designTime, bool requiresUIThread = false)
         {
-            var releaseUIThread = false;
-
-            try
+            // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
+            if (this.buildManagerAccessor != null)
             {
-                // If the SVsBuildManagerAccessor service is absent, we're not running within Visual Studio.
-                if (this.buildManagerAccessor != null)
+                if (requiresUIThread)
                 {
-                    if (requiresUIThread)
+                    var result = this.buildManagerAccessor.ClaimUIThreadForBuild();
+                    if (result < 0)
                     {
-                        var result = this.buildManagerAccessor.ClaimUIThreadForBuild();
-                        if (result < 0)
+                        // Not allowed to claim the UI thread right now. Try again later.
+                        return false;
+                    }
+                }
+
+                if (designTime)
+                {
+                    var result = this.buildManagerAccessor.BeginDesignTimeBuild();
+                    if (result < 0)
+                    {
+                        if (requiresUIThread)
                         {
-                            // Not allowed to claim the UI thread right now. Try again later.
-                            return false;
+                            this.buildManagerAccessor.ReleaseUIThreadForBuild();
                         }
 
-                        releaseUIThread = true; // assume we need to release this immediately until we get through the whole gauntlet.
+                        // Not allowed to begin a design-time build at this time. Try again later.
+                        return false;
                     }
-
-                    if (designTime)
-                    {
-                        var result = this.buildManagerAccessor.BeginDesignTimeBuild();
-                        if (result < 0)
-                        {
-                            // Not allowed to begin a design-time build at this time. Try again later.
-                            return false;
-                        }
-                    }
-
-                    // We obtained all the resources we need.  So don't release the UI thread until after the build is finished.
-                    releaseUIThread = false;
-                }
-                else
-                {
-                    var buildParameters = new BuildParameters(this.buildEngine);
-                    BuildManager.DefaultBuildManager.BeginBuild(buildParameters);
                 }
 
-                this.buildInProcess = true;
-                return true;
+                // We obtained all the resources we need.  So don't release the UI thread until after the build is finished.
             }
-            finally
+            else
             {
-                // If we were denied the privilege of starting a design-time build,
-                // we need to release the UI thread.
-                if (releaseUIThread)
-                {
-                    Debug.Assert(this.buildManagerAccessor != null, "We think we need to release the UI thread for an accessor we don't have!");
-                    this.buildManagerAccessor.ReleaseUIThreadForBuild();
-                }
+                var buildParameters = new BuildParameters(this.buildEngine);
+                BuildManager.DefaultBuildManager.BeginBuild(buildParameters);
             }
+
+            this.buildInProcess = true;
+            return true;
         }
 
         /// <summary>
@@ -6090,6 +6079,8 @@ If the files in the existing folder have the same names as files in the folder y
         /// </remarks>
         private void EndBuild(BuildSubmission submission, bool designTime, bool requiresUIThread = false)
         {
+            Debug.Assert(this.buildInProcess);
+
             if (this.buildManagerAccessor != null)
             {
                 // It's very important that we try executing all three end-build steps, even if errors occur partway through.
