@@ -412,14 +412,7 @@ namespace Microsoft.NodejsTools.Project
                         }
                         else
                         {
-                            if (this.HasMissingModules)
-                            {
-                                result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
-                            }
-                            else
-                            {
-                                result = QueryStatusResult.SUPPORTED;
-                            }
+                            result = QueryStatusResult.ENABLED | QueryStatusResult.SUPPORTED;
                         }
                         return VSConstants.S_OK;
 

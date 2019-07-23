@@ -180,7 +180,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallModules</CommandName>
-          <ButtonText>&amp;Install Missing npm Packages</ButtonText>
+          <ButtonText>&amp;Install npm Packages</ButtonText>
         </Strings>
       </Button>
 
@@ -210,7 +210,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <CommandName>cmdidNpmInstallSingleMissingModule</CommandName>
-          <ButtonText>&amp;Install Missing npm Package(s)</ButtonText>
+          <ButtonText>&amp;Install npm Package(s)</ButtonText>
         </Strings>
       </Button>
 
