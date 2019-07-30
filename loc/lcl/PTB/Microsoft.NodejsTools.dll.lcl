@@ -4547,10 +4547,13 @@
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{9f4b31b4-09ac-4937-a2e7-f4bc02bb7dba},769" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button" IgnoreHK="true">
-            <Val><![CDATA[&Install Missing npm Packages]]></Val>
+            <Val><![CDATA[&Install npm Packages]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[&Instalar Pacotes npm Ausentes]]></Val>
+              <Val><![CDATA[&Instalar os Pacotes de npm]]></Val>
             </Tgt>
+            <Prev Cat="Button" IgnoreHK="true">
+              <Val><![CDATA[&Install Missing npm Packages]]></Val>
+            </Prev>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
@@ -4610,10 +4613,13 @@
         <Disp Icon="Menu" Expand="true" Disp="true" LocTbl="false" />
         <Item ItemId=";{9f4b31b4-09ac-4937-a2e7-f4bc02bb7dba},772" ItemType=";Button" PsrId="240" Leaf="true">
           <Str Cat="Button" IgnoreHK="true">
-            <Val><![CDATA[&Install Missing npm Package(s)]]></Val>
+            <Val><![CDATA[&Install npm Package(s)]]></Val>
             <Tgt Cat="Button" IgnoreHK="true" Stat="Loc" Orig="New">
-              <Val><![CDATA[&Instalar Pacote(s) npm Ausente(s)]]></Val>
+              <Val><![CDATA[&Instalar o(s) Pacote(s) de npm]]></Val>
             </Tgt>
+            <Prev Cat="Button" IgnoreHK="true">
+              <Val><![CDATA[&Install Missing npm Package(s)]]></Val>
+            </Prev>
           </Str>
           <Disp Icon="Str" Expand="true" />
         </Item>
