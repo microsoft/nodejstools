@@ -291,16 +291,12 @@ namespace Microsoft.VisualStudioTools.Project
             strSavePath = CommonUtils.GetAbsoluteDirectoryPath(this.ProjectMgr.ProjectHome, strSavePath);
             var newName = Path.Combine(strSavePath, label);
 
-            if (StringComparer.OrdinalIgnoreCase.Equals(newName, this.Url))
+            if (StringComparer.Ordinal.Equals(newName, this.Url))
             {
                 // This is really a no-op (including changing case), so there is nothing to do
                 return VSConstants.S_FALSE;
             }
-            else if (StringComparer.OrdinalIgnoreCase.Equals(newName, this.Url))
-            {
-                // This is a change of file casing only.
-            }
-            else
+            else if (!StringComparer.OrdinalIgnoreCase.Equals(newName, this.Url)) // This is not a change of file casing only.
             {
                 // If the renamed file already exists then quit (unless it is the result of the parent having done the move).
                 if (IsFileOnDisk(newName)
