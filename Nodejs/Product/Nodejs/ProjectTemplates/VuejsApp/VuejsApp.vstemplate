@@ -11,6 +11,9 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <LanguageTag>Javascript</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <ProjectTypeTag>Web</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="VuejsApp.njsproj" ReplaceParameters="true">
