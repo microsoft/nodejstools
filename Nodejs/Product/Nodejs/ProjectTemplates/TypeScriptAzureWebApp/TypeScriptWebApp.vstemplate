@@ -13,6 +13,9 @@
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
     <TemplateGroupID>Node.js</TemplateGroupID>
+    <LanguageTag>Typescript</LanguageTag>
+    <PlatformTag>Azure</PlatformTag>
+    <ProjectTypeTag>Cloud</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptWebApp.njsproj" ReplaceParameters="true">

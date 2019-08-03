@@ -12,6 +12,11 @@
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
+    <LanguageTag>Javascript</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>macOS</PlatformTag>
+    <ProjectTypeTag>Web</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="NodejsWebApp.njsproj" ReplaceParameters="true">
@@ -25,3 +30,4 @@
     <FullClassName>Microsoft.NodejsTools.ProjectWizard.NodejsPackageParametersExtension</FullClassName>
   </WizardExtension>
 </VSTemplate>
+

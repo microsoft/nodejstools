@@ -13,6 +13,8 @@
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <LanguageTag>Javascript</LanguageTag>
     <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Web</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>

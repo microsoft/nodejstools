@@ -11,6 +11,12 @@
     <ProvideDefaultName>true</ProvideDefaultName>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
+    <LanguageTag>Javascript</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>macOS</PlatformTag>
+    <ProjectTypeTag>Web</ProjectTypeTag>
+    <ProjectTypeTag>Console</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="FromExistingCode.njsproj" ReplaceParameters="true">

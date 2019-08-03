@@ -15,6 +15,10 @@
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <LanguageTag>Javascript</LanguageTag>
+    <LanguageTag>Typescript</LanguageTag>
+    <PlatformTag>Azure</PlatformTag>
+    <ProjectTypeTag>Cloud</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="CloudService.ccproj" ReplaceParameters="true">
