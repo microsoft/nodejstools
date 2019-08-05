@@ -13,6 +13,11 @@
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
     <TemplateGroupID>Node.js</TemplateGroupID>
+    <LanguageTag>Typescript</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>macOS</PlatformTag>
+    <ProjectTypeTag>Web</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
     <Project File="NodejsWebApp.njsproj" ReplaceParameters="true">
