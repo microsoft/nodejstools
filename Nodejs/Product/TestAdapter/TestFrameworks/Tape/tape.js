@@ -1,3 +1,4 @@
+//@ts-check
 "use strict";
 var EOL = require('os').EOL;
 var fs = require('fs');
@@ -30,9 +31,9 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
             var t = tests[count];
             t._skip = true; // don't run tests
             testList.push({
-                test: t.name,
+                name: t.name,
                 suite: '',
-                file: testFile,
+                filepath: testFile,
                 line: 0,
                 column: 0
             });
@@ -42,11 +43,12 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
     var fd = fs.openSync(discoverResultFile, 'w');
     fs.writeSync(fd, JSON.stringify(testList));
     fs.closeSync(fd);
-};
+}
 module.exports.find_tests = find_tests;
 
-function run_tests(testInfo, callback) {
-    var tape = findTape(testInfo[0].projectFolder);
+function run_tests(context, callback) {
+
+    var tape = findTape(context.testCases[0].projectFolder);
     if (tape === null) {
         return;
     }
@@ -57,11 +59,12 @@ function run_tests(testInfo, callback) {
     var harness = tape.getHarness({ objectMode: true });
 
     harness.createStream({ objectMode: true }).on('data', function (evt) {
+        var result;
+
         switch (evt.type) {
             case 'test':
-
-                var result = {
-                    'title': evt.name,
+                result = {
+                    'fullyQualifiedName': context.getFullyQualifiedName(evt.name),
                     'passed': undefined,
                     'stdOut': '',
                     'stdErr': ''
@@ -72,12 +75,12 @@ function run_tests(testInfo, callback) {
                 // Test is starting. Reset the result object. Send a "test start" event.
                 callback({
                     'type': 'test start',
-                    'title': result.title,
+                    'fullyQualifiedName': result.fullyQualifiedName,
                     'result': result
                 });
                 break;
             case 'assert':
-                var result = testState[evt.test];
+                result = testState[evt.test];
                 if (!result) { break; }
 
                 // Correlate the success/failure asserts for this test. There may be multiple per test
@@ -91,12 +94,12 @@ function run_tests(testInfo, callback) {
                 }
                 break;
             case 'end':
-                var result = testState[evt.test];
+                result = testState[evt.test];
                 if (!result) { break; }
                 // Test is done. Send a "result" event.
                 callback({
                     'type': 'result',
-                    'title': result.title,
+                    'fullyQualifiedName': result.fullyQualifiedName,
                     'result': result
                 });
                 testState[evt.test] = undefined;
@@ -106,11 +109,11 @@ function run_tests(testInfo, callback) {
         }
     });
 
-    loadTestCases(testInfo[0].testFile);
+    loadTestCases(context.testCases[0].testFile);
 
     // Skip those not selected to run. The rest will start running on the next tick.
     harness['_tests'].forEach(function (test) {
-        if (!testInfo.some(function (ti) { return ti.testName == test.name; })) {
+        if (!context.testCases.some(function (ti) { return ti.fullyQualifiedName === context.getFullyQualifiedName(test.name); })) {
             test._skip = true;
         }
     });
@@ -123,7 +126,7 @@ function run_tests(testInfo, callback) {
                 if (!result.passed) { result.passed = false; }
                 callback({
                     'type': 'result',
-                    'title': result.title,
+                    'fullyQualifiedName': result.fullyQualifiedName,
                     'result': result
                 });
             }

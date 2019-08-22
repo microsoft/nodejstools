@@ -10,7 +10,7 @@ var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
 
 function reset_result() {
     return {
-        'title': '',
+        'fullyQualifiedName': '',
         'passed': false,
         'pending': false,
         'stdOut': '',
@@ -31,9 +31,9 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             if (suite.tests && suite.tests.length !== 0) {
                 suite.tests.forEach(function (t, i, testArray) {
                     testList.push({
-                        test: t.fullTitle(),
+                        name: t.title,
                         suite: suite.fullTitle(),
-                        file: testFile,
+                        filepath: testFile,
                         line: 0,
                         column: 0
                     });
@@ -47,6 +47,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             }
         }
     }
+
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
         var mocha = initializeMocha(Mocha, projectFolder);
@@ -66,9 +67,10 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     fs.writeSync(fd, JSON.stringify(testList));
     fs.closeSync(fd);
 };
+
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, callback) {
+var run_tests = function (context, callback) {
     function post(event) {
         callback(event);
         hook_outputs();
@@ -94,21 +96,21 @@ var run_tests = function (testCases, callback) {
     hook_outputs();
 
     var testResults = [];
-    var Mocha = detectMocha(testCases[0].projectFolder);
+    var Mocha = detectMocha(context.testCases[0].projectFolder);
     if (!Mocha) {
         return;
     }
 
-    var mocha = initializeMocha(Mocha, testCases[0].projectFolder);
+    var mocha = initializeMocha(Mocha, context.testCases[0].projectFolder);
 
-    var testGrepString = '^(' + testCases.map(function (testCase) {
-        return escapeRegExp(testCase.testName);
+    var testGrepString = '^(' + context.testCases.map(function (testCase) {
+        return escapeRegExp(testCase.fullTitle);
     }).join('|') + ')$';
 
     if (testGrepString) {
         mocha.grep(new RegExp(testGrepString));
     }
-    mocha.addFile(testCases[0].testFile);
+    mocha.addFile(context.testCases[0].testFile);
 
     var runner = mocha.run(function (code) {
         process.exitCode = code ? code : 0;
@@ -154,20 +156,20 @@ var run_tests = function (testCases, callback) {
 
     runner.on('pending', function (test) {
         result.pending = true;
-        result.title = test.fullTitle();
+        result.fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
         post({
             type: 'pending',
-            title: result.title,
+            fullyQualifiedName: result.fullyQualifiedName,
             result: result
         });
         result = reset_result();
     });
 
     runner.on('test', function (test) {
-        result.title = test.fullTitle();
+        result.fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
         post({
             type: 'test start',
-            title: result.title
+            fullyQualifiedName: result.fullyQualifiedName
         });
     });
 
@@ -182,7 +184,7 @@ var run_tests = function (testCases, callback) {
         result.passed = true;
         post({
             type: 'result',
-            title: result.title,
+            fullyQualifiedName: result.fullyQualifiedName,
             result: result
         });
         result = reset_result();
@@ -192,7 +194,7 @@ var run_tests = function (testCases, callback) {
         result.passed = false;
         post({
             type: 'result',
-            title: result.title,
+            fullyQualifiedName: result.fullyQualifiedName,
             result: result
         });
         result = reset_result();
@@ -217,7 +219,7 @@ function detectMocha(projectFolder) {
         }
 
         var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
-        var Mocha = new require(mochaPath);
+        var Mocha = require(mochaPath);
         return Mocha;
     } catch (ex) {
         logError(
@@ -265,7 +267,7 @@ function getMochaOptions(projectFolder) {
     }
 
     // set timeout to 10 minutes, because the default of 2 sec is too short for debugging scenarios
-    if (typeof (v8debug) === 'object') {
+    if (typeof v8debug === 'object') {
         mochaOptions['timeout'] = 600000;
     }
 

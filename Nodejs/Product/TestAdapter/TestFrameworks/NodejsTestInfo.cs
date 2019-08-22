@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     public sealed class NodejsTestInfo
     {
-        public NodejsTestInfo(string testPath, string testName, string testFramework, int line, int column, string projectRootDir)
+        public NodejsTestInfo(string testPath, string suite, string testName, string testFramework, int line, int column, string projectRootDir)
         {
             Debug.Assert(testPath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) || testPath.EndsWith(".jsx", StringComparison.OrdinalIgnoreCase));
 
@@ -20,9 +20,20 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             this.TestFramework = testFramework;
             this.SourceLine = line;
             this.SourceColumn = column;
+            this.Suite = suite;
         }
 
-        public string FullyQualifiedName => $"{this.TestFile}::{this.TestName}::{this.TestFramework}";
+        public string FullyQualifiedName
+        {
+            get
+            {
+                // If no suite is defined, it on the "global" space.
+                var suite = string.IsNullOrWhiteSpace(this.Suite) ? "global" : this.Suite;
+
+                // Only three levels are allowed on vstest.
+                return $"{this.TestFile}::{suite}::{this.TestName}";
+            }
+        }
 
         /// <summary>
         /// Project root relative path to the test file.
@@ -41,5 +52,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         public int SourceLine { get; }
 
         public int SourceColumn { get; }
+
+        public string Suite { get; }
     }
 }

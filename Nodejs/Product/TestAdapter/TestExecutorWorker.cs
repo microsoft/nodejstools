@@ -159,7 +159,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     nodeArgs.Add(args.RunTestsScriptFile);
                 }
 
-                testObjects.Add(new TestCaseObject(framework: args.TestFramework, testName: args.TestName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
+                testObjects.Add(new TestCaseObject(framework: args.TestFramework, fullyQualifiedName: args.fullyQualifiedName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
             }
 
             var port = 0;
@@ -224,7 +224,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 var testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
                 // Extract test from list of tests
                 var test = this.currentTests
-                               .Where(n => n.TestCase.DisplayName == testEvent.title)
+                               .Where(n => n.TestCase.FullyQualifiedName == testEvent.fullyQualifiedName)
                                .FirstOrDefault();
 
                 if (test != null)
@@ -353,7 +353,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.DisplayName, testFile, workingDir, projectRootDir);
+            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.FullyQualifiedName, testFile, workingDir, projectRootDir);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

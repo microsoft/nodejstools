@@ -1,8 +1,9 @@
+//@ts-check
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var result = {
-    'title': '',
+    'fullyQualifiedName': '',
     'passed': false,
     'stdOut': '',
     'stdErr': ''
@@ -45,7 +46,7 @@ var find_tests = function (testFileList, discoverResultFile) {
             if (debug !== undefined) {
                 try {
                     var funcDetails = debug.findFunctionSourceLocation(testCases[test]);
-                    if (funcDetails != undefined) {
+                    if (funcDetails !== undefined) {
                         line = funcDetails.line; // 0 based
                         column = funcDetails.column; // 0 based
                     }
@@ -54,9 +55,9 @@ var find_tests = function (testFileList, discoverResultFile) {
                 }
             }
             testList.push({
-                test: test,
+                name: test,
                 suite: '',
-                file: testFile,
+                filepath: testFile,
                 line: line,
                 column: column
             });
@@ -69,7 +70,7 @@ var find_tests = function (testFileList, discoverResultFile) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, callback) {
+var run_tests = function (context, callback) {
     function post(event) {
         callback(event);
         hook_outputs();
@@ -77,15 +78,15 @@ var run_tests = function (testCases, callback) {
 
     hook_outputs();
 
-    for (var test of testCases) {
+    for (var test of context.testCases) {
         post({
             type: 'test start',
-            title: test.testName
+            fullyQualifiedName: test.fullyQualifiedName
         });
         try {
             var testCase = require(test.testFile);
-            result.title = test.testName;
-            testCase[test.testName]();
+            result.fullyQualifiedName = test.fullyQualifiedName;
+            testCase[test.fullTitle]();
             result.passed = true;
             result.stdOut += "Test passed.\n";
         } catch (err) {
@@ -95,11 +96,11 @@ var run_tests = function (testCases, callback) {
         }
         post({
             type: 'result',
-            title: test.testName,
+            fullyQualifiedName: test.fullyQualifiedName,
             result: result
         });
         result = {
-            'title': '',
+            'fullyQualifiedName': '',
             'passed': false,
             'stdOut': '',
             'stdErr': ''

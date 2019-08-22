@@ -27,7 +27,7 @@ internal sealed class ResultObject
 internal sealed class TestEvent
 {
     public string type { get; set; }
-    public string title { get; set; }
+    public string fullyQualifiedName { get; set; }
     public ResultObject result { get; set; }
 }
 
@@ -36,22 +36,22 @@ internal sealed class TestCaseObject
     public TestCaseObject()
     {
         this.framework = string.Empty;
-        this.testName = string.Empty;
+        this.fullyQualifiedName = string.Empty;
         this.testFile = string.Empty;
         this.workingFolder = string.Empty;
         this.projectFolder = string.Empty;
     }
 
-    public TestCaseObject(string framework, string testName, string testFile, string workingFolder, string projectFolder)
+    public TestCaseObject(string framework, string fullyQualifiedName, string testFile, string workingFolder, string projectFolder)
     {
         this.framework = framework;
-        this.testName = testName;
+        this.fullyQualifiedName = fullyQualifiedName;
         this.testFile = testFile;
         this.workingFolder = workingFolder;
         this.projectFolder = projectFolder;
     }
     public string framework { get; set; }
-    public string testName { get; set; }
+    public string fullyQualifiedName { get; set; }
     public string testFile { get; set; }
     public string workingFolder { get; set; }
     public string projectFolder { get; set; }

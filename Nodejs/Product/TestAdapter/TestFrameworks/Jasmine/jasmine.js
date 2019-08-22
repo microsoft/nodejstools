@@ -92,9 +92,9 @@ function enumerateSpecs(suite, testList, testFile) {
             enumerateSpecs(child, testList, testFile);
         } else {
             testList.push({
-                test: child.getFullName(),
-                suite: suite.description,
-                file: testFile,
+                name: child.description,
+                suite: suite.description === "Jasmine__TopLevel__Suite" ? null : suite.getFullName(),
+                filepath: testFile,
                 line: 0,
                 column: 0
             });
@@ -141,7 +141,7 @@ exports.find_tests = find_tests;
 
 function createTestResult() {
     return {
-        title: "",
+        fullyQualifiedName: "",
         passed: false,
         pending: false,
         stdout: "",
@@ -162,17 +162,17 @@ function hookStandardOutputs() {
     };
 }
 
-function sendTestProgress(callback, evtType, result, title) {
+function sendTestProgress(callback, evtType, result, fullyQualifiedName) {
     var event = {
         type: evtType,
         result: result
     };
-    title && (event.title = title);
+    fullyQualifiedName && (event.fullyQualifiedName = fullyQualifiedName);
     callback(event);
     hookStandardOutputs();
 }
 
-function createCustomReporter(callback) {
+function createCustomReporter(context, callback) {
     return {
         jasmineStarted: (suiteInfo) => {
             sendTestProgress(callback, "start", result);
@@ -181,17 +181,18 @@ function createCustomReporter(callback) {
             sendTestProgress(callback, "suite start", result);
         },
         specStarted: (specResult) => {
-            result.title = specResult.fullName;
-            sendTestProgress(callback, "test start", undefined, result.title);
+            result.fullyQualifiedName = context.getFullyQualifiedName(specResult.fullName);
+            sendTestProgress(callback, "test start", undefined, result.fullyQualifiedName);
         },
         specDone: (specResult) => {
+            // TODO: Report the output of the test. Currently is only showing "F" for a regression.
             var type = "result";
-            result.passed = specResult.status == "passed";
-            if (specResult.status == "disabled" || specResult.status == "pending") {
+            result.passed = specResult.status === "passed";
+            if (specResult.status === "disabled" || specResult.status === "pending") {
                 type = "pending";
                 result.pending = true;
             }
-            sendTestProgress(callback, type, result, specResult.fullName);
+            sendTestProgress(callback, type, result, context.getFullyQualifiedName(specResult.fullName));
             result = createTestResult();
         },
         suiteDone: (suiteResult) => {
@@ -203,27 +204,28 @@ function createCustomReporter(callback) {
     };
 }
 
-function run_tests(testCases, callback) {
+function run_tests(context, callback) {
     hookStandardOutputs();
 
-    var projectFolder = testCases[0].projectFolder;
+    var projectFolder = context.testCases[0].projectFolder;
     var Jasmine = detectJasmine(projectFolder);
     if (!Jasmine) {
         return;
     }
     var testFileList = [];
     var testNameList = {};
-    testCases.forEach((testCase) => {
+
+    context.testCases.forEach((testCase) => {
         if (testFileList.indexOf(testCase.testFile) < 0) {
             testFileList.push(testCase.testFile);
         }
-        testNameList[testCase.testName] = true;
+        testNameList[testCase.fullTitle] = true;
     });
     try {
         var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
         jasmineInstance.configureDefaultReporter({ showColors: false });
         setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
-        jasmineInstance.addReporter(createCustomReporter(callback));
+        jasmineInstance.addReporter(createCustomReporter(context, callback));
         jasmineInstance.execute(testFileList);
     }
     catch (ex) {
