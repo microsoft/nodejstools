@@ -32,7 +32,7 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
     fs.closeSync(fd);
 };
 
-const run_tests = function (context, post) {
+const run_tests = function (context) {
     const jest = detectPackage(context.testCases[0].projectFolder, 'jest');
     if (!jest) {
         return;
@@ -40,7 +40,7 @@ const run_tests = function (context, post) {
 
     // Start all test cases, as jest is unable to filter out independently
     for (const testCase of context.testCases) {
-        post({
+        context.post({
             type: 'test start',
             fullyQualifiedName: testCase.fullyQualifiedName
         });
@@ -48,7 +48,7 @@ const run_tests = function (context, post) {
 
     const config = {
         json: true,
-        reporters: [[__dirname + '/jestReporter.js', { context, post }]],
+        reporters: [[__dirname + '/jestReporter.js', { context }]],
         testMatch: [context.testCases[0].testFile]
     };
 

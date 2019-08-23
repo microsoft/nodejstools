@@ -15,16 +15,15 @@ class jestReporter {
                 fullyQualifiedName: this._options.context.getFullyQualifiedName(assertionResult.fullName)
             };
 
-            this._options.post({
+            this._options.context.post({
                 type: result.pending ? 'pending' : 'result',
                 fullyQualifiedName: result.fullyQualifiedName,
-                result: result
+                result
             });
         }
 
-        this._options.post({
-            type: 'suite end',
-            result: {}
+        this._options.context.post({
+            type: 'end'
         });
     }
 }

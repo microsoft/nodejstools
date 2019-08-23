@@ -4,14 +4,6 @@ var EOL = require('os').EOL;
 var fs = require('fs');
 var path = require('path');
 
-function append_stdout(string, encoding, fd) {
-    result.stdOut += string;
-}
-
-function append_stderr(string, encoding, fd) {
-    result.stdErr += string;
-}
-
 function find_tests(testFileList, discoverResultFile, projectFolder) {
     var test = findTape(projectFolder);
     if (test === null) {
@@ -46,7 +38,7 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 }
 module.exports.find_tests = find_tests;
 
-function run_tests(context, callback) {
+function run_tests(context) {
 
     var tape = findTape(context.testCases[0].projectFolder);
     if (tape === null) {
@@ -64,19 +56,18 @@ function run_tests(context, callback) {
         switch (evt.type) {
             case 'test':
                 result = {
-                    'fullyQualifiedName': context.getFullyQualifiedName(evt.name),
-                    'passed': undefined,
-                    'stdOut': '',
-                    'stdErr': ''
+                    fullyQualifiedName: context.getFullyQualifiedName(evt.name),
+                    passed: undefined,
+                    stdout: '',
+                    stderr: ''
                 };
 
                 testState[evt.id] = result;
 
                 // Test is starting. Reset the result object. Send a "test start" event.
-                callback({
-                    'type': 'test start',
-                    'fullyQualifiedName': result.fullyQualifiedName,
-                    'result': result
+                context.post({
+                    type: 'test start',
+                    fullyQualifiedName: result.fullyQualifiedName
                 });
                 break;
             case 'assert':
@@ -86,10 +77,10 @@ function run_tests(context, callback) {
                 // Correlate the success/failure asserts for this test. There may be multiple per test
                 var msg = "Operator: " + evt.operator + ". Expected: " + evt.expected + ". Actual: " + evt.actual + ". evt: " + JSON.stringify(evt) + "\n";
                 if (evt.ok) {
-                    result.stdOut += msg;
+                    result.stdout += msg;
                     result.passed = result.passed === undefined ? true : result.passed;
                 } else {
-                    result.stdErr += msg + (evt.error.stack || evt.error.message) + "\n";
+                    result.stderr += msg + (evt.error.stack || evt.error.message) + "\n";
                     result.passed = false;
                 }
                 break;
@@ -97,11 +88,12 @@ function run_tests(context, callback) {
                 result = testState[evt.test];
                 if (!result) { break; }
                 // Test is done. Send a "result" event.
-                callback({
-                    'type': 'result',
-                    'fullyQualifiedName': result.fullyQualifiedName,
-                    'result': result
+                context.post({
+                    type: 'result',
+                    fullyQualifiedName: result.fullyQualifiedName,
+                    result
                 });
+                context.clearOutputs();
                 testState[evt.test] = undefined;
                 break;
             default:
@@ -119,16 +111,17 @@ function run_tests(context, callback) {
     });
 
     harness.onFinish(function () {
+        // TODO: Not used?
         // loop through items in testState
         for (var i = 0; i < testState.length; i++) {
             if (testState[i]) {
                 var result = testState[i];
                 if (!result.passed) { result.passed = false; }
-                callback({
-                    'type': 'result',
-                    'fullyQualifiedName': result.fullyQualifiedName,
-                    'result': result
-                });
+                //callback({
+                //    'type': 'result',
+                //    'fullyQualifiedName': result.fullyQualifiedName,
+                //    'result': result
+                //});
             }
         }
         process.exit(0);

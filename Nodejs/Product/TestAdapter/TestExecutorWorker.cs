@@ -247,7 +247,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             break;
                     }
                 }
-                else if (testEvent.type == "suite end")
+                else if (testEvent.type == "end")
                 {
                     this.currentResultObject = testEvent.result;
                     this.testsCompleted.Set();

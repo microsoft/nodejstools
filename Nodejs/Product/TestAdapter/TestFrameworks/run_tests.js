@@ -1,8 +1,6 @@
 //@ts-check
 var framework;
 var readline = require('readline');
-var old_stdout = process.stdout.write;
-var old_stderr = process.stderr.write;
 var rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -32,18 +30,9 @@ rl.on('line', function (line) {
         process.exit(1);
     }
 
-    function postResult(result) {
-        // unhook stdout and stderr
-        process.stdout.write = old_stdout;
-        process.stderr.write = old_stderr;
-        if (result) {
-            console.log(JSON.stringify(result));
-        }
-    }
     // run the test
-    framework.run_tests(context, postResult);
+    framework.run_tests(context);
 });
-
 
 function createContext(line) {
     function setFullTitle(testCases) {
@@ -64,11 +53,65 @@ function createContext(line) {
         }
     }
 
+    function post(event) {
+        unhookOutputs();
+
+        if (event) {
+            if (event.result) {
+                // Set only stdout and stderr if they are empty.
+                event.result.stdout = event.result.stdout || newOutputs.stdout;
+                event.result.stderr = event.result.stderr || newOutputs.stderr;
+            }
+
+            console.log(JSON.stringify(event));
+        }
+
+        hookOutputs();
+    }
+
+    function clearOutputs() {
+        newOutputs = {
+            stdout: '',
+            stderr: ''
+        };
+    }
+
     let testCases = JSON.parse(line);
     setFullTitle(testCases);
 
     return {
         testCases: testCases,
-        getFullyQualifiedName: (fullTitle) => getFullyQualifiedName(testCases, fullTitle)
+        getFullyQualifiedName: (fullTitle) => getFullyQualifiedName(testCases, fullTitle),
+        post,
+        clearOutputs
     };
 }
+
+function hookOutputs() {
+    oldOutputs = {
+        stdout: process.stdout.write,
+        stderr: process.stderr.write
+    };
+
+    process.stdout.write = (str, encording, callback) => {
+        newOutputs.stdout += str;
+        return true;
+    };
+    process.stderr.write = (str, encording, callback) => {
+        newOutputs.stderr += str;
+        return true;
+    };
+}
+
+function unhookOutputs() {
+    process.stdout.write = oldOutputs.stdout;
+    process.stderr.write = oldOutputs.stderr;
+}
+
+let oldOutputs = {};
+let newOutputs = {
+    stdout: '',
+    stderr: ''
+};
+
+hookOutputs();

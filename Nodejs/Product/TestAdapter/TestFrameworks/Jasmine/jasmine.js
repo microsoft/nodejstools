@@ -139,74 +139,42 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 
 exports.find_tests = find_tests;
 
-function createTestResult() {
+function createCustomReporter(context) {
     return {
-        fullyQualifiedName: "",
-        passed: false,
-        pending: false,
-        stdout: "",
-        stderr: ""
-    };
-}
-
-var result = createTestResult();
-
-function hookStandardOutputs() {
-    process.stdout.write = (str, encording, callback) => {
-        result.stdout += str;
-        return true;
-    };
-    process.stderr.write = (str, encording, callback) => {
-        result.stderr += str;
-        return true;
-    };
-}
-
-function sendTestProgress(callback, evtType, result, fullyQualifiedName) {
-    var event = {
-        type: evtType,
-        result: result
-    };
-    fullyQualifiedName && (event.fullyQualifiedName = fullyQualifiedName);
-    callback(event);
-    hookStandardOutputs();
-}
-
-function createCustomReporter(context, callback) {
-    return {
-        jasmineStarted: (suiteInfo) => {
-            sendTestProgress(callback, "start", result);
-        },
-        suiteStarted: (suiteResult) => {
-            sendTestProgress(callback, "suite start", result);
-        },
         specStarted: (specResult) => {
-            result.fullyQualifiedName = context.getFullyQualifiedName(specResult.fullName);
-            sendTestProgress(callback, "test start", undefined, result.fullyQualifiedName);
+            context.post({
+                type: "test start",
+                fullyQualifiedName: context.getFullyQualifiedName(specResult.fullName)
+            });
         },
         specDone: (specResult) => {
             // TODO: Report the output of the test. Currently is only showing "F" for a regression.
             var type = "result";
-            result.passed = specResult.status === "passed";
+            var result = {
+                passed: specResult.status === "passed",
+                pending: false
+            };
+
             if (specResult.status === "disabled" || specResult.status === "pending") {
                 type = "pending";
                 result.pending = true;
             }
-            sendTestProgress(callback, type, result, context.getFullyQualifiedName(specResult.fullName));
-            result = createTestResult();
-        },
-        suiteDone: (suiteResult) => {
-            sendTestProgress(callback, "suite end", result);
+            context.post({
+                type,
+                result,
+                fullyQualifiedName: context.getFullyQualifiedName(specResult.fullName)
+            });
+            context.clearOutputs();
         },
         jasmineDone: (suiteInfo) => {
-            sendTestProgress(callback, "end", result);
+            context.post({
+                type: "end"
+            });
         }
     };
 }
 
-function run_tests(context, callback) {
-    hookStandardOutputs();
-
+function run_tests(context) {
     var projectFolder = context.testCases[0].projectFolder;
     var Jasmine = detectJasmine(projectFolder);
     if (!Jasmine) {
@@ -225,7 +193,7 @@ function run_tests(context, callback) {
         var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
         jasmineInstance.configureDefaultReporter({ showColors: false });
         setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
-        jasmineInstance.addReporter(createCustomReporter(context, callback));
+        jasmineInstance.addReporter(createCustomReporter(context));
         jasmineInstance.execute(testFileList);
     }
     catch (ex) {

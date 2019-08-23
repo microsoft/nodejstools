@@ -8,18 +8,6 @@ var path = require('path');
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
 
-function reset_result() {
-    return {
-        'fullyQualifiedName': '',
-        'passed': false,
-        'pending': false,
-        'stdOut': '',
-        'stdErr': ''
-    };
-}
-
-var result = reset_result();
-
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
@@ -70,32 +58,11 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
 
 module.exports.find_tests = find_tests;
 
-var run_tests = function (context, callback) {
-    function post(event) {
-        callback(event);
-        hook_outputs();
-    }
-
+var run_tests = function (context) {
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
-    function append_stdout(string, encoding, fd) {
-        result.stdOut += string;
-        return true;
-    }
-    function append_stderr(string, encoding, fd) {
-        result.stdErr += string;
-        return true;
-    }
-    function hook_outputs() {
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
-    }
-
-    hook_outputs();
-
-    var testResults = [];
     var Mocha = detectMocha(context.testCases[0].projectFolder);
     if (!Mocha) {
         return;
@@ -117,87 +84,58 @@ var run_tests = function (context, callback) {
     });
 
     // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
-    runner.on('suite', function (suite) {
-        post({
-            type: 'suite start',
-            result: result
-        });
-    });
-
-    runner.on('suite end', function (suite) {
-        post({
-            type: 'suite end',
-            result: result
-        });
-    });
-
-    runner.on('hook', function (hook) {
-        post({
-            type: 'hook start',
-            title: hook.title,
-            result: result
-        });
-    });
-
-    runner.on('hook end', function (hook) {
-        post({
-            type: 'hook end',
-            title: hook.title,
-            result: result
-        });
-    });
-
-    runner.on('start', function () {
-        post({
-            type: 'start',
-            result: result
-        });
-    });
-
     runner.on('pending', function (test) {
-        result.pending = true;
-        result.fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+        context.post({
             type: 'pending',
-            fullyQualifiedName: result.fullyQualifiedName,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                pending: true
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 
     runner.on('test', function (test) {
-        result.fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
-        post({
+        context.post({
             type: 'test start',
-            fullyQualifiedName: result.fullyQualifiedName
+            fullyQualifiedName: context.getFullyQualifiedName(test.fullTitle())
         });
     });
 
     runner.on('end', function () {
-        post({
-            type: 'end',
-            result: result
+        context.post({
+            type: 'end'
         });
     });
 
     runner.on('pass', function (test) {
-        result.passed = true;
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+
+        context.post({
             type: 'result',
-            fullyQualifiedName: result.fullyQualifiedName,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                passed: true
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 
     runner.on('fail', function (test, err) {
-        result.passed = false;
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+
+        context.post({
             type: 'result',
-            fullyQualifiedName: result.fullyQualifiedName,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                passed: false
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 };
 
