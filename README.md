@@ -11,7 +11,7 @@ and our (old) [feature overview](https://channel9.msdn.com/events/Visual-Studio/
 
 Feel free to file issues or ask questions on our [issue tracker](http://github.com/Microsoft/nodejstools/issues), 
 and we welcome code contributions - see 
-[Contributing](https://github.com/Microsoft/nodejstools/.github/Contributing.md) for information. 
+[Contributing](https://github.com/Microsoft/nodejstools/blob/master/.github/CONTRIBUTING.md) for information. 
 
 ## Visual Studio 2017 installation
 
