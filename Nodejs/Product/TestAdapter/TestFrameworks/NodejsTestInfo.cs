@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         {
             get
             {
-                // If no suite is defined, it on the "global" space.
+                // If no suite is defined, it's on the "global" space.
                 var suite = string.IsNullOrWhiteSpace(this.Suite) ? "global" : this.Suite;
 
                 // Only three levels are allowed on vstest.

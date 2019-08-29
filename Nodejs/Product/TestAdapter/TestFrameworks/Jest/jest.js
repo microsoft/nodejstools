@@ -64,8 +64,11 @@ function visitNodes(nodes, suites, tests) {
     for (let node of nodes) {
         switch (node.type) {
             case "describe":
-                suites.push(node.name);
+                const parent = suites.length > 0 ? `${suites[suites.length - 1]} ` : '';
+                suites.push(`${parent}${node.name}`);
+
                 visitNodes(node.children, suites, tests);
+
                 suites.pop();
                 break;
             case "it":
@@ -73,7 +76,7 @@ function visitNodes(nodes, suites, tests) {
                     column: node.start.column,
                     filepath: node.file,
                     line: node.start.line,
-                    suite: suites.length === 0 ? null : suites.join(" "),
+                    suite: suites.length === 0 ? null : suites[suites.length - 1],
                     name: node.name
                 });
                 break;

@@ -38,6 +38,7 @@ function createContext(line) {
     function setFullTitle(testCases) {
         // FullyQualifiedName looks like `<filepath>::<suite><subSuite>::<testName>`.
         // <suite> will be `global` for all tests on the "global" scope.
+        // The result would be something like `<suite> <subSuite> <testName>`. Removes `global` as well.
         const cleanRegex = /.*?::(global::)?/;
 
         for (let testCase of testCases) {
@@ -54,19 +55,19 @@ function createContext(line) {
     }
 
     function post(event) {
-        unhookOutputs();
-
         if (event) {
             if (event.result) {
-                // Set only stdout and stderr if they are empty.
+                // Some test frameworks report the result on the stdout/stderr so the event will be empty. Set only stdout and stderr if that's the case.
                 event.result.stdout = event.result.stdout || newOutputs.stdout;
                 event.result.stderr = event.result.stderr || newOutputs.stderr;
             }
 
+            // We need to unhook the outputs as we want to post the event to the test explorer.
+            // Then hook again to continue capturing the stdout
+            unhookOutputs();
             console.log(JSON.stringify(event));
+            hookOutputs();
         }
-
-        hookOutputs();
     }
 
     function clearOutputs() {
