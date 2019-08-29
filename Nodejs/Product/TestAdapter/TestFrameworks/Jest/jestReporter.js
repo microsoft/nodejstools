@@ -1,4 +1,5 @@
-﻿class jestReporter {
+﻿//@ts-check
+class jestReporter {
     constructor(globalConfig, options) {
         this._globalConfig = globalConfig;
         this._options = options;
@@ -11,19 +12,18 @@
                 pending: assertionResult.status === 'pending',
                 stderr: assertionResult.failureMessages.join('\n'),
                 stdout: "",
-                title: assertionResult.title
+                fullyQualifiedName: this._options.context.getFullyQualifiedName(assertionResult.fullName)
             };
 
-            this._options.post({
+            this._options.context.post({
                 type: result.pending ? 'pending' : 'result',
-                title: assertionResult.title,
-                result: result
+                fullyQualifiedName: result.fullyQualifiedName,
+                result
             });
         }
 
-        this._options.post({
-            type: 'suite end',
-            result: {}
+        this._options.context.post({
+            type: 'end'
         });
     }
 }

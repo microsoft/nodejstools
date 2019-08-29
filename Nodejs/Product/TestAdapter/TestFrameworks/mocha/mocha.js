@@ -8,18 +8,6 @@ var path = require('path');
 // and 'xunit' does not print the stack trace from the test.
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
 
-function reset_result() {
-    return {
-        'title': '',
-        'passed': false,
-        'pending': false,
-        'stdOut': '',
-        'stdErr': ''
-    };
-}
-
-var result = reset_result();
-
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     var Mocha = detectMocha(projectFolder);
     if (!Mocha) {
@@ -31,9 +19,9 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             if (suite.tests && suite.tests.length !== 0) {
                 suite.tests.forEach(function (t, i, testArray) {
                     testList.push({
-                        test: t.fullTitle(),
+                        name: t.title,
                         suite: suite.fullTitle(),
-                        file: testFile,
+                        filepath: testFile,
                         line: 0,
                         column: 0
                     });
@@ -47,6 +35,7 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
             }
         }
     }
+
     var testList = [];
     testFileList.split(';').forEach(function (testFile) {
         var mocha = initializeMocha(Mocha, projectFolder);
@@ -66,136 +55,87 @@ var find_tests = function (testFileList, discoverResultFile, projectFolder) {
     fs.writeSync(fd, JSON.stringify(testList));
     fs.closeSync(fd);
 };
+
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, callback) {
-    function post(event) {
-        callback(event);
-        hook_outputs();
-    }
-
+var run_tests = function (context) {
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
-    function append_stdout(string, encoding, fd) {
-        result.stdOut += string;
-        return true;
-    }
-    function append_stderr(string, encoding, fd) {
-        result.stdErr += string;
-        return true;
-    }
-    function hook_outputs() {
-        process.stdout.write = append_stdout;
-        process.stderr.write = append_stderr;
-    }
-
-    hook_outputs();
-
-    var testResults = [];
-    var Mocha = detectMocha(testCases[0].projectFolder);
+    var Mocha = detectMocha(context.testCases[0].projectFolder);
     if (!Mocha) {
         return;
     }
 
-    var mocha = initializeMocha(Mocha, testCases[0].projectFolder);
+    var mocha = initializeMocha(Mocha, context.testCases[0].projectFolder);
 
-    var testGrepString = '^(' + testCases.map(function (testCase) {
-        return escapeRegExp(testCase.testName);
+    var testGrepString = '^(' + context.testCases.map(function (testCase) {
+        return escapeRegExp(testCase.fullTitle);
     }).join('|') + ')$';
 
     if (testGrepString) {
         mocha.grep(new RegExp(testGrepString));
     }
-    mocha.addFile(testCases[0].testFile);
+    mocha.addFile(context.testCases[0].testFile);
 
     var runner = mocha.run(function (code) {
         process.exitCode = code ? code : 0;
     });
 
     // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
-    runner.on('suite', function (suite) {
-        post({
-            type: 'suite start',
-            result: result
-        });
-    });
-
-    runner.on('suite end', function (suite) {
-        post({
-            type: 'suite end',
-            result: result
-        });
-    });
-
-    runner.on('hook', function (hook) {
-        post({
-            type: 'hook start',
-            title: hook.title,
-            result: result
-        });
-    });
-
-    runner.on('hook end', function (hook) {
-        post({
-            type: 'hook end',
-            title: hook.title,
-            result: result
-        });
-    });
-
-    runner.on('start', function () {
-        post({
-            type: 'start',
-            result: result
-        });
-    });
-
     runner.on('pending', function (test) {
-        result.pending = true;
-        result.title = test.fullTitle();
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+        context.post({
             type: 'pending',
-            title: result.title,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                pending: true
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 
     runner.on('test', function (test) {
-        result.title = test.fullTitle();
-        post({
+        context.post({
             type: 'test start',
-            title: result.title
+            fullyQualifiedName: context.getFullyQualifiedName(test.fullTitle())
         });
     });
 
     runner.on('end', function () {
-        post({
-            type: 'end',
-            result: result
+        context.post({
+            type: 'end'
         });
     });
 
     runner.on('pass', function (test) {
-        result.passed = true;
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+
+        context.post({
             type: 'result',
-            title: result.title,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                passed: true
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 
     runner.on('fail', function (test, err) {
-        result.passed = false;
-        post({
+        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+
+        context.post({
             type: 'result',
-            title: result.title,
-            result: result
+            fullyQualifiedName,
+            result: {
+                fullyQualifiedName,
+                passed: false
+            }
         });
-        result = reset_result();
+        context.clearOutputs();
     });
 };
 
@@ -217,7 +157,7 @@ function detectMocha(projectFolder) {
         }
 
         var mochaPath = path.join(node_modulesFolder, 'node_modules', 'mocha');
-        var Mocha = new require(mochaPath);
+        var Mocha = require(mochaPath);
         return Mocha;
     } catch (ex) {
         logError(
@@ -265,7 +205,7 @@ function getMochaOptions(projectFolder) {
     }
 
     // set timeout to 10 minutes, because the default of 2 sec is too short for debugging scenarios
-    if (typeof (v8debug) === 'object') {
+    if (typeof v8debug === 'object') {
         mochaOptions['timeout'] = 600000;
     }
 

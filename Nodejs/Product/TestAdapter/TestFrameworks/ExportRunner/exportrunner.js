@@ -1,23 +1,11 @@
+//@ts-check
 var fs = require('fs');
 var path = require('path');
 var vm = require('vm');
 var result = {
-    'title': '',
-    'passed': false,
-    'stdOut': '',
-    'stdErr': ''
+    fullyQualifiedName: '',
+    passed: false
 };
-
-function append_stdout(string, encoding, fd) {
-    result.stdOut += string;
-}
-function append_stderr(string, encoding, fd) {
-    result.stdErr += string;
-}
-function hook_outputs() {
-    process.stdout.write = append_stdout;
-    process.stderr.write = append_stderr;
-}
 
 var find_tests = function (testFileList, discoverResultFile) {
     var debug;
@@ -45,7 +33,7 @@ var find_tests = function (testFileList, discoverResultFile) {
             if (debug !== undefined) {
                 try {
                     var funcDetails = debug.findFunctionSourceLocation(testCases[test]);
-                    if (funcDetails != undefined) {
+                    if (funcDetails !== undefined) {
                         line = funcDetails.line; // 0 based
                         column = funcDetails.column; // 0 based
                     }
@@ -54,9 +42,9 @@ var find_tests = function (testFileList, discoverResultFile) {
                 }
             }
             testList.push({
-                test: test,
+                name: test,
                 suite: '',
-                file: testFile,
+                filepath: testFile,
                 line: line,
                 column: column
             });
@@ -69,45 +57,32 @@ var find_tests = function (testFileList, discoverResultFile) {
 };
 module.exports.find_tests = find_tests;
 
-var run_tests = function (testCases, callback) {
-    function post(event) {
-        callback(event);
-        hook_outputs();
-    }
-
-    hook_outputs();
-
-    for (var test of testCases) {
-        post({
+var run_tests = function (context) {
+    for (var test of context.testCases) {
+        context.post({
             type: 'test start',
-            title: test.testName
+            fullyQualifiedName: test.fullyQualifiedName
         });
         try {
             var testCase = require(test.testFile);
-            result.title = test.testName;
-            testCase[test.testName]();
+            result.fullyQualifiedName = test.fullyQualifiedName;
+            testCase[test.fullTitle]();
             result.passed = true;
-            result.stdOut += "Test passed.\n";
+            console.log("Test passed.\n");
         } catch (err) {
             result.passed = false;
             console.error(err.name);
             console.error(err.message);
         }
-        post({
+        context.post({
             type: 'result',
-            title: test.testName,
+            fullyQualifiedName: test.fullyQualifiedName,
             result: result
         });
-        result = {
-            'title': '',
-            'passed': false,
-            'stdOut': '',
-            'stdErr': ''
-        };
+        context.clearOutputs();
     }
-    callback({
-        type: 'suite end',
-        result: result
+    context.callback({
+        type: 'end'
     });
     process.exit();
 };

@@ -92,9 +92,9 @@ function enumerateSpecs(suite, testList, testFile) {
             enumerateSpecs(child, testList, testFile);
         } else {
             testList.push({
-                test: child.getFullName(),
-                suite: suite.description,
-                file: testFile,
+                name: child.description,
+                suite: suite.description === "Jasmine__TopLevel__Suite" ? null : suite.getFullName(),
+                filepath: testFile,
                 line: 0,
                 column: 0
             });
@@ -139,91 +139,61 @@ function find_tests(testFileList, discoverResultFile, projectFolder) {
 
 exports.find_tests = find_tests;
 
-function createTestResult() {
+function createCustomReporter(context) {
     return {
-        title: "",
-        passed: false,
-        pending: false,
-        stdout: "",
-        stderr: ""
-    };
-}
-
-var result = createTestResult();
-
-function hookStandardOutputs() {
-    process.stdout.write = (str, encording, callback) => {
-        result.stdout += str;
-        return true;
-    };
-    process.stderr.write = (str, encording, callback) => {
-        result.stderr += str;
-        return true;
-    };
-}
-
-function sendTestProgress(callback, evtType, result, title) {
-    var event = {
-        type: evtType,
-        result: result
-    };
-    title && (event.title = title);
-    callback(event);
-    hookStandardOutputs();
-}
-
-function createCustomReporter(callback) {
-    return {
-        jasmineStarted: (suiteInfo) => {
-            sendTestProgress(callback, "start", result);
-        },
-        suiteStarted: (suiteResult) => {
-            sendTestProgress(callback, "suite start", result);
-        },
         specStarted: (specResult) => {
-            result.title = specResult.fullName;
-            sendTestProgress(callback, "test start", undefined, result.title);
+            context.post({
+                type: "test start",
+                fullyQualifiedName: context.getFullyQualifiedName(specResult.fullName)
+            });
         },
         specDone: (specResult) => {
+            // TODO: Report the output of the test. Currently is only showing "F" for a regression.
             var type = "result";
-            result.passed = specResult.status == "passed";
-            if (specResult.status == "disabled" || specResult.status == "pending") {
+            var result = {
+                passed: specResult.status === "passed",
+                pending: false
+            };
+
+            if (specResult.status === "disabled" || specResult.status === "pending") {
                 type = "pending";
                 result.pending = true;
             }
-            sendTestProgress(callback, type, result, specResult.fullName);
-            result = createTestResult();
-        },
-        suiteDone: (suiteResult) => {
-            sendTestProgress(callback, "suite end", result);
+            context.post({
+                type,
+                result,
+                fullyQualifiedName: context.getFullyQualifiedName(specResult.fullName)
+            });
+            context.clearOutputs();
         },
         jasmineDone: (suiteInfo) => {
-            sendTestProgress(callback, "end", result);
+            context.post({
+                type: "end"
+            });
         }
     };
 }
 
-function run_tests(testCases, callback) {
-    hookStandardOutputs();
-
-    var projectFolder = testCases[0].projectFolder;
+function run_tests(context) {
+    var projectFolder = context.testCases[0].projectFolder;
     var Jasmine = detectJasmine(projectFolder);
     if (!Jasmine) {
         return;
     }
     var testFileList = [];
     var testNameList = {};
-    testCases.forEach((testCase) => {
+
+    context.testCases.forEach((testCase) => {
         if (testFileList.indexOf(testCase.testFile) < 0) {
             testFileList.push(testCase.testFile);
         }
-        testNameList[testCase.testName] = true;
+        testNameList[testCase.fullTitle] = true;
     });
     try {
         var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
         jasmineInstance.configureDefaultReporter({ showColors: false });
         setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
-        jasmineInstance.addReporter(createCustomReporter(callback));
+        jasmineInstance.addReporter(createCustomReporter(context));
         jasmineInstance.execute(testFileList);
     }
     catch (ex) {
