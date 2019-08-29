@@ -47,6 +47,7 @@ function createContext(line) {
     }
 
     function getFullyQualifiedName(testCases, fullTitle) {
+        // TODO: Don't do linear search, instead use a property or cache the fullTitle, fullyQualifiedName.
         for (let testCase of testCases) {
             if (testCase.fullTitle === fullTitle) {
                 return testCase.fullyQualifiedName;
