@@ -3239,7 +3239,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Script arguments]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Argomenti dello script]]></Val>
+            <Val><![CDATA[Argomenti script]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />

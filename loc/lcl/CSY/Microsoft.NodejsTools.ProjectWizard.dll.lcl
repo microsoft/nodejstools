@@ -3113,7 +3113,7 @@
         <Str Cat="Text">
           <Val><![CDATA[If the file should be included in the files which are published.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Jestli má být soubor zahrnutý mezi publikované soubory]]></Val>
+            <Val><![CDATA[Jestli má být soubor zahrnutý mezi publikované soubory.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
