@@ -632,7 +632,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Loading published package list...]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[発行済みのパッケージ一覧を読み込んでいます...]]></Val>
+            <Val><![CDATA[公開済みのパッケージ一覧を読み込んでいます...]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3722,7 +3722,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Publish]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[発行]]></Val>
+            <Val><![CDATA[公開]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -3731,7 +3731,7 @@
         <Str Cat="Text">
           <Val><![CDATA[If the file should be included in the files which are published.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ファイルを発行対象のファイルに含める場合。]]></Val>
+            <Val><![CDATA[ファイルを公開対象のファイルに含める場合。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
