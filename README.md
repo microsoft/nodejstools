@@ -21,10 +21,7 @@ and select the **Node.js development workload**.
 
 ## Visual Studio 2017 installation
 
-The Node.js development workload is available as part of Visual Studio 2017 Community, Professional 
-and Enterprise. 
-To install, head to run the [2017 VS installer](https://visualstudio.microsoft.com/vs/older-downloads/). Please note you will need a Visual Studio Subscription to access this.
-and select the **Node.js development workload**.
+For Visual Studio 2017 Community, Professional and Enterprise, run the [2017 VS installer](https://visualstudio.microsoft.com/vs/older-downloads/) and choose the Node.js development workload. Please note you will need a Visual Studio Subscription to access this. 
 
 
 ## Visual Studio 2015 and earlier
