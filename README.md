@@ -29,7 +29,7 @@ and select the **Node.js development workload**.
 
 ## Visual Studio 2015 and earlier
 
-For more information on how to install Node.js tools, please send an email to (Gabrielle Crevecoeur (Current Program Manager))[mailto:gacreve@microsoft.com?subject=Installing%20Node.js%20Tools%20For%20Early%20Versions%20%Of%20VS]
+For more information on how to install Node.js tools, please send an email to [Gabrielle Crevecoeur (Current Program Manager)](mailto:gacreve@microsoft.com?subject=Installing%20Node.js%20Tools%20For%20Early%20Versions%20%Of%20VS)
 
 ## Code of Conduct
 
