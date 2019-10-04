@@ -2702,7 +2702,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Verbosity]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Commentaires]]></Val>
+            <Val><![CDATA[Verbosité]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
