@@ -554,7 +554,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Current interactive window is disconnected - please reset the process.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[現在の対話型ウィンドウは切断されています - プロセスをリセットしてください。]]></Val>
+            <Val><![CDATA[現在のインタラクティブ ウィンドウは切断されています - プロセスをリセットしてください。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -572,7 +572,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js Interactive Window]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js 対話型ウィンドウ]]></Val>
+            <Val><![CDATA[Node.js インタラクティブ ウィンドウ]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1679,7 +1679,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js interactive window. Type .help for a list of commands.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js 対話型ウィンドウです。コマンドを一覧表示するには、.help と入力してください。]]></Val>
+            <Val><![CDATA[Node.js インタラクティブ ウィンドウです。コマンドを一覧表示するには、.help と入力してください。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
