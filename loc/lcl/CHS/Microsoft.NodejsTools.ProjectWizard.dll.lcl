@@ -554,7 +554,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Current interactive window is disconnected - please reset the process.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[当前交互式窗口断开 - 请重置进程。]]></Val>
+            <Val><![CDATA[当前交互窗口断开 - 请重置进程。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -572,7 +572,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js Interactive Window]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js 交互式窗口]]></Val>
+            <Val><![CDATA[Node.js 交互窗口]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1679,7 +1679,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js interactive window. Type .help for a list of commands.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Node.js 交互式窗口。键入 .help 获取命令列表。]]></Val>
+            <Val><![CDATA[Node.js 交互窗口。键入 .help 获取命令列表。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
