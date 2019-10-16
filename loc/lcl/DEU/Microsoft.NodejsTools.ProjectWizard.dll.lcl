@@ -572,7 +572,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js Interactive Window]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Interaktives Node.js-Fenster]]></Val>
+            <Val><![CDATA[Interactive-Fenster für Node.js]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1679,7 +1679,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js interactive window. Type .help for a list of commands.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Interaktives Node.js-Fenster. Geben Sie ".help" ein, um die Liste der Befehle anzuzeigen.]]></Val>
+            <Val><![CDATA[Interactive-Fenster für Node.js. Geben Sie ".help" ein, um die Liste der Befehle anzuzeigen.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
