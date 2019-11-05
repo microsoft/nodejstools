@@ -5,7 +5,7 @@ import path = require('path');
 import routes from './routes/index';
 import users from './routes/user';
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -17,8 +17,8 @@ app.use('/', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+app.use((req, res, next) => {
+    const err = new Error('Not Found');
     err['status'] = 404;
     next(err);
 });
@@ -28,7 +28,7 @@ app.use(function (req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use((err: any, req, res, next) => {
+    app.use((err, req, res, next) => { // eslint-disable-line @typescript-eslint/no-unused-vars
         res.status(err['status'] || 500);
         res.render('error', {
             message: err.message,
@@ -39,7 +39,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use((err: any, req, res, next) => {
+app.use((err, req, res, next) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
@@ -49,6 +49,6 @@ app.use((err: any, req, res, next) => {
 
 app.set('port', process.env.PORT || 3000);
 
-var server = app.listen(app.get('port'), function () {
+const server = app.listen(app.get('port'), function () {
     debug('Express server listening on port ' + server.address().port);
 });

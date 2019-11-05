@@ -4,6 +4,6 @@
  */
 'use strict';
 
-while (true) {
+while (true) { // eslint-disable-line no-constant-condition
 
 }
