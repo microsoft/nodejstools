@@ -347,7 +347,7 @@
         <Str Cat="Text">
           <Val><![CDATA[This TypeScript project has 'Combine Javascript output into file' option enabled. This option is not supported by NTVS debugger, and may result in erratic behavior of breakpoints, stepping, and debug tool windows. Are you sure you want to start debugging?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Bei diesem TypeScript-Projekt wurde die Option "Javascript-Ausgabe in Datei kombinieren" aktiviert. Diese Option wird vom NTVS-Debugger nicht unterstützt und kann zu fehlerhaften Verhalten von Haltepunkt-, Stepping- und Debugging-Tool-Fenstern führen. Soll das Debugging gestartet werden?]]></Val>
+            <Val><![CDATA[Bei diesem TypeScript-Projekt wurde die Option "Javascript-Ausgabe in Datei kombinieren" aktiviert. Diese Option wird vom NTVS-Debugger nicht unterstützt und kann zu fehlerhaftem Verhalten von Haltepunkten, Einzelschrittausführung und Debugtoolfenstern führen. Soll das Debuggen gestartet werden?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
