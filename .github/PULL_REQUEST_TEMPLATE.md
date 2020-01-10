@@ -1,9 +1,0 @@
-Issue #
-
-##### Bug
-
-
-##### Fix
-
-
-##### Testing
