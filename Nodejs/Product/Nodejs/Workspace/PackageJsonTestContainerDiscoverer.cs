@@ -68,7 +68,8 @@ namespace Microsoft.NodejsTools.Workspace
                 var indexService = workspace.GetIndexWorkspaceService();
                 // This returns null for LiveShare workspace so adding a check.
                 // TestExplorer support with LiveShare is currently only enabled for LiveShare insiders and is still a little buggy for C#.
-                // We should revisit this to light it up when it becomes stable.
+                // We should revisit this to light it up when it becomes stable and we hear feedback.
+                // Disabling this now means no tests will be discovered and TestExplorer will be empty while LiveSharing.
                 if (indexService != null)
                 {
                     var filesDataValues = await indexService.GetFilesDataValuesAsync<string>(NodejsConstants.TestRootDataValueGuid);
