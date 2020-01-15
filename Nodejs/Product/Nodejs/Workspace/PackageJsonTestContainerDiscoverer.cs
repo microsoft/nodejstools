@@ -66,20 +66,27 @@ namespace Microsoft.NodejsTools.Workspace
             if (workspace != null)
             {
                 var indexService = workspace.GetIndexWorkspaceService();
-                var filesDataValues = await indexService.GetFilesDataValuesAsync<string>(NodejsConstants.TestRootDataValueGuid);
-
-                lock (this.containerLock)
+                // This returns null for LiveShare workspace so adding a check.
+                // TestExplorer support with LiveShare is currently only enabled for LiveShare insiders and is still a little buggy for C#.
+                // We should revisit this to light it up when it becomes stable and we hear feedback.
+                // Disabling this now means no tests will be discovered and TestExplorer will be empty while LiveSharing.
+                if (indexService != null)
                 {
-                    this.containers.Clear();
-                    foreach (var dataValue in filesDataValues)
-                    {
-                        var rootFilePath = workspace.MakeRooted(dataValue.Key);
-                        var testRoot = dataValue.Value.Where(f => f.Name == NodejsConstants.TestRootDataValueName).FirstOrDefault()?.Value;
+                    var filesDataValues = await indexService.GetFilesDataValuesAsync<string>(NodejsConstants.TestRootDataValueGuid);
 
-                        if (!string.IsNullOrEmpty(testRoot))
+                    lock (this.containerLock)
+                    {
+                        this.containers.Clear();
+                        foreach (var dataValue in filesDataValues)
                         {
-                            var testRootPath = workspace.MakeRooted(testRoot);
-                            this.containers.Add(new PackageJsonTestContainer(this, rootFilePath, testRootPath));
+                            var rootFilePath = workspace.MakeRooted(dataValue.Key);
+                            var testRoot = dataValue.Value.Where(f => f.Name == NodejsConstants.TestRootDataValueName).FirstOrDefault()?.Value;
+
+                            if (!string.IsNullOrEmpty(testRoot))
+                            {
+                                var testRootPath = workspace.MakeRooted(testRoot);
+                                this.containers.Add(new PackageJsonTestContainer(this, rootFilePath, testRootPath));
+                            }
                         }
                     }
                 }
