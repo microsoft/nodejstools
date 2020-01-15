@@ -1,0 +1,20 @@
+{
+  "name": "MicrosoftNodejsTools",
+  "license": "Apache-2.0",
+  "description": "Node.js Tools for Visual Studio",
+  "repository": "https://github.com/microsoft/nodejstools",
+  "readme": "https://github.com/microsoft/nodejstools/blob/master/README.md",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "2.6.0",
+    "@typescript-eslint/parser": "2.6.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "6.5.1",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-node": "10.0.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-react": "7.16.0",
+    "eslint-plugin-vue": "^6.0.1",
+    "react": "^16.12.0",
+    "typescript": "3.6.4"
+  }
+}
