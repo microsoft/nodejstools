@@ -86,7 +86,7 @@ namespace Microsoft.NodejsTools.Workspace
             var jsonContent = GetJsonConfigurationForInspectProtocol(target, cwd, nodeExe, debugLaunchContext);
 
             vsDebugTargetInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-            vsDebugTargetInfo.clsidCustom = NodejsProjectLauncher.WebKitDebuggerV2Guid;
+            vsDebugTargetInfo.clsidCustom = NodejsProjectLauncher.ShouldUseV3CdpDebugger() ? NodejsProjectLauncher.JsCdpDebuggerV3Guid : NodejsProjectLauncher.WebKitDebuggerV2Guid;
             vsDebugTargetInfo.bstrOptions = jsonContent;
             vsDebugTargetInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
         }
