@@ -35,8 +35,7 @@ namespace Microsoft.NodejsTools.Project
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
-        internal static readonly Guid JsCdpDebuggerV3Guid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
+        private static Guid debuggerGuid = Guid.Empty;
 
         public NodejsProjectLauncher(NodejsProjectNode project)
         {
@@ -217,10 +216,17 @@ namespace Microsoft.NodejsTools.Project
             return builder.ToString();
         }
 
-        internal static bool ShouldUseV3CdpDebugger()
+        internal static Guid GetDebuggerGuid()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            
+            Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+            Guid JsCdpDebuggerV3Guid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
+            
             var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
-            return featureFlagsService != null && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpDebugAdapter", false);
+            return (featureFlagsService != null && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpDebugAdapter", false)) ?
+                                JsCdpDebuggerV3Guid :
+                                WebKitDebuggerV2Guid;
         }
 
         private int TestServerPort
@@ -288,7 +294,7 @@ namespace Microsoft.NodejsTools.Project
             var debugTargets = new[] {
                 new VsDebugTargetInfo4() {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
-                    guidLaunchDebugEngine = ShouldUseV3CdpDebugger() ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid,
+                    guidLaunchDebugEngine = GetDebuggerGuid(),
                     bstrExe = file,
                     bstrOptions = jsonContent
                 }
