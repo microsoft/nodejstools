@@ -16,7 +16,6 @@ using System.Web;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Debugger;
 using Microsoft.NodejsTools.Debugger.DebugEngine;
-using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.SharedProject;
 using Microsoft.NodejsTools.Telemetry;
@@ -24,9 +23,7 @@ using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudioTools.Project;
-using Microsoft.Internal.VisualStudio.Shell.Interop;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.NodejsTools.Project
