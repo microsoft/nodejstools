@@ -237,7 +237,7 @@ namespace Microsoft.NodejsTools.Project
                     return ((int) userDebuggerOption != 0) ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return WebKitDebuggerV2Guid;
             }
