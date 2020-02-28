@@ -24,6 +24,7 @@ using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.Internal.VisualStudio.Shell.Interop;
 using Newtonsoft.Json.Linq;
@@ -222,11 +223,24 @@ namespace Microsoft.NodejsTools.Project
             
             Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
             Guid JsCdpDebuggerV3Guid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
-            
-            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
-            return (featureFlagsService != null && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpDebugAdapter", false)) ?
-                                JsCdpDebuggerV3Guid :
-                                WebKitDebuggerV2Guid;
+
+            var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
+            try
+            {
+                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetDebugging");
+                if (userDebuggerOption == null)
+                {
+                    return WebKitDebuggerV2Guid;
+                }
+                else
+                {
+                    return ((int) userDebuggerOption != 0) ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid;
+                }
+            }
+            catch (Exception e)
+            {
+                return WebKitDebuggerV2Guid;
+            }
         }
 
         private int TestServerPort
@@ -287,7 +301,9 @@ namespace Microsoft.NodejsTools.Project
                 new JProperty("env", JObject.FromObject(envVars)),
                 new JProperty("trace", CheckEnableDiagnosticLoggingOption()),
                 new JProperty("sourceMaps", true),
-                new JProperty("stopOnEntry", true));
+                new JProperty("stopOnEntry", true),
+                new JProperty("url", webBrowserUrl));
+
 
             var jsonContent = configuration.ToString();
 
