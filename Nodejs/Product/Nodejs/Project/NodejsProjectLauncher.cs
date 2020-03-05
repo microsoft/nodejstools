@@ -28,6 +28,7 @@ using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudioTools.Project;
 using Microsoft.Internal.VisualStudio.Shell.Interop;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.Project
 {
@@ -36,7 +37,8 @@ namespace Microsoft.NodejsTools.Project
         private readonly NodejsProjectNode _project;
         private int? _testServerPort;
 
-        private static Guid debuggerGuid = Guid.Empty;
+        internal static readonly Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
+        internal static readonly Guid JsCdpDebuggerV3Guid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
 
         public NodejsProjectLauncher(NodejsProjectNode project)
         {
@@ -217,29 +219,24 @@ namespace Microsoft.NodejsTools.Project
             return builder.ToString();
         }
 
-        internal static Guid GetDebuggerGuid()
+        internal static bool ShouldUseV3CdpDebugger()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            
-            Guid WebKitDebuggerV2Guid = Guid.Parse("30d423cc-6d0b-4713-b92d-6b2a374c3d89");
-            Guid JsCdpDebuggerV3Guid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
-
             var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
             try
             {
                 object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetDebugging");
                 if (userDebuggerOption == null)
                 {
-                    return WebKitDebuggerV2Guid;
+                    return false;
                 }
                 else
                 {
-                    return ((int) userDebuggerOption != 0) ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid;
+                    return (int)userDebuggerOption != 0;
                 }
             }
             catch (Exception)
             {
-                return WebKitDebuggerV2Guid;
+                return false;
             }
         }
 
@@ -287,30 +284,40 @@ namespace Microsoft.NodejsTools.Project
             var scriptArguments = ConvertArguments(this._project.GetProjectProperty(NodeProjectProperty.ScriptArguments));
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
-            var configuration = new JObject(
-                new JProperty("name", "Debug Node.js program from Visual Studio"),
-                new JProperty("type", "node2"),
-                new JProperty("request", "launch"),
-                new JProperty("program", file),
-                new JProperty("args", scriptArguments),
-                new JProperty("runtimeExecutable", nodePath),
-                new JProperty("runtimeArgs", runtimeArguments),
-                new JProperty("port", debuggerPort),
-                new JProperty("cwd", cwd),
-                new JProperty("console", "externalTerminal"),
-                new JProperty("env", JObject.FromObject(envVars)),
-                new JProperty("trace", CheckEnableDiagnosticLoggingOption()),
-                new JProperty("sourceMaps", true),
-                new JProperty("stopOnEntry", true),
-                new JProperty("url", webBrowserUrl));
 
+            NodePinezorroDebugLaunchConfig config = new NodePinezorroDebugLaunchConfig(file, 
+                                                                                       scriptArguments, 
+                                                                                       nodePath, 
+                                                                                       runtimeArguments, 
+                                                                                       debuggerPort, 
+                                                                                       cwd, 
+                                                                                       CheckEnableDiagnosticLoggingOption(),
+                                                                                       JObject.FromObject(envVars));
 
-            var jsonContent = configuration.ToString();
+            bool usingV3Debugger = ShouldUseV3CdpDebugger();
+
+            if (usingV3Debugger && shouldStartBrowser && (browserPath.EndsWith("chrome.exe") || browserPath.EndsWith("msedge.exe")))
+            {
+                NodePinezorroDebugLaunchConfig newConfig = new NodePinezorroDebugLaunchConfig();
+                newConfig.ConfigName = "Debug Node program and browser from Visual Studio";
+                newConfig.Request = "launch";
+                newConfig.DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge";
+                newConfig.RuntimeExecutable = browserPath;
+                newConfig.BrowserUrl = webBrowserUrl;
+                newConfig.BrowserUserDataDir = true;
+                newConfig.Environment = config.Environment;
+                newConfig.Server = config.toPwaChromeServerConfig();
+                shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
+                
+                config = newConfig;
+            }
+
+            var jsonContent = JObject.FromObject(config).ToString();
 
             var debugTargets = new[] {
                 new VsDebugTargetInfo4() {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
-                    guidLaunchDebugEngine = GetDebuggerGuid(),
+                    guidLaunchDebugEngine = usingV3Debugger ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid,
                     bstrExe = file,
                     bstrOptions = jsonContent
                 }
@@ -559,6 +566,99 @@ namespace Microsoft.NodejsTools.Project
                 }
             }
             return startupFile;
+        }
+    }
+
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
+    internal class NodePinezorroDebugLaunchConfig
+    {
+        public NodePinezorroDebugLaunchConfig() { }
+
+        public NodePinezorroDebugLaunchConfig (string program, 
+                                               string[] programArgs, 
+                                               string runtimeExecutable, 
+                                               string[] runtimeArgs, 
+                                               string port, 
+                                               string currWorkingDir,
+                                               bool trace,
+                                               object environmentSettings = null)
+        {
+            this.ConfigName = "Debug Node.js program from Visual Studio";
+            this.Request = "launch";
+            this.DebugType = "node2";
+            this.Console = "externalTerminal";
+            this.Program = program;
+            this.ProgramArgs = programArgs;
+            this.RuntimeExecutable = runtimeExecutable;
+            this.RuntimeArgs = runtimeArgs;
+            this.Port = port;
+            this.WorkingDir = currWorkingDir;
+            this.Environment = environmentSettings;
+            this.Trace = trace;
+        }
+
+        [JsonProperty("name")]
+        public string ConfigName { get; set; } 
+
+        [JsonProperty("type")]
+        public string DebugType { get; set; }
+
+        [JsonProperty("request")]
+        public string Request { get; set; } 
+
+        [JsonProperty("program")]
+        public string Program { get; set; }
+
+        [JsonProperty("args")]
+        public string[] ProgramArgs { get; set; }
+
+        [JsonProperty("runtimeExecutable")]
+        public string RuntimeExecutable { get; set; }
+
+        [JsonProperty("runtimeArgs")]
+        public string[] RuntimeArgs { get; set; }
+
+        [JsonProperty("port")]
+        public string Port { get; set; }
+
+        [JsonProperty("cwd")]
+        public string WorkingDir { get; set; }
+
+        [JsonProperty("console")]
+        public string Console { get; set; }
+
+        [JsonProperty("env")]
+        public object Environment { get; set; }
+
+        [JsonProperty("trace")]
+        public bool Trace { get; set; }
+
+        [JsonProperty("sourceMaps")]
+        public bool SourceMaps { get; set; } = true;
+
+        [JsonProperty("stopOnEntry")]
+        public bool StopOnEntry { get; set; } = true;
+
+        [JsonProperty("url")]
+        public string BrowserUrl { get; set; }
+
+        [JsonProperty("server")]
+        public object Server { get; set; } 
+
+        [JsonProperty("sourceMapPathOverrides")]
+        public string[] SourceMapPathOverrides { get; set; }
+
+        [JsonProperty("restart")]
+        public bool RestartPolicy { get; set; }
+
+        [JsonProperty("userDataDir")]
+        public object BrowserUserDataDir { get; set; } = null;
+
+        public object toPwaChromeServerConfig()
+        {
+            this.Console = "internalConsole";
+            this.SourceMapPathOverrides = new string[0];
+            return this;
         }
     }
 

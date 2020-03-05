@@ -67,22 +67,16 @@ namespace Microsoft.NodejsTools.Workspace
             runtimeArguments = runtimeArguments.Append($"--inspect-brk={debuggerPort}");
             var scriptArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(ScriptArgsKey, defaultValue: null));
 
-            var configuration = new JObject(
-                new JProperty("name", "Debug Node.js program from Visual Studio"),
-                new JProperty("type", "node2"),
-                new JProperty("request", "launch"),
-                new JProperty("program", target),
-                new JProperty("args", scriptArguments),
-                new JProperty("runtimeExecutable", nodeExe),
-                new JProperty("runtimeArgs", runtimeArguments),
-                new JProperty("port", debuggerPort),
-                new JProperty("cwd", workingDir),
-                new JProperty("console", "externalTerminal"),
-                new JProperty("trace", NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption()),
-                new JProperty("sourceMaps", true),
-                new JProperty("stopOnEntry", true));
+            NodePinezorroDebugLaunchConfig launchConfig = new NodePinezorroDebugLaunchConfig(target,
+                                                                                             scriptArguments,
+                                                                                             nodeExe,
+                                                                                             runtimeArguments,
+                                                                                             debuggerPort.ToString(),
+                                                                                             workingDir,
+                                                                                             NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption());
 
-            return configuration.ToString();
+
+            return JObject.FromObject(launchConfig).ToString();
         }
 
         protected static string[] ConvertArguments(string argumentString)
