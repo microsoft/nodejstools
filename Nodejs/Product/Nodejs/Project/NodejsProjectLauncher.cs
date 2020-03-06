@@ -219,6 +219,11 @@ namespace Microsoft.NodejsTools.Project
             return builder.ToString();
         }
 
+        internal static Guid GetDebuggerGuid()
+        {
+            return ShouldUseV3CdpDebugger() ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid;
+        }
+
         internal static bool ShouldUseV3CdpDebugger()
         {
             var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
@@ -285,31 +290,31 @@ namespace Microsoft.NodejsTools.Project
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
 
-            NodePinezorroDebugLaunchConfig config = new NodePinezorroDebugLaunchConfig(file, 
-                                                                                       scriptArguments, 
-                                                                                       nodePath, 
-                                                                                       runtimeArguments, 
-                                                                                       debuggerPort, 
-                                                                                       cwd, 
-                                                                                       CheckEnableDiagnosticLoggingOption(),
-                                                                                       JObject.FromObject(envVars));
+            var config = new NodePinezorroDebugLaunchConfig(file, 
+                                                            scriptArguments,
+                                                            nodePath,
+                                                            runtimeArguments,
+                                                            debuggerPort,
+                                                            cwd,
+                                                            CheckEnableDiagnosticLoggingOption(),
+                                                            JObject.FromObject(envVars));
 
             bool usingV3Debugger = ShouldUseV3CdpDebugger();
 
             if (usingV3Debugger && shouldStartBrowser && (browserPath.EndsWith("chrome.exe") || browserPath.EndsWith("msedge.exe")))
             {
-                NodePinezorroDebugLaunchConfig newConfig = new NodePinezorroDebugLaunchConfig();
-                newConfig.ConfigName = "Debug Node program and browser from Visual Studio";
-                newConfig.Request = "launch";
-                newConfig.DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge";
-                newConfig.RuntimeExecutable = browserPath;
-                newConfig.BrowserUrl = webBrowserUrl;
-                newConfig.BrowserUserDataDir = true;
-                newConfig.Environment = config.Environment;
-                newConfig.Server = config.toPwaChromeServerConfig();
+                config = new NodePinezorroDebugLaunchConfig()
+                {
+                    ConfigName = "Debug Node program and browser from Visual Studio",
+                    Request = "launch",
+                    DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge",
+                    RuntimeExecutable = browserPath,
+                    BrowserUrl = webBrowserUrl,
+                    BrowserUserDataDir = true,
+                    Environment = config.Environment,
+                    Server = config.toPwaChromeServerConfig()
+                };
                 shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
-                
-                config = newConfig;
             }
 
             var jsonContent = JObject.FromObject(config).ToString();
@@ -317,7 +322,7 @@ namespace Microsoft.NodejsTools.Project
             var debugTargets = new[] {
                 new VsDebugTargetInfo4() {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
-                    guidLaunchDebugEngine = usingV3Debugger ? JsCdpDebuggerV3Guid : WebKitDebuggerV2Guid,
+                    guidLaunchDebugEngine = GetDebuggerGuid(),
                     bstrExe = file,
                     bstrOptions = jsonContent
                 }

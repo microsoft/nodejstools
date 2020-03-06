@@ -67,7 +67,7 @@ namespace Microsoft.NodejsTools.Workspace
             runtimeArguments = runtimeArguments.Append($"--inspect-brk={debuggerPort}");
             var scriptArguments = ConvertArguments(debugLaunchContext.LaunchConfiguration.GetValue<string>(ScriptArgsKey, defaultValue: null));
 
-            NodePinezorroDebugLaunchConfig launchConfig = new NodePinezorroDebugLaunchConfig(target,
+            var launchConfig = new NodePinezorroDebugLaunchConfig(target,
                                                                                              scriptArguments,
                                                                                              nodeExe,
                                                                                              runtimeArguments,
