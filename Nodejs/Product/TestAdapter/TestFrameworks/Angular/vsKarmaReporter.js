@@ -4,6 +4,8 @@ const http = require('http');
 const path = require('path');
 
 const jasmineReporterPath = path.resolve(process.env.VSTESTADAPTERPATH, 'jasmineReporter.js');
+const testCases = JSON.parse(process.env.TESTCASES);
+const isDiscovery = process.env.ISDISCOVERY === 'true';
 
 const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter) {
     baseReporterDecorator(this);
@@ -16,13 +18,15 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         watched: false
     });
 
-    const testList = [];
-
     // TODO: Is there a better option than onBrowserLog?
     this.onBrowserLog = (browser, browserLog, type) => {
-        // TODO: handle status "Excluded";
         const cleaned = browserLog.substring(1, browserLog.length - 1); // Remove extra quote at start and end
         const result = JSON.parse(cleaned);
+
+        // If not discovering, ignore all excluded tests. Jasmine reports the test as excluded if it was not marked for execution.
+        if (!isDiscovery && result.status === "excluded") {
+            return;
+        }
 
         const fullFilePath = `${process.env.PROJECTPATH}${result.fileLocation.relativeFilePath}`;
         const suite = result.fullName.substring(0, result.fullName.length - result.description.length - 1);
@@ -33,7 +37,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         }
 
         // Handles both scenarios, discovery and execution.
-        testList.push({
+        process.send({
             // Discovery properties
             name: result.description,
             suite,
@@ -44,7 +48,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
             // Execution properties
             passed: result.status === "passed",
             pending: result.status === "disabled" || result.status === "pending",
-            fullyQualifiedName: `${result.fileLocation.relativeFilePath}::${suite}::${result.description}`,
+            fullName: result.fullName,
             stderr: errorLog
         });
 
@@ -52,16 +56,32 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
     }
 
     this.onRunComplete = (browsers, results) => {
-        console.log(JSON.stringify(testList));
-
         log.debug(`onRunComplete: ${JSON.stringify(results)}`);
 
-        // We need to exit the process as angular keeps listening, so it never emits an 'end' event.
-        process.exit();
+        const testCase = testCases.pop();
+        if (testCase) {
+            runTestCase(testCase);
+        } else {
+            // We need to exit the process as angular keeps it running and to emit the 'exit' event.
+            process.exit();
+        }
     }
+
+    let hasStarted = false;
 
     // Check when browser is ready to request a run.
     emitter.on("browsers_ready", () => {
+        // There's Scenario that I'm not sure how to repro where the browser do something (refresh? crashes?)
+        // and we get the event again. We only want to executed it once.
+        if (!hasStarted) {
+            hasStarted = true;
+
+            // At least one test case should exists.
+            runTestCase(testCases.pop());
+        }
+    });
+
+    function runTestCase(testCase) {
         const options = {
             hostname: 'localhost',
             path: '/run',
@@ -74,9 +94,9 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
 
         const request = http.request(options);
         request.end(
-            JSON.stringify({ args: ['--grep="NTVS_AStringThatShouldNeverExists"'] })
+            JSON.stringify({ args: [`--grep=${testCase.fullTitle}`] })
         );
-    });
+    }
 }
 
 vsKarmaReporter.$inject = ['baseReporterDecorator', 'config', 'logger', 'emitter'];

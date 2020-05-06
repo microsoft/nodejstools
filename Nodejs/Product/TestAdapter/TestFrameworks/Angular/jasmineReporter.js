@@ -23,7 +23,7 @@ function getFileLocation() {
 }
 
 var myReporter = {
-    specDone: function (result) {
+    specDone: result => {
         console.log(JSON.stringify(result));
     }
 };
