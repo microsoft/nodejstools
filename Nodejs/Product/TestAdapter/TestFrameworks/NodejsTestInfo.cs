@@ -10,8 +10,6 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
     {
         public NodejsTestInfo(string testPath, string suite, string testName, string testFramework, int line, int column, string projectRootDir)
         {
-            Debug.Assert(testPath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) || testPath.EndsWith(".jsx", StringComparison.OrdinalIgnoreCase));
-
             var testFileRelative = CommonUtils.GetRelativeFilePath(projectRootDir, testPath);
 
             this.TestFile = testFileRelative;

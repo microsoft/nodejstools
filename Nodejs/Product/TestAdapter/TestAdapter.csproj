@@ -60,6 +60,7 @@
     <Compile Include="ProjectTestDiscoverer.cs" />
     <Compile Include="TestDiscovererWorker.cs" />
     <Compile Include="TestExecutorWorker.cs" />
+    <Compile Include="TestFrameworkFactory.cs" />
     <Compile Include="TestFrameworks\FrameworkDiscoverer.cs" />
     <Compile Include="JavaScriptTestCaseProperties.cs" />
     <Compile Include="TestFrameworks\NodejsTestInfo.cs" />
@@ -94,6 +95,18 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestFrameworks\Angular\Angular.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\Angular\jasmineReporter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\Angular\karmaConfig.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFrameworks\Angular\vsKarmaReporter.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestFrameworks\ExportRunner\exportrunner.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

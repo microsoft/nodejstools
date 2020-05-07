@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Build.Framework.XamlTypes;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudioTools;
 using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
@@ -61,74 +61,13 @@ namespace Microsoft.NodejsTools.TestAdapter
                     }
 
                     FrameworkDiscoverer frameworkDiscoverer = null;
+                    var testItems = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
                     foreach (var proj in buildEngine.LoadedProjects)
                     {
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        var testItems = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-
-                        var testRoot = proj.GetProperty(NodeProjectProperty.TestRoot)?.EvaluatedValue;
-                        var testFramework = proj.GetProperty(NodeProjectProperty.TestFramework)?.EvaluatedValue;
-
-                        if (!string.IsNullOrEmpty(testRoot) && string.IsNullOrEmpty(testFramework))
-                        {
-                            logger.SendMessage(TestMessageLevel.Warning, $"TestRoot specified for '{Path.GetFileName(proj.FullPath)}' but no TestFramework.");
-                        }
-
-                        // Provide all files to the test analyzer
-                        foreach (var item in proj.Items)
-                        {
-                            string testFrameworkName;
-                            string fileAbsolutePath;
-                            if (!string.IsNullOrEmpty(testRoot) && !string.IsNullOrEmpty(testFramework))
-                            {
-                                testFrameworkName = testFramework;
-                                var testRootPath = Path.GetFullPath(Path.Combine(proj.DirectoryPath, testRoot));
-
-                                try
-                                {
-                                    fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                                }
-                                catch (ArgumentException)
-                                {
-                                    // .Net core projects include invalid paths, ignore them and continue checking the items.
-                                    continue;
-                                }
-
-                                if (!fileAbsolutePath.StartsWith(testRootPath, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                //Check to see if this is a TestCase
-                                testFrameworkName = item.GetMetadataValue("TestFramework");
-                                if (!TestFramework.IsValidTestFramework(testFrameworkName))
-                                {
-                                    continue;
-                                }
-                                fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectHome, item.EvaluatedInclude);
-                            }
-
-                            var typeScriptTest = TypeScript.TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
-                            if (typeScriptTest)
-                            {
-                                fileAbsolutePath = TypeScript.TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(proj, fileAbsolutePath);
-                            }
-                            else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(fileAbsolutePath), ".js"))
-                            {
-                                continue;
-                            }
-
-                            if (!testItems.TryGetValue(testFrameworkName, out var fileList))
-                            {
-                                fileList = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                                testItems.Add(testFrameworkName, fileList);
-                            }
-                            fileList.Add(fileAbsolutePath);
-                        }
+                        testItems = TestFrameworkFactory.GetTestItems(projectHome, proj);
 
                         if (testItems.Any())
                         {
