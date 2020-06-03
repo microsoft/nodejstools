@@ -230,19 +230,15 @@ namespace Microsoft.NodejsTools.Project
             try
             {
                 object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetDebugging");
-                if (userDebuggerOption == null)
+                if (userDebuggerOption is int optionVal)
                 {
-                    return false;
-                }
-                else
-                {
-                    return (int)userDebuggerOption != 0;
+                    return optionVal != 0;
                 }
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            catch (Exception) { } // do nothing. proceed to trying the feature flag below.
+
+            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
+            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpDebugAdapter", false);
         }
 
         private int TestServerPort
@@ -311,7 +307,6 @@ namespace Microsoft.NodejsTools.Project
                     RuntimeExecutable = browserPath,
                     BrowserUrl = webBrowserUrl,
                     BrowserUserDataDir = true,
-                    Environment = config.Environment,
                     Server = config.toPwaChromeServerConfig()
                 };
                 shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
