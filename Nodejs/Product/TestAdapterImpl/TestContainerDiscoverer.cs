@@ -16,7 +16,7 @@ using Microsoft.VisualStudioTools;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    [Export(typeof(ITestContainerDiscoverer))]
+    [Export]
     internal class TestContainerDiscoverer : ITestContainerDiscoverer, IDisposable
     {
         private readonly IServiceProvider serviceProvider;

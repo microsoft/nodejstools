@@ -31,6 +31,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public string GetCurrentTest(string filePath, int line, int lineCharOffset)
         {
+            // TODO: finish implementing this method
+            return null;
+
             var project = this.PathToProject(filePath);
             if (project != null && this.discoverer.IsProjectKnown(project))
             {
@@ -45,7 +48,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                      */
                 }
             }
-            return null;
         }
 
         private IVsProject PathToProject(string filePath)
