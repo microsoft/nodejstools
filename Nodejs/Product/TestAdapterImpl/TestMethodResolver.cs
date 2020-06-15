@@ -22,9 +22,9 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.discoverer = discoverer;
         }
 
-        public Uri ExecutorUri => NodejsConstants.ExecutorUri;
+        Uri ITestMethodResolver.ExecutorUri => NodejsConstants.ExecutorUri;
 
-        public string GetCurrentTest(string filePath, int line, int lineCharOffset)
+        string ITestMethodResolver.GetCurrentTest(string filePath, int line, int lineCharOffset)
         {
             // TODO: finish implementing this method with specified imports.
             return null;
