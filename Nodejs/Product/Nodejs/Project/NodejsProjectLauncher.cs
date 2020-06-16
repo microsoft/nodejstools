@@ -293,6 +293,7 @@ namespace Microsoft.NodejsTools.Project
                                                             debuggerPort,
                                                             cwd,
                                                             CheckEnableDiagnosticLoggingOption(),
+                                                            _project.ProjectGuid.ToString(),
                                                             JObject.FromObject(envVars));
 
             bool usingV3Debugger = ShouldUseV3CdpDebugger();
@@ -307,7 +308,10 @@ namespace Microsoft.NodejsTools.Project
                     RuntimeExecutable = browserPath,
                     BrowserUrl = webBrowserUrl,
                     BrowserUserDataDir = true,
-                    Server = config.toPwaChromeServerConfig()
+                    Server = config.toPwaChromeServerConfig(),
+                    WorkingDir = cwd,
+                    WebRoot = cwd,
+                    ProjectGuid = _project.ProjectGuid.ToString()
                 };
                 shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
             }
@@ -581,6 +585,7 @@ namespace Microsoft.NodejsTools.Project
                                                string port, 
                                                string currWorkingDir,
                                                bool trace,
+                                               string projectGuid,
                                                object environmentSettings = null)
         {
             this.ConfigName = "Debug Node.js program from Visual Studio";
@@ -595,6 +600,7 @@ namespace Microsoft.NodejsTools.Project
             this.WorkingDir = currWorkingDir;
             this.Environment = environmentSettings;
             this.Trace = trace;
+            this.ProjectGuid = projectGuid;
         }
 
         [JsonProperty("name")]
@@ -653,6 +659,12 @@ namespace Microsoft.NodejsTools.Project
 
         [JsonProperty("userDataDir")]
         public object BrowserUserDataDir { get; set; } = null;
+
+        [JsonProperty("webRoot")]
+        public string WebRoot { get; set; }
+
+        [JsonProperty("projectGuid")]
+        public string ProjectGuid { get; set; }
 
         public object toPwaChromeServerConfig()
         {
