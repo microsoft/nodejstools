@@ -73,7 +73,8 @@ namespace Microsoft.NodejsTools.Workspace
                                                                                              runtimeArguments,
                                                                                              debuggerPort.ToString(),
                                                                                              workingDir,
-                                                                                             NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption());
+                                                                                             NodejsProjectLauncher.CheckEnableDiagnosticLoggingOption(),
+                                                                                             null);
 
 
             return JObject.FromObject(launchConfig).ToString();
