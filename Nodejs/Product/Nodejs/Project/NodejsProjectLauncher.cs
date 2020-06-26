@@ -229,7 +229,7 @@ namespace Microsoft.NodejsTools.Project
             var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
             try
             {
-                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetDebugging");
+                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetNodeDebug");
                 if (userDebuggerOption is int optionVal)
                 {
                     return optionVal != 0;
@@ -238,7 +238,7 @@ namespace Microsoft.NodejsTools.Project
             catch (Exception) { } // do nothing. proceed to trying the feature flag below.
 
             var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
-            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpDebugAdapter", false);
+            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeDebugAdapter", false);
         }
 
         private int TestServerPort
