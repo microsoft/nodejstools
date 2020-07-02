@@ -49,6 +49,10 @@ namespace Microsoft.NodejsTools
                 {
                     return relativePath;
                 }
+                catch (ArgumentException)
+                {
+                    return relativePath;
+                }
             }
             return NodeExePath;
         }
