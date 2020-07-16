@@ -7,7 +7,6 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Project
 {
-    // Based on typescript implementation: https://devdiv.visualstudio.com/DevDiv/_git/TypeScript-VS?path=%2FVS%2FLanguageService%2FTypeScriptVisualStudio%2FUtilities%2FOperationProgressService.cs&version=GBmaster&_a=contents
     internal class OperationProgressService
     {
         private readonly Dictionary<string, TaskCompletionSource<bool>> loadCompletionMap = new Dictionary<string, TaskCompletionSource<bool>>();
