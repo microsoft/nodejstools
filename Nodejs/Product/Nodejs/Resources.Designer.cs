@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -791,42 +791,6 @@ namespace Microsoft.NodejsTools {
         internal static string NoKeywordsInPackage {
             get {
                 return ResourceManager.GetString("NoKeywordsInPackage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} canceled.
-        /// </summary>
-        internal static string NpmCancelled {
-            get {
-                return ResourceManager.GetString("NpmCancelled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} canceled with errors - see Output window for details.
-        /// </summary>
-        internal static string NpmCancelledWithErrors {
-            get {
-                return ResourceManager.GetString("NpmCancelledWithErrors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} started..
-        /// </summary>
-        internal static string NpmCommandStarted {
-            get {
-                return ResourceManager.GetString("NpmCommandStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
-        /// </summary>
-        internal static string NpmCompletedWithErrors {
-            get {
-                return ResourceManager.GetString("NpmCompletedWithErrors", resourceCulture);
             }
         }
         

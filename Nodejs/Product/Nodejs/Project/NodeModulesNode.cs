@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
@@ -39,13 +38,13 @@ namespace Microsoft.NodejsTools.Project
 
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
+        private readonly OperationProgressService _operationProgressService;
 
         private Timer _npmIdleTimer;
-        private int _npmCommandsExecuting;
         private bool _suppressCommands;
         private bool _firstHierarchyLoad = true;
 
-        private readonly object _commandCountLock = new object();
+        private readonly object _commandLock = new object();
 
         private bool _isDisposed;
 
@@ -64,6 +63,8 @@ namespace Microsoft.NodejsTools.Project
 
             this._optionalModulesNode = new LocalModulesNode(root, this, "optional", "OptionalModules", DependencyType.Optional);
             AddChild(this._optionalModulesNode);
+
+            this._operationProgressService = new OperationProgressService();
         }
 
         private void CheckNotDisposed()
@@ -131,7 +132,7 @@ namespace Microsoft.NodejsTools.Project
             return NpmControllerFactory.Create(
                 projectHome,
                 NodejsConstants.NpmCachePath,
-                isProject:true,
+                isProject: true,
                 showMissingDevOptionalSubPackages: false,
                 npmPathProvider: pathProvider);
         }
@@ -180,45 +181,6 @@ namespace Microsoft.NodejsTools.Project
 
         private OutputWindowRedirector NpmOutputPane => this.projectNode.NpmOutputPane;
 
-        private void ForceUpdateStatusBarWithNpmActivity(string activity)
-        {
-            if (string.IsNullOrEmpty(activity) || string.IsNullOrEmpty(activity.Trim()))
-            {
-                return;
-            }
-
-            if (!activity.Contains("npm"))
-            {
-                activity = string.Format(CultureInfo.CurrentCulture, "npm: {0}", activity);
-            }
-
-            var statusBar = (IVsStatusbar)this.projectNode.GetService(typeof(SVsStatusbar));
-            if (null != statusBar)
-            {
-                statusBar.SetText(activity);
-            }
-        }
-
-        private void ForceUpdateStatusBarWithNpmActivitySafe(string activity)
-        {
-            this.ProjectMgr.Site.GetUIThread().InvokeAsync(() => ForceUpdateStatusBarWithNpmActivity(activity))
-                .HandleAllExceptions(SR.ProductName)
-                .DoNotWait();
-        }
-
-        private void UpdateStatusBarWithNpmActivity(string activity)
-        {
-            lock (this._commandCountLock)
-            {
-                if (this._npmCommandsExecuting == 0)
-                {
-                    return;
-                }
-            }
-
-            ForceUpdateStatusBarWithNpmActivitySafe(activity);
-        }
-
         private static string TrimLastNewline(string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -251,12 +213,11 @@ namespace Microsoft.NodejsTools.Project
         private void NpmController_CommandStarted(object sender, NpmCommandStartedEventArgs e)
         {
             StopNpmIdleTimer();
-            lock (this._commandCountLock)
+            lock (this._commandLock)
             {
-                ++this._npmCommandsExecuting;
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmStatusExecuting, e.CommandText);
 
-                var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmCommandStarted, e.CommandText);
-                ForceUpdateStatusBarWithNpmActivitySafe(message);
+                this._operationProgressService.RegisterAndStartStage(e.CommandText, message);
             }
         }
 
@@ -277,32 +238,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void NpmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
         {
-            lock (this._commandCountLock)
-            {
-                --this._npmCommandsExecuting;
-                if (this._npmCommandsExecuting < 0)
-                {
-                    this._npmCommandsExecuting = 0;
-                }
-            }
-
-            var message = GetStatusBarMessage(e);
-            ForceUpdateStatusBarWithNpmActivitySafe(message);
-        }
-
-        private static string GetStatusBarMessage(NpmCommandCompletedEventArgs e)
-        {
-            if (e.WithErrors)
-            {
-                return string.Format(CultureInfo.CurrentCulture,
-                    e.Cancelled ? Resources.NpmCancelledWithErrors : Resources.NpmCompletedWithErrors,
-                    e.CommandText);
-            }
-            else if (e.Cancelled)
-            {
-                return string.Format(CultureInfo.CurrentCulture, Resources.NpmCancelled, e.CommandText);
-            }
-            return string.Format(CultureInfo.CurrentCulture, Resources.NpmSuccessfullyCompleted, e.CommandText);
+            this._operationProgressService.CompleteAndCleanupStage(e.CommandText);
         }
 
         private void StopNpmIdleTimer()
