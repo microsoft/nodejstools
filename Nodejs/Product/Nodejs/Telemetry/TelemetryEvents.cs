@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 namespace Microsoft.NodejsTools.Telemetry
 {
@@ -38,6 +38,8 @@ namespace Microsoft.NodejsTools.Telemetry
         /// User executed some script in the interactive window.
         /// </summary>
         public const string UsedRepl = Prefix + "UsedRepl";
+        
+        public const string OperationRegistrationFaulted = Prefix + "OperationRegistrationFaulted";
     }
 
     internal static class TelemetryProperties

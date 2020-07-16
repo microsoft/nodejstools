@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.OperationProgress;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
@@ -9,12 +10,12 @@ namespace Microsoft.NodejsTools.Project
 {
     internal class OperationProgressService
     {
-        private readonly Dictionary<string, TaskCompletionSource<bool>> loadCompletionMap = new Dictionary<string, TaskCompletionSource<bool>>();
+        private readonly Dictionary<string, TaskCompletionSource<bool>> taskCompletionSources = new Dictionary<string, TaskCompletionSource<bool>>();
 
         public void RegisterAndStartStage(string stageId, string message)
         {
-            var loadCompletion = new TaskCompletionSource<bool>();
-            this.loadCompletionMap.Add(stageId, loadCompletion);
+            var taskCompletionSource = new TaskCompletionSource<bool>();
+            this.taskCompletionSources.Add(stageId, taskCompletionSource);
 
             ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -35,8 +36,8 @@ namespace Microsoft.NodejsTools.Project
                     0,
                     (stageAccess) =>
                     {
-                        // Check if ProjectLoadingFinishEvent has already fired and nulled this out
-                        if (loadCompletion == null)
+                        // Check if the task completion has already fired and nulled this out
+                        if (taskCompletionSource == null)
                         {
                             return null;
                         }
@@ -47,17 +48,17 @@ namespace Microsoft.NodejsTools.Project
                                   "NTVSTask" /* not used elsewhere */,
                                   () => Task.FromResult(string.Empty)));
 
-                        return loadCompletion.Task;
+                        return taskCompletionSource.Task;
                     });
-            }).Task.Forget();
+            }).Task.FileAndForget(TelemetryEvents.OperationRegistrationFaulted);
         }
 
         public void CompleteAndCleanupStage(string stageId)
         {
-            if (this.loadCompletionMap.TryGetValue(stageId, out var loadCompletion))
+            if (this.taskCompletionSources.TryGetValue(stageId, out var taskCompletionSource))
             {
-                loadCompletion.TrySetResult(true);
-                this.loadCompletionMap.Remove(stageId);
+                taskCompletionSource.TrySetResult(true);
+                this.taskCompletionSources.Remove(stageId);
             }
         }
     }
