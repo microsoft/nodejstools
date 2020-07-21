@@ -39,6 +39,7 @@ namespace Microsoft.NodejsTools.Project
         private readonly LocalModulesNode _devModulesNode;
         private readonly LocalModulesNode _optionalModulesNode;
         private readonly OperationProgressService _operationProgressService;
+        private readonly string _npmCommandStageId = "NtvsNpmCommand";
 
         private Timer _npmIdleTimer;
         private bool _suppressCommands;
@@ -215,9 +216,7 @@ namespace Microsoft.NodejsTools.Project
             StopNpmIdleTimer();
             lock (this._commandLock)
             {
-                var message = string.Format(CultureInfo.CurrentCulture, Resources.NpmStatusExecuting, e.CommandText);
-
-                this._operationProgressService.RegisterAndStartStage(e.CommandText, message);
+                this._operationProgressService.RegisterAndStartStage(this._npmCommandStageId, Resources.ExecutingNpmCommandMessage);
             }
         }
 
@@ -238,7 +237,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void NpmController_CommandCompleted(object sender, NpmCommandCompletedEventArgs e)
         {
-            this._operationProgressService.CompleteAndCleanupStage(e.CommandText);
+            this._operationProgressService.CompleteAndCleanupStage(this._npmCommandStageId);
         }
 
         private void StopNpmIdleTimer()

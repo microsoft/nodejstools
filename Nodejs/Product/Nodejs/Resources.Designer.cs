@@ -417,6 +417,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Executing npm command..
+        /// </summary>
+        internal static string ExecutingNpmCommandMessage {
+            get {
+                return ResourceManager.GetString("ExecutingNpmCommandMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files..
         /// </summary>
         internal static string ImportingProjectAccessErrorStatusText {
@@ -1164,15 +1173,6 @@ namespace Microsoft.NodejsTools {
         internal static string NpmSpecifyValidProject {
             get {
                 return ResourceManager.GetString("NpmSpecifyValidProject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Executing: {0}.
-        /// </summary>
-        internal static string NpmStatusExecuting {
-            get {
-                return ResourceManager.GetString("NpmStatusExecuting", resourceCulture);
             }
         }
         

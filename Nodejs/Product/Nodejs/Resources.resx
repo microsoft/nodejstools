@@ -352,9 +352,6 @@
   <data name="NpmStatusReadyWithErrors" xml:space="preserve">
     <value>Ready - Command(s) completed with errors ({0})</value>
   </data>
-  <data name="NpmStatusExecuting" xml:space="preserve">
-    <value>Executing: {0}</value>
-  </data>
   <data name="NpmStatusExecutingQueued" xml:space="preserve">
     <value>Executing: {0} ({1} command(s) queued)</value>
   </data>
@@ -742,5 +739,8 @@ The following error occurred trying to execute npm.cmd:
   <data name="WarningDialogCaption" xml:space="preserve">
     <value>Microsoft Visual Studio</value>
     <comment>Caption displayed on the error dialog of the project properties.</comment>
+  </data>
+  <data name="ExecutingNpmCommandMessage" xml:space="preserve">
+    <value>Executing npm command</value>
   </data>
 </root>
