@@ -9,6 +9,7 @@
         <Icon>NodeJS.ico</Icon>
         <PreviewImage>NodeJS_200x.png</PreviewImage>
         <PackageId>Microsoft.VisualStudio.NodejsTools.TestAdapter</PackageId>
+        <AllowClientRole>true</AllowClientRole>
     </Metadata>
     <Installation SystemComponent="true">
         <InstallationTarget Version="[16.0.0,17.0)" Id="Microsoft.VisualStudio.Community" />
