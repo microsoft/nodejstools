@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -417,6 +417,15 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Executing npm command..
+        /// </summary>
+        internal static string ExecutingNpmCommandMessage {
+            get {
+                return ResourceManager.GetString("ExecutingNpmCommandMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files..
         /// </summary>
         internal static string ImportingProjectAccessErrorStatusText {
@@ -795,42 +804,6 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} canceled.
-        /// </summary>
-        internal static string NpmCancelled {
-            get {
-                return ResourceManager.GetString("NpmCancelled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} canceled with errors - see Output window for details.
-        /// </summary>
-        internal static string NpmCancelledWithErrors {
-            get {
-                return ResourceManager.GetString("NpmCancelledWithErrors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} started..
-        /// </summary>
-        internal static string NpmCommandStarted {
-            get {
-                return ResourceManager.GetString("NpmCommandStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} completed with errors - see Output window for details.
-        /// </summary>
-        internal static string NpmCompletedWithErrors {
-            get {
-                return ResourceManager.GetString("NpmCompletedWithErrors", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] &lt;npm arguments&gt;.
         /// </summary>
         internal static string NpmExecuteCommand {
@@ -1200,15 +1173,6 @@ namespace Microsoft.NodejsTools {
         internal static string NpmSpecifyValidProject {
             get {
                 return ResourceManager.GetString("NpmSpecifyValidProject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Executing: {0}.
-        /// </summary>
-        internal static string NpmStatusExecuting {
-            get {
-                return ResourceManager.GetString("NpmStatusExecuting", resourceCulture);
             }
         }
         
