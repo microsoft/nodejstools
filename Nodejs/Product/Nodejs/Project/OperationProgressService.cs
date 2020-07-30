@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.OperationProgress;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.NodejsTools.Project
@@ -42,6 +43,9 @@ namespace Microsoft.NodejsTools.Project
                             return null;
                         }
 
+                        // We register an empty task and empty description as this will provide
+                        // with an "infinite" progress. Registerging and npm task, will instead create
+                        // a step by step progress which is undesired for our purposes.
                         stageAccess.RegisterTask(
                               new OperationProgressTask(
                                   ThreadHelper.JoinableTaskFactory.RunAsync(() => Task.FromResult(string.Empty)),
