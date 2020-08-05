@@ -952,6 +952,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ExecutingNpmCommandMessage" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Executing npm command]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Npm komutu yürütülüyor]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ImportingProjectAccessErrorStatusText" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.]]></Val>
@@ -1336,48 +1345,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NpmCancelled" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} canceled]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} iptal edildi]]></Val>
-          </Tgt>
-          <Prev Cat="Text">
-            <Val><![CDATA[{0} cancelled]]></Val>
-          </Prev>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCancelledWithErrors" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} canceled with errors - see Output window for details]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} hatalarla iptal edildi. Ayrıntılar için Çıkış penceresine bakın]]></Val>
-          </Tgt>
-          <Prev Cat="Text">
-            <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
-          </Prev>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCommandStarted" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} started.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} başlatıldı.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCompletedWithErrors" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} completed with errors - see Output window for details]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} hatalarla tamamlandı - ayrıntılar için Çıkış penceresine bakın]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NpmExecuteCommand" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
@@ -1743,15 +1710,6 @@
           <Val><![CDATA[Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir]5D; <npm arguments> For example: .npm [MyApp]5D; list.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Lütfen geçerli bir Node.js projesi veya proje dizini belirtin. Çözümünüz birden fazla proje içeriyorsa, .npm [ProjeAdı veya ProjeDizini]5D; <npm bağımsız değişkenleri> komutunu kullanarak bir hedef proje belirtin Örneğin: .npm [Uygulamam]5D; list.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmStatusExecuting" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Executing: {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} çalıştırılıyor]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
