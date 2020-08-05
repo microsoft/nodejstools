@@ -952,6 +952,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ExecutingNpmCommandMessage" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Executing npm command]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Esecuzione del comando npm]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ImportingProjectAccessErrorStatusText" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.]]></Val>
@@ -1336,48 +1345,6 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
-      <Item ItemId=";NpmCancelled" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} canceled]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} annullato]]></Val>
-          </Tgt>
-          <Prev Cat="Text">
-            <Val><![CDATA[{0} cancelled]]></Val>
-          </Prev>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCancelledWithErrors" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} canceled with errors - see Output window for details]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} annullato con errori. Per dettagli, vedere la finestra di output]]></Val>
-          </Tgt>
-          <Prev Cat="Text">
-            <Val><![CDATA[{0} cancelled with errors - see Output window for details]]></Val>
-          </Prev>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCommandStarted" ItemType="0" PsrId="211" InstFlg="true" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} started.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} avviato.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmCompletedWithErrors" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[{0} completed with errors - see Output window for details]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} completato con errori. Per dettagli, vedere la finestra di output]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
       <Item ItemId=";NpmExecuteCommand" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
@@ -1743,15 +1710,6 @@
           <Val><![CDATA[Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir]5D; <npm arguments> For example: .npm [MyApp]5D; list.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Specificare una directory di progetto o un progetto Node.js valido. Se la soluzione contiene più progetti, per specificare un progetto di destinazione, usare .npm [NomeProgetto o DirProgetto]5D; <argomenti di npm>, ad esempio .npm [MyApp]5D; list.]]></Val>
-          </Tgt>
-        </Str>
-        <Disp Icon="Str" />
-      </Item>
-      <Item ItemId=";NpmStatusExecuting" ItemType="0" PsrId="211" Leaf="true">
-        <Str Cat="Text">
-          <Val><![CDATA[Executing: {0}]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Esecuzione di: {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
