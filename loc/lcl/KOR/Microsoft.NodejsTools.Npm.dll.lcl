@@ -258,7 +258,7 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";InternalName" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
+      <Str Cat="Text" DevLk="true" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
       </Str>
       <Disp Icon="Str" />
@@ -273,7 +273,7 @@
       <Disp Icon="Str" />
     </Item>
     <Item ItemId=";OriginalFilename" ItemType="0" PsrId="211" Leaf="true">
-      <Str Cat="Text" DevLk="true">
+      <Str Cat="Text" DevLk="true" UsrLk="true">
         <Val><![CDATA[Microsoft.NodejsTools.Npm.dll]]></Val>
       </Str>
       <Disp Icon="Str" />
