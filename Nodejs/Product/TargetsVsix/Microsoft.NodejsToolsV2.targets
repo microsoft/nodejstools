@@ -108,6 +108,13 @@
     <AssignTargetPath Files="@(_TempBuiltProjectOutputGroup)" RootFolder="$(MSBuildProjectDirectory)">
       <Output TaskParameter="AssignedFiles" ItemName="BuiltProjectOutputGroupOutput" />
     </AssignTargetPath>
+
+    <!-- Add FinalOutputPath property to support Azure Cloud Service role packaging -->
+    <ItemGroup>
+      <BuiltProjectOutputGroupOutput Include="@(BuiltProjectOutputGroupOutput)">
+        <FinalOutputPath>%(FullPath)</FinalOutputPath>
+      </BuiltProjectOutputGroupOutput>
+    </ItemGroup> 
   </Target>
 
   <Target
