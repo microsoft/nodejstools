@@ -9,6 +9,7 @@
         <Icon>NodeJS.ico</Icon>
         <PreviewImage>NodeJS_200x.png</PreviewImage>
         <PackageId>Microsoft.VisualStudio.NodejsTools.NodejsTools</PackageId>
+        <AllowClientRole>true</AllowClientRole>
     </Metadata>
     <!-- Version="11.0" specifies the minimum (not the maximum) version, and the
        Id specifications are minimums; any SKU equal or 'higher' will accept

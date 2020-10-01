@@ -229,20 +229,16 @@ namespace Microsoft.NodejsTools.Project
             var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
             try
             {
-                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetDebugging");
-                if (userDebuggerOption == null)
+                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptMultitargetNodeDebug");
+                if (userDebuggerOption is int optionVal)
                 {
-                    return false;
-                }
-                else
-                {
-                    return (int)userDebuggerOption != 0;
+                    return optionVal != 0;
                 }
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            catch (Exception) { } // do nothing. proceed to trying the feature flag below.
+
+            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
+            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeDebugAdapter", false);
         }
 
         private int TestServerPort
@@ -297,6 +293,7 @@ namespace Microsoft.NodejsTools.Project
                                                             debuggerPort,
                                                             cwd,
                                                             CheckEnableDiagnosticLoggingOption(),
+                                                            _project.ProjectGuid.ToString(),
                                                             JObject.FromObject(envVars));
 
             bool usingV3Debugger = ShouldUseV3CdpDebugger();
@@ -311,8 +308,10 @@ namespace Microsoft.NodejsTools.Project
                     RuntimeExecutable = browserPath,
                     BrowserUrl = webBrowserUrl,
                     BrowserUserDataDir = true,
-                    Environment = config.Environment,
-                    Server = config.toPwaChromeServerConfig()
+                    Server = config.toPwaChromeServerConfig(),
+                    WorkingDir = cwd,
+                    WebRoot = cwd,
+                    ProjectGuid = _project.ProjectGuid.ToString()
                 };
                 shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
             }
@@ -586,6 +585,7 @@ namespace Microsoft.NodejsTools.Project
                                                string port, 
                                                string currWorkingDir,
                                                bool trace,
+                                               string projectGuid,
                                                object environmentSettings = null)
         {
             this.ConfigName = "Debug Node.js program from Visual Studio";
@@ -600,6 +600,7 @@ namespace Microsoft.NodejsTools.Project
             this.WorkingDir = currWorkingDir;
             this.Environment = environmentSettings;
             this.Trace = trace;
+            this.ProjectGuid = projectGuid;
         }
 
         [JsonProperty("name")]
@@ -658,6 +659,12 @@ namespace Microsoft.NodejsTools.Project
 
         [JsonProperty("userDataDir")]
         public object BrowserUserDataDir { get; set; } = null;
+
+        [JsonProperty("webRoot")]
+        public string WebRoot { get; set; }
+
+        [JsonProperty("projectGuid")]
+        public string ProjectGuid { get; set; }
 
         public object toPwaChromeServerConfig()
         {
