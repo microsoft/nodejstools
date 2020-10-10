@@ -18,6 +18,10 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         watched: false
     });
 
+    this.onBrowserError = (browser, error) => {
+        log.debug(`onBrowserError: ${JSON.stringify(error)}`);
+    }
+
     // TODO: Is there a better option than onBrowserLog?
     this.onBrowserLog = (browser, browserLog, type) => {
         const cleaned = browserLog.substring(1, browserLog.length - 1); // Remove extra quote at start and end
@@ -33,7 +37,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
 
         let errorLog = "";
         for (const failedExpectation of result.failedExpectations) {
-            errorLog += `\n\nMessage: ${failedExpectation.message}\nStack:\n${failedExpectation.stack}`;
+            errorLog += `${failedExpectation.stack}\n`;
         }
 
         // Handles both scenarios, discovery and execution.
@@ -67,11 +71,14 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         }
     }
 
+    // Override specFailure to avoid crashing the process as Karma sends a string output that cannot be parsed as JSON.
+    this.specFailure = () => { }
+
     let hasStarted = false;
 
     // Check when browser is ready to request a run.
     emitter.on("browsers_ready", () => {
-        // There's Scenario that I'm not sure how to repro where the browser do something (refresh? crashes?)
+        // There's a scenario that I'm not sure how to repro where the browser do something (refresh? crashes?)
         // and we get the event again. We only want to executed it once.
         if (!hasStarted) {
             hasStarted = true;

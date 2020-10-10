@@ -11,7 +11,7 @@ const karmaConfigName = "karma.conf.js";
 const vsKarmaConfigPath = path.resolve(__dirname, "./karmaConfig.js");
 
 const find_tests = function (configFiles, discoverResultFile, projectFolder) {
-    return new Promise(async resolve => {
+    return new Promise(resolve => {
         const angular = detectPackage(projectFolder, '@angular/cli');
         if (!angular) {
             return;
@@ -72,9 +72,9 @@ const find_tests = function (configFiles, discoverResultFile, projectFolder) {
 
 const run_tests = function (context) {
     const projectFolder = context.testCases[0].projectFolder;
-    
+
     // TODO: Send the configuration path along with the test cases.
-    const configFile = "C:/Users/araguir/source/repos/AngularNTVSSample/AngularNTVSSample/angular.json";
+    const configFile = `${projectFolder}/angular.json`;
 
     for (const testCase of context.testCases) {
         context.post({
@@ -83,12 +83,12 @@ const run_tests = function (context) {
         });
     }
 
-    return new Promise(async resolve => {
+    return new Promise(resolve => {
         const angular = detectPackage(projectFolder, '@angular/cli');
         if (!angular) {
             return;
         }
-        
+
         const projectPath = path.dirname(configFile);
         const karmaConfigPath = path.resolve(projectPath, `./${karmaConfigName}`);
 
