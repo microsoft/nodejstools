@@ -17,6 +17,7 @@ namespace Microsoft.NodejsTools
         public const string NodejsProjectExtension = ".njsproj";
         public const string CSharpProjectExtension = ".csproj";
         public const string VisualBasicProjectExtension = ".vbproj";
+        public const string AngularProjectExtension = ".esproj";
 
         public const string JavaScript = "JavaScript";
         public const string CSS = "CSS";
