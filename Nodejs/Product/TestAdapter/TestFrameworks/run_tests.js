@@ -6,30 +6,8 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.on('line', function (line2) {
+rl.on('line', function (line) {
     rl.close();
-
-    var line = line2 || JSON.stringify(
-        [{
-            "framework": "Angular",
-            "fullyQualifiedName": "\"src\\app\\app.component2.spec.ts::CustomTest::Should fail\"",
-            "testFile": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\\src\\app\\app.component2.spec.ts\"",
-            "workingFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\"",
-            "projectFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\""
-        }, {
-            "framework": "Angular",
-            "fullyQualifiedName": "\"src\\app\\app.component2.spec.ts::CustomTest::Should fail as well\"",
-            "testFile": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\\src\\app\\app.component2.spec.ts\"",
-            "workingFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\"",
-            "projectFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\""
-        }, {
-            "framework": "Angular",
-            "fullyQualifiedName": "\"src\\app\\app.component2.spec.ts::CustomTest::Should not fail\"",
-            "testFile": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\\src\\app\\app.component2.spec.ts\"",
-            "workingFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\"",
-            "projectFolder": "\"C:\\Users\\araguir\\source\\repos\\NodeJsAngularUnitTestSample\\NodeJsAngularUnitTestSample\""
-        }]
-    );
 
     // strip the BOM in case of UTF-8
     if (line.charCodeAt(0) === 0xFEFF) {
