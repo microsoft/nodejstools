@@ -21,7 +21,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
-            // Enumarte all directories to appear on the properties bar. Angular is removed as it is configured by config file instead.
+            // Enumerate all directories to appear on the properties bar. Angular is removed as it is configured by config file instead.
             return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).Where(x => x != "Angular").ToArray();
         }
 

@@ -21,16 +21,14 @@ namespace Microsoft.NodejsTools.TestAdapter
             foreach (var projectItem in projectItems)
             {
                 string testFrameworkName = null;
-                // TODO: Should it validate karma.conf.js? 
-                // consider it can also be inside a <root>/.config/ folder and will configure the <root> folder.
+                // TODO: Consider it can also be inside a <root>/.config/ folder and will configure the <root> folder.
                 if (projectItem.EvaluatedInclude.Contains("angular.json"))
                 {
                     testFrameworkName = "angular";
                 }
-                // TODO: Add configuration files for jest, mocha , jasmine. Consider some frameworks can be configured using package.json
+                // TODO: Add configuration files for jest, mocha , jasmine. Consider that some frameworks can be configured using package.json
                 // Also some frameworks have more than one filename to define a configuration.
                 // Tape is the only framework we support that doesn't have a configuration file. Decide what to do about that.
-
                 if (testFrameworkName != null)
                 {
                     if (!configItems.ContainsKey(testFrameworkName))

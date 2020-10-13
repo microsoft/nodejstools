@@ -44,24 +44,20 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         }
 
         // Handles both scenarios, discovery and execution.
-        try {
-            process.send({
-                // Discovery properties
-                name: result.description,
-                suite,
-                filepath: fullFilePath,
-                line: result.fileLocation.line,
-                column: result.fileLocation.column,
+        process.send({
+            // Discovery properties
+            name: result.description,
+            suite,
+            filepath: fullFilePath,
+            line: result.fileLocation.line,
+            column: result.fileLocation.column,
 
-                // Execution properties
-                passed: result.status === "passed",
-                pending: result.status === "disabled" || result.status === "pending",
-                fullName: result.fullName,
-                stderr: errorLog
-            });
-        } catch (e) {
-            log.debug(`error: ${JSON.stringify(e)}`);
-        }
+            // Execution properties
+            passed: result.status === "passed",
+            pending: result.status === "disabled" || result.status === "pending",
+            fullName: result.fullName,
+            stderr: errorLog
+        });
 
         log.debug(`onBrowserLog: ${JSON.stringify(result)}`);
     }
