@@ -30,9 +30,8 @@ const find_tests = function (configFiles, discoverResultFile, projectFolder) {
             process.env.TESTCASES = JSON.stringify([{ fullTitle: "NTVS_Discovery_ThisStringShouldExcludeAllTestCases" }]);
             process.env.ISDISCOVERY = 'true';
 
-            // TODO: Handle npx or some other way to run ng not using the node_modules path.
             const ngTest = spawn(
-                'E:/NodeJS/node-v13.11.0-win-x64/node.exe',
+                process.argv0, // Node executable path
                 [
                     path.resolve(projectPath, "./node_modules/@angular/cli/bin/ng"),
                     'test',
@@ -43,15 +42,6 @@ const find_tests = function (configFiles, discoverResultFile, projectFolder) {
                     shell: true,
                     stdio: ['pipe', 'ipc', 'pipe']
                 });
-
-            // TODO: Handle multiple projects. aka. multiple spawns running.
-            // const ngTest = spawn(
-            //     'npx',
-            //     ['ng', 'test', `--karmaConfig="${vsKarmaConfigPath}"`],
-            //     {
-            //         cwd: projectPath,
-            //         shell: true,
-            //     });
 
             const testsDiscovered = [];
 
@@ -73,7 +63,8 @@ const find_tests = function (configFiles, discoverResultFile, projectFolder) {
 const run_tests = function (context) {
     const projectFolder = context.testCases[0].projectFolder;
 
-    // TODO: Send the configuration path along with the test cases.
+    // TODO: Handle the scenario where Angular.json may not exists on a child folder instead of root.
+    // One way would be to send the location of angular.json instead of assuming it's on root.
     const configFile = `${projectFolder}/angular.json`;
 
     for (const testCase of context.testCases) {
@@ -101,9 +92,8 @@ const run_tests = function (context) {
         process.env.PROJECTPATH = projectPath;
         process.env.TESTCASES = JSON.stringify(context.testCases);
 
-        // TODO: Handle npx or some other way to run ng not using the node_modules path.
         const ngTest = spawn(
-            'E:/NodeJS/node-v13.11.0-win-x64/node.exe',
+            process.argv0, //Node executable path
             [
                 path.resolve(projectPath, "./node_modules/@angular/cli/bin/ng"),
                 'test',
@@ -114,15 +104,6 @@ const run_tests = function (context) {
                 shell: true,
                 stdio: ['pipe', 'ipc', 'pipe']
             });
-
-        // TODO: Handle multiple projects. aka. multiple spawns running.
-        // const ngTest = spawn(
-        //     'npx',
-        //     ['ng', 'test', `--karmaConfig="${vsKarmaConfigPath}"`],
-        //     {
-        //         cwd: projectPath,
-        //         shell: true,
-        //     });
 
         ngTest.on("message", message => {
             context.post({

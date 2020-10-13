@@ -42,7 +42,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 }
                 else if (!configItems.Any()) // Legacy behavior. If we have found a test configuration file is safe to ignore the rest of the files.
                 {
-                    // TODO: Deprecate. Is configured by projecft file or is configured per file.
+                    // TODO: Deprecate. Is configured by project file or is configured per file.
                     var testFrameworkAndFilePath = GetTestFrameworkAndFilePath(project, projectItem, projectRoot);
                     if (testFrameworkAndFilePath.HasValue)
                     {

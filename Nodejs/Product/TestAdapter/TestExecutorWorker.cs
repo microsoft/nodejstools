@@ -91,6 +91,30 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(tests, nameof(tests));
             this.cancelRequested.Reset();
 
+            var testFramework = tests.First().GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
+            if (testFramework == "Angular")
+            {
+                RunAllTests(tests);
+            }
+            else
+            {
+                RunTestsByFile(tests);
+            }
+        }
+
+        private void RunAllTests(IEnumerable<TestCase> tests)
+        {
+            var testCaseResults = tests.Select(x => new TestCaseResult { TestCase = x });
+            this.currentTests = testCaseResults.ToList();
+
+            this.RunTestCases(testCaseResults);
+        }
+
+        /// <summary>
+        /// Runs all of the test cases by executing each one of the files sequentially.
+        /// </summary>
+        private void RunTestsByFile(IEnumerable<TestCase> tests)
+        {
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCaseResult>>();
 
@@ -109,8 +133,6 @@ namespace Microsoft.NodejsTools.TestAdapter
             {
                 this.currentTests = testCaseList;
 
-                // TODO: Don't run each test file. Instead run all of the test at once.
-                // This generates a problem for Angular as it creates all instances again for the servers.
                 // Run all test cases in a given file
                 this.RunTestCases(testCaseList);
             }
@@ -133,12 +155,9 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First().TestCase;
-            // TODO: Get the test framework using the configuration file logic.
             var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
-            // TODO: Is this necessary if using a configuration file?.
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
-            // TODO: Is this necessary if using a configuration file?.
             var projectRootDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
 
             if (string.IsNullOrEmpty(nodeExePath) || !File.Exists(nodeExePath))

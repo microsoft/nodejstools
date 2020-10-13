@@ -7,10 +7,6 @@ using System.Linq;
 
 namespace Microsoft.NodejsTools.TestFrameworks
 {
-    // TODO: Remove Angular form the test framworks.
-    // The Angular property appears on the file and project settings, nonetheless, this is configured differently
-    // than the rest of the frameworks due to the config file. We need to remove the Angular text as it not 
-    // supported like that.
     internal static class TestFrameworkDirectories
     {
         public const string ExportRunnerFrameworkName = "ExportRunner";
@@ -25,7 +21,8 @@ namespace Microsoft.NodejsTools.TestFrameworks
                 throw new InvalidOperationException($"Unable to find test framework folder. Tried: \"{testFrameworkRoot}\"");
             }
 
-            return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).ToArray();
+            // Enumarte all directories to appear on the properties bar. Angular is removed as it is configured by config file instead.
+            return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).Where(x => x != "Angular").ToArray();
         }
 
         public static string[] GetFrameworkDirectories(string testFrameworkRoot = null)

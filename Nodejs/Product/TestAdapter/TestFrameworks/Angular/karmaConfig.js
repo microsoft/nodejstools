@@ -12,8 +12,7 @@ module.exports = function (config) {
     karmaConfig(config);
 
     config.autoWatch = false;
-    // config.browsers = ['ChromeHeadless'];
-    config.browsers = ['Chrome'];
+    config.browsers = ['ChromeHeadless'];
     config.logLevel = config.LOG_DISABLE;
     // Keep the original plugins
     config.plugins = config.plugins || [];
@@ -25,25 +24,19 @@ module.exports = function (config) {
 };
 
 function setGrep(config) {
-    // Search for an existing grep on clientArgs.
-    const clientArgs = [];
-    let hasGrep = false;
-    for (let arg of config.client.args) {
-        if (arg.substring(0, 6) === '--grep=') {
-            hasGrep = true;
-        }
-        clientArgs.push(arg);
-    }
+    // Remove any existing --grep argument
+    config.client.args = config.client.args.filter(x => x.substring(0, 7) !== '--grep=');
 
-    // If grep is not configured already, use VS configuration
-    if (!hasGrep) {
-        const testCasesRegex = testCases
-            .reduce((previous, current) => {
-                // TODO: Escape all of regex reserved characters.
-                previous.push(current.fullTitle);
-                return previous;
-            }, [])
-            .join('|');
-        config.client.args.push(`--grep=${testCasesRegex}`);
-    }
+    // Push custom grep.
+    const testCasesRegex = testCases
+        .reduce((previous, current) => {
+            previous.push(escapeRegExp(current.fullTitle));
+            return previous;
+        }, [])
+        .join('|');
+    config.client.args.push(`--grep=${testCasesRegex}`);
+}
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }

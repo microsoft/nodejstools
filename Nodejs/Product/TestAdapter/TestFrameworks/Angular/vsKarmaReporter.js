@@ -23,6 +23,9 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
     }
 
     // TODO: Is there a better option than onBrowserLog?
+    // So far, since this is runned by multiple out of proc, the only way I have found to communicate
+    // is through the console, thus, the need for capturing the browser log. JasmineReporter uses 
+    // console.log for this purpose.
     this.onBrowserLog = (browser, browserLog, type) => {
         const cleaned = browserLog.substring(1, browserLog.length - 1); // Remove extra quote at start and end
         const result = JSON.parse(cleaned);
@@ -41,20 +44,24 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         }
 
         // Handles both scenarios, discovery and execution.
-        process.send({
-            // Discovery properties
-            name: result.description,
-            suite,
-            filepath: fullFilePath,
-            line: result.fileLocation.line,
-            column: result.fileLocation.column,
+        try {
+            process.send({
+                // Discovery properties
+                name: result.description,
+                suite,
+                filepath: fullFilePath,
+                line: result.fileLocation.line,
+                column: result.fileLocation.column,
 
-            // Execution properties
-            passed: result.status === "passed",
-            pending: result.status === "disabled" || result.status === "pending",
-            fullName: result.fullName,
-            stderr: errorLog
-        });
+                // Execution properties
+                passed: result.status === "passed",
+                pending: result.status === "disabled" || result.status === "pending",
+                fullName: result.fullName,
+                stderr: errorLog
+            });
+        } catch (e) {
+            log.debug(`error: ${JSON.stringify(e)}`);
+        }
 
         log.debug(`onBrowserLog: ${JSON.stringify(result)}`);
     }
