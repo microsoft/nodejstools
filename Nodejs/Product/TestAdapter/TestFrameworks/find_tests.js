@@ -1,3 +1,4 @@
+//@ts-check
 const fs = require("fs");
 
 let framework;
