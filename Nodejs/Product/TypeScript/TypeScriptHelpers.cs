@@ -45,7 +45,7 @@ namespace Microsoft.NodejsTools.TypeScript
             return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.NodejsProjectExtension)
                 || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.CSharpProjectExtension)
                 || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.VisualBasicProjectExtension)
-                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.AngularProjectExtension);
+                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.JavaScriptProjectExtension);
         }
 
 #if !NETSTANDARD2_0

@@ -3,59 +3,71 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require("child_process");
+const { fork } = require("child_process");
 
 process.env.VSTESTADAPTERPATH = __dirname;
 
-const karmaConfigName = "karma.conf.js";
 const vsKarmaConfigPath = path.resolve(__dirname, "./karmaConfig.js");
 
-const find_tests = function (configFiles, discoverResultFile, projectFolder) {
-    return new Promise(resolve => {
-        const angular = detectPackage(projectFolder, '@angular/cli');
-        if (!angular) {
-            return;
-        }
-        for (let configFile of configFiles.split(';')) {
-            const projectPath = path.dirname(configFile);
-            const karmaConfigPath = path.resolve(projectPath, `./${karmaConfigName}`);
+function getKarmaConfigPath(configFile, configPath) {
+    let karmaConfigPath = '';
+    const angularConfig = require(configFile);
+    for (const projectName of Object.keys(angularConfig.projects)) {
+        const project = angularConfig.projects[projectName];
 
-            if (!fs.existsSync(karmaConfigPath)) {
-                logError(`Failed to find "${karmaConfigName}" file. The "${karmaConfigName}" file must exists in the same path as the "angular.json" file.`);
+        karmaConfigPath = project.architect.test
+            && project.architect.test.options
+            && project.architect.test.options.karmaConfig
+            && path.resolve(configPath, project.architect.test.options.karmaConfig);
+
+        // TODO: For now, only return the first one found. We need to support multi-project workspaces.
+        if (karmaConfigPath) {
+            return karmaConfigPath;
+        }
+    }
+}
+
+const find_tests = function (configFiles, discoverResultFile) {
+    return new Promise(resolve => {
+        for (let configFile of configFiles.split(';')) {
+            const configPath = path.dirname(configFile);
+
+            if (!detectPackage(configPath, '@angular/cli')) {
                 continue;
             }
 
+            const karmaConfigPath = getKarmaConfigPath(configFile, configPath);
+
             // Set the environment variable to share it across processes.
-            process.env.PROJECTPATH = projectPath;
+            process.env.KARMACONFIGPATH = karmaConfigPath;
+            process.env.PROJECTPATH = configPath;
             process.env.TESTCASES = JSON.stringify([{ fullTitle: "NTVS_Discovery_ThisStringShouldExcludeAllTestCases" }]);
             process.env.ISDISCOVERY = 'true';
 
-            const ngTest = spawn(
-                process.argv0, // Node executable path
-                [
-                    path.resolve(projectPath, "./node_modules/@angular/cli/bin/ng"),
-                    'test',
-                    `--karmaConfig="${vsKarmaConfigPath}"`
-                ],
-                {
-                    cwd: projectPath,
-                    shell: true,
-                    stdio: ['pipe', 'ipc', 'pipe']
-                });
-
             const testsDiscovered = [];
 
-            ngTest.on('message', message => {
-                testsDiscovered.push(message);
-            });
+            const ngTest = fork(
+                path.resolve(configPath, "./node_modules/@angular/cli/bin/ng"),
+                [
+                    'test',
+                    `--karmaConfig=${vsKarmaConfigPath}`
+                ],
+                {
+                    cwd: configPath,
+                }).on('message', message => {
+                    testsDiscovered.push(message);
 
-            ngTest.on('exit', () => {
-                const fd = fs.openSync(discoverResultFile, 'w');
-                fs.writeSync(fd, JSON.stringify(testsDiscovered));
-                fs.closeSync(fd);
+                    // We need to keep track and communicate when we have received a testcase because the IPC channel
+                    // does not guarantees that we'll receive the event on the order it has been emitted.
+                    // Send to the child process as simple signal that we have parsed the testcase.
+                    ngTest.send({});
+                }).on('exit', () => {
+                    const fd = fs.openSync(discoverResultFile, 'w');
+                    fs.writeSync(fd, JSON.stringify(testsDiscovered));
+                    fs.closeSync(fd);
 
-                resolve();
-            });
+                    resolve();
+                });
         };
     });
 }
@@ -77,49 +89,42 @@ const run_tests = function (context) {
     return new Promise(resolve => {
         const angular = detectPackage(projectFolder, '@angular/cli');
         if (!angular) {
-            return;
+            return resolve();
         }
 
-        const projectPath = path.dirname(configFile);
-        const karmaConfigPath = path.resolve(projectPath, `./${karmaConfigName}`);
-
-        if (!fs.existsSync(karmaConfigPath)) {
-            logError(`Failed to find "${karmaConfigName}" file. The "${karmaConfigName}" file must exists in the same path as the "angular.json" file.`);
-            return;
-        }
+        const configPath = path.dirname(configFile);
 
         // Set the environment variable to share it across processes.
-        process.env.PROJECTPATH = projectPath;
+        process.env.KARMACONFIGPATH = getKarmaConfigPath(configFile, configPath);
+        process.env.PROJECTPATH = configPath;
         process.env.TESTCASES = JSON.stringify(context.testCases);
 
-        const ngTest = spawn(
-            process.argv0, //Node executable path
+        const ngTest = fork(
+            path.resolve(configPath, "./node_modules/@angular/cli/bin/ng"),
             [
-                path.resolve(projectPath, "./node_modules/@angular/cli/bin/ng"),
                 'test',
-                `--karmaConfig="${vsKarmaConfigPath}"`
+                `--karmaConfig=${vsKarmaConfigPath}`
             ],
             {
-                cwd: projectPath,
-                shell: true,
-                stdio: ['pipe', 'ipc', 'pipe']
-            });
+                cwd: configPath,
+                stdio: ['ignore', 1, 2, 'ipc'] // We need to ignore the stdin as NTVS keeps it open and causes the process to wait indefinitely.
+            }).on("message", message => {
+                context.post({
+                    type: message.pending ? 'pending' : 'result',
+                    fullyQualifiedName: context.getFullyQualifiedName(message.fullName),
+                    result: message
+                });
 
-        ngTest.on("message", message => {
-            context.post({
-                type: message.pending ? 'pending' : 'result',
-                fullyQualifiedName: context.getFullyQualifiedName(message.fullName),
-                result: message
-            });
-        });
+                ngTest.send({});
+            }).on('exit', () => {
+                context.post({
+                    type: 'end'
+                });
 
-        ngTest.on('exit', () => {
-            context.post({
-                type: 'end'
+                resolve();
+            }).on('error', err => {
+                console.log(err);
             });
-
-            resolve();
-        });
     });
 }
 

@@ -92,8 +92,10 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.cancelRequested.Reset();
 
             var testFramework = tests.First().GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
-            if (testFramework == "Angular")
+            if (string.Equals(testFramework, TestFrameworkDirectories.AngularFrameworkName, StringComparison.OrdinalIgnoreCase))
             {
+                // Every angular run initializes karma, browser, caching, etc, 
+                // so is preferable to let the test adapter handle any optimization.
                 RunAllTests(tests);
             }
             else

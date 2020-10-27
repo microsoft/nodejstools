@@ -9,51 +9,55 @@ var path = require('path');
 var defaultMochaOptions = { ui: 'tdd', reporter: 'tap', timeout: 2000 };
 
 var find_tests = function (testFileList, discoverResultFile, projectFolder) {
-    var Mocha = detectMocha(projectFolder);
-    if (!Mocha) {
-        return;
-    }
+    return new Promise(resolve => {
+        var Mocha = detectMocha(projectFolder);
+        if (!Mocha) {
+            return resolve();
+        }
 
-    function getTestList(suite, testFile) {
-        if (suite) {
-            if (suite.tests && suite.tests.length !== 0) {
-                suite.tests.forEach(function (t, i, testArray) {
-                    testList.push({
-                        name: t.title,
-                        suite: suite.fullTitle(),
-                        filepath: testFile,
-                        line: 0,
-                        column: 0
+        function getTestList(suite, testFile) {
+            if (suite) {
+                if (suite.tests && suite.tests.length !== 0) {
+                    suite.tests.forEach(function (t, i, testArray) {
+                        testList.push({
+                            name: t.title,
+                            suite: suite.fullTitle(),
+                            filepath: testFile,
+                            line: 0,
+                            column: 0
+                        });
                     });
-                });
-            }
+                }
 
-            if (suite.suites) {
-                suite.suites.forEach(function (s, i, suiteArray) {
-                    getTestList(s, testFile);
-                });
+                if (suite.suites) {
+                    suite.suites.forEach(function (s, i, suiteArray) {
+                        getTestList(s, testFile);
+                    });
+                }
             }
         }
-    }
 
-    var testList = [];
-    testFileList.split(';').forEach(function (testFile) {
-        var mocha = initializeMocha(Mocha, projectFolder);
-        process.chdir(path.dirname(testFile));
+        var testList = [];
+        testFileList.split(';').forEach(function (testFile) {
+            var mocha = initializeMocha(Mocha, projectFolder);
+            process.chdir(path.dirname(testFile));
 
-        try {
-            mocha.addFile(testFile);
-            mocha.loadFiles();
-            getTestList(mocha.suite, testFile);
-        } catch (e) {
-            //we would like continue discover other files, so swallow, log and continue;
-            console.error("Test discovery error:", e, "in", testFile);
-        }
+            try {
+                mocha.addFile(testFile);
+                mocha.loadFiles();
+                getTestList(mocha.suite, testFile);
+            } catch (e) {
+                //we would like continue discover other files, so swallow, log and continue;
+                console.error("Test discovery error:", e, "in", testFile);
+            }
+        });
+
+        var fd = fs.openSync(discoverResultFile, 'w');
+        fs.writeSync(fd, JSON.stringify(testList));
+        fs.closeSync(fd);
+
+        resolve();
     });
-
-    var fd = fs.openSync(discoverResultFile, 'w');
-    fs.writeSync(fd, JSON.stringify(testList));
-    fs.closeSync(fd);
 };
 
 module.exports.find_tests = find_tests;
@@ -63,79 +67,83 @@ var run_tests = function (context) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
-    var Mocha = detectMocha(context.testCases[0].projectFolder);
-    if (!Mocha) {
-        return;
-    }
+    return new Promise(resolve => {
+        var Mocha = detectMocha(context.testCases[0].projectFolder);
+        if (!Mocha) {
+            return resolve();
+        }
 
-    var mocha = initializeMocha(Mocha, context.testCases[0].projectFolder);
+        var mocha = initializeMocha(Mocha, context.testCases[0].projectFolder);
 
-    var testGrepString = '^(' + context.testCases.map(function (testCase) {
-        return escapeRegExp(testCase.fullTitle);
-    }).join('|') + ')$';
+        var testGrepString = '^(' + context.testCases.map(function (testCase) {
+            return escapeRegExp(testCase.fullTitle);
+        }).join('|') + ')$';
 
-    if (testGrepString) {
-        mocha.grep(new RegExp(testGrepString));
-    }
-    mocha.addFile(context.testCases[0].testFile);
+        if (testGrepString) {
+            mocha.grep(new RegExp(testGrepString));
+        }
+        mocha.addFile(context.testCases[0].testFile);
 
-    var runner = mocha.run(function (code) {
-        process.exitCode = code ? code : 0;
-    });
+        var runner = mocha.run(function (code) {
+            process.exitCode = code ? code : 0;
+        });
 
-    // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
-    runner.on('pending', function (test) {
-        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
-        context.post({
-            type: 'pending',
-            fullyQualifiedName,
-            result: {
+        // See events available at https://github.com/mochajs/mocha/blob/8cae7a34f0b6eafeb16567beb8852b827cc5956b/lib/runner.js#L47-L57
+        runner.on('pending', function (test) {
+            const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+            context.post({
+                type: 'pending',
                 fullyQualifiedName,
-                pending: true
-            }
+                result: {
+                    fullyQualifiedName,
+                    pending: true
+                }
+            });
+            context.clearOutputs();
         });
-        context.clearOutputs();
-    });
 
-    runner.on('test', function (test) {
-        context.post({
-            type: 'test start',
-            fullyQualifiedName: context.getFullyQualifiedName(test.fullTitle())
+        runner.on('test', function (test) {
+            context.post({
+                type: 'test start',
+                fullyQualifiedName: context.getFullyQualifiedName(test.fullTitle())
+            });
         });
-    });
 
-    runner.on('end', function () {
-        context.post({
-            type: 'end'
+        runner.on('end', function () {
+            context.post({
+                type: 'end'
+            });
+
+            resolve();
         });
-    });
 
-    runner.on('pass', function (test) {
-        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+        runner.on('pass', function (test) {
+            const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
 
-        context.post({
-            type: 'result',
-            fullyQualifiedName,
-            result: {
+            context.post({
+                type: 'result',
                 fullyQualifiedName,
-                passed: true
-            }
+                result: {
+                    fullyQualifiedName,
+                    passed: true
+                }
+            });
+            context.clearOutputs();
         });
-        context.clearOutputs();
-    });
 
-    runner.on('fail', function (test, err) {
-        const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
+        runner.on('fail', function (test, err) {
+            const fullyQualifiedName = context.getFullyQualifiedName(test.fullTitle());
 
-        context.post({
-            type: 'result',
-            fullyQualifiedName,
-            result: {
+            context.post({
+                type: 'result',
                 fullyQualifiedName,
-                passed: false
-            }
+                result: {
+                    fullyQualifiedName,
+                    passed: false
+                }
+            });
+            context.clearOutputs();
         });
-        context.clearOutputs();
     });
 };
 

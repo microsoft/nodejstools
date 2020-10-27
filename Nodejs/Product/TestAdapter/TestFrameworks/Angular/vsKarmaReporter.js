@@ -4,12 +4,17 @@ const http = require('http');
 const path = require('path');
 
 const jasmineReporterPath = path.resolve(process.env.VSTESTADAPTERPATH, 'jasmineReporter.js');
-const testCases = JSON.parse(process.env.TESTCASES);
 const isDiscovery = process.env.ISDISCOVERY === 'true';
 
 const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter) {
     baseReporterDecorator(this);
     const log = logger.create('vsKarmaReporter');
+    let testCaseCount = 0;
+
+    process.on('message', () => {
+        // We have recieved an indication that the test case has been processed. Decrement the amount
+        testCaseCount--;
+    });
 
     config.files.push({
         included: true,
@@ -19,11 +24,15 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
     });
 
     this.onBrowserError = (browser, error) => {
+        // TODO: Report error to user
         log.debug(`onBrowserError: ${JSON.stringify(error)}`);
+
+        // If there's an error we want to clear the test cases so that we can finish the process.
+        testCaseCount = 0;
     }
 
     // TODO: Is there a better option than onBrowserLog?
-    // So far, since this is runned by multiple out of proc, the only way I have found to communicate
+    // So far, since this is run by multiple out of proc, the only way I have found to communicate
     // is through the console, thus, the need for capturing the browser log. JasmineReporter uses 
     // console.log for this purpose.
     this.onBrowserLog = (browser, browserLog, type) => {
@@ -34,6 +43,9 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         if (!isDiscovery && result.status === "excluded") {
             return;
         }
+
+        // Increment the amount of test cases found.
+        testCaseCount++;
 
         const fullFilePath = `${process.env.PROJECTPATH}${result.fileLocation.relativeFilePath}`;
         const suite = result.fullName.substring(0, result.fullName.length - result.description.length - 1);
@@ -62,20 +74,22 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         log.debug(`onBrowserLog: ${JSON.stringify(result)}`);
     }
 
-    this.onRunComplete = (browsers, results) => {
+    this.onRunComplete = async (browsers, results) => {
         log.debug(`onRunComplete: ${JSON.stringify(results)}`);
 
-        const testCase = testCases.pop();
-        if (testCase) {
-            runTestCase(testCase);
-        } else {
-            // We need to exit the process as angular keeps it running and to emit the 'exit' event.
-            process.exit();
+        // Wait until we have processed all of the test cases.
+        while (testCaseCount > 0) {
+            await sleep(1000);
         }
+
+        // We need to exit the process as angular keeps it running and to emit the 'exit' event.
+        process.exit();
     }
 
     // Override specFailure to avoid crashing the process as Karma sends a string output that cannot be parsed as JSON.
-    this.specFailure = () => { }
+    this.specFailure = () => {
+        // no-op
+    }
 
     let hasStarted = false;
 
@@ -87,7 +101,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
             hasStarted = true;
 
             // At least one test case should exists.
-            runTestCase(testCases.pop());
+            runTestCase();
         }
     });
 
@@ -103,9 +117,13 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         };
 
         const request = http.request(options);
-        request.end(
-            JSON.stringify({ args: [`--grep=${testCase.fullTitle}`] })
-        );
+        request.end();
+    }
+
+    async function sleep(ms) {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+        });
     }
 }
 

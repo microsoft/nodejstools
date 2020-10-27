@@ -1,14 +1,13 @@
 ﻿// @ts-check
-
 const path = require('path');
 
-const karmaConfigPath = path.resolve(process.env.PROJECTPATH, 'karma.conf.js');
 const reporterPath = path.resolve(process.env.VSTESTADAPTERPATH, 'vsKarmaReporter.js');
 const testCases = JSON.parse(process.env.TESTCASES);
-
-const karmaConfig = require(karmaConfigPath);
+const karmaConfigPath = process.env.KARMACONFIGPATH;
 
 module.exports = function (config) {
+    const karmaConfig = require(karmaConfigPath);
+
     karmaConfig(config);
 
     config.autoWatch = false;
@@ -34,7 +33,7 @@ function setGrep(config) {
             return previous;
         }, [])
         .join('|');
-    config.client.args.push(`--grep=${testCasesRegex}`);
+    config.client.args.push(`--grep=/${testCasesRegex}/`);
 }
 
 function escapeRegExp(string) {

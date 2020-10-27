@@ -13,7 +13,7 @@ using MSBuild = Microsoft.Build.Evaluation;
 namespace Microsoft.NodejsTools.TestAdapter
 {
     // Keep in sync the method TypeScriptHelpers.IsSupportedTestProjectFile if there's a change on the supported projects.
-    [FileExtension(NodejsConstants.NodejsProjectExtension), FileExtension(NodejsConstants.CSharpProjectExtension), FileExtension(NodejsConstants.VisualBasicProjectExtension), FileExtension(NodejsConstants.AngularProjectExtension)]
+    [FileExtension(NodejsConstants.NodejsProjectExtension), FileExtension(NodejsConstants.CSharpProjectExtension), FileExtension(NodejsConstants.VisualBasicProjectExtension), FileExtension(NodejsConstants.JavaScriptProjectExtension)]
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public partial class ProjectTestDiscoverer : ITestDiscoverer
     {
@@ -60,13 +60,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                     }
 
                     FrameworkDiscoverer frameworkDiscoverer = null;
-                    var testItems = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-
                     foreach (var proj in buildEngine.LoadedProjects)
                     {
                         var projectHome = Path.GetFullPath(Path.Combine(proj.DirectoryPath, "."));
 
-                        testItems = TestFrameworkFactory.GetTestItems(projectHome, proj);
+                        var testItems = TestFrameworkFactory.GetTestItems(projectHome, proj);
 
                         if (testItems.Any())
                         {

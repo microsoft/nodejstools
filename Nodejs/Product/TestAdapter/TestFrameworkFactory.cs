@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
+using Microsoft.NodejsTools.TestFrameworks;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudioTools;
 
@@ -20,17 +21,14 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             foreach (var projectItem in projectItems)
             {
-                string testFrameworkName = null;
                 // TODO: Consider it can also be inside a <root>/.config/ folder and will configure the <root> folder.
-                if (projectItem.EvaluatedInclude.Contains("angular.json"))
-                {
-                    testFrameworkName = "angular";
-                }
                 // TODO: Add configuration files for jest, mocha , jasmine. Consider that some frameworks can be configured using package.json
                 // Also some frameworks have more than one filename to define a configuration.
                 // Tape is the only framework we support that doesn't have a configuration file. Decide what to do about that.
-                if (testFrameworkName != null)
+                if (projectItem.EvaluatedInclude.Contains("angular.json"))
                 {
+                    var testFrameworkName = TestFrameworkDirectories.AngularFrameworkName;
+
                     if (!configItems.ContainsKey(testFrameworkName))
                     {
                         configItems.Add(testFrameworkName, new HashSet<string>(StringComparer.OrdinalIgnoreCase));

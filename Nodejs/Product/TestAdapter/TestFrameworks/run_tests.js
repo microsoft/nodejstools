@@ -6,7 +6,7 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-rl.on('line', function (line) {
+rl.on('line', async function (line) {
     rl.close();
 
     // strip the BOM in case of UTF-8
@@ -25,13 +25,11 @@ rl.on('line', function (line) {
 
     try {
         framework = require('./' + context.testCases[0].framework + '/' + context.testCases[0].framework + '.js');
+        await framework.run_tests(context);
     } catch (exception) {
         console.log("NTVS_ERROR:Failed to load TestFramework (" + context.testCases[0].framework + "), " + exception);
         process.exit(1);
     }
-
-    // run the test
-    framework.run_tests(context);
 });
 
 function createContext(line) {

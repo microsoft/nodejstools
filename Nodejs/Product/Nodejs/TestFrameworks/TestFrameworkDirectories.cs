@@ -9,6 +9,7 @@ namespace Microsoft.NodejsTools.TestFrameworks
 {
     internal static class TestFrameworkDirectories
     {
+        public const string AngularFrameworkName = "Angular";
         public const string ExportRunnerFrameworkName = "ExportRunner";
         private const string TestFrameworksFolderName = "TestFrameworks";
         private const string TestAdapterFolderName = "TestAdapter";
@@ -22,7 +23,10 @@ namespace Microsoft.NodejsTools.TestFrameworks
             }
 
             // Enumerate all directories to appear on the properties bar. Angular is removed as it is configured by config file instead.
-            return Directory.EnumerateDirectories(testFrameworkRoot).Select(Path.GetFileName).Where(x => x != "Angular").ToArray();
+            return Directory.EnumerateDirectories(testFrameworkRoot)
+                .Select(Path.GetFileName)
+                .Where(x => !string.Equals(x, TestFrameworkDirectories.AngularFrameworkName, StringComparison.OrdinalIgnoreCase))
+                .ToArray();
         }
 
         public static string[] GetFrameworkDirectories(string testFrameworkRoot = null)
