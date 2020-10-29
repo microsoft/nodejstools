@@ -652,7 +652,7 @@ namespace Microsoft.NodejsTools.Project
         public object Server { get; set; } 
 
         [JsonProperty("sourceMapPathOverrides")]
-        public string[] SourceMapPathOverrides { get; set; }
+        public Dictionary<string, string> SourceMapPathOverrides { get; set; }
 
         [JsonProperty("restart")]
         public bool RestartPolicy { get; set; }
@@ -669,7 +669,6 @@ namespace Microsoft.NodejsTools.Project
         public object toPwaChromeServerConfig()
         {
             this.Console = "internalConsole";
-            this.SourceMapPathOverrides = new string[0];
             return this;
         }
     }
