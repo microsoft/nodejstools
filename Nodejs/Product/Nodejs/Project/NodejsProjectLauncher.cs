@@ -669,6 +669,7 @@ namespace Microsoft.NodejsTools.Project
         public object toPwaChromeServerConfig()
         {
             this.Console = "internalConsole";
+            this.SourceMapPathOverrides = new Dictionary<string, string>();
             return this;
         }
     }
