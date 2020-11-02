@@ -108,33 +108,37 @@ function enumerateSpecs(suite, testList, testFile) {
  * @param {string} projectFolder
  */
 function find_tests(testFileList, discoverResultFile, projectFolder) {
-    var Jasmine = detectJasmine(projectFolder);
-    if (!Jasmine) {
-        return;
-    }
-    var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
-    setSpecFilter(jasmineInstance, _ => false);
-
-    var testList = [];
-    testFileList.split(";").forEach((testFile) => {
-        try {
-            jasmineInstance.specDir = "";
-            jasmineInstance.specFiles = [];
-            jasmineInstance.addSpecFiles([testFile]);
-            jasmineInstance.loadSpecs();
-
-            var topSuite = jasmineInstance.env.topSuite();
-            enumerateSpecs(topSuite, testList, testFile);
+    return new Promise(resolve => {
+        var Jasmine = detectJasmine(projectFolder);
+        if (!Jasmine) {
+            return resolve();
         }
-        catch (ex) {
-            //we would like continue discover other files, so swallow, log and continue;
-            console.error("Test discovery error:", ex, "in", testFile);
-        }
+        var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
+        setSpecFilter(jasmineInstance, _ => false);
+
+        var testList = [];
+        testFileList.split(";").forEach((testFile) => {
+            try {
+                jasmineInstance.specDir = "";
+                jasmineInstance.specFiles = [];
+                jasmineInstance.addSpecFiles([testFile]);
+                jasmineInstance.loadSpecs();
+
+                var topSuite = jasmineInstance.env.topSuite();
+                enumerateSpecs(topSuite, testList, testFile);
+            }
+            catch (ex) {
+                //we would like continue discover other files, so swallow, log and continue;
+                console.error("Test discovery error:", ex, "in", testFile);
+            }
+        });
+
+        var fd = fs.openSync(discoverResultFile, 'w');
+        fs.writeSync(fd, JSON.stringify(testList));
+        fs.closeSync(fd);
+
+        resolve();
     });
-
-    var fd = fs.openSync(discoverResultFile, 'w');
-    fs.writeSync(fd, JSON.stringify(testList));
-    fs.closeSync(fd);
 }
 
 exports.find_tests = find_tests;
@@ -175,30 +179,34 @@ function createCustomReporter(context) {
 }
 
 function run_tests(context) {
-    var projectFolder = context.testCases[0].projectFolder;
-    var Jasmine = detectJasmine(projectFolder);
-    if (!Jasmine) {
-        return;
-    }
-    var testFileList = [];
-    var testNameList = {};
-
-    context.testCases.forEach((testCase) => {
-        if (testFileList.indexOf(testCase.testFile) < 0) {
-            testFileList.push(testCase.testFile);
+    return new Promise(resolve => {
+        var projectFolder = context.testCases[0].projectFolder;
+        var Jasmine = detectJasmine(projectFolder);
+        if (!Jasmine) {
+            return resolve();
         }
-        testNameList[testCase.fullTitle] = true;
+        var testFileList = [];
+        var testNameList = {};
+
+        context.testCases.forEach((testCase) => {
+            if (testFileList.indexOf(testCase.testFile) < 0) {
+                testFileList.push(testCase.testFile);
+            }
+            testNameList[testCase.fullTitle] = true;
+        });
+        try {
+            var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
+            jasmineInstance.configureDefaultReporter({ showColors: false });
+            setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
+            jasmineInstance.addReporter(createCustomReporter(context));
+            jasmineInstance.execute(testFileList);
+        }
+        catch (ex) {
+            logError("Execute test error:", ex);
+        }
+
+        resolve();
     });
-    try {
-        var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
-        jasmineInstance.configureDefaultReporter({ showColors: false });
-        setSpecFilter(jasmineInstance, spec => testNameList.hasOwnProperty(spec.getSpecName(spec)));
-        jasmineInstance.addReporter(createCustomReporter(context));
-        jasmineInstance.execute(testFileList);
-    }
-    catch (ex) {
-        logError("Execute test error:", ex);
-    }
 }
 
 function setSpecFilter(jasmineInstance, specFilter) {

@@ -5,55 +5,66 @@ const os = require('os');
 const path = require('path');
 
 const find_tests = function (testFileList, discoverResultFile, projectFolder) {
-    const jest = detectPackage(projectFolder, 'jest');
-    const jestEditorSupport = detectPackage(projectFolder, 'jest-editor-support');
+    return new Promise(resolve => {
+        const jest = detectPackage(projectFolder, 'jest');
+        const jestEditorSupport = detectPackage(projectFolder, 'jest-editor-support');
 
-    if (!jest || !jestEditorSupport) {
-        return;
-    }
-
-    let testList = [];
-    for (let testFile of testFileList.split(';')) {
-        process.chdir(path.dirname(testFile));
-
-        try {
-            const parseResult = jestEditorSupport.parse(testFile);
-
-            visitNodes(parseResult.root.children, [], testList);
+        if (!jest || !jestEditorSupport) {
+            return resolve();
         }
-        catch (e) {
-            // We would like continue discover other files, so swallow, log and continue;
-            console.error("Test discovery error:", e, "in", testFile);
-        }
-    }
 
-    const fd = fs.openSync(discoverResultFile, 'w');
-    fs.writeSync(fd, JSON.stringify(testList));
-    fs.closeSync(fd);
+        let testList = [];
+        for (let testFile of testFileList.split(';')) {
+            process.chdir(path.dirname(testFile));
+
+            try {
+                const parseResult = jestEditorSupport.parse(testFile);
+
+                visitNodes(parseResult.root.children, [], testList);
+            }
+            catch (e) {
+                // We would like continue discover other files, so swallow, log and continue;
+                console.error("Test discovery error:", e, "in", testFile);
+            }
+        }
+
+        const fd = fs.openSync(discoverResultFile, 'w');
+        fs.writeSync(fd, JSON.stringify(testList));
+        fs.closeSync(fd);
+
+        resolve();
+    });
 };
 
 const run_tests = function (context) {
-    const jest = detectPackage(context.testCases[0].projectFolder, 'jest');
-    if (!jest) {
-        return;
-    }
+    return new Promise(async resolve => {
+        const jest = detectPackage(context.testCases[0].projectFolder, 'jest');
+        if (!jest) {
+            return resolve();
+        }
 
-    // Start all test cases, as jest is unable to filter out independently
-    for (const testCase of context.testCases) {
-        context.post({
-            type: 'test start',
-            fullyQualifiedName: testCase.fullyQualifiedName
-        });
-    }
+        // Start all test cases, as jest is unable to filter out independently
+        for (const testCase of context.testCases) {
+            context.post({
+                type: 'test start',
+                fullyQualifiedName: testCase.fullyQualifiedName
+            });
+        }
 
-    const config = {
-        json: true,
-        reporters: [[__dirname + '/jestReporter.js', { context }]],
-        testMatch: [context.testCases[0].testFile]
-    };
+        const config = {
+            json: true,
+            reporters: [[__dirname + '/jestReporter.js', { context }]],
+            testMatch: [context.testCases[0].testFile]
+        };
 
-    jest.runCLI(config, [context.testCases[0].projectFolder])
-        .catch((error) => logError(error));
+        try {
+            await jest.runCLI(config, [context.testCases[0].projectFolder]);
+        } catch (error) {
+            logError(error);
+        }
+
+        resolve();
+    });
 };
 
 function visitNodes(nodes, suites, tests) {

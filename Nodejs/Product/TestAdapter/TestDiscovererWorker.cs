@@ -30,7 +30,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void DiscoverTests(string testFolderPath, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
-            var fileList = Directory.GetFiles(testFolderPath, "*.js", SearchOption.AllDirectories);
+            var fileList = Directory.EnumerateFiles(testFolderPath, "*.js", SearchOption.AllDirectories).Where(x => !x.Contains(NodejsConstants.NodeModulesFolder));
             this.DiscoverTests(fileList, testFx, logger, discoverySink);
         }
 

@@ -91,6 +91,32 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(tests, nameof(tests));
             this.cancelRequested.Reset();
 
+            var testFramework = tests.First().GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
+            if (string.Equals(testFramework, TestFrameworkDirectories.AngularFrameworkName, StringComparison.OrdinalIgnoreCase))
+            {
+                // Every angular run initializes karma, browser, caching, etc, 
+                // so is preferable to let the test adapter handle any optimization.
+                RunAllTests(tests);
+            }
+            else
+            {
+                RunTestsByFile(tests);
+            }
+        }
+
+        private void RunAllTests(IEnumerable<TestCase> tests)
+        {
+            var testCaseResults = tests.Select(x => new TestCaseResult { TestCase = x });
+            this.currentTests = testCaseResults.ToList();
+
+            this.RunTestCases(testCaseResults);
+        }
+
+        /// <summary>
+        /// Runs all of the test cases by executing each one of the files sequentially.
+        /// </summary>
+        private void RunTestsByFile(IEnumerable<TestCase> tests)
+        {
             // .ts file path -> project settings
             var fileToTests = new Dictionary<string, List<TestCaseResult>>();
 
@@ -159,7 +185,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                     nodeArgs.Add(args.RunTestsScriptFile);
                 }
 
-                testObjects.Add(new TestCaseObject(framework: args.TestFramework, fullyQualifiedName: args.fullyQualifiedName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
+                testObjects.Add(new TestCaseObject(
+                    framework: args.TestFramework,
+                    fullyQualifiedName: args.fullyQualifiedName,
+                    testFile: args.TestFile,
+                    workingFolder: args.WorkingDirectory,
+                    projectFolder: args.ProjectRootDir));
             }
 
             var port = 0;
