@@ -185,7 +185,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                     nodeArgs.Add(args.RunTestsScriptFile);
                 }
 
-                testObjects.Add(new TestCaseObject(framework: args.TestFramework, fullyQualifiedName: args.fullyQualifiedName, testFile: args.TestFile, workingFolder: args.WorkingDirectory, projectFolder: args.ProjectRootDir));
+                testObjects.Add(new TestCaseObject(
+                    framework: args.TestFramework,
+                    fullyQualifiedName: args.fullyQualifiedName,
+                    testFile: args.TestFile,
+                    workingFolder: args.WorkingDirectory,
+                    projectFolder: args.ProjectRootDir));
             }
 
             var port = 0;

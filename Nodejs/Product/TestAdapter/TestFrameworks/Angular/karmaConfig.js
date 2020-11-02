@@ -3,15 +3,15 @@ const path = require('path');
 
 const reporterPath = path.resolve(process.env.VSTESTADAPTERPATH, 'vsKarmaReporter.js');
 const testCases = JSON.parse(process.env.TESTCASES);
-const karmaConfigPath = process.env.KARMACONFIGPATH;
+const project = JSON.parse(process.env.PROJECT);
 
 module.exports = function (config) {
-    const karmaConfig = require(karmaConfigPath);
+    const karmaConfig = require(project.karmaConfigPath);
 
     karmaConfig(config);
 
     config.autoWatch = false;
-    config.browsers = ['ChromeHeadless'];
+    config.browsers = ['Chrome'];
     config.logLevel = config.LOG_DISABLE;
     // Keep the original plugins
     config.plugins = config.plugins || [];

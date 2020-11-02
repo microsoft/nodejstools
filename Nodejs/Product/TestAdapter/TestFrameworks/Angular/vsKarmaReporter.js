@@ -5,6 +5,7 @@ const path = require('path');
 
 const jasmineReporterPath = path.resolve(process.env.VSTESTADAPTERPATH, 'jasmineReporter.js');
 const isDiscovery = process.env.ISDISCOVERY === 'true';
+const project = JSON.parse(process.env.PROJECT);
 
 const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter) {
     baseReporterDecorator(this);
@@ -47,7 +48,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         // Increment the amount of test cases found.
         testCaseCount++;
 
-        const fullFilePath = `${process.env.PROJECTPATH}${result.fileLocation.relativeFilePath}`;
+        const fullFilePath = path.join(path.dirname(project.karmaConfigPath), result.fileLocation.relativeFilePath);
         const suite = result.fullName.substring(0, result.fullName.length - result.description.length - 1);
 
         let errorLog = "";

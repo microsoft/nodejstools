@@ -16,7 +16,7 @@ function getFileLocation() {
 
     return match
         ? {
-            relativeFilePath: match[1], // Relative to root. This is due to webpack.
+            relativeFilePath: match[1], // Relative to karma config. This is due to webpack.
             line: match[2],
             column: match[3]
         }
