@@ -11,7 +11,7 @@ module.exports = function (config) {
     karmaConfig(config);
 
     config.autoWatch = false;
-    config.browsers = ['Chrome'];
+    config.browsers = ['ChromeHeadless'];
     config.logLevel = config.LOG_DISABLE;
     // Keep the original plugins
     config.plugins = config.plugins || [];
