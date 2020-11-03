@@ -7,7 +7,7 @@ const { fork } = require("child_process");
 
 process.env.VSTESTADAPTERPATH = __dirname;
 
-const vsKarmaConfigPath = path.resolve(__dirname, "./karmaConfig.js");
+const vsKarmaConfigFilePath = path.resolve(__dirname, "./karmaConfig.js");
 
 function getTestProjects(configFile) {
     const configPath = path.dirname(configFile);
@@ -17,16 +17,17 @@ function getTestProjects(configFile) {
     for (const projectName of Object.keys(angularConfig.projects)) {
         const project = angularConfig.projects[projectName];
 
-        const karmaConfigPath = project.architect.test
+        const karmaConfigFilePath = project.architect.test
             && project.architect.test.options
             && project.architect.test.options.karmaConfig
             && path.resolve(configPath, project.architect.test.options.karmaConfig);
 
-        if (karmaConfigPath) {
+        if (karmaConfigFilePath) {
             angularProjects.push({
                 angularConfigPath: configPath,
-                karmaConfigPath,
+                karmaConfigFilePath,
                 name: projectName,
+                rootPath: path.join(configPath, project.root),
             });
         }
     }
@@ -61,7 +62,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigPath}`
+                    `--karmaConfig=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
@@ -78,7 +79,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
                     ngTest.send({});
                 }).on('error', err => {
                     reject(err);
-                }).on('exit', (code) => {
+                }).on('exit', code => {
                     resolve(code);
                 });
         });
@@ -125,7 +126,7 @@ const run_tests = async function (context) {
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigPath}`
+                    `--karmaConfig=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
@@ -142,8 +143,8 @@ const run_tests = async function (context) {
                     });
 
                     ngTest.send({});
-                }).on('exit', () => {
-                    resolve();
+                }).on('exit', code => {
+                    resolve(code);
                 }).on('error', err => {
                     reject(err);
                 });

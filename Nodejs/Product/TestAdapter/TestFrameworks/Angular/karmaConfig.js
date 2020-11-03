@@ -6,7 +6,7 @@ const testCases = JSON.parse(process.env.TESTCASES);
 const project = JSON.parse(process.env.PROJECT);
 
 module.exports = function (config) {
-    const karmaConfig = require(project.karmaConfigPath);
+    const karmaConfig = require(project.karmaConfigFilePath);
 
     karmaConfig(config);
 

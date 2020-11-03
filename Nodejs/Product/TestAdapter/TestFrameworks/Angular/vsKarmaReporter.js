@@ -48,7 +48,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         // Increment the amount of test cases found.
         testCaseCount++;
 
-        const fullFilePath = path.join(path.dirname(project.karmaConfigPath), result.fileLocation.relativeFilePath);
+        const fullFilePath = path.join(project.rootPath, result.fileLocation.relativeFilePath);
         const suite = result.fullName.substring(0, result.fullName.length - result.description.length - 1);
 
         let errorLog = "";
