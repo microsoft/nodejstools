@@ -96,14 +96,14 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 {
                     var line = discoveredTest.Line + 1;
                     var column = discoveredTest.Column + 1;
-                    var test = new NodejsTestInfo(discoveredTest.Filepath, discoveredTest.Suite, discoveredTest.Name, this.Name, line, column, projectRoot);
+                    var test = new NodejsTestInfo(discoveredTest.Filepath, discoveredTest.Suite, discoveredTest.Name, this.Name, line, column, projectRoot, discoveredTest.ConfigPath);
                     testCases.Add(test);
                 }
             }
             return testCases;
         }
 
-        public ArgumentsToRunTests GetArgumentsToRunTests(string fullyQualifiedName, string testFile, string workingDirectory, string projectRootDir)
+        public ArgumentsToRunTests GetArgumentsToRunTests(string fullyQualifiedName, string testFile, string workingDirectory, string projectRootDir, string configPath)
         {
             workingDirectory = workingDirectory.TrimEnd('\\');
             projectRootDir = projectRootDir.TrimEnd('\\');
@@ -113,7 +113,8 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 fullyQualifiedName,
                 testFile,
                 workingDirectory,
-                projectRootDir);
+                projectRootDir,
+                configPath);
         }
 
         private static string WrapWithQuotes(string path)
@@ -172,6 +173,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             public string Filepath;
             public int Line;
             public int Column;
+            public string ConfigPath;
 #pragma warning restore CS0649
         }
 
@@ -206,7 +208,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 
         public sealed class ArgumentsToRunTests
         {
-            public ArgumentsToRunTests(string runTestsScriptFile, string testFramework, string fullyQualifiedName, string testFile, string workingDirectory, string projectRootDir)
+            public ArgumentsToRunTests(string runTestsScriptFile, string testFramework, string fullyQualifiedName, string testFile, string workingDirectory, string projectRootDir, string configPath)
             {
                 this.RunTestsScriptFile = WrapWithQuotes(runTestsScriptFile);
                 this.TestFramework = testFramework;
@@ -214,6 +216,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
                 this.TestFile = WrapWithQuotes(testFile);
                 this.WorkingDirectory = WrapWithQuotes(workingDirectory);
                 this.ProjectRootDir = WrapWithQuotes(projectRootDir);
+                this.ConfigPath = WrapWithQuotes(configPath);
             }
 
             public readonly string RunTestsScriptFile;
@@ -222,6 +225,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             public readonly string TestFile;
             public readonly string WorkingDirectory;
             public readonly string ProjectRootDir;
+            public readonly string ConfigPath;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
 {
     public sealed class NodejsTestInfo
     {
-        public NodejsTestInfo(string testPath, string suite, string testName, string testFramework, int line, int column, string projectRootDir)
+        public NodejsTestInfo(string testPath, string suite, string testName, string testFramework, int line, int column, string projectRootDir, string configPath)
         {
             var testFileRelative = CommonUtils.GetRelativeFilePath(projectRootDir, testPath);
 
@@ -19,6 +19,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
             this.SourceLine = line;
             this.SourceColumn = column;
             this.Suite = suite;
+            this.ConfigPath = configPath;
         }
 
         public string FullyQualifiedName
@@ -52,5 +53,7 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         public int SourceColumn { get; }
 
         public string Suite { get; }
+
+        public string ConfigPath { get; }
     }
 }

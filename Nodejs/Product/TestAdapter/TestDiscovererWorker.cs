@@ -78,6 +78,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, this.workingDir);
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, this.nodeExePath);
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.ConfigPath, discoveredTest.ConfigPath);
 
                 discoverySink.SendTestCase(testCase);
             }

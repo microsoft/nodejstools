@@ -11,5 +11,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         public static readonly TestProperty NodeExePath = TestProperty.Register(id: $"NodeTools.{nameof(NodeExePath)}", label: nameof(NodeExePath), valueType: typeof(string), owner: typeof(TestCase));
         public static readonly TestProperty ProjectRootDir = TestProperty.Register(id: $"NodeTools.{nameof(ProjectRootDir)}", label: nameof(ProjectRootDir), valueType: typeof(string), owner: typeof(TestCase));
         public static readonly TestProperty TestFile = TestProperty.Register(id: $"NodeTools.{nameof(TestFile)}", label: nameof(TestFile), valueType: typeof(string), owner: typeof(TestCase));
+        public static readonly TestProperty ConfigPath = TestProperty.Register(id: $"NodeTools.{nameof(ConfigPath)}", label: nameof(ConfigPath), valueType: typeof(string), owner: typeof(TestCase));
     }
 }

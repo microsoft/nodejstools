@@ -64,6 +64,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
             filepath: fullFilePath,
             line: result.fileLocation.line,
             column: result.fileLocation.column,
+            configPath: project.angularConfigPath,
 
             // Execution properties
             passed: result.status === "passed",
