@@ -73,16 +73,18 @@ namespace Microsoft.NodejsTools.TestAdapter
                 foreach (var (projectFile, propertyGroup) in projects)
                 {
                     var projectHome = Path.GetDirectoryName(projectFile);
+                    // Assume is Angular as it's the only one we have configuration files support so far.
+                    var testFrameworkName = TestFrameworkDirectories.AngularFrameworkName;
 
                     // Prioritize configuration files over manually setup tests files.
                     var testItems = this.GetConfigItems(projectHome);
                     if (!testItems.Any())
                     {
-                        var testFramework = propertyGroup.Descendants(NodeProjectProperty.TestFramework).FirstOrDefault()?.Value;
+                        testFrameworkName = propertyGroup.Descendants(NodeProjectProperty.TestFramework).FirstOrDefault()?.Value;
                         var testRoot = propertyGroup.Descendants(NodeProjectProperty.TestRoot).FirstOrDefault()?.Value;
-                        var outDir = propertyGroup.Descendants(NodeProjectProperty.TypeScriptOutDir).FirstOrDefault()?.Value ?? "";
+                        var outDir = propertyGroup.Descendants(NodeProjectProperty.TypeScriptOutDir).FirstOrDefault()?.Value;
 
-                        if (string.IsNullOrEmpty(testRoot) || string.IsNullOrEmpty(testFramework))
+                        if (string.IsNullOrEmpty(testRoot) || string.IsNullOrEmpty(testFrameworkName))
                         {
                             logger.SendMessage(TestMessageLevel.Warning, $"No TestRoot or TestFramework specified for '{Path.GetFileName(projectFile)}'.");
                             continue;
@@ -96,7 +98,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             continue;
                         }
 
-                        testItems = this.GetTestItems(testFolder, testFramework, outDir);
+                        testItems = this.GetTestItems(testFolder, outDir);
                     }
 
                     if (testItems.Any())
@@ -108,7 +110,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                             nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
                         }
 
-                        this.DiscoverTests(testItems, frameworkDiscoverer, discoverySink, logger, nodeExePath, projectFile);
+                        this.DiscoverTests(testItems, frameworkDiscoverer, discoverySink, logger, nodeExePath, projectFile, testFrameworkName);
                     }
                 }
             }
@@ -119,76 +121,40 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
-        private void DiscoverTests(Dictionary<string, HashSet<string>> testItems, FrameworkDiscoverer frameworkDiscoverer, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath)
+        private void DiscoverTests(IEnumerable<string> testItems, FrameworkDiscoverer frameworkDiscoverer, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath, string testFrameworkName)
         {
-            foreach (var testFx in testItems.Keys)
+            var testFramework = frameworkDiscoverer.GetFramework(testFrameworkName);
+            if (testFramework == null)
             {
-                var testFramework = frameworkDiscoverer.GetFramework(testFx);
-                if (testFramework == null)
-                {
-                    logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFx}'.");
-                    continue;
-                }
-
-                var fileList = testItems[testFx];
-
-                var discoverWorker = new TestDiscovererWorker(projectFullPath, NodejsConstants.ExecutorUri, nodeExePath);
-                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink);
+                logger.SendMessage(TestMessageLevel.Warning, $"Ignoring unsupported test framework '{testFrameworkName}'.");
             }
+
+            var discoverWorker = new TestDiscovererWorker(projectFullPath, nodeExePath);
+            discoverWorker.DiscoverTests(testItems, testFramework, logger, discoverySink);
         }
 
-        private Dictionary<string, HashSet<string>> GetConfigItems(string projectRoot)
+        private IEnumerable<string> GetConfigItems(string projectRoot)
         {
-            var files = Directory.EnumerateFiles(projectRoot, "angular.json", SearchOption.AllDirectories)
+            return Directory.EnumerateFiles(projectRoot, "angular.json", SearchOption.AllDirectories)
                 .Where(x => !x.Contains("\\node_modules\\"));
-            if (files.Any())
-            {
-                return new Dictionary<string, HashSet<string>>()
-                {
-                    {
-                        TestFrameworkDirectories.AngularFrameworkName,
-                        new HashSet<string>(files)
-                    }
-                };
-            }
-
-            return default;
         }
 
-        private Dictionary<string, HashSet<string>> GetTestItems(string projectRoot, string testFramework, string outDir)
+        private IEnumerable<string> GetTestItems(string projectRoot, string outDir)
         {
+            // TODO: Do our own directory traversal. It's better for performance.
+
             // If we find ts or tsx files, get the JS file and return.
             var files = Directory.EnumerateFiles(projectRoot, "*.ts?", SearchOption.AllDirectories)
                 .Where(x => !x.Contains("\\node_modules\\"));
             if (files.Any())
             {
-                var testFilePaths = files
-                    .Where(x => TypeScriptHelpers.IsTypeScriptFile(x))
-                    .Select(x => TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(x, projectRoot, outDir));
-
-                return new Dictionary<string, HashSet<string>>()
-                {
-                    {
-                        testFramework,
-                        new HashSet<string>(testFilePaths)
-                    }
-                };
+                return files
+                    .Where(p => TypeScriptHelpers.IsTypeScriptFile(p))
+                    .Select(p => TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(p, outDir, projectRoot));
             }
 
-            files = Directory.EnumerateFiles(projectRoot, "*.js", SearchOption.AllDirectories)
-                .Where(x => !x.Contains("\\node_modules\\"));
-            if (files.Any())
-            {
-                return new Dictionary<string, HashSet<string>>()
-                {
-                    {
-                        testFramework,
-                        new HashSet<string>(files)
-                    }
-                };
-            }
-
-            return default;
+            return Directory.EnumerateFiles(projectRoot, "*.js", SearchOption.AllDirectories)
+                .Where(p => !p.Contains("\\node_modules\\"));
         }
     }
 }

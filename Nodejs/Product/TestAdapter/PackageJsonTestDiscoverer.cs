@@ -68,7 +68,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             testFx = testFx ?? this.frameworkDiscoverer.GetFramework(TestFrameworkDirectories.ExportRunnerFrameworkName);
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
-            var worker = new TestDiscovererWorker(packageJsonPath, NodejsConstants.PackageJsonExecutorUri, nodeExePath);
+            var worker = new TestDiscovererWorker(packageJsonPath, nodeExePath);
             worker.DiscoverTests(testFolderPath, testFx, logger, discoverySink);
         }
     }

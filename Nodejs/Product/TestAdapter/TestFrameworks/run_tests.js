@@ -19,7 +19,7 @@ rl.on('line', async function (line) {
     // get rid of leftover quotations from C# (necessary?)
     for (var test in context.testCases) {
         for (var value in context.testCases[test]) {
-            context.testCases[test][value] = context.testCases[test][value].replace(/["]+/g, '');
+            context.testCases[test][value] = context.testCases[test][value] && context.testCases[test][value].replace(/["]+/g, '');
         }
     }
 

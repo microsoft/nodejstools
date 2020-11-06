@@ -40,22 +40,22 @@ internal sealed class TestCaseObject
         this.testFile = string.Empty;
         this.workingFolder = string.Empty;
         this.projectFolder = string.Empty;
-        this.configPath = string.Empty;
+        this.configDirPath = string.Empty;
     }
 
-    public TestCaseObject(string framework, string fullyQualifiedName, string testFile, string workingFolder, string projectFolder, string configPath)
+    public TestCaseObject(string framework, string fullyQualifiedName, string testFile, string workingFolder, string projectFolder, string configDirPath)
     {
         this.framework = framework;
         this.fullyQualifiedName = fullyQualifiedName;
         this.testFile = testFile;
         this.workingFolder = workingFolder;
         this.projectFolder = projectFolder;
-        this.configPath = configPath;
+        this.configDirPath = configDirPath;
     }
     public string framework { get; set; }
     public string fullyQualifiedName { get; set; }
     public string testFile { get; set; }
     public string workingFolder { get; set; }
     public string projectFolder { get; set; }
-    public string configPath { get; set; }
+    public string configDirPath { get; set; }
 }

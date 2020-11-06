@@ -190,7 +190,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     testFile: args.TestFile,
                     workingFolder: args.WorkingDirectory,
                     projectFolder: args.ProjectRootDir,
-                    configPath: args.ConfigPath));
+                    configDirPath: args.ConfigDirPath));
             }
 
             var port = 0;
@@ -384,8 +384,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            var configPath = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.ConfigPath, defaultValue: null);
-            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.FullyQualifiedName, testFile, workingDir, projectRootDir, configPath);
+            var configDirPath = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.ConfigDirPath, defaultValue: null);
+            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.FullyQualifiedName, testFile, workingDir, projectRootDir, configDirPath);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

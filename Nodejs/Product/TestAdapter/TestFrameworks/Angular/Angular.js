@@ -10,7 +10,7 @@ process.env.VSTESTADAPTERPATH = __dirname;
 const vsKarmaConfigFilePath = path.resolve(__dirname, "./karmaConfig.js");
 
 function getTestProjects(configFile) {
-    const configPath = path.dirname(configFile);
+    const configDirPath = path.dirname(configFile);
 
     const angularProjects = [];
     const angularConfig = require(configFile);
@@ -20,14 +20,14 @@ function getTestProjects(configFile) {
         const karmaConfigFilePath = project.architect.test
             && project.architect.test.options
             && project.architect.test.options.karmaConfig
-            && path.resolve(configPath, project.architect.test.options.karmaConfig);
+            && path.resolve(configDirPath, project.architect.test.options.karmaConfig);
 
         if (karmaConfigFilePath) {
             angularProjects.push({
-                angularConfigPath: configPath,
+                angularConfigDirPath: configDirPath,
                 karmaConfigFilePath,
                 name: projectName,
-                rootPath: path.join(configPath, project.root),
+                rootPath: path.join(configDirPath, project.root),
             });
         }
     }
@@ -39,9 +39,9 @@ const find_tests = async function (configFiles, discoverResultFile) {
     const projects = [];
 
     for (const configFile of configFiles.split(';')) {
-        const configPath = path.dirname(configFile);
+        const configDirPath = path.dirname(configFile);
 
-        if (!detectPackage(configPath, '@angular/cli')) {
+        if (!detectPackage(configDirPath, '@angular/cli')) {
             continue;
         }
 
@@ -58,7 +58,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
         // on a lock file for building the project, that might be the reason.
         await new Promise((resolve, reject) => {
             const ngTest = fork(
-                path.resolve(project.angularConfigPath, "./node_modules/@angular/cli/bin/ng"),
+                path.resolve(project.angularConfigDirPath, "./node_modules/@angular/cli/bin/ng"),
                 [
                     'test',
                     project.name,
@@ -69,7 +69,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
                         ...process.env,
                         PROJECT: JSON.stringify(project)
                     },
-                    cwd: project.angularConfigPath,
+                    cwd: project.angularConfigDirPath,
                 }).on('message', message => {
                     testsDiscovered.push(message);
 
@@ -101,16 +101,16 @@ const run_tests = async function (context) {
 
     // Get all the projects
     const projects = [];
-    const angularConfigPaths = new Set();
+    const angularConfigDirectories = new Set();
     for (let testCase of context.testCases) {
-        if (!angularConfigPaths.has(testCase.configPath)) {
-            angularConfigPaths.add(testCase.configPath);
+        if (!angularConfigDirectories.has(testCase.configDirPath)) {
+            angularConfigDirectories.add(testCase.configDirPath);
 
-            if (!detectPackage(testCase.configPath, '@angular/cli')) {
+            if (!detectPackage(testCase.configDirPath, '@angular/cli')) {
                 continue;
             }
 
-            projects.push(...getTestProjects(`${testCase.configPath}/angular.json`));
+            projects.push(...getTestProjects(`${testCase.configDirPath}/angular.json`));
         }
     }
 
@@ -122,7 +122,7 @@ const run_tests = async function (context) {
         // on a lock file for building the project, that might be the reason.
         await new Promise((resolve, reject) => {
             const ngTest = fork(
-                path.resolve(project.angularConfigPath, "./node_modules/@angular/cli/bin/ng"),
+                path.resolve(project.angularConfigDirPath, "./node_modules/@angular/cli/bin/ng"),
                 [
                     'test',
                     project.name,
@@ -133,7 +133,7 @@ const run_tests = async function (context) {
                         ...process.env,
                         PROJECT: JSON.stringify(project)
                     },
-                    cwd: project.angularConfigPath,
+                    cwd: project.angularConfigDirPath,
                     stdio: ['ignore', 1, 2, 'ipc'] // We need to ignore the stdin as NTVS keeps it open and causes the process to wait indefinitely.
                 }).on('message', message => {
                     context.post({

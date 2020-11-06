@@ -48,6 +48,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
         // Increment the amount of test cases found.
         testCaseCount++;
 
+        // rootPath will be the directory of angular.json plus the "root" configuration defined in it.
         const fullFilePath = path.join(project.rootPath, result.fileLocation.relativeFilePath);
         const suite = result.fullName.substring(0, result.fullName.length - result.description.length - 1);
 
@@ -64,7 +65,7 @@ const vsKarmaReporter = function (baseReporterDecorator, config, logger, emitter
             filepath: fullFilePath,
             line: result.fileLocation.line,
             column: result.fileLocation.column,
-            configPath: project.angularConfigPath,
+            configDirPath: project.angularConfigDirPath,
 
             // Execution properties
             passed: result.status === "passed",
