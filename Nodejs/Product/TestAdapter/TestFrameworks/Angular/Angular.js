@@ -103,14 +103,14 @@ const run_tests = async function (context) {
     const projects = [];
     const angularConfigPaths = new Set();
     for (let testCase of context.testCases) {
-        if (!angularConfigPaths.has(testCase.projectFolder)) {
-            angularConfigPaths.add(testCase.projectFolder);
+        if (!angularConfigPaths.has(testCase.configPath)) {
+            angularConfigPaths.add(testCase.configPath);
 
-            if (!detectPackage(testCase.projectFolder, '@angular/cli')) {
+            if (!detectPackage(testCase.configPath, '@angular/cli')) {
                 continue;
             }
 
-            projects.push(...getTestProjects(`${testCase.projectFolder}/angular.json`));
+            projects.push(...getTestProjects(`${testCase.configPath}/angular.json`));
         }
     }
 
@@ -157,18 +157,18 @@ const run_tests = async function (context) {
 }
 
 function detectPackage(projectFolder, packageName) {
-    try {
-        const packagePath = path.join(projectFolder, 'node_modules', packageName);
-        const pkg = require(packagePath);
+    const packagePath = path.join(projectFolder, 'node_modules', packageName);
 
-        return pkg;
-    } catch (ex) {
+    if (!fs.existsSync(packagePath)) {
         logError(
             `Failed to find "${packageName}" package. "${packageName}" must be installed in the project locally.` + os.EOL +
             `Install "${packageName}" locally using the npm manager via solution explorer` + os.EOL +
             `or with ".npm install ${packageName} --save-dev" via the Node.js interactive window.`);
-        return null;
+
+        return false;
     }
+
+    return true;
 }
 
 function logError() {

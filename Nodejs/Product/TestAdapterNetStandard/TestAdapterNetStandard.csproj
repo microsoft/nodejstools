@@ -78,6 +78,18 @@
     <Content Include="..\TestAdapter\TestFrameworks\Jest\jestReporter.js" Link="TestFrameworks\Jest\jestReporter.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Angular\Angular.js" Link="TestFrameworks\Angular\Angular.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Angular\jasmineReporter.js" Link="TestFrameworks\Angular\jasmineReporter.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Angular\karmaConfig.js" Link="TestFrameworks\Angular\karmaConfig.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\TestAdapter\TestFrameworks\Angular\vsKarmaReporter.js" Link="TestFrameworks\Angular\vsKarmaReporter.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
