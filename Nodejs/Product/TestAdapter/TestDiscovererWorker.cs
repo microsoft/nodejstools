@@ -17,14 +17,12 @@ namespace Microsoft.NodejsTools.TestAdapter
     {
         private readonly string testSource;
         private readonly string workingDir;
-        private readonly Uri testExecutorUri;
         private readonly string nodeExePath;
 
-        public TestDiscovererWorker(string testSource, Uri testExecutorUri, string nodeExePath)
+        public TestDiscovererWorker(string testSource, string nodeExePath)
         {
             this.testSource = testSource;
             this.workingDir = Path.GetDirectoryName(this.testSource);
-            this.testExecutorUri = testExecutorUri;
             this.nodeExePath = nodeExePath;
         }
 
@@ -78,6 +76,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, this.workingDir);
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, this.nodeExePath);
                 testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
+                testCase.SetPropertyValue(JavaScriptTestCaseProperties.ConfigDirPath, discoveredTest.ConfigDirPath);
 
                 discoverySink.SendTestCase(testCase);
             }

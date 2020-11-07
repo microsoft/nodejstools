@@ -97,6 +97,8 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void DiscoverTests(Dictionary<string, HashSet<string>> testItems, FrameworkDiscoverer frameworkDiscoverer, ITestCaseDiscoverySink discoverySink, IMessageLogger logger, string nodeExePath, string projectFullPath)
         {
+            var discoverWorker = new TestDiscovererWorker(projectFullPath, nodeExePath);
+
             foreach (var testFx in testItems.Keys)
             {
                 var testFramework = frameworkDiscoverer.GetFramework(testFx);
@@ -108,7 +110,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 var fileList = testItems[testFx];
 
-                var discoverWorker = new TestDiscovererWorker(projectFullPath, NodejsConstants.ExecutorUri, nodeExePath);
                 discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink);
             }
         }

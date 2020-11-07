@@ -157,7 +157,6 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             // All tests being run are for the same test file, so just use the first test listed to get the working dir
             var firstTest = tests.First().TestCase;
-            var testFramework = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.TestFramework, defaultValue: TestFrameworkDirectories.ExportRunnerFrameworkName);
             var workingDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
             var nodeExePath = firstTest.GetPropertyValue<string>(JavaScriptTestCaseProperties.NodeExePath, defaultValue: null);
             var projectRootDir = firstTest.GetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, defaultValue: Path.GetDirectoryName(firstTest.CodeFilePath));
@@ -190,7 +189,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                     fullyQualifiedName: args.fullyQualifiedName,
                     testFile: args.TestFile,
                     workingFolder: args.WorkingDirectory,
-                    projectFolder: args.ProjectRootDir));
+                    projectFolder: args.ProjectRootDir,
+                    configDirPath: args.ConfigDirPath));
             }
 
             var port = 0;
@@ -384,7 +384,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             var testFile = test.GetPropertyValue(JavaScriptTestCaseProperties.TestFile, defaultValue: test.CodeFilePath);
             var testFramework = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.TestFramework, defaultValue: null);
-            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.FullyQualifiedName, testFile, workingDir, projectRootDir);
+            var configDirPath = test.GetPropertyValue<string>(JavaScriptTestCaseProperties.ConfigDirPath, defaultValue: null);
+            return this.frameworkDiscoverer.GetFramework(testFramework).GetArgumentsToRunTests(test.FullyQualifiedName, testFile, workingDir, projectRootDir, configDirPath);
         }
 
         private static string GetDebugArgs(Version nodeVersion, out int port)

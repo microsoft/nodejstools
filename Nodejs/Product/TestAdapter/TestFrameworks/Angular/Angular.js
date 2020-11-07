@@ -7,26 +7,27 @@ const { fork } = require("child_process");
 
 process.env.VSTESTADAPTERPATH = __dirname;
 
-const vsKarmaConfigPath = path.resolve(__dirname, "./karmaConfig.js");
+const vsKarmaConfigFilePath = path.resolve(__dirname, "./karmaConfig.js");
 
 function getTestProjects(configFile) {
-    const configPath = path.dirname(configFile);
+    const configDirPath = path.dirname(configFile);
 
     const angularProjects = [];
     const angularConfig = require(configFile);
     for (const projectName of Object.keys(angularConfig.projects)) {
         const project = angularConfig.projects[projectName];
 
-        const karmaConfigPath = project.architect.test
+        const karmaConfigFilePath = project.architect.test
             && project.architect.test.options
             && project.architect.test.options.karmaConfig
-            && path.resolve(configPath, project.architect.test.options.karmaConfig);
+            && path.resolve(configDirPath, project.architect.test.options.karmaConfig);
 
-        if (karmaConfigPath) {
+        if (karmaConfigFilePath) {
             angularProjects.push({
-                angularConfigPath: configPath,
-                karmaConfigPath,
+                angularConfigDirPath: configDirPath,
+                karmaConfigFilePath,
                 name: projectName,
+                rootPath: path.join(configDirPath, project.root),
             });
         }
     }
@@ -38,9 +39,9 @@ const find_tests = async function (configFiles, discoverResultFile) {
     const projects = [];
 
     for (const configFile of configFiles.split(';')) {
-        const configPath = path.dirname(configFile);
+        const configDirPath = path.dirname(configFile);
 
-        if (!detectPackage(configPath, '@angular/cli')) {
+        if (!detectPackage(configDirPath, '@angular/cli')) {
             continue;
         }
 
@@ -57,18 +58,18 @@ const find_tests = async function (configFiles, discoverResultFile) {
         // on a lock file for building the project, that might be the reason.
         await new Promise((resolve, reject) => {
             const ngTest = fork(
-                path.resolve(project.angularConfigPath, "./node_modules/@angular/cli/bin/ng"),
+                path.resolve(project.angularConfigDirPath, "./node_modules/@angular/cli/bin/ng"),
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigPath}`
+                    `--karmaConfig=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
                         ...process.env,
                         PROJECT: JSON.stringify(project)
                     },
-                    cwd: project.angularConfigPath,
+                    cwd: project.angularConfigDirPath,
                 }).on('message', message => {
                     testsDiscovered.push(message);
 
@@ -78,7 +79,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
                     ngTest.send({});
                 }).on('error', err => {
                     reject(err);
-                }).on('exit', (code) => {
+                }).on('exit', code => {
                     resolve(code);
                 });
         });
@@ -100,16 +101,16 @@ const run_tests = async function (context) {
 
     // Get all the projects
     const projects = [];
-    const angularConfigPaths = new Set();
+    const angularConfigDirectories = new Set();
     for (let testCase of context.testCases) {
-        if (!angularConfigPaths.has(testCase.projectFolder)) {
-            angularConfigPaths.add(testCase.projectFolder);
+        if (!angularConfigDirectories.has(testCase.configDirPath)) {
+            angularConfigDirectories.add(testCase.configDirPath);
 
-            if (!detectPackage(testCase.projectFolder, '@angular/cli')) {
+            if (!detectPackage(testCase.configDirPath, '@angular/cli')) {
                 continue;
             }
 
-            projects.push(...getTestProjects(`${testCase.projectFolder}/angular.json`));
+            projects.push(...getTestProjects(`${testCase.configDirPath}/angular.json`));
         }
     }
 
@@ -121,18 +122,18 @@ const run_tests = async function (context) {
         // on a lock file for building the project, that might be the reason.
         await new Promise((resolve, reject) => {
             const ngTest = fork(
-                path.resolve(project.angularConfigPath, "./node_modules/@angular/cli/bin/ng"),
+                path.resolve(project.angularConfigDirPath, "./node_modules/@angular/cli/bin/ng"),
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigPath}`
+                    `--karmaConfig=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
                         ...process.env,
                         PROJECT: JSON.stringify(project)
                     },
-                    cwd: project.angularConfigPath,
+                    cwd: project.angularConfigDirPath,
                     stdio: ['ignore', 1, 2, 'ipc'] // We need to ignore the stdin as NTVS keeps it open and causes the process to wait indefinitely.
                 }).on('message', message => {
                     context.post({
@@ -142,8 +143,8 @@ const run_tests = async function (context) {
                     });
 
                     ngTest.send({});
-                }).on('exit', () => {
-                    resolve();
+                }).on('exit', code => {
+                    resolve(code);
                 }).on('error', err => {
                     reject(err);
                 });
@@ -156,18 +157,18 @@ const run_tests = async function (context) {
 }
 
 function detectPackage(projectFolder, packageName) {
-    try {
-        const packagePath = path.join(projectFolder, 'node_modules', packageName);
-        const pkg = require(packagePath);
+    const packagePath = path.join(projectFolder, 'node_modules', packageName);
 
-        return pkg;
-    } catch (ex) {
+    if (!fs.existsSync(packagePath)) {
         logError(
             `Failed to find "${packageName}" package. "${packageName}" must be installed in the project locally.` + os.EOL +
             `Install "${packageName}" locally using the npm manager via solution explorer` + os.EOL +
             `or with ".npm install ${packageName} --save-dev" via the Node.js interactive window.`);
-        return null;
+
+        return false;
     }
+
+    return true;
 }
 
 function logError() {

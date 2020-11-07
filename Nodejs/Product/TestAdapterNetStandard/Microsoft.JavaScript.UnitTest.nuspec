@@ -32,6 +32,7 @@
     <file src="$outdir$TestFrameworks\Tape\Tape.js" target="build\_common\TestFrameworks\Tape\" />
     <file src="$outdir$TestFrameworks\Jest\jest.js" target="build\_common\TestFrameworks\Jest\" />
     <file src="$outdir$TestFrameworks\Jest\jestReporter.js" target="build\_common\TestFrameworks\Jest\" />
+    <file src="$outdir$TestFrameworks\Angular\*.js" target="build\_common\TestFrameworks\Angular\" />
      <!--net standard library--> 
     <file src="$outdir$Microsoft.JavaScript.UnitTest.props" target="build\netstandard2.0\" />
     <file src="$outdir$Microsoft.JavaScript.UnitTest.targets" target="build\netstandard2.0\" />
