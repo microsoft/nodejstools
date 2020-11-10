@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.NpmUI {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class NpmInstallWindowResources {
@@ -237,6 +237,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         public static string OtherNpmArgumentsLabel {
             get {
                 return ResourceManager.GetString("OtherNpmArgumentsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package list.
+        /// </summary>
+        public static string PackageListName {
+            get {
+                return ResourceManager.GetString("PackageListName", resourceCulture);
             }
         }
         

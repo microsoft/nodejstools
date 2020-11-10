@@ -296,6 +296,7 @@
             <ContentControl Style="{StaticResource SearchStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsTabStop="False" Focusable="False" />
             <Grid Grid.Row="1" Background="{Binding ElementName=packageList, Path=Background}">
                 <ListView x:Name="packageList"
+                          AutomationProperties.Name="{x:Static resx:NpmInstallWindowResources.PackageListName}"
                           ItemsSource="{Binding FilteredPackages}"
                           SelectedItem="{Binding SelectedPackage}"
                           SelectionChanged="packageList_SelectionChanged"
