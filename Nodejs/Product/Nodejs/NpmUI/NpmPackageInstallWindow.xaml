@@ -1,4 +1,4 @@
-﻿<vsui:DialogWindow
+﻿<vsui:DialogWindow 
     x:Class="Microsoft.NodejsTools.NpmUI.NpmPackageInstallWindow"
     x:ClassModifier="public"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -343,7 +343,7 @@
                               Content="{Binding Path=SelectedPackage}"
                               ContentTemplate="{StaticResource PackageInfoTemplate}"
                               IsTabStop="True" AutomationProperties.Name="{Binding Path=SelectedPackage.Name}"
-                              TabIndex="3" />
+                              Focusable="False"/>
 
                 <StackPanel Grid.Row="1"
                             Orientation="Vertical"
