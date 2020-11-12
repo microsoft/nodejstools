@@ -40,6 +40,11 @@ namespace Microsoft.NodejsTools.Telemetry
         public const string UsedRepl = Prefix + "UsedRepl";
         
         public const string OperationRegistrationFaulted = Prefix + "OperationRegistrationFaulted";
+
+        /// <summary>
+        /// User started discovery on the test adapters.
+        /// </summary>
+        public const string TestDiscoveryStarted = Prefix + "TestDiscoveryStarted";
     }
 
     internal static class TelemetryProperties
@@ -64,5 +69,15 @@ namespace Microsoft.NodejsTools.Telemetry
         /// The version of Node the user is using.
         /// </summary>
         public const string NodeVersion = Prefix + "NodeVersion";
+
+        /// <summary>
+        /// The test adapter the user is using when test discovery launched.
+        /// </summary>
+        public const string TestAdapterName = Prefix + "TestAdapterName";
+
+        /// <summary>
+        /// The type of test adapter that launched discovery.
+        /// </summary>
+        public const string TestDiscovererName = Prefix + "TestDiscovererName";
     }
 }

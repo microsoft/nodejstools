@@ -110,7 +110,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 var fileList = testItems[testFx];
 
-                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink);
+                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink, nameof(ProjectTestDiscoverer));
             }
         }
     }

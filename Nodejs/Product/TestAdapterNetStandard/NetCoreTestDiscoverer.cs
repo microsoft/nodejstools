@@ -130,7 +130,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
 
             var discoverWorker = new TestDiscovererWorker(projectFullPath, nodeExePath);
-            discoverWorker.DiscoverTests(testItems, testFramework, logger, discoverySink);
+            discoverWorker.DiscoverTests(testItems, testFramework, logger, discoverySink, nameof(NetCoreTestDiscoverer));
         }
 
         private IEnumerable<string> GetConfigItems(string projectRoot)

@@ -34,6 +34,8 @@
     <Compile Include="..\Nodejs\SourceMapping\SourceMap.cs" Link="SourceMapping\SourceMap.cs" />
     <Compile Include="..\Nodejs\SourceMapping\SourceMapper.cs" Link="SourceMapping\SourceMapper.cs" />
     <Compile Include="..\Nodejs\TestFrameworks\TestFrameworkDirectories.cs" Link="TestFrameworks\TestFrameworkDirectories.cs" />
+    <Compile Include="..\Nodejs\Telemetry\TelemetryEvents.cs" Link="Telemetry\TelemetryEvents.cs" />
+    <Compile Include="..\Nodejs\Telemetry\TelemetryHelper.cs" Link="Telemetry\TelemetryHelper.cs" />
     <Compile Include="..\TestAdapter\JavaScriptTestCaseProperties.cs" Link="JavaScriptTestCaseProperties.cs" />
     <Compile Include="..\TestAdapter\SerializationHelpers.cs" Link="SerializationHelpers.cs" />
     <Compile Include="..\TestAdapter\TestDiscovererWorker.cs" Link="TestDiscovererWorker.cs" />
@@ -98,6 +100,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry" Version="16.3.59" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 

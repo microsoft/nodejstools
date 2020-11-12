@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.SourceMapping;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -26,14 +27,16 @@ namespace Microsoft.NodejsTools.TestAdapter
             this.nodeExePath = nodeExePath;
         }
 
-        public void DiscoverTests(string testFolderPath, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        public void DiscoverTests(string testFolderPath, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink, string testDiscovererName)
         {
             var fileList = Directory.EnumerateFiles(testFolderPath, "*.js", SearchOption.AllDirectories).Where(x => !x.Contains(NodejsConstants.NodeModulesFolder));
-            this.DiscoverTests(fileList, testFx, logger, discoverySink);
+            this.DiscoverTests(fileList, testFx, logger, discoverySink, testDiscovererName);
         }
 
-        public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
+        public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink, string testDiscovererName)
         {
+            TelemetryHelper.LogTestDiscoveryStarted(testFx.Name, testDiscovererName);
+
             if (!File.Exists(this.nodeExePath))
             {
                 logger.SendMessage(TestMessageLevel.Error, "Node.exe was not found. Please install Node.js before running tests.");
