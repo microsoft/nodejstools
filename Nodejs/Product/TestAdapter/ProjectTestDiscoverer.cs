@@ -12,11 +12,12 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    // Keep in sync the method TypeScriptHelpers.IsSupportedTestProjectFile if there's a change on the supported projects.
-    [FileExtension(NodejsConstants.NodejsProjectExtension), FileExtension(NodejsConstants.CSharpProjectExtension), FileExtension(NodejsConstants.VisualBasicProjectExtension), FileExtension(NodejsConstants.JavaScriptProjectExtension)]
-    [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
-    public partial class ProjectTestDiscoverer : ITestDiscoverer
+    // We require to put a non-existent file extension to avoid duplicate discovery executions.
+    [FileExtension("NTVS_NonExistentFileExtension")]
+    public class ProjectTestDiscoverer : ITestDiscoverer
     {
+        public virtual string TestDiscovererName => nameof(ProjectTestDiscoverer);
+
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {
             AssemblyResolver.SetupHandler();
@@ -110,7 +111,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
                 var fileList = testItems[testFx];
 
-                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink, nameof(ProjectTestDiscoverer));
+                discoverWorker.DiscoverTests(fileList, testFramework, logger, discoverySink, this.TestDiscovererName);
             }
         }
     }
