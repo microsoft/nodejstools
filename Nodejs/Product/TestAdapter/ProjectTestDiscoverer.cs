@@ -12,11 +12,9 @@ using MSBuild = Microsoft.Build.Evaluation;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    // We require to put a non-existent file extension to avoid duplicate discovery executions.
-    [FileExtension("NTVS_NonExistentFileExtension")]
-    public class ProjectTestDiscoverer : ITestDiscoverer
+    public abstract class ProjectTestDiscoverer
     {
-        public virtual string TestDiscovererName => nameof(ProjectTestDiscoverer);
+        public abstract string TestDiscovererName { get; }
 
         public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
         {

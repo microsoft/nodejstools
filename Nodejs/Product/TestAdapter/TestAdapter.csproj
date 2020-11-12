@@ -54,6 +54,7 @@
     <Compile Include="..\Nodejs\Telemetry\TelemetryEvents.cs" Link="Telemetry\TelemetryEvents.cs" />
     <Compile Include="..\Nodejs\Telemetry\TelemetryHelper.cs" Link="Telemetry\TelemetryHelper.cs" />
     <Compile Include="AssemblyResolver.cs" />
+    <Compile Include="DefaultTestDiscoverer.cs" />
     <Compile Include="DotNetTestDiscoverer.cs" />
     <Compile Include="JavascriptProjectTestDiscoverer.cs" />
     <Compile Include="NodejsToolsTestDiscoverer.cs" />

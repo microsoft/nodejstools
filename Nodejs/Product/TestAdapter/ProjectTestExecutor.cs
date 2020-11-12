@@ -27,7 +27,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             this.Cancel();
             this.worker = new TestExecutorWorker(runContext, frameworkHandle);
-            this.worker.RunTests(sources, new ProjectTestDiscoverer());
+            this.worker.RunTests(sources, new DefaultTestDiscoverer());
         }
 
         public void Cancel()
