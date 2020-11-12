@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
-    // Keep in sync the method TypeScriptHelpers.IsSupportedTestProjectFile if there's a change on the supported projects.
+    /// Keep in sync the method <see cref="TypeScript.TypeScriptHelpers.IsSupportedTestProjectFile(string)" /> if there's a change on the supported projects.
     [FileExtension(NodejsConstants.JavaScriptProjectExtension)]
     [DefaultExecutorUri(NodejsConstants.ExecutorUriString)]
     public sealed class JavascriptProjectTestDiscoverer : ProjectTestDiscoverer, ITestDiscoverer
