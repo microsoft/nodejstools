@@ -69,7 +69,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             var nodeExePath = Nodejs.GetPathToNodeExecutableFromEnvironment();
             var worker = new TestDiscovererWorker(packageJsonPath, nodeExePath);
-            worker.DiscoverTests(testFolderPath, testFx, logger, discoverySink);
+            worker.DiscoverTests(testFolderPath, testFx, logger, discoverySink, nameof(PackageJsonTestDiscoverer));
         }
     }
 }
