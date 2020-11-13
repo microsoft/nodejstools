@@ -47,10 +47,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink, string testDiscovererName)
         {
             // If it's a framework name we support, is safe to submit the string to telemetry.
-            if (supportedFrameworks.Contains(testFx.Name))
-            {
-                TelemetryHelper.LogTestDiscoveryStarted(testFx.Name, testDiscovererName);
-            }
+            var testAdapterName = supportedFrameworks.Contains(testFx.Name) ? testFx.Name : "Other";
+            TelemetryHelper.LogTestDiscoveryStarted(testAdapterName, testDiscovererName);
 
             if (!File.Exists(this.nodeExePath))
             {
