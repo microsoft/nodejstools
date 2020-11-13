@@ -16,6 +16,17 @@ namespace Microsoft.NodejsTools.TestAdapter
 {
     public sealed class TestDiscovererWorker
     {
+        // Keep in sync with the folder names of ./Product/TestAdapter/TestFrameworks.
+        private readonly HashSet<string> supportedFrameworks = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Angular",
+            "ExportRunner",
+            "Jasmine",
+            "Jest",
+            "mocha",
+            "Tape",
+        };
+
         private readonly string testSource;
         private readonly string workingDir;
         private readonly string nodeExePath;
@@ -35,7 +46,11 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink, string testDiscovererName)
         {
-            TelemetryHelper.LogTestDiscoveryStarted(testFx.Name, testDiscovererName);
+            // If it's a framework name we support, is safe to submit the string to telemetry.
+            if (supportedFrameworks.Contains(testFx.Name))
+            {
+                TelemetryHelper.LogTestDiscoveryStarted(testFx.Name, testDiscovererName);
+            }
 
             if (!File.Exists(this.nodeExePath))
             {
