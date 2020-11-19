@@ -11,22 +11,12 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
+using static Microsoft.NodejsTools.TestAdapter.TestFrameworks.TestFramework;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
     public sealed class TestDiscovererWorker
     {
-        // Keep in sync with the folder names of ./Product/TestAdapter/TestFrameworks.
-        private readonly HashSet<string> supportedFrameworks = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Angular",
-            "ExportRunner",
-            "Jasmine",
-            "Jest",
-            "mocha",
-            "Tape",
-        };
-
         private readonly string testSource;
         private readonly string workingDir;
         private readonly string nodeExePath;
@@ -47,7 +37,8 @@ namespace Microsoft.NodejsTools.TestAdapter
         public void DiscoverTests(IEnumerable<string> fileList, TestFramework testFx, IMessageLogger logger, ITestCaseDiscoverySink discoverySink, string testDiscovererName)
         {
             // If it's a framework name we support, is safe to submit the string to telemetry.
-            var testAdapterName = supportedFrameworks.Contains(testFx.Name) ? testFx.Name : "Other";
+            var testAdapterName = Enum.GetNames(typeof(SupportedFramework)).Contains(testFx.Name, StringComparer.OrdinalIgnoreCase) ? testFx.Name : "Other";
+
             TelemetryHelper.LogTestDiscoveryStarted(testAdapterName, testDiscovererName);
 
             if (!File.Exists(this.nodeExePath))

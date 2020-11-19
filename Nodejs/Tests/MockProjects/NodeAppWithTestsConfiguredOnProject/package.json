@@ -1,0 +1,12 @@
+{
+  "name": "nodejs-app-with-test-configured-on-project",
+  "version": "0.0.0",
+  "description": "NodejsAppWithTestConfiguredOnProject",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "mocha": "^8.2.1"
+  }
+}

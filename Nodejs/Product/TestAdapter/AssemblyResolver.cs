@@ -15,9 +15,10 @@ namespace Microsoft.NodejsTools.TestAdapter
         private AssemblyResolver()
         {
             // Use the setup API to find the VS install Dir, then build paths to the Private and Public Assemblies folders
-            var installPath = GetVSInstallDir();
+            var installPath = GetInstallDir();
             var ideFolder = Path.Combine(installPath, "Common7", "IDE");
             this.probePaths = new[] {
+                installPath,
                 Path.Combine(ideFolder, "PrivateAssemblies"),
                 Path.Combine(ideFolder, "PublicAssemblies"),
                 Path.Combine(installPath, "MSBuild","Current","Bin"),
@@ -31,7 +32,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         public static void SetupHandler()
         {
             var handler = AppDomain.CurrentDomain.GetData(ResolveHandlerKey);
-            if(handler == null)
+            if (handler == null)
             {
                 resolver = new AssemblyResolver();
                 AppDomain.CurrentDomain.SetData(ResolveHandlerKey, "set");
@@ -40,16 +41,18 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private readonly string[] probePaths;
 
-        private static string GetVSInstallDir()
+        private static string GetInstallDir()
         {
             var vsTestFrameworkAssembly = typeof(ITestExecutor).Assembly;
             var testAdapterPath = vsTestFrameworkAssembly.Location;
 
             // <VSROOT>\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll
+            // Assembly might be running from nuget. In that case use the current directory path.
             var indexOfCommon7Ide = testAdapterPath.IndexOf("common7", StringComparison.OrdinalIgnoreCase);
-            var vsInstallDir = testAdapterPath.Substring(0, indexOfCommon7Ide);
 
-            return vsInstallDir;
+            return indexOfCommon7Ide != -1
+                ? testAdapterPath.Substring(0, indexOfCommon7Ide)
+                : Path.GetDirectoryName(testAdapterPath);
         }
 
         private Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)

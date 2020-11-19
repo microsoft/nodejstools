@@ -1,0 +1,16 @@
+{
+  "name": "node-app-with-tests-configured-per-file",
+  "version": "0.0.0",
+  "description": "NodeAppWithTestsConfiguredPerFile",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "dependencies": {
+    "jasmine": "^3.6.3",
+    "jest": "^26.6.3",
+    "jest-editor-support": "^27.2.0",
+    "mocha": "^8.2.1",
+    "tape": "^5.0.1"
+  }
+}
