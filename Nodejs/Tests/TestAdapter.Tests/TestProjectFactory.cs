@@ -3,12 +3,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.TestAdapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using static Microsoft.NodejsTools.TestAdapter.TestFrameworks.TestFramework;
 
 namespace TestAdapter.Tests
 {
-    public class TestProjectFactory
+    public static class TestProjectFactory
     {
         public enum ProjectName
         {
@@ -17,113 +19,134 @@ namespace TestAdapter.Tests
             NodeAppWithAngularTests,
         }
 
-        private readonly ProjectName projectName;
-        private string projectNameString => Enum.GetName(typeof(ProjectName), this.projectName);
-
-        public TestProjectFactory(ProjectName projectName)
+        private struct TestCaseOptions
         {
-            this.projectName = projectName;
+            public SupportedFramework TestFramework;
+            public string Source;
+            public string WorkingDir;
+            public string ConfigDirPath;
         }
 
-        public string GetProjectDirPath()
+        public static string GetProjectDirPath(ProjectName projectName)
         {
-            return Path.Combine(Directory.GetCurrentDirectory(), $@"..\..\..\..\MockProjects\{projectNameString}");
+            return Path.Combine(Directory.GetCurrentDirectory(), $@"..\..\..\..\MockProjects\{projectName}");
         }
 
-        public string GetProjectFilePath()
+        public static string GetProjectFilePath(ProjectName projectName)
         {
-            switch (this.projectName)
+            switch (projectName)
             {
                 case ProjectName.NodeAppWithTestsConfiguredOnProject:
                 case ProjectName.NodeAppWithTestsConfiguredPerFile:
                 case ProjectName.NodeAppWithAngularTests:
-                    return Path.Combine(this.GetProjectDirPath(), $"{projectNameString}.njsproj");
+                    return Path.Combine(GetProjectDirPath(projectName), $"{projectName}.njsproj");
             }
 
-            throw new ArgumentException();
+            throw new NotImplementedException($"ProjectName {projectName} has not been implemented.");
         }
 
-        public List<TestCase> GetTestCases()
+        public static List<TestCase> GetTestCases(ProjectName projectName)
         {
-            switch (this.projectName)
+            switch (projectName)
             {
                 case ProjectName.NodeAppWithTestsConfiguredOnProject:
-                    return new List<TestCase>(this.GetTestCases(SupportedFramework.Mocha));
+                    return new List<TestCase>(GetTestCases(projectName, SupportedFramework.Mocha));
 
                 case ProjectName.NodeAppWithTestsConfiguredPerFile:
                     var result = new List<TestCase>();
-                    result.AddRange(this.GetTestCases(SupportedFramework.Jasmine));
-                    result.AddRange(this.GetTestCases(SupportedFramework.ExportRunner));
-                    result.AddRange(this.GetTestCases(SupportedFramework.Jest));
-                    result.AddRange(this.GetTestCases(SupportedFramework.Mocha));
-                    result.AddRange(this.GetTestCases(SupportedFramework.Tape));
+                    result.AddRange(GetTestCases(projectName, SupportedFramework.Jasmine));
+                    result.AddRange(GetTestCases(projectName, SupportedFramework.ExportRunner));
+                    result.AddRange(GetTestCases(projectName, SupportedFramework.Jest));
+                    result.AddRange(GetTestCases(projectName, SupportedFramework.Mocha));
+                    result.AddRange(GetTestCases(projectName, SupportedFramework.Tape));
 
                     return result;
 
                 case ProjectName.NodeAppWithAngularTests:
-                    return new List<TestCase>(this.GetTestCases(SupportedFramework.Angular));
+                    return new List<TestCase>(GetTestCases(projectName, SupportedFramework.Angular));
 
             };
 
-            throw new InvalidOperationException();
+            throw new NotImplementedException($"ProjectName {projectName} has not been implemented.");
         }
 
-        private List<TestCase> GetTestCases(SupportedFramework testFramework)
+        private static List<TestCase> GetTestCases(ProjectName projectName, SupportedFramework testFramework)
         {
-            var configPath = this.projectName == ProjectName.NodeAppWithAngularTests
-                ? this.GetProjectDirPath()
-                : null;
-
-            var testCaseFactory = new TestCaseFactory(
-                testFramework,
-                this.GetProjectDirPath(),
-                this.GetProjectFilePath(),
-                configPath);
+            var testCaseOptions = new TestCaseOptions()
+            {
+                TestFramework = testFramework,
+                WorkingDir = GetProjectDirPath(projectName),
+                Source = GetProjectFilePath(projectName),
+                ConfigDirPath = projectName == ProjectName.NodeAppWithAngularTests ? GetProjectDirPath(projectName) : null
+            };
 
             switch (testFramework)
             {
                 case SupportedFramework.Jasmine:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase("JasmineUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(this.GetProjectDirPath(), "JasmineUnitTest.js")),
-                        testCaseFactory.GetTestCase("JasmineUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(this.GetProjectDirPath(), "JasmineUnitTest.js")),
+                        GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "JasmineUnitTest.js")),
+                        GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "JasmineUnitTest.js")),
                     };
                 case SupportedFramework.ExportRunner:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase("ExportRunnerUnitTest.js::global::Test 1", "Test 1", 1, Path.Combine(this.GetProjectDirPath(), "ExportRunnerUnitTest.js")),
-                        testCaseFactory.GetTestCase("ExportRunnerUnitTest.js::global::Test 2", "Test 2", 1, Path.Combine(this.GetProjectDirPath(), "ExportRunnerUnitTest.js")),
+                        GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "ExportRunnerUnitTest.js")),
+                        GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "ExportRunnerUnitTest.js")),
                     };
                 case SupportedFramework.Jest:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase("JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, Path.Combine(this.GetProjectDirPath(), "JestUnitTest.js")),
-                        testCaseFactory.GetTestCase("JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, Path.Combine(this.GetProjectDirPath(), "JestUnitTest.js")),
+                        GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js")),
+                        GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js")),
                     };
                 case SupportedFramework.Mocha:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase("MochaUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(this.GetProjectDirPath(), "MochaUnitTest.js")),
-                        testCaseFactory.GetTestCase("MochaUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(this.GetProjectDirPath(), "MochaUnitTest.js")),
+                        GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "MochaUnitTest.js")),
+                        GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "MochaUnitTest.js")),
                     };
                 case SupportedFramework.Tape:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase("TapeUnitTest.js::global::Test A", "Test A", 1, Path.Combine(this.GetProjectDirPath(), "TapeUnitTest.js")),
-                        testCaseFactory.GetTestCase("TapeUnitTest.js::global::Test B", "Test B", 1, Path.Combine(this.GetProjectDirPath(), "TapeUnitTest.js")),
+                        GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test A", "Test A", 1, Path.Combine(GetProjectDirPath(projectName), "TapeUnitTest.js")),
+                        GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test B", "Test B", 1, Path.Combine(GetProjectDirPath(projectName), "TapeUnitTest.js")),
                     };
                 case SupportedFramework.Angular:
                     return new List<TestCase>()
                     {
-                        testCaseFactory.GetTestCase(@"src\app\app.component.spec.ts::AppComponent::should create the app","should create the app", 14, Path.Combine(this.GetProjectDirPath(), @"src\app\app.component.spec.ts")),
-                        testCaseFactory.GetTestCase(@"src\app\app.component.spec.ts::AppComponent::should have as title 'my-app'","should have as title 'my-app'", 20, Path.Combine(this.GetProjectDirPath(), @"src\app\app.component.spec.ts")),
-                        testCaseFactory.GetTestCase(@"src\app\app.component.spec.ts::AppComponent::should render title","should render title", 26, Path.Combine(this.GetProjectDirPath(), @"src\app\app.component.spec.ts")),
-                        testCaseFactory.GetTestCase(@"src\app\customTest.spec.ts::CustomTest::should succeed","should succeed", 4, Path.Combine(this.GetProjectDirPath(), @"src\app\customTest.spec.ts")),
-                        testCaseFactory.GetTestCase(@"src\app\customTest.spec.ts::CustomTest::should fail","should fail", 8, Path.Combine(this.GetProjectDirPath(), @"src\app\customTest.spec.ts")),
+                        GetTestCase(testCaseOptions, @"src\app\app.component.spec.ts::AppComponent::should create the app","should create the app", 14, Path.Combine(GetProjectDirPath(projectName), @"src\app\app.component.spec.ts")),
+                        GetTestCase(testCaseOptions, @"src\app\app.component.spec.ts::AppComponent::should have as title 'my-app'","should have as title 'my-app'", 20, Path.Combine(GetProjectDirPath(projectName), @"src\app\app.component.spec.ts")),
+                        GetTestCase(testCaseOptions, @"src\app\app.component.spec.ts::AppComponent::should render title","should render title", 26, Path.Combine(GetProjectDirPath(projectName), @"src\app\app.component.spec.ts")),
+                        GetTestCase(testCaseOptions, @"src\app\customTest.spec.ts::CustomTest::should succeed","should succeed", 4, Path.Combine(GetProjectDirPath(projectName), @"src\app\customTest.spec.ts")),
+                        GetTestCase(testCaseOptions, @"src\app\customTest.spec.ts::CustomTest::should fail","should fail", 8, Path.Combine(GetProjectDirPath(projectName), @"src\app\customTest.spec.ts")),
                     };
             }
 
-            throw new ArgumentException();
+            throw new NotImplementedException($"ProjectName {projectName} has not been implemented.");
+        }
+
+        private static TestCase GetTestCase(TestCaseOptions testCaseOptions, string fullyQualifiedName, string displayName, int lineNumber, string filePath)
+        {
+            var testCase = new TestCase()
+            {
+                FullyQualifiedName = fullyQualifiedName,
+                DisplayName = displayName,
+                LineNumber = lineNumber,
+                ExecutorUri = NodejsConstants.ExecutorUri,
+                Source = testCaseOptions.Source,
+                CodeFilePath = filePath,
+            };
+
+            testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFramework, testCaseOptions.TestFramework.ToString());
+            testCase.SetPropertyValue(JavaScriptTestCaseProperties.WorkingDir, testCaseOptions.WorkingDir);
+            testCase.SetPropertyValue(JavaScriptTestCaseProperties.ProjectRootDir, testCaseOptions.WorkingDir);
+            // TODO: We might only want to check that this is not empty. The value changes depending on the environment.
+            //testCase.SetPropertyValue(JavaScriptTestCaseProperties.NodeExePath, nodeExePath);
+            testCase.SetPropertyValue(JavaScriptTestCaseProperties.TestFile, filePath);
+            testCase.SetPropertyValue(JavaScriptTestCaseProperties.ConfigDirPath, testCaseOptions.ConfigDirPath);
+
+            return testCase;
         }
     }
 }

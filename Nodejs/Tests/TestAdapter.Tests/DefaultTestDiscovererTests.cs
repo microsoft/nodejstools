@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
-using static TestAdapter.Tests.TestProjectFactory;
 
 namespace TestAdapter.Tests
 {
@@ -74,13 +73,11 @@ namespace TestAdapter.Tests
             }
         }
 
-        private void AssertProject(ProjectName projectName, int expectedTests)
+        private void AssertProject(TestProjectFactory.ProjectName projectName, int expectedTests)
         {
             // Arrange
-            var testProjectFactory = new TestProjectFactory(projectName);
-
             var actual = new List<TestCase>();
-            var expected = testProjectFactory.GetTestCases();
+            var expected = TestProjectFactory.GetTestCases(projectName);
 
             var discoverContext = new Mock<IDiscoveryContext>();
             var messageLogger = new Mock<IMessageLogger>();
@@ -89,10 +86,10 @@ namespace TestAdapter.Tests
             testCaseDiscoverySink.Setup(x => x.SendTestCase(It.IsAny<TestCase>()))
                 .Callback<TestCase>(x => actual.Add(x));
 
-            var testSource = testProjectFactory.GetProjectFilePath();
+            var testSource = TestProjectFactory.GetProjectFilePath(projectName);
             var sources = new List<string>() { testSource };
 
-            AssureNodeModules(testProjectFactory.GetProjectDirPath());
+            AssureNodeModules(TestProjectFactory.GetProjectDirPath(projectName));
 
             var testDiscoverer = new DefaultTestDiscoverer();
 
@@ -115,19 +112,19 @@ namespace TestAdapter.Tests
         [TestMethod]
         public void DiscoversTests_ConfiguredPerFile()
         {
-            this.AssertProject(ProjectName.NodeAppWithTestsConfiguredPerFile, 10);
+            this.AssertProject(TestProjectFactory.ProjectName.NodeAppWithTestsConfiguredPerFile, 10);
         }
 
         [TestMethod]
         public void DiscoversTests_Node_ConfiguredOnProject()
         {
-            this.AssertProject(ProjectName.NodeAppWithTestsConfiguredOnProject, 2);
+            this.AssertProject(TestProjectFactory.ProjectName.NodeAppWithTestsConfiguredOnProject, 2);
         }
 
         [TestMethod]
         public void DiscoversTests_NodeAppWithAngularTests()
         {
-            this.AssertProject(ProjectName.NodeAppWithAngularTests, 5);
+            this.AssertProject(TestProjectFactory.ProjectName.NodeAppWithAngularTests, 5);
         }
     }
 }
