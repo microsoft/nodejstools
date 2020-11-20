@@ -83,35 +83,50 @@ namespace TestAdapter.Tests
             switch (testFramework)
             {
                 case SupportedFramework.Jasmine:
-                    return new List<TestCase>()
                     {
-                        GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "JasmineUnitTest.js")),
-                        GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "JasmineUnitTest.js")),
-                    };
+                        var filePath = Path.Combine(GetProjectDirPath(projectName), "JasmineUnitTest.js");
+                        return new List<TestCase>()
+                        {
+                            GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, filePath),
+                            GetTestCase(testCaseOptions, "JasmineUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, filePath),
+                        };
+                    }
                 case SupportedFramework.ExportRunner:
-                    return new List<TestCase>()
                     {
-                        GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "ExportRunnerUnitTest.js")),
-                        GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "ExportRunnerUnitTest.js")),
-                    };
+                        var filePath = Path.Combine(GetProjectDirPath(projectName), "ExportRunnerUnitTest.js");
+                        return new List<TestCase>()
+                        {
+                            GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 1", "Test 1", 1, filePath),
+                            GetTestCase(testCaseOptions, "ExportRunnerUnitTest.js::global::Test 2", "Test 2", 1, filePath),
+                        };
+                    }
                 case SupportedFramework.Jest:
-                    return new List<TestCase>()
                     {
-                        GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js")),
-                        GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js")),
-                    };
+                        var filePath = Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js");
+                        return new List<TestCase>()
+                        {
+                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, filePath),
+                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, filePath),
+                        };
+                    }
                 case SupportedFramework.Mocha:
-                    return new List<TestCase>()
                     {
-                        GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, Path.Combine(GetProjectDirPath(projectName), "MochaUnitTest.js")),
-                        GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, Path.Combine(GetProjectDirPath(projectName), "MochaUnitTest.js")),
-                    };
+                        var filePath = Path.Combine(GetProjectDirPath(projectName), "MochaUnitTest.js");
+                        return new List<TestCase>()
+                        {
+                            GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 1", "Test 1", 1, filePath),
+                            GetTestCase(testCaseOptions, "MochaUnitTest.js::Test Suite 1::Test 2", "Test 2", 1, filePath),
+                        };
+                    }
                 case SupportedFramework.Tape:
-                    return new List<TestCase>()
                     {
-                        GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test A", "Test A", 1, Path.Combine(GetProjectDirPath(projectName), "TapeUnitTest.js")),
-                        GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test B", "Test B", 1, Path.Combine(GetProjectDirPath(projectName), "TapeUnitTest.js")),
-                    };
+                        var filePath = Path.Combine(GetProjectDirPath(projectName), "TapeUnitTest.js");
+                        return new List<TestCase>()
+                        {
+                            GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test A", "Test A", 1, filePath),
+                            GetTestCase(testCaseOptions, "TapeUnitTest.js::global::Test B", "Test B", 1, filePath),
+                        };
+                    }
                 case SupportedFramework.Angular:
                     return new List<TestCase>()
                     {
