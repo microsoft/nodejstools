@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Microsoft.NodejsTools
 {
-    internal static class NodejsConstants
+    public static class NodejsConstants
     {
         public const string JavaScriptExtension = ".js";
         public const string JavaScriptJsxExtension = ".jsx";

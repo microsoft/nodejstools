@@ -17,6 +17,17 @@ namespace Microsoft.NodejsTools.TestAdapter.TestFrameworks
         private readonly string findTestsScriptFile;
         private readonly string runTestsScriptFile;
 
+        // Keep in sync with the folder names of ./Product/TestAdapter/TestFrameworks.
+        public enum SupportedFramework
+        {
+            Angular,
+            ExportRunner,
+            Jasmine,
+            Jest,
+            Mocha,
+            Tape
+        }
+
         public TestFramework(string vsixScriptFolder)
         {
             this.Name = Path.GetFileNameWithoutExtension(vsixScriptFolder);

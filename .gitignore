@@ -126,4 +126,4 @@ VSPackage.xform.resx
 /Nodejs/Product/Nodejs/ProjectTemplates/AddWebSiteStarterExpressApp/AddWebSiteStarterExpressApp.vstemplate
 
 # node_modules used for ESLint
-node_modules/*
+**/node_modules/*
