@@ -1,5 +1,5 @@
 'use strict';
-var debug = require('debug');
+var debug = require('debug')('my express app');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
