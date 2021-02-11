@@ -5174,7 +5174,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Azure Cloud Service]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Service cloud Azure]]></Val>
+            <Val><![CDATA[Azure Cloud Service]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Basic Node.js Express 4 Application.]]></Val>
