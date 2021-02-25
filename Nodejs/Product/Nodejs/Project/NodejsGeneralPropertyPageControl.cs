@@ -254,10 +254,12 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowsePathClick(object sender, EventArgs e)
         {
-            var nodeExePath = this._nodeExePath.Text;
-            if (this.GetFileViaBrowse(nodeExePath, ref nodeExePath, _exeFilter) && !string.IsNullOrEmpty(nodeExePath))
+            var dialog = new OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.Filter = _exeFilter;
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                this._nodeExePath.Text = nodeExePath;
+                this._nodeExePath.Text = dialog.FileName;
                 this._nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
@@ -270,10 +272,10 @@ namespace Microsoft.NodejsTools.Project
             {
                 dir = projectHome;
             }
-
-            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
+            if (!string.IsNullOrEmpty(path))
             {
-                this._workingDir.Text = string.IsNullOrEmpty(dir) ? "." : dir;
+                this._workingDir.Text = path;
             }
         }
 
@@ -286,7 +288,8 @@ namespace Microsoft.NodejsTools.Project
                 dir = projectHome;
             }
 
-            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
+            if (!string.IsNullOrEmpty(path))
             {
                 this._testRoot.Text = string.IsNullOrEmpty(dir) ? "." : dir;
             }
