@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.TestFrameworks;
-using Microsoft.VisualStudio.Editors.PropertyPages;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase /*UserControl*/
+    internal partial class NodejsGeneralPropertyPageControl : UserControl
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Project
             this._testRootLabel.Text = Resources.TestRoot;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
-            this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
             this._browseTestroot.AccessibleName = Resources.PropertiesBrowseTestRootAccessibleName;
         }
 
@@ -75,10 +75,6 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._testRoot, Resources.TestRootToolTip);
             this._tooltip.SetToolTip(this._frameworkSelector, Resources.TestFrameworkToolTip);
         }
-
-        protected override bool DisableOnBuild => false;
-
-        protected override bool DisableOnDebug => false;
 
         public string NodeExePath
         {
@@ -242,7 +238,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void Changed(object sender, EventArgs e)
         {
-            this.IsDirty = true;
+            this._propPage.IsDirty = true;
         }
 
         private void NodeExePathChanged(object sender, EventArgs e)

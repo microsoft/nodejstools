@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -18,14 +18,7 @@ namespace Microsoft.NodejsTools.Project
             this.control = new NodejsGeneralPropertyPageControl(this);
         }
 
-        protected override Control CreateControl()
-        {
-            return this.control;
-        }
-
         public override Control Control => this.control;
-
-        protected override Type ControlType => typeof(NodejsGeneralPropertyPageControl);
 
         internal override CommonProjectNode Project
         {
@@ -46,8 +39,7 @@ namespace Microsoft.NodejsTools.Project
                 }
             }
         }
-
-        protected override void Apply()
+        public override void Apply()
         {
             this.Project.SetProjectProperty(CommonConstants.StartupFile, this.control.ScriptFile);
             this.Project.SetProjectProperty(NodeProjectProperty.ScriptArguments, this.control.ScriptArguments);
@@ -95,32 +87,40 @@ namespace Microsoft.NodejsTools.Project
                 this.Project.SetUserProjectProperty(NodeProjectProperty.DebuggerPort, this.control.DebuggerPort);
             }
 
-            this.control.IsDirty = false;
+            this.IsDirty = false;
         }
 
         public override void LoadSettings()
         {
-            this.control.NodeExeArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
-            this.control.NodeExePath = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
-            this.control.ScriptFile = this.Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
-            this.control.ScriptArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.ScriptArguments);
-            this.control.WorkingDirectory = this.Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
-            this.control.LaunchUrl = this.Project.GetUnevaluatedProperty(NodeProjectProperty.LaunchUrl);
-            this.control.NodejsPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
-            this.control.DebuggerPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
-            this.control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
-            this.control.StartWebBrowser = GetBoolProperty(this.Project, NodeProjectProperty.StartWebBrowser);
-            this.control.SaveNodeSettingsInProject = GetBoolProperty(this.Project, NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
-            this.control.TestRoot = this.Project.GetProjectProperty(NodeProjectProperty.TestRoot);
-            this.control.TestFramework = this.Project.GetProjectProperty(NodeProjectProperty.TestFramework);
-
-            bool GetBoolProperty(ProjectNode node, string property)
+            this.Loading = true;
+            try
             {
-                // Attempt to parse the boolean.  If we fail, assume it is true.
-                return bool.TryParse(node.GetUnevaluatedProperty(property), out var result) ? result : true;
+                this.control.NodeExeArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExeArguments);
+                this.control.NodeExePath = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodeExePath);
+                this.control.ScriptFile = this.Project.GetUnevaluatedProperty(CommonConstants.StartupFile);
+                this.control.ScriptArguments = this.Project.GetUnevaluatedProperty(NodeProjectProperty.ScriptArguments);
+                this.control.WorkingDirectory = this.Project.GetUnevaluatedProperty(CommonConstants.WorkingDirectory);
+                this.control.LaunchUrl = this.Project.GetUnevaluatedProperty(NodeProjectProperty.LaunchUrl);
+                this.control.NodejsPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.NodejsPort);
+                this.control.DebuggerPort = this.Project.GetUnevaluatedProperty(NodeProjectProperty.DebuggerPort);
+                this.control.Environment = this.Project.GetUnevaluatedProperty(NodeProjectProperty.Environment);
+                this.control.StartWebBrowser = GetBoolProperty(this.Project, NodeProjectProperty.StartWebBrowser);
+                this.control.SaveNodeSettingsInProject = GetBoolProperty(this.Project, NodeProjectProperty.SaveNodeJsSettingsInProjectFile);
+                this.control.TestRoot = this.Project.GetProjectProperty(NodeProjectProperty.TestRoot);
+                this.control.TestFramework = this.Project.GetProjectProperty(NodeProjectProperty.TestFramework);
+
+                bool GetBoolProperty(ProjectNode node, string property)
+                {
+                    // Attempt to parse the boolean.  If we fail, assume it is true.
+                    return bool.TryParse(node.GetUnevaluatedProperty(property), out var result) ? result : true;
+                }
+            }
+            finally
+            {
+                this.Loading = false;
             }
         }
 
-        protected override string Title => "General";
+        public override string Name => "General";
     }
 }
