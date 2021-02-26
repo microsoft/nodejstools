@@ -95,7 +95,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MicroBuild.Core" Version="0.3.0">
+    <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" Version="0.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
