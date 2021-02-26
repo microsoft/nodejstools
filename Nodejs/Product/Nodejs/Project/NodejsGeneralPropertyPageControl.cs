@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.TestFrameworks;
-using Microsoft.VisualStudio.Editors.PropertyPages;
+using Microsoft.VisualStudioTools.Project;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal sealed partial class NodejsGeneralPropertyPageControl : PropPageUserControlBase /*UserControl*/
+    internal partial class NodejsGeneralPropertyPageControl : UserControl
     {
         private readonly NodejsGeneralPropertyPage _propPage;
         private const string _exeFilter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Project
             this._testRootLabel.Text = Resources.TestRoot;
 
             this._browsePath.AccessibleName = Resources.PropertiesBrowsePathAccessibleName;
-            this._browseDirectory.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
+            this._browsePath.AccessibleName = Resources.PropertiesBrowseDirectoryAccessibleName;
             this._browseTestroot.AccessibleName = Resources.PropertiesBrowseTestRootAccessibleName;
         }
 
@@ -75,10 +75,6 @@ namespace Microsoft.NodejsTools.Project
             this._tooltip.SetToolTip(this._testRoot, Resources.TestRootToolTip);
             this._tooltip.SetToolTip(this._frameworkSelector, Resources.TestFrameworkToolTip);
         }
-
-        protected override bool DisableOnBuild => false;
-
-        protected override bool DisableOnDebug => false;
 
         public string NodeExePath
         {
@@ -242,7 +238,7 @@ namespace Microsoft.NodejsTools.Project
 
         private void Changed(object sender, EventArgs e)
         {
-            this.IsDirty = true;
+            this._propPage.IsDirty = true;
         }
 
         private void NodeExePathChanged(object sender, EventArgs e)
@@ -258,10 +254,12 @@ namespace Microsoft.NodejsTools.Project
 
         private void BrowsePathClick(object sender, EventArgs e)
         {
-            var nodeExePath = this._nodeExePath.Text;
-            if (this.GetFileViaBrowse(nodeExePath, ref nodeExePath, _exeFilter) && !string.IsNullOrEmpty(nodeExePath))
+            var dialog = new OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.Filter = _exeFilter;
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                this._nodeExePath.Text = nodeExePath;
+                this._nodeExePath.Text = dialog.FileName;
                 this._nodeExePath.ForeColor = SystemColors.ControlText;
             }
         }
@@ -274,10 +272,10 @@ namespace Microsoft.NodejsTools.Project
             {
                 dir = projectHome;
             }
-
-            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
+            if (!string.IsNullOrEmpty(path))
             {
-                this._workingDir.Text = string.IsNullOrEmpty(dir) ? "." : dir;
+                this._workingDir.Text = path;
             }
         }
 
@@ -290,7 +288,8 @@ namespace Microsoft.NodejsTools.Project
                 dir = projectHome;
             }
 
-            if (this.GetDirectoryViaBrowseRelative(dir, projectHome, Resources.BrowseWorkingDirDialogTitle, ref dir))
+            var path = NodejsPackage.Instance.BrowseForDirectory(this.Handle, dir);
+            if (!string.IsNullOrEmpty(path))
             {
                 this._testRoot.Text = string.IsNullOrEmpty(dir) ? "." : dir;
             }
