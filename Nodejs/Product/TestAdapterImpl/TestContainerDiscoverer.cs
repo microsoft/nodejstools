@@ -261,6 +261,12 @@ namespace Microsoft.NodejsTools.TestAdapter
                 yield break;
             }
 
+            // No need to search for tests in not supported projects.
+            if (!TypeScriptHelpers.IsSupportedTestProjectFile(path))
+            {
+                yield break;
+            }
+
             if (this.detectingChanges)
             {
                 this.SaveModifiedFiles(project);
