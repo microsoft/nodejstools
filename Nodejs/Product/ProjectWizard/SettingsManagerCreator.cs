@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudioTools
 {
     internal static class SettingsManagerCreator
     {
-        private const string VSVersion = "16.0";
+        private const string VSVersion = "17.0";
 
         public static SettingsManager GetSettingsManager(DTE dte)
         {

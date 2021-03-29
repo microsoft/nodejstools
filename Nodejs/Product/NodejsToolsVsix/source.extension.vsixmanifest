@@ -15,9 +15,9 @@
        Id specifications are minimums; any SKU equal or 'higher' will accept
        them. -->
     <Installation SystemComponent="true">
-        <InstallationTarget Version="[16.0.0,17.0)" Id="Microsoft.VisualStudio.Community" />
-        <InstallationTarget Version="[16.0.0,17.0)" Id="Microsoft.VisualStudio.Pro" />
-        <InstallationTarget Version="[16.0.0,17.0)" Id="Microsoft.VisualStudio.Enterprise" />
+        <InstallationTarget Version="[17.0.0,18.0)" Id="Microsoft.VisualStudio.Community" />
+        <InstallationTarget Version="[17.0.0,18.0)" Id="Microsoft.VisualStudio.Pro" />
+        <InstallationTarget Version="[17.0.0,18.0)" Id="Microsoft.VisualStudio.Enterprise" />
     </Installation>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="Nodejs" Path="|Nodejs;PkgdefProjectOutputGroup|" />
@@ -28,6 +28,6 @@
         <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="Nodejs" d:TargetPath="|Nodejs;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,17.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
 </PackageManifest>

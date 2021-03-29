@@ -23,8 +23,8 @@
 
     <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">false</CodeCoverageEnabled>
 
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
-    <VSTarget Condition="$(VSTarget)==''">16.0</VSTarget>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSTarget Condition="$(VSTarget)==''">17.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
 
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
