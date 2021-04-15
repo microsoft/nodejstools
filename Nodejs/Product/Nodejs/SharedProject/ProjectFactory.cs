@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudioTools.Project
     /// Creates projects within the solution
     /// </summary>
 
-    public abstract class ProjectFactory : FlavoredProjectFactoryBase, /*IVsAsynchronousProjectCreate,*/ IVsProjectUpgradeViaFactory4, IVsProjectUpgradeViaFactory
+    public abstract class ProjectFactory : FlavoredProjectFactoryBase, IVsProjectUpgradeViaFactory4, IVsProjectUpgradeViaFactory
     {
         #region fields
         private System.IServiceProvider site;
@@ -156,30 +156,6 @@ namespace Microsoft.VisualStudioTools.Project
             return guids;
         }
         #endregion
-
-        //public virtual bool CanCreateProjectAsynchronously(ref Guid rguidProjectID, string filename, uint flags)
-        //{
-        //    return true;
-        //}
-
-        //public void OnBeforeCreateProjectAsync(ref Guid rguidProjectID, string filename, string location, string pszName, uint flags)
-        //{
-        //}
-
-        //public IVsTask CreateProjectAsync(ref Guid rguidProjectID, string filename, string location, string pszName, uint flags)
-        //{
-        //    var iid = typeof(IVsHierarchy).GUID;
-        //    return VsTaskLibraryHelper.CreateAndStartTask(this.taskSchedulerService.Value, VsTaskRunContext.UIThreadBackgroundPriority, VsTaskLibraryHelper.CreateTaskBody(() =>
-        //    {
-        //        CreateProject(filename, location, pszName, flags, ref iid, out var project, out var cancelled);
-        //        if (cancelled != 0)
-        //        {
-        //            throw new OperationCanceledException();
-        //        }
-
-        //        return Marshal.GetObjectForIUnknown(project);
-        //    }));
-        //}
 
         #region Project Upgrades
 
