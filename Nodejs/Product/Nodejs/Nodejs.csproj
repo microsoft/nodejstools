@@ -1156,7 +1156,7 @@
       <Version>17.0.12-preview-0001-g930963cc5f</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Workspace.VSIntegration">
-      <Version>16.3.43</Version>
+      <Version>17.0.12-preview-0001-g930963cc5f</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core">
       <Version>0.4.1</Version>
@@ -1177,6 +1177,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <!--Temporary exclusions for interop transition-->
+    <PackageReference Include="EnvDTE" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.Internal.VisualStudio.Shell.Interop.10.0.DesignTime" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.OLE.Interop" ExcludeAssets="compile" PrivateAssets="compile" />
@@ -1185,7 +1187,12 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.10.0" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.11.0" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.12.0" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.14.0.DesignTime" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.15.0.DesignTime" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.Interop.15.6.DesignTime" ExcludeAssets="compile" PrivateAssets="compile" />
     <PackageReference Include="Microsoft.VisualStudio.TextManager.Interop" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.VisualStudio.TextManager.Interop.8.0" ExcludeAssets="compile" PrivateAssets="compile" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" ExcludeAssets="all" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />

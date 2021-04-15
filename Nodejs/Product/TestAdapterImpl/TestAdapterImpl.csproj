@@ -91,9 +91,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
       <Version>17.0.0-preview-1-31212-1111</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes">
-      <Version>15.0.34</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core">
       <Version>0.4.1</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
