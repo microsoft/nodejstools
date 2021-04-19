@@ -21,7 +21,7 @@ using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 
 namespace Microsoft.NodejsTools.Project
 {
-    internal class NodejsProjectNode : CommonProjectNode, /*VsWebSite.VSWebSite,*/ INodePackageModulesCommands, IVsBuildPropertyStorage
+    internal class NodejsProjectNode : CommonProjectNode, VsWebSite.VSWebSite, INodePackageModulesCommands, IVsBuildPropertyStorage
     {
         private readonly HashSet<string> _warningFiles = new HashSet<string>();
         private readonly HashSet<string> _errorFiles = new HashSet<string>();
