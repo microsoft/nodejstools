@@ -86,10 +86,10 @@
       <Version>16.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Interop">
-      <Version>17.0.0-preview-1-31214-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.0.0-preview-1-31212-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core">
       <Version>0.4.1</Version>

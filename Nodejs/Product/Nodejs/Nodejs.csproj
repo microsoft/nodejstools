@@ -1123,34 +1123,34 @@
       <Version>4.7.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.10.0">
-      <Version>17.0.0-preview-1-31209-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Debugger.InteropA">
-      <Version>17.0.0-preview-1-31209-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.ImageCatalog">
-      <Version>17.0.0-preview-1-31209-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Imaging">
-      <Version>17.0.0-preview-1-31212-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Interop">
-      <Version>17.0.0-preview-1-31214-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.ProjectAggregator">
-      <Version>17.0.0-preview-1-31209-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.0.0-preview-1-31212-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.Framework">
-      <Version>17.0.0-preview-1-31212-1111</Version>
+      <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TestWindow.Interfaces">
       <Version>17.0.0-beta.21213.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.VsInteractiveWindow">
-      <Version>4.0.0-beta.21176.3</Version>
+      <Version>4.0.0-beta.21220.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Workspace.Extensions.VS">
       <Version>17.0.12-preview-0001-g930963cc5f</Version>
