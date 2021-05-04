@@ -83,7 +83,7 @@
       <Version>4.7.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel">
-      <Version>17.0.0-release-20210407-01</Version>
+      <Version>16.10.0-release-20210429-01</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Interop">
       <Version>17.0.0-preview-2-31221-277</Version>
