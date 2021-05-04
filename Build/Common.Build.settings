@@ -23,7 +23,7 @@
 
     <CodeCoverageEnabled Condition="'$(CodeCoverageEnabled)'==''">false</CodeCoverageEnabled>
 
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <VSTarget Condition="$(VSTarget)==''">16.0</VSTarget>
     <BuildingInsideVisualStudio Condition="'$(BuildingInsideVisualStudio)' == ''">false</BuildingInsideVisualStudio>
 
