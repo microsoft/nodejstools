@@ -1153,7 +1153,7 @@
       <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TestWindow.Interfaces">
-      <Version>17.0.0-beta.21222.4</Version>
+      <Version>17.0.0-beta.21223.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.VsInteractiveWindow">
       <Version>4.0.0-beta.21220.1</Version>
