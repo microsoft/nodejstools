@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.ComponentModel;
@@ -440,10 +440,7 @@ namespace Microsoft.VisualStudioTools.Project
         [Browsable(false)]
         public object __project => throw new NotImplementedException();
         [Browsable(false)]
-        public object get_Extender(string ExtenderName)
-        {
-            throw new NotImplementedException();
-        }
+        object VSLangProj.ProjectProperties.Extender => throw new NotImplementedException();
 
         #endregion
     }
