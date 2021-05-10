@@ -267,11 +267,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                 yield break;
             }
 
-            if (this.detectingChanges)
-            {
-                this.SaveModifiedFiles(project);
-            }
-
             if (!this.knownProjects.TryGetValue(path, out var projectInfo) || !TryGetProjectUnitTestProperties(projectInfo.Project, out _, out _))
             {
                 // Don't return any containers for projects we don't know about or that we know that they are not configured for JavaScript unit tests.
@@ -295,22 +290,6 @@ namespace Microsoft.NodejsTools.TestAdapter
                 });
 
             yield return new TestContainer(this, path, latestWrite);
-        }
-
-        private void SaveModifiedFiles(IVsProject project)
-        {
-            // save all the open files in the project...
-            foreach (var itemPath in project.GetProjectItems())
-            {
-                if (string.IsNullOrEmpty(itemPath))
-                {
-                    continue;
-                }
-
-                var solution = (IVsSolution)this.serviceProvider.GetService(typeof(SVsSolution));
-                ErrorHandler.ThrowOnFailure(
-                    solution.SaveSolutionElement((uint)__VSSLNSAVEOPTIONS.SLNSAVEOPT_SaveIfDirty, (IVsHierarchy)project, /* save entire project */ 0));
-            }
         }
 
         private bool ShouldDiscover(string pathToItem)
