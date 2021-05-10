@@ -145,7 +145,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         /// <summary>
         /// Get the items present in the project
         /// </summary>
-        public static IEnumerable<string> GetProjectItems(this IVsProject project)
+        private static IEnumerable<string> GetProjectItems(this IVsProject project)
         {
             if (project == null)
             {
