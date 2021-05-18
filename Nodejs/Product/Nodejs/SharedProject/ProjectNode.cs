@@ -1266,7 +1266,7 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 Array contextParamsAsArray = contextParams;
 
-                var result = ivsExtensibility.RunWizardFile(wizardToRun, (int)dlgOwner, ref contextParamsAsArray, out wizResultAsInt);
+                var result = ivsExtensibility.RunWizardFile(wizardToRun, dlgOwner, ref contextParamsAsArray, out wizResultAsInt);
 
                 if (!ErrorHandler.Succeeded(result) && result != VSConstants.OLE_E_PROMPTSAVECANCELLED)
                 {
