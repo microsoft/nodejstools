@@ -87,16 +87,16 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Interop">
-      <Version>17.0.0-preview-2-31221-277</Version>
+      <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Settings.15.0">
-      <Version>17.0.0-preview-2-31221-277</Version>
+      <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.0.0-preview-2-31221-277</Version>
+      <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TemplateWizardInterface" >
-      <Version>17.0.0-preview-2-31221-277</Version>
+      <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
