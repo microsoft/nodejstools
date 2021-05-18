@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build">
-      <Version>16.6.0</Version>
+      <Version>17.0.0-preview-21256-03</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>
