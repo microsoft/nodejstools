@@ -11,7 +11,7 @@ function itReplacement(it) {
 }
 
 function getFileLocation() {
-    const stackLineRegex = /at.*\(.*_karma_webpack_(.*\.spec\.ts):(\d*):(\d*)/;
+    const stackLineRegex = /at.*\(.*_karma_webpack_(?:\/webpack\:)(.*\.spec\.ts):(\d*):(\d*)/;
     const match = (new Error()).stack.match(stackLineRegex);
 
     return match
