@@ -185,7 +185,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Node.js Interactive - Cyan]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Интерактивное окно Node.js — голубой]]></Val>
+            <Val><![CDATA[Интерактивное окно Node.js— голубой]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2243,7 +2243,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An 'Import' of the file '{1}' was found in the project file '{0}'. This file is not registered as a safe file to import, and could contain targets and tasks that are harmful.  If this imported file is indeed considered safe, then it can be registered by writing to the registry key {2}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[В файле проекта "{0}" найден <Import> файла "{1}". Этот файл не зарегистрирован как безопасный для импорта, и может содержать опасные цели и задания. Если файл является безопасным, он может быть зарегистрирован при помощи записи в раздел реестра {2}.]]></Val>
+            <Val><![CDATA[В файле проекта "{0}" найден Import файла "{1}". Этот файл не зарегистрирован как безопасный для импорта, и может содержать опасные цели и задания. Если файл является безопасным, он может быть зарегистрирован при помощи записи в раздел реестра {2}.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2288,7 +2288,7 @@
         <Str Cat="Text">
           <Val><![CDATA[An 'Import' of the file '{1}' was found in the user project file '{0}'.  All imports in user project files are considered unsafe.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[В файле проекта пользователя "{0}" найден <Import> файла "{1}". Все импорты в пользовательских файлах проекта считается небезопасным.]]></Val>
+            <Val><![CDATA[В файле проекта пользователя "{0}" найден Import файла "{1}". Все импорты в пользовательских файлах проекта считается небезопасным.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -2297,7 +2297,7 @@
         <Str Cat="Text">
           <Val><![CDATA[A 'UsingTask' tag which registers the '{1}' task was found in the project file '{0}'.  'UsingTask' tags in the project file take precedence over those in the imported .TARGETS files, and therefore could be used to execute arbitrary code during an otherwise unmodified build process.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[В файле проекта "{0}" обнаружен тег "UsingTask", регистрирующий задачу "{1}". Метки <UsingTask> в файле проекта имеют превосходство перед импортированными .TARGETS-файлами, и поэтому могут быть использованы для выполнения произвольного кода во время не изменяемого другими средствами процесса построения.]]></Val>
+            <Val><![CDATA[В файле проекта "{0}" обнаружен тег "UsingTask", регистрирующий задачу "{1}". Метки UsingTask в файле проекта имеют превосходство перед импортированными .TARGETS-файлами, и поэтому могут быть использованы для выполнения произвольного кода во время не изменяемого другими средствами процесса построения.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
