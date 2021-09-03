@@ -37,8 +37,10 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 
 const run_tests = function (context) {
+    let projectFolder = context.testCases[0].projectFolder;
+    process.env.NODE_ENV =  process.env.NODE_ENV || 'test';
     return new Promise(async resolve => {
-        const jest = detectPackage(context.testCases[0].projectFolder, 'jest');
+        const jest = detectPackage(projectFolder, 'jest');
         if (!jest) {
             return resolve();
         }
@@ -51,14 +53,15 @@ const run_tests = function (context) {
             });
         }
 
-        const config = {
+        let projectFolderJsonReady = projectFolder.replaceAll('\\', '\\\\');
+        const argv = {
             json: true,
             reporters: [[__dirname + '/jestReporter.js', { context }]],
-            testMatch: [context.testCases[0].testFile]
-        };
+            config : `{"roots":["<rootDir>/src"],"collectCoverageFrom":["src/**/*.{js,jsx,ts,tsx}","!src/**/*.d.ts"],"setupFiles":["${projectFolderJsonReady}\\\\node_modules\\\\react-app-polyfill\\\\jsdom.js"],"setupFilesAfterEnv":["<rootDir>/src/setupTests.js"],"testMatch":["<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}","<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"],"testEnvironment":"jsdom","testRunner":"${projectFolderJsonReady}\\\\node_modules\\\\jest-circus\\\\runner.js","transform":{"^.+\\\\.(js|jsx|mjs|cjs|ts|tsx)$":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\babelTransform.js","^.+\\\\.css$":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"},"transformIgnorePatterns":["[/\\\\\\\\]node_modules[/\\\\\\\\].+\\\\.(js|jsx|mjs|cjs|ts|tsx)$","^.+\\\\.module\\\\.(css|sass|scss)$"],"modulePaths":[],"moduleNameMapper":{"^react-native$":"react-native-web","^.+\\\\.module\\\\.(css|sass|scss)$":"identity-obj-proxy"},"moduleFileExtensions":["web.js","js","web.ts","ts","web.tsx","tsx","json","web.jsx","jsx","node"],"watchPlugins":["jest-watch-typeahead/filename","jest-watch-typeahead/testname"],"resetMocks":true,"rootDir":"${projectFolderJsonReady}"}`,
+        }
 
         try {
-            await jest.runCLI(config, [context.testCases[0].projectFolder]);
+            await jest.runCLI(argv, [projectFolder]);
         } catch (error) {
             logError(error);
         }
