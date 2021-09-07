@@ -37,7 +37,10 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 
 const run_tests = function (context) {
-    let projectFolder = context.testCases[0].projectFolder;
+    const projectFolder = context.testCases[0].projectFolder;
+
+    // NODE_ENV sets the environment context for Node, it can be development, production or test and it needs to be set up for jest to work.
+    // If no value was assigned, assign test.
     process.env.NODE_ENV =  process.env.NODE_ENV || 'test';
     return new Promise(async resolve => {
         const jest = detectPackage(projectFolder, 'jest');
@@ -53,11 +56,16 @@ const run_tests = function (context) {
             });
         }
 
-        let projectFolderJsonReady = projectFolder.replaceAll('\\', '\\\\');
+        let config = {
+            setupFilesAfterEnv:["<rootDir>/src/setupTests.js"],
+            testMatch: [context.testCases[0].testFile],
+            transform:{"^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": projectFolder + "\\node_modules\\react-scripts\\config\\jest\\babelTransform.js","^.+\\\\.css$": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"}
+        }
+
         const argv = {
             json: true,
             reporters: [[__dirname + '/jestReporter.js', { context }]],
-            config : `{"roots":["<rootDir>/src"],"collectCoverageFrom":["src/**/*.{js,jsx,ts,tsx}","!src/**/*.d.ts"],"setupFiles":["${projectFolderJsonReady}\\\\node_modules\\\\react-app-polyfill\\\\jsdom.js"],"setupFilesAfterEnv":["<rootDir>/src/setupTests.js"],"testMatch":["<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}","<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"],"testEnvironment":"jsdom","testRunner":"${projectFolderJsonReady}\\\\node_modules\\\\jest-circus\\\\runner.js","transform":{"^.+\\\\.(js|jsx|mjs|cjs|ts|tsx)$":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\babelTransform.js","^.+\\\\.css$":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)":"${projectFolderJsonReady}\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"},"transformIgnorePatterns":["[/\\\\\\\\]node_modules[/\\\\\\\\].+\\\\.(js|jsx|mjs|cjs|ts|tsx)$","^.+\\\\.module\\\\.(css|sass|scss)$"],"modulePaths":[],"moduleNameMapper":{"^react-native$":"react-native-web","^.+\\\\.module\\\\.(css|sass|scss)$":"identity-obj-proxy"},"moduleFileExtensions":["web.js","js","web.ts","ts","web.tsx","tsx","json","web.jsx","jsx","node"],"watchPlugins":["jest-watch-typeahead/filename","jest-watch-typeahead/testname"],"resetMocks":true,"rootDir":"${projectFolderJsonReady}"}`,
+            config : JSON.stringify(config)
         }
 
         try {
