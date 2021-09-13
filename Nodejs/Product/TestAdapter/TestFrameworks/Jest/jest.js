@@ -125,6 +125,7 @@ function logError() {
 
 function readConfigs(projectFolder, context)
 {
+    // First look for Jest.config.js, otherwise look at the package.json under "jest" tag
     var userConfig;
     const jestConfigPath = projectFolder + "\\jest.config.js";
     const packageJsonPath = projectFolder + "\\package.json";
@@ -145,6 +146,7 @@ function readConfigs(projectFolder, context)
 
     function mergeConfigs()
     {
+        // If no config was found OR the user doesn't have these tags set up, add it.
         if(!userConfig) userConfig = {};
         if(!userConfig.setupFilesAfterEnv) userConfig.setupFilesAfterEnv = ["<rootDir>/src/setupTests.js"];
         if(!userConfig.testMatch) userConfig.testMatch = [context.testCases[0].testFile];
