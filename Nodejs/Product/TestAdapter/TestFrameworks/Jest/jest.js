@@ -37,8 +37,13 @@ const find_tests = function (testFileList, discoverResultFile, projectFolder) {
 };
 
 const run_tests = function (context) {
+    const projectFolder = context.testCases[0].projectFolder;
+
+    // NODE_ENV sets the environment context for Node, it can be development, production or test and it needs to be set up for jest to work.
+    // If no value was assigned, assign test.
+    process.env.NODE_ENV =  process.env.NODE_ENV || 'test';
     return new Promise(async resolve => {
-        const jest = detectPackage(context.testCases[0].projectFolder, 'jest');
+        const jest = detectPackage(projectFolder, 'jest');
         if (!jest) {
             return resolve();
         }
@@ -51,14 +56,16 @@ const run_tests = function (context) {
             });
         }
 
-        const config = {
+        let config = readConfigs(projectFolder, context);
+
+        const argv = {
             json: true,
             reporters: [[__dirname + '/jestReporter.js', { context }]],
-            testMatch: [context.testCases[0].testFile]
-        };
+            config : JSON.stringify(config)
+        }
 
         try {
-            await jest.runCLI(config, [context.testCases[0].projectFolder]);
+            await jest.runCLI(argv, [projectFolder]);
         } catch (error) {
             logError(error);
         }
@@ -114,6 +121,37 @@ function logError() {
     var errorArgs = Array.from(arguments);
     errorArgs.unshift("NTVS_ERROR:");
     console.error.apply(console, errorArgs);
+}
+
+function readConfigs(projectFolder, context)
+{
+    // First look for Jest.config.js, otherwise look at the package.json under "jest" tag
+    var userConfig;
+    const jestConfigPath = projectFolder + "\\jest.config.js";
+    const packageJsonPath = projectFolder + "\\package.json";
+
+    if(fs.existsSync(jestConfigPath))
+    {
+        userConfig = require(jestConfigPath);
+        mergeConfigs();
+        return userConfig;
+    }
+
+    if(fs.existsSync(packageJsonPath))
+    {
+        userConfig = require(packageJsonPath).jest;
+        mergeConfigs();
+        return userConfig;
+    }
+
+    function mergeConfigs()
+    {
+        // If no config was found OR the user doesn't have these tags set up, add it.
+        if(!userConfig) userConfig = {};
+        if(!userConfig.setupFilesAfterEnv) userConfig.setupFilesAfterEnv = ["<rootDir>/src/setupTests.js"];
+        if(!userConfig.testMatch) userConfig.testMatch = [context.testCases[0].testFile];
+        if(!userConfig.transform) userConfig.transform = {"^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": projectFolder + "\\node_modules\\react-scripts\\config\\jest\\babelTransform.js","^.+\\\\.css$": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"};
+    }
 }
 
 module.exports.find_tests = find_tests;
