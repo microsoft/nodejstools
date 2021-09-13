@@ -56,11 +56,7 @@ const run_tests = function (context) {
             });
         }
 
-        let config = {
-            setupFilesAfterEnv:["<rootDir>/src/setupTests.js"],
-            testMatch: [context.testCases[0].testFile],
-            transform:{"^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": projectFolder + "\\node_modules\\react-scripts\\config\\jest\\babelTransform.js","^.+\\\\.css$": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"}
-        }
+        let config = readConfigs(projectFolder, context);
 
         const argv = {
             json: true,
@@ -125,6 +121,35 @@ function logError() {
     var errorArgs = Array.from(arguments);
     errorArgs.unshift("NTVS_ERROR:");
     console.error.apply(console, errorArgs);
+}
+
+function readConfigs(projectFolder, context)
+{
+    var userConfig;
+    const jestConfigPath = projectFolder + "\\jest.config.js";
+    const packageJsonPath = projectFolder + "\\package.json";
+
+    if(fs.existsSync(jestConfigPath))
+    {
+        userConfig = require(jestConfigPath);
+        mergeConfigs();
+        return userConfig;
+    }
+
+    if(fs.existsSync(packageJsonPath))
+    {
+        userConfig = require(packageJsonPath).jest;
+        mergeConfigs();
+        return userConfig;
+    }
+
+    function mergeConfigs()
+    {
+        if(!userConfig) userConfig = {};
+        if(!userConfig.setupFilesAfterEnv) userConfig.setupFilesAfterEnv = ["<rootDir>/src/setupTests.js"];
+        if(!userConfig.testMatch) userConfig.testMatch = [context.testCases[0].testFile];
+        if(!userConfig.transform) userConfig.transform = {"^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": projectFolder + "\\node_modules\\react-scripts\\config\\jest\\babelTransform.js","^.+\\\\.css$": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"};
+    }
 }
 
 module.exports.find_tests = find_tests;
