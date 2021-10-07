@@ -42,6 +42,7 @@ const run_tests = function (context) {
     // NODE_ENV sets the environment context for Node, it can be development, production or test and it needs to be set up for jest to work.
     // If no value was assigned, assign test.
     process.env.NODE_ENV =  process.env.NODE_ENV || 'test';
+
     return new Promise(async resolve => {
         const jest = detectPackage(projectFolder, 'jest');
         if (!jest) {
@@ -55,9 +56,9 @@ const run_tests = function (context) {
                 fullyQualifiedName: testCase.fullyQualifiedName
             });
         }
-
+        
         let config = readConfigs(projectFolder, context);
-
+        
         const argv = {
             json: true,
             reporters: [[__dirname + '/jestReporter.js', { context }]],
@@ -117,41 +118,50 @@ function detectPackage(projectFolder, packageName) {
     }
 }
 
+function readConfigs(projectFolder, context)
+{
+    var config;
+    const packageJsonPath = projectFolder + "\\package.json";
+    const jestConfigPath = projectFolder + "\\jest.config.js";
+
+    // If this is a React project, then the path exists, and we should use the react scripts config generation. 
+    // It already deals with override from package.json config, if there's any.
+    const pathToReactConfig = projectFolder + "\\node_modules\\react-scripts\\scripts\\utils\\createJestConfig.js";
+    if(fs.existsSync(pathToReactConfig))
+    {
+        const createJestConfig = require(pathToReactConfig);
+        const path = require('path');
+        config = createJestConfig(
+            relativePath => path.resolve(projectFolder + '/node_modules/react-scripts/', relativePath),
+            projectFolder,
+            false
+        )
+
+        return config;
+    }
+
+    // Else, for other frameworks, first prioritize package.json config if jest config exists there under "jest".
+    // If not, try to find jest.config.js. If no file found, finally use a basic config.
+    if(fs.existsSync(packageJsonPath))
+    {
+        config = require(packageJsonPath).jest;
+    }
+
+    if(fs.existsSync(jestConfigPath) && !config)
+    {
+        config = require(jestConfigPath);
+    }
+
+    if(!config) config = {};
+    if(!config.testMatch) config.testMatch = [context.testCases[0].testFile];    
+    
+    return config;
+}
+
 function logError() {
     var errorArgs = Array.from(arguments);
     errorArgs.unshift("NTVS_ERROR:");
     console.error.apply(console, errorArgs);
-}
-
-function readConfigs(projectFolder, context)
-{
-    // First look for Jest.config.js, otherwise look at the package.json under "jest" tag
-    var userConfig;
-    const jestConfigPath = projectFolder + "\\jest.config.js";
-    const packageJsonPath = projectFolder + "\\package.json";
-
-    if(fs.existsSync(jestConfigPath))
-    {
-        userConfig = require(jestConfigPath);
-        mergeConfigs();
-        return userConfig;
-    }
-
-    if(fs.existsSync(packageJsonPath))
-    {
-        userConfig = require(packageJsonPath).jest;
-        mergeConfigs();
-        return userConfig;
-    }
-
-    function mergeConfigs()
-    {
-        // If no config was found OR the user doesn't have these tags set up, add it.
-        if(!userConfig) userConfig = {};
-        if(!userConfig.setupFilesAfterEnv) userConfig.setupFilesAfterEnv = ["<rootDir>/src/setupTests.js"];
-        if(!userConfig.testMatch) userConfig.testMatch = [context.testCases[0].testFile];
-        if(!userConfig.transform) userConfig.transform = {"^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": projectFolder + "\\node_modules\\react-scripts\\config\\jest\\babelTransform.js","^.+\\\\.css$": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\cssTransform.js","^(?!.*\\\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": projectFolder + "\\\\node_modules\\\\react-scripts\\\\config\\\\jest\\\\fileTransform.js"};
-    }
 }
 
 module.exports.find_tests = find_tests;
