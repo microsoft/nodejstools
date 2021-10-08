@@ -120,7 +120,7 @@ function detectPackage(projectFolder, packageName) {
 
 function readConfigs(projectFolder, context)
 {
-    var config;
+    let config;
     const packageJsonPath = path.join(projectFolder, 'package.json');
     const jestConfigPath = path.join(projectFolder, 'jest.config.js');
 
