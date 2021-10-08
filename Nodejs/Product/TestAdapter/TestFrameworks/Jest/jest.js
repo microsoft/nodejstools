@@ -121,18 +121,17 @@ function detectPackage(projectFolder, packageName) {
 function readConfigs(projectFolder, context)
 {
     var config;
-    const packageJsonPath = projectFolder + "\\package.json";
-    const jestConfigPath = projectFolder + "\\jest.config.js";
+    const packageJsonPath = path.join(projectFolder, 'package.json');
+    const jestConfigPath = path.join(projectFolder + 'jest.config.js');
 
     // If this is a React project, then the path exists, and we should use the react scripts config generation. 
     // It already deals with override from package.json config, if there's any.
-    const pathToReactConfig = projectFolder + "\\node_modules\\react-scripts\\scripts\\utils\\createJestConfig.js";
+    const pathToReactConfig = path.join(projectFolder, 'node_modules/react-scripts/scripts/utils/createJestConfig.js');
     if(fs.existsSync(pathToReactConfig))
     {
         const createJestConfig = require(pathToReactConfig);
-        const path = require('path');
         config = createJestConfig(
-            relativePath => path.resolve(projectFolder + '/node_modules/react-scripts/', relativePath),
+            relativePath => path.join(projectFolder, 'node_modules/react-scripts/', relativePath),
             projectFolder,
             false
         )
@@ -147,7 +146,7 @@ function readConfigs(projectFolder, context)
         config = require(packageJsonPath).jest;
     }
 
-    if(fs.existsSync(jestConfigPath) && !config)
+    if(!config && fs.existsSync(jestConfigPath))
     {
         config = require(jestConfigPath);
     }
