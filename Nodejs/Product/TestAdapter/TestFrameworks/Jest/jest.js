@@ -122,7 +122,7 @@ function readConfigs(projectFolder, context)
 {
     var config;
     const packageJsonPath = path.join(projectFolder, 'package.json');
-    const jestConfigPath = path.join(projectFolder + 'jest.config.js');
+    const jestConfigPath = path.join(projectFolder, 'jest.config.js');
 
     // If this is a React project, then the path exists, and we should use the react scripts config generation. 
     // It already deals with override from package.json config, if there's any.
