@@ -120,9 +120,10 @@ function detectPackage(projectFolder, packageName) {
 
 function readConfigs(projectFolder, context)
 {
-    let config;
+    var config;
     const packageJsonPath = path.join(projectFolder, 'package.json');
-    const jestConfigPath = path.join(projectFolder, 'jest.config.js');
+    const jestConfigPathTS = path.join(projectFolder, 'jest.config.ts');
+    const jestConfigPathJS = path.join(projectFolder, 'jest.config.js');
 
     // If this is a React project, then the path exists, and we should use the react scripts config generation. 
     // It already deals with override from package.json config, if there's any.
@@ -134,25 +135,29 @@ function readConfigs(projectFolder, context)
             relativePath => path.join(projectFolder, 'node_modules/react-scripts/', relativePath),
             projectFolder,
             false
-        )
+        );
 
         return config;
     }
 
     // Else, for other frameworks, first prioritize package.json config if jest config exists there under "jest".
-    // If not, try to find jest.config.js. If no file found, finally use a basic config.
+    // If not, try to find jest.config either being TS or JS. If no file found, finally use a basic config.
     if(fs.existsSync(packageJsonPath))
     {
         config = require(packageJsonPath).jest;
     }
 
-    if(!config && fs.existsSync(jestConfigPath))
+    if(!config && fs.existsSync(jestConfigPathJS))
     {
-        config = require(jestConfigPath);
+        config = require(jestConfigPathJS);
+    }
+    else if(!config && fs.existsSync(jestConfigPathTS))
+    {
+        config = require(jestConfigPathTS);
     }
 
-    if(!config) config = {};
-    if(!config.testMatch) config.testMatch = [context.testCases[0].testFile];    
+    config ||= {};
+    config.testMatch ||= [context.testCases[0].testFile];    
     
     return config;
 }

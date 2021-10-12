@@ -91,6 +91,22 @@ namespace Microsoft.NodejsTools.TestAdapter
                 fileAbsolutePath = CommonUtils.GetAbsoluteFilePath(projectRoot, projectItem.EvaluatedInclude);
             }
 
+            // Check if file is a typecript file. If so, get the javascript file. The javascript file needs to be in the same path and name.
+            // It doesn't work with bundlers or minimizers. Also, project needs to be build in order to have the js file created.
+            // Note: for Jest we're just passing the .ts or .tsx, no need for .js
+            if(testFrameworkName != "Jest")
+            {
+                var typeScriptTest = TypeScriptHelpers.IsTypeScriptFile(fileAbsolutePath);
+                if (typeScriptTest)
+                {
+                    fileAbsolutePath = TypeScriptHelpers.GetTypeScriptBackedJavaScriptFile(project, fileAbsolutePath);
+                }
+                else if (!StringComparer.OrdinalIgnoreCase.Equals(Path.GetExtension(fileAbsolutePath), ".js"))
+                {
+                    return null;
+                }
+            }
+
             return (testFrameworkName, fileAbsolutePath);
         }
     }
