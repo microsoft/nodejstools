@@ -106,7 +106,7 @@ namespace TestAdapter.Tests
         {
             // Setup the variable due to LoadProjects looks for a specific path of Microsoft.NodejsToolsV2.targets.
             // TODO: Probably we could remove this dependency by configuring the BuildOutput path, but I haven't found how to do it.
-            Environment.SetEnvironmentVariable("VSINSTALLDIR", @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview");
+            Environment.SetEnvironmentVariable("VSINSTALLDIR", @"C:\Program Files\Microsoft Visual Studio\2022\Preview");
         }
 
         [TestMethod]
@@ -125,6 +125,18 @@ namespace TestAdapter.Tests
         public void DiscoversTests_NodeAppWithAngularTests()
         {
             this.AssertProject(TestProjectFactory.ProjectName.NodeAppWithAngularTests, 5);
+        }
+
+        [TestMethod]
+        public void DiscoversTests_ReactAppWithJestTestsJavaScript()
+        {
+            this.AssertProject(TestProjectFactory.ProjectName.reactappwithjesttestsjavascript, 1);
+        }
+
+        [TestMethod]
+        public void DiscoversTests_ReactAppWithJestTestsTypeScript()
+        {
+            this.AssertProject(TestProjectFactory.ProjectName.reactappwithjestteststypescript, 1);
         }
     }
 }
