@@ -17,6 +17,7 @@ namespace TestAdapter.Tests
             NodeAppWithTestsConfiguredOnProject,
             NodeAppWithTestsConfiguredPerFile,
             NodeAppWithAngularTests,
+            // React Apps are created with lower-case names.
             reactappwithjesttestsjavascript,
             reactappwithjestteststypescript
         }
@@ -134,10 +135,10 @@ namespace TestAdapter.Tests
                         {
                             var filePath = Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js");
                             return new List<TestCase>()
-                        {
-                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, filePath),
-                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, filePath),
-                        };
+                            {
+                                GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, filePath),
+                                GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, filePath),
+                            };
                         }
                     }
                 case SupportedFramework.Mocha:
