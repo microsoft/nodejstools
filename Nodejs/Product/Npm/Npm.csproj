@@ -146,7 +146,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.2</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="System.CodeDom">
       <Version>4.7.0</Version>

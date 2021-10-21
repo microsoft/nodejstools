@@ -17,6 +17,9 @@ namespace TestAdapter.Tests
             NodeAppWithTestsConfiguredOnProject,
             NodeAppWithTestsConfiguredPerFile,
             NodeAppWithAngularTests,
+            // React Apps are created with lower-case names.
+            reactappwithjesttestsjavascript,
+            reactappwithjestteststypescript
         }
 
         private struct TestCaseOptions
@@ -40,6 +43,9 @@ namespace TestAdapter.Tests
                 case ProjectName.NodeAppWithTestsConfiguredPerFile:
                 case ProjectName.NodeAppWithAngularTests:
                     return Path.Combine(GetProjectDirPath(projectName), $"{projectName}.njsproj");
+                case ProjectName.reactappwithjesttestsjavascript:
+                case ProjectName.reactappwithjestteststypescript:
+                    return Path.Combine(GetProjectDirPath(projectName), $"{projectName}.esproj");
             }
 
             throw new NotImplementedException($"ProjectName {projectName} has not been implemented.");
@@ -64,6 +70,12 @@ namespace TestAdapter.Tests
 
                 case ProjectName.NodeAppWithAngularTests:
                     return new List<TestCase>(GetTestCases(projectName, SupportedFramework.Angular));
+
+                case ProjectName.reactappwithjesttestsjavascript:
+                    return new List<TestCase>(GetTestCases(projectName, SupportedFramework.Jest));
+
+                case ProjectName.reactappwithjestteststypescript:
+                    return new List<TestCase>(GetTestCases(projectName, SupportedFramework.Jest));
 
             };
 
@@ -102,12 +114,32 @@ namespace TestAdapter.Tests
                     }
                 case SupportedFramework.Jest:
                     {
-                        var filePath = Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js");
-                        return new List<TestCase>()
+                        // Using React out-of-the-box test file in case of a React project:
+                        if(projectName == ProjectName.reactappwithjesttestsjavascript)
                         {
-                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, filePath),
-                            GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, filePath),
-                        };
+                            var filePath = Path.Combine(GetProjectDirPath(projectName), "src", "App.test.js");
+                            return new List<TestCase>()
+                            {
+                                GetTestCase(testCaseOptions, "src\\App.test.js::global::renders learn react link", "renders learn react link", 5, filePath)
+                            };
+                        }
+                        else if(projectName == ProjectName.reactappwithjestteststypescript)
+                        {
+                            var filePath = Path.Combine(GetProjectDirPath(projectName), "src", "App.test.tsx");
+                            return new List<TestCase>()
+                            {
+                                GetTestCase(testCaseOptions, "src\\App.test.tsx::global::renders learn react link", "renders learn react link", 6, filePath)
+                            };
+                        }
+                        else
+                        {
+                            var filePath = Path.Combine(GetProjectDirPath(projectName), "JestUnitTest.js");
+                            return new List<TestCase>()
+                            {
+                                GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 1 - This shouldn't fail", "Test 1 - This shouldn't fail", 3, filePath),
+                                GetTestCase(testCaseOptions, "JestUnitTest.js::Test Suite 1::Test 2 - This should fail", "Test 2 - This should fail", 7, filePath),
+                            };
+                        }
                     }
                 case SupportedFramework.Mocha:
                     {
