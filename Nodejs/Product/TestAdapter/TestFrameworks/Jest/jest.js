@@ -151,8 +151,8 @@ function readConfigs(projectFolder, context)
         config = require(jestConfigPathJS);
     }
 
-    config ||= {};
-    config.testMatch ||= [context.testCases[0].testFile];    
+    config = config || {};
+    config.testMatch = config.testMatch || [context.testCases[0].testFile];    
     
     return config;
 }
