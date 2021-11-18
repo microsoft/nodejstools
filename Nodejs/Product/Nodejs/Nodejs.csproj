@@ -371,6 +371,8 @@
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
     <ZipProject Include="ProjectTemplates\VuejsApp\babel.config.js" />
+    <Resource Include="ProjectTemplates\VuejsApp\logo.png" />
+    <Resource Include="ProjectTemplates\TypeScriptVuejsApp\logo.png" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -448,6 +450,10 @@
     <ZipItem Include="Templates\Files\JavaScriptVueComponent\JavaScriptVueComponent.vue" />
     <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\.browserslistrc" />
+    <None Include="ProjectTemplates\TypeScriptVuejsApp\HelloWorld.vue" />
+    <None Include="ProjectTemplates\VuejsApp\.browserslistrc" />
+    <None Include="ProjectTemplates\VuejsApp\HelloWorld.vue" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
