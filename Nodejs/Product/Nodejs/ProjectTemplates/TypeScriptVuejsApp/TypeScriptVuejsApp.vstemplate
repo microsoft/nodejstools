@@ -20,21 +20,23 @@
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptVuejsApp.njsproj" ReplaceParameters="true">
-      <Folder Name="dist" />
       <Folder Name="public">
         <ProjectItem>favicon.ico</ProjectItem>
         <ProjectItem ReplaceParameters="true">index.html</ProjectItem>
       </Folder>
       <Folder Name="src">
-        <Folder Name="assets" />
+        <Folder Name="assets">
+          <ProjectItem>logo.png</ProjectItem>  
+        </Folder>
         <Folder Name="components">
-          <ProjectItem>Home.vue</ProjectItem>
+          <ProjectItem>HelloWorld.vue</ProjectItem>
         </Folder>
         <ProjectItem>App.vue</ProjectItem>
         <ProjectItem OpenInEditor="true">main.ts</ProjectItem>
-        <ProjectItem>shims-tsx.d.ts</ProjectItem>
         <ProjectItem>shims-vue.d.ts</ProjectItem>
       </Folder>
+      <ProjectItem>babel.config.js</ProjectItem>
+      <ProjectItem>.browserslistrc</ProjectItem>
       <ProjectItem>babel.config.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
