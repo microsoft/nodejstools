@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -18,7 +20,10 @@ namespace Microsoft.NodejsTools.TestAdapter
         private readonly IDictionary<string, uint> watchedFiles = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
         private readonly IDictionary<string, uint> watchedFolders = new Dictionary<string, uint>(StringComparer.OrdinalIgnoreCase);
 
-        private bool disposed;
+        const int NOT_DISPOSED = 0;
+        const int DISPOSED = 1;
+
+        private int disposed = NOT_DISPOSED;
 
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
@@ -87,17 +92,22 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public int FilesChanged(uint cChanges, string[] rgpszFile, uint[] rggrfChange)
         {
-            return ThreadHelper.JoinableTaskFactory.Run(async () =>
+            ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 for (var i = 0; i < cChanges; i++)
                 {
+                    if(this.IsDisposed)
+                    {
+                        return;
+                    }
+
                     this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(rgpszFile[i], ConvertVSFILECHANGEFLAGS(rggrfChange[i])));
                 }
+            }).FileAndForget(TelemetryEvents.TestFilesWatcherEventFaulted);
 
-                return VSConstants.S_OK;
-            });
+            return VSConstants.S_OK;
         }
 
         public int DirectoryChanged(string directory)
@@ -122,17 +132,22 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public int DirectoryChangedEx2(string directory, uint numberOfFilesChanged, string[] filesChanged, uint[] flags)
         {
-            return ThreadHelper.JoinableTaskFactory.Run(async () =>
+            ThreadHelper.JoinableTaskFactory.RunAsync (async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 for (var i = 0; i < numberOfFilesChanged; i++)
                 {
+                    if (this.IsDisposed)
+                    {
+                        return;
+                    }
+
                     this.FileChangedEvent?.Invoke(this, new TestFileChangedEventArgs(filesChanged[i], ConvertVSFILECHANGEFLAGS(flags[i])));
                 }
+            }).FileAndForget(TelemetryEvents.TestFilesWatcherEventFaulted);
 
-                return VSConstants.S_OK;
-            });
+            return VSConstants.S_OK;
         }
 
         private static WatcherChangeTypes ConvertVSFILECHANGEFLAGS(uint flag)
@@ -156,17 +171,18 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         private void CheckDisposed()
         {
-            if (this.disposed)
+            if (this.disposed == DISPOSED)
             {
-                throw new ObjectDisposedException(nameof(TestFilesUpdateWatcher));
+                throw new ObjectDisposedException(nameof(TestFilesUpdateWatcher));   
             }
         }
 
+        private bool IsDisposed => this.disposed == DISPOSED;
+
         public void Dispose()
         {
-            if (!this.disposed)
+            if (Interlocked.CompareExchange(ref this.disposed, DISPOSED, NOT_DISPOSED) == NOT_DISPOSED)
             {
-                this.disposed = true;
                 foreach (var cookie in this.watchedFiles.Values)
                 {
                     this.fileWatcher.UnadviseFileChange(cookie);

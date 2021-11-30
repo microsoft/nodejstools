@@ -42,6 +42,11 @@ namespace Microsoft.NodejsTools.Telemetry
         public const string OperationRegistrationFaulted = Prefix + "OperationRegistrationFaulted";
 
         /// <summary>
+        /// An error occurred within a TestFilesUpdateWatcher event handler
+        /// </summary>
+        public const string TestFilesWatcherEventFaulted = Prefix + "TestFilesWatcherEventFaulted";
+
+        /// <summary>
         /// User started discovery on the test adapters.
         /// </summary>
         public const string TestDiscoveryStarted = Prefix + "TestDiscoveryStarted";
