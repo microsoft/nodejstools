@@ -241,6 +241,24 @@ namespace Microsoft.NodejsTools.Project
             return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeDebugAdapter", false);
         }
 
+        internal static bool EnableV3BrowserDebugging()
+        {
+            var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
+            try
+            {
+                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptNodeBrowserDebugging");
+                if (userDebuggerOption is int optionVal)
+                {
+                    return optionVal != 0;
+                }
+            }
+            catch (Exception) { } // do nothing. proceed to trying the feature flag below.
+
+            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
+            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeBrowserDebug", false);
+        }
+
+
         private int TestServerPort
         {
             get
@@ -296,26 +314,6 @@ namespace Microsoft.NodejsTools.Project
                                                             _project.ProjectGuid.ToString(),
                                                             JObject.FromObject(envVars));
 
-            bool usingV3Debugger = ShouldUseV3CdpDebugger();
-
-            if (usingV3Debugger && shouldStartBrowser && (browserPath.EndsWith("chrome.exe") || browserPath.EndsWith("msedge.exe")))
-            {
-                config = new NodePinezorroDebugLaunchConfig()
-                {
-                    ConfigName = "Debug Node program and browser from Visual Studio",
-                    Request = "launch",
-                    DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge",
-                    RuntimeExecutable = browserPath,
-                    BrowserUrl = webBrowserUrl,
-                    BrowserUserDataDir = true,
-                    Server = config.toPwaChromeServerConfig(),
-                    WorkingDir = cwd,
-                    WebRoot = cwd,
-                    ProjectGuid = _project.ProjectGuid.ToString()
-                };
-                shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
-            }
-
             var jsonContent = JObject.FromObject(config).ToString();
 
             var debugTargets = new[] {
@@ -335,12 +333,24 @@ namespace Microsoft.NodejsTools.Project
             // Launch browser 
             if (shouldStartBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
             {
-                var uri = new Uri(webBrowserUrl);
-                OnPortOpenedHandler.CreateHandler(
-                    uri.Port,
-                    timeout: 5_000, // 5 seconds
-                    action: () => OpenBrowser(browserPath, webBrowserUrl)
-                );
+                if (ShouldUseV3CdpDebugger() && EnableV3BrowserDebugging())
+                {
+                    var uri = new Uri(webBrowserUrl);
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        timeout: 5_000, // 5 seconds
+                        action: () => DebugBrowser(browserPath, webBrowserUrl)
+                    );
+                }
+                else
+                { 
+                    var uri = new Uri(webBrowserUrl);
+                    OnPortOpenedHandler.CreateHandler(
+                        uri.Port,
+                        timeout: 5_000, // 5 seconds
+                        action: () => OpenBrowser(browserPath, webBrowserUrl)
+                    );
+                }
             }
         }
 
@@ -525,7 +535,42 @@ namespace Microsoft.NodejsTools.Project
             else
             {
                 VsShellUtilities.OpenBrowser(webBrowserUrl, (uint)__VSOSPFLAGS.OSP_LaunchNewBrowser);
-            }
+            } 
+         }
+
+        private void DebugBrowser(string browserPath, string webBrowserUrl)
+        { 
+            var serviceProvider = _project.Site;
+            var cwd = _project.GetWorkingDirectory(); // Current working directory
+
+            var config = new NodePinezorroDebugLaunchConfig()
+            {
+                ConfigName = "Debug Node program and browser from Visual Studio",
+                Request = "launch",
+                DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge",
+                RuntimeExecutable = browserPath,
+                BrowserUrl = webBrowserUrl,
+                BrowserUserDataDir = true,
+                WorkingDir = cwd,
+                WebRoot = cwd,
+                ProjectGuid = _project.ProjectGuid.ToString()
+            };
+
+            var launchJson = JObject.FromObject(config).ToString();
+
+            var debugTargets = new[] {
+                new VsDebugTargetInfo4() {
+                    dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_CreateProcess,
+                    guidLaunchDebugEngine = GetDebuggerGuid(),
+                    bstrExe = browserPath,
+                    bstrOptions = launchJson
+                }
+            };
+
+            var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
+
+            var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
+            debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
         }
 
         private IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
