@@ -813,18 +813,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\WebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWebRole\TypeScriptWebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\ExpressWebRole.vstemplate" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceExpressWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\roletemplatedata.xml" />
-    <_WebRoleZipItem Include="Templates\Files\CloudServiceTypeScriptExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\roletemplatedata.xml" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceTypeScriptWorkerRole\TypeScriptWorkerRole.vstemplate" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\roletemplatedata.xml" />
-    <_WorkerRoleZipItem Include="Templates\Files\CloudServiceWorkerRole\WorkerRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CSWebRole\WebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CSWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CSTSWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CSTSWebRole\TypeScriptWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CSExpressWebRole\ExpressWebRole.vstemplate" />
+    <_WebRoleZipItem Include="Templates\Files\CSExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CSTSExpressWebRole\roletemplatedata.xml" />
+    <_WebRoleZipItem Include="Templates\Files\CSTSExpressWebRole\TypeScriptExpressWebRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CSTSWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CSTSWorkerRole\TypeScriptWorkerRole.vstemplate" />
+    <_WorkerRoleZipItem Include="Templates\Files\CSWorkerRole\roletemplatedata.xml" />
+    <_WorkerRoleZipItem Include="Templates\Files\CSWorkerRole\WorkerRole.vstemplate" />
     <ZipItem Include="@(_WebRoleZipItem)">
       <OutputSubPath>NETFramework4\Web Role\Node.js</OutputSubPath>
       <Language>CloudService</Language>
