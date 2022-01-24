@@ -2,8 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -316,11 +318,51 @@ namespace Microsoft.NodejsTools.TestAdapter
             }
         }
 
+        private int GetParentProcessId(uint processId, int counter = 0)
+        {
+            try
+            {
+                var query = string.Format("SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {0}", processId);
+                var search = new ManagementObjectSearcher(query);
+                var results = search.Get().GetEnumerator();
+                results.MoveNext();
+
+                var parentId = (uint)results.Current["ParentProcessId"];
+
+                var parentName = Process.GetProcessById((int)parentId).ProcessName;
+
+                if (parentName == "devenv")
+                    return (int)parentId;
+                if (parentName == "explorer") //explorer is the parent of every process
+                    return 0;
+                if (counter < 8) //devenv.exe is usually the 4th process app, so don't search forever
+                    return GetParentProcessId(parentId, counter++);
+            }
+            catch
+            {
+                //return 0 if we encounter any other issue
+                return 0;
+            }
+
+            return 0;
+        }
+
         private bool HasVisualStudioProcessId(out int processId)
         {
             processId = 0;
             var pid = Environment.GetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable);
-            return pid == null ? false : int.TryParse(pid, out processId);
+
+            if (pid != null)
+            {
+                return pid == null ? false : int.TryParse(pid, out processId);
+            }
+            else
+            {
+                //NTVS sets _NTVS_PID on startup. JSPS does not. We're using the environment variable if it exists.
+                //if it doesn't, we check for the parent process that is devenv instead. This will cover both cases and any future cases too.
+                processId = GetParentProcessId((uint)Process.GetCurrentProcess().Id);
+                return processId > 0;
+            }
         }
 
         private void DetachDebugger(int vsProcessId)
