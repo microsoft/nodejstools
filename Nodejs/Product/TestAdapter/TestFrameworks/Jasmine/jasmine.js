@@ -122,7 +122,11 @@ async function find_tests(testFileList, discoverResultFile, projectFolder) {
             jasmineInstance.specDir = "";
             jasmineInstance.specFiles = [];
             jasmineInstance.addMatchingSpecFiles([testFile]);
-            await jasmineInstance.loadSpecs();
+            
+			var p = jasmineInstance.loadSpecs();
+			if (p instanceof Promise) {
+				await p;
+			}
 
             var topSuite = jasmineInstance.env.topSuite();
             // In Jasmine 4.0+ the Suite object is not top level anymore and is instead in the suite_ property
