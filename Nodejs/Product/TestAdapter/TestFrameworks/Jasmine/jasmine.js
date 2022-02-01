@@ -121,8 +121,8 @@ async function find_tests(testFileList, discoverResultFile, projectFolder) {
         try {
             jasmineInstance.specDir = "";
             jasmineInstance.specFiles = [];
-			
-			// In Jasmine 4.0+ addSpecFiles has been deprecated in favor of addMatchingSpecFiles
+
+            // In Jasmine 4.0+ addSpecFiles has been deprecated in favor of addMatchingSpecFiles
             (jasmineInstance.addMatchingSpecFiles || jasmineInstance.addSpecFiles).apply(jasmineInstance, [[testFile]]);
             
             var p = jasmineInstance.loadSpecs();
