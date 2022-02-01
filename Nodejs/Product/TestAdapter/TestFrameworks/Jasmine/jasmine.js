@@ -107,38 +107,46 @@ function enumerateSpecs(suite, testList, testFile) {
  * @param {string} discoverResultFile
  * @param {string} projectFolder
  */
-function find_tests(testFileList, discoverResultFile, projectFolder) {
-    return new Promise(resolve => {
-        var Jasmine = detectJasmine(projectFolder);
-        if (!Jasmine) {
-            return resolve();
+async function find_tests(testFileList, discoverResultFile, projectFolder) {
+    var Jasmine = detectJasmine(projectFolder);
+    if (!Jasmine) {
+        return;
+    }
+    
+    var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
+    setSpecFilter(jasmineInstance, _ => false);
+
+    var testList = [];
+    for (var testFile of testFileList.split(";")) {
+        try {
+            jasmineInstance.specDir = "";
+            jasmineInstance.specFiles = [];
+
+            // In Jasmine 4.0+ addSpecFiles has been deprecated in favor of addMatchingSpecFiles
+            (jasmineInstance.addMatchingSpecFiles || jasmineInstance.addSpecFiles).apply(jasmineInstance, [[testFile]]);
+            
+            var p = jasmineInstance.loadSpecs();
+            if (p instanceof Promise) {
+                await p;
+            }
+
+            var topSuite = jasmineInstance.env.topSuite();
+            // In Jasmine 4.0+ the Suite object is not top level anymore and is instead in the suite_ property
+            if (topSuite && topSuite.suite_) {
+                topSuite = topSuite.suite_;
+            }
+            
+            enumerateSpecs(topSuite, testList, testFile);
         }
-        var jasmineInstance = initializeJasmine(Jasmine, projectFolder);
-        setSpecFilter(jasmineInstance, _ => false);
+        catch (ex) {
+            //we would like continue discover other files, so swallow, log and continue;
+            console.error("Test discovery error:", ex, "in", testFile);
+        }
+    }
 
-        var testList = [];
-        testFileList.split(";").forEach((testFile) => {
-            try {
-                jasmineInstance.specDir = "";
-                jasmineInstance.specFiles = [];
-                jasmineInstance.addSpecFiles([testFile]);
-                jasmineInstance.loadSpecs();
-
-                var topSuite = jasmineInstance.env.topSuite();
-                enumerateSpecs(topSuite, testList, testFile);
-            }
-            catch (ex) {
-                //we would like continue discover other files, so swallow, log and continue;
-                console.error("Test discovery error:", ex, "in", testFile);
-            }
-        });
-
-        var fd = fs.openSync(discoverResultFile, 'w');
-        fs.writeSync(fd, JSON.stringify(testList));
-        fs.closeSync(fd);
-
-        resolve();
-    });
+    var fd = fs.openSync(discoverResultFile, 'w');
+    fs.writeSync(fd, JSON.stringify(testList));
+    fs.closeSync(fd);
 }
 
 exports.find_tests = find_tests;
