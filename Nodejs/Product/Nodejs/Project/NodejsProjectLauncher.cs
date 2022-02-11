@@ -241,24 +241,6 @@ namespace Microsoft.NodejsTools.Project
             return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeDebugAdapter", false);
         }
 
-        internal static bool EnableV3BrowserDebugging()
-        {
-            var userRegistryRoot = VSRegistry.RegistryRoot(__VsLocalRegistryType.RegType_UserSettings, writable: false);
-            try
-            {
-                object userDebuggerOption = userRegistryRoot.OpenSubKey("Debugger")?.GetValue("EnableJavaScriptNodeBrowserDebugging");
-                if (userDebuggerOption is int optionVal)
-                {
-                    return optionVal != 0;
-                }
-            }
-            catch (Exception) { } // do nothing. proceed to trying the feature flag below.
-
-            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
-            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeBrowserDebug", false);
-        }
-
-
         private int TestServerPort
         {
             get
@@ -333,7 +315,7 @@ namespace Microsoft.NodejsTools.Project
             // Launch browser 
             if (shouldStartBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
             {
-                if (ShouldUseV3CdpDebugger() && EnableV3BrowserDebugging())
+                if (ShouldUseV3CdpDebugger())
                 {
                     var uri = new Uri(webBrowserUrl);
                     OnPortOpenedHandler.CreateHandler(
