@@ -17,7 +17,7 @@ namespace Microsoft.NodejsTools.NpmUI
         private readonly NpmPackageInstallViewModel viewModel;
         private const string NpmResultGuid = "2A7B6678-DFC9-40AA-BF2C-AD08B40A3031";
 
-        internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Standard)
+        internal NpmPackageInstallWindow(INpmController controller, NpmWorker npmWorker, DependencyType dependencyType = DependencyType.Production)
         {
             this.DataContext = this.viewModel = new NpmPackageInstallViewModel(npmWorker, this.Dispatcher);
 
@@ -129,8 +129,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void ResetOptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DependencyComboBox.SelectedIndex = (int)DependencyType.Standard;
-            this.SaveToPackageJsonCheckbox.IsChecked = true;
+            this.DependencyComboBox.SelectedIndex = (int)DependencyType.Production;
 
             this.OtherNpmArgumentsTextBox.Text = string.Empty;
             this.OtherNpmArgumentsTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();

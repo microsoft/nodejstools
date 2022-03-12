@@ -374,13 +374,6 @@
                                 <Binding ElementName="OtherNpmArgumentsLabel" />
                             </AutomationProperties.LabeledBy>
                         </TextBox>
-                        <Label Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonLabel}" x:Name="AddToPackageJsonLabel"/>
-                        <CheckBox x:Name="SaveToPackageJsonCheckbox" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" 
-                                  IsChecked="{Binding SaveToPackageJson}" Margin="4" TabIndex="10" Content="{x:Static resx:NpmInstallWindowResources.AddToPackageJsonCheckboxLabel}">
-                            <AutomationProperties.LabeledBy>
-                                <Binding ElementName="AddToPackageJsonLabel" />
-                            </AutomationProperties.LabeledBy>
-                        </CheckBox>
 
                         <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.DependencyTypeLabel}" x:Name="DependencyTypeLabel" />
                         <ComboBox Name="DependencyComboBox"
@@ -394,9 +387,10 @@
                             <AutomationProperties.LabeledBy>
                                 <Binding ElementName="DependencyTypeLabel" />
                             </AutomationProperties.LabeledBy>
-                            <ComboBoxItem Tag="St" IsSelected="True" Content="{x:Static resx:NpmInstallWindowResources.DevTypeStandardChoice}" />
+                            <ComboBoxItem Tag="St" IsSelected="True" Content="{x:Static resx:NpmInstallWindowResources.DevTypeProductionChoice}" />
                             <ComboBoxItem Tag="Dev" Content="{x:Static resx:NpmInstallWindowResources.DevTypeDevelopmentChoice}" />
                             <ComboBoxItem Tag="Opt" Content="{x:Static resx:NpmInstallWindowResources.DevTypeOptionalChoice}" />
+                            <ComboBoxItem Tag="NoS" Content="{x:Static resx:NpmInstallWindowResources.DevTypeNoSaveChoice}" />
                         </ComboBox>
 
                         <Label Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.SelectedVersionLabel}" x:Name="SelectedVersionLabel"/>
