@@ -22,6 +22,7 @@ namespace Microsoft.NodejsTools.NpmUI
             IndexStandard = 0,
             IndexDev = 1,
             IndexOptional = 2,
+            IndexNoSave = 3,
         }
 
         internal static class FilterState
@@ -44,7 +45,6 @@ namespace Microsoft.NodejsTools.NpmUI
         private int selectedDependencyTypeIndex;
         private string filterText = string.Empty;
         private string arguments = string.Empty;
-        private bool saveToPackageJson = true;
         private bool isExecutingCommand = false;
         private object selectedVersion;
 
@@ -303,15 +303,17 @@ namespace Microsoft.NodejsTools.NpmUI
 
         internal void Install(PackageCatalogEntryViewModel package)
         {
-            var type = DependencyType.Standard;
+            var type = DependencyType.Production;
             switch ((Indices)this.SelectedDependencyTypeIndex)
             {
                 case Indices.IndexDev:
                     type = DependencyType.Development;
                     break;
-
                 case Indices.IndexOptional:
                     type = DependencyType.Optional;
+                    break;
+                case Indices.IndexNoSave:
+                    type = DependencyType.NoSave;
                     break;
             }
 
@@ -327,7 +329,6 @@ namespace Microsoft.NodejsTools.NpmUI
                         selectedVersion,
                         type,
                         false,
-                        this.SaveToPackageJson,
                         this.Arguments));
             }
         }
@@ -348,16 +349,6 @@ namespace Microsoft.NodejsTools.NpmUI
             set
             {
                 this.arguments = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool SaveToPackageJson
-        {
-            get { return this.saveToPackageJson; }
-            set
-            {
-                this.saveToPackageJson = value;
                 OnPropertyChanged();
             }
         }

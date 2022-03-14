@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -11,7 +11,6 @@ namespace Microsoft.NodejsTools.Npm
             string versionRange,
             DependencyType type,
             bool global = false,
-            bool saveToPackageJson = true,
             string otherArguments = "")
         {
             string dependencyArguments = "";
@@ -19,18 +18,21 @@ namespace Microsoft.NodejsTools.Npm
             {
                 dependencyArguments = "-g";
             }
-            else if (saveToPackageJson)
+            else
             {
                 switch (type)
                 {
-                    case DependencyType.Standard:
-                        dependencyArguments = "--save";
+                    case DependencyType.Production:
+                        dependencyArguments = "--save-prod";
                         break;
                     case DependencyType.Development:
                         dependencyArguments = "--save-dev";
                         break;
                     case DependencyType.Optional:
                         dependencyArguments = "--save-optional";
+                        break;
+                    case DependencyType.NoSave:
+                        dependencyArguments = "--no-save";
                         break;
                 }
             }

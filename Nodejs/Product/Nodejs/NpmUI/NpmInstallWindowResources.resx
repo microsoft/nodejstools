@@ -144,8 +144,11 @@
   <data name="DevTypeOptionalChoice" xml:space="preserve">
     <value>Optional</value>
   </data>
-  <data name="DevTypeStandardChoice" xml:space="preserve">
-    <value>Standard</value>
+  <data name="DevTypeProductionChoice" xml:space="preserve">
+    <value>Production</value>
+  </data>
+  <data name="DevTypeNoSaveChoice" xml:space="preserve">
+    <value>No Save</value>
   </data>
   <data name="HomepageLabel" xml:space="preserve">
     <value>Homepage: </value>

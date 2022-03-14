@@ -20,7 +20,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                             : string.Format(CultureInfo.InvariantCulture,
                                 "uninstall {0} --{1}",
                                 packageName,
-                                (type == DependencyType.Standard
+                                (type == DependencyType.Production
                                      ? "save"
                                      : (type == DependencyType.Development ? "save-dev" : "save-optional")));
         }

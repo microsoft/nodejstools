@@ -19,7 +19,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
             string versionRange,
             DependencyType type,
             bool global = false,
-            bool saveToPackageJson = true,
             string pathToNpm = null,
             bool useFallbackIfNpmNotFound = true)
             : base(fullPathToRootPackageDirectory, showConsole: false, pathToNpm: pathToNpm)
@@ -28,8 +27,7 @@ namespace Microsoft.NodejsTools.Npm.SPI
                 packageName,
                 versionRange,
                 type,
-                global,
-                saveToPackageJson);
+                global);
         }
     }
 }

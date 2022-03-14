@@ -4,8 +4,9 @@ namespace Microsoft.NodejsTools.Npm
 {
     public enum DependencyType
     {
-        Standard = 0,
+        Production = 0,
         Development,
         Optional,
+        NoSave
     }
 }

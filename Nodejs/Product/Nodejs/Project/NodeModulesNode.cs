@@ -400,7 +400,7 @@ namespace Microsoft.NodejsTools.Project
             return base.ExecCommandOnNode(cmdGroup, cmd, nCmdexecopt, pvaIn, pvaOut);
         }
 
-        public void ManageModules(DependencyType dependencyType = DependencyType.Standard)
+        public void ManageModules(DependencyType dependencyType = DependencyType.Production)
         {
             CheckNotDisposed();
 
@@ -528,8 +528,7 @@ namespace Microsoft.NodejsTools.Project
                 await commander.InstallPackageByVersionAsync(
                     package.Name,
                     null == dep ? "*" : dep.VersionRangeText,
-                    DependencyType.Standard,
-                    false);
+                    DependencyType.Production);
             });
         }
 

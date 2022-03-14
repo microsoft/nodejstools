@@ -19,7 +19,7 @@ namespace Microsoft.NodejsTools.NpmUI {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class NpmInstallWindowResources {
@@ -133,6 +133,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Save.
+        /// </summary>
+        public static string DevTypeNoSaveChoice {
+            get {
+                return ResourceManager.GetString("DevTypeNoSaveChoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Optional.
         /// </summary>
         public static string DevTypeOptionalChoice {
@@ -142,11 +151,11 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Standard.
+        ///   Looks up a localized string similar to Production.
         /// </summary>
-        public static string DevTypeStandardChoice {
+        public static string DevTypeProductionChoice {
             get {
-                return ResourceManager.GetString("DevTypeStandardChoice", resourceCulture);
+                return ResourceManager.GetString("DevTypeProductionChoice", resourceCulture);
             }
         }
         
