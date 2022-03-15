@@ -61,14 +61,12 @@
                                 <Run Text="{Binding Path=Description, Mode=OneWay}"/>
                             </TextBlock>
 
-                            <StackPanel Orientation="Horizontal" Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}" KeyboardNavigation.TabIndex="7">
-                                <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.AuthorLabel}" />
-                                <TextBlock Text="{Binding Path=Author, Mode=OneWay}"/>
-                            </StackPanel>
+                            <TextBlock Margin="0 4 0 4" x:Name="AuthorBlock" Visibility="{Binding Path=AuthorVisibility, Mode=OneWay}" KeyboardNavigation.TabIndex="7">
+                                <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.AuthorLabel}" />
+                                <Run Text="{Binding Path=Author, Mode=OneWay}"/>
+                            </TextBlock>
 
-                            <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock"
-                                Visibility="{Binding HomepagesVisibility}"
-                                Orientation="Horizontal">
+                            <StackPanel Margin="0 4 0 4" x:Name="HomepageBlock" Visibility="{Binding HomepagesVisibility}" Orientation="Horizontal">
                                 <TextBlock Margin="0" FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.HomepageLabel}" />
                                 <ItemsControl ItemsSource="{Binding Path=Homepages, Mode=OneWay}" IsTabStop="False">
                                     <ItemsControl.ItemTemplate>
@@ -368,12 +366,6 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Row="1" FontWeight="Bold" Margin="0 4 0 4" Text="{x:Static resx:NpmInstallWindowResources.OptionsLabel}" />
-                        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.OtherNpmArgumentsLabel}" Name="OtherNpmArgumentsLabel" />
-                        <TextBox x:Name="OtherNpmArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="12">
-                            <AutomationProperties.LabeledBy>
-                                <Binding ElementName="OtherNpmArgumentsLabel" />
-                            </AutomationProperties.LabeledBy>
-                        </TextBox>
 
                         <Label Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.DependencyTypeLabel}" x:Name="DependencyTypeLabel" />
                         <ComboBox Name="DependencyComboBox"
@@ -418,6 +410,13 @@
                                 </CompositeCollection>
                             </ComboBox.ItemsSource>
                         </ComboBox>
+                        
+                        <Label Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{x:Static resx:NpmInstallWindowResources.OtherNpmArgumentsLabel}" Name="OtherNpmArgumentsLabel" />
+                        <TextBox x:Name="OtherNpmArgumentsTextBox" Grid.Column="1" Grid.Row="5" HorizontalAlignment="Stretch" Text="{Binding Arguments}" Margin="4" TabIndex="12">
+                            <AutomationProperties.LabeledBy>
+                                <Binding ElementName="OtherNpmArgumentsLabel" />
+                            </AutomationProperties.LabeledBy>
+                        </TextBox>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
                         <Button x:Name="InstallButton" Margin="0 0 4 0"
