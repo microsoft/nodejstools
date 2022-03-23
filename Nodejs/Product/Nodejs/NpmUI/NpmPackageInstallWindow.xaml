@@ -15,6 +15,7 @@
     MinWidth="600"
     WindowStartupLocation="CenterOwner"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
+    Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
     ResizeMode="CanResizeWithGrip">
 
     <!-- Theming -->
@@ -278,7 +279,6 @@
                            Text="{x:Static resx:NpmInstallWindowResources.SearchForPackagesLabel}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}" />
                             <Setter Property="Visibility" Value="Hidden"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding FilterText}"  Value="">
