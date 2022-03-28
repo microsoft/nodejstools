@@ -377,6 +377,7 @@ namespace Microsoft.NodejsTools.NpmUI
 
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(ExecutionProgressVisibility));
+                    OnPropertyChanged(nameof(AreOptionsEnabled));
                 }
             }
         }
@@ -385,6 +386,8 @@ namespace Microsoft.NodejsTools.NpmUI
         {
             get { return IsExecutingCommand ? Visibility.Visible : Visibility.Collapsed; }
         }
+
+        public bool AreOptionsEnabled => !this.IsExecutingCommand;
 
         #endregion
 

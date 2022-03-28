@@ -236,11 +236,6 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ProgressBar Name="_progress"
-                         Height="4"
-                         IsEnabled="{Binding Path=IsExecutingCommand}"
-                         IsIndeterminate="{Binding Path=IsExecutingCommand}"
-                         Visibility="{Binding Path=ExecutionProgressVisibility}" Grid.Row="1" Grid.ColumnSpan="2"/>
             <Button x:Name="CloseButton"
                         Grid.Column="1"
                         Command="ApplicationCommands.Close"
@@ -348,7 +343,8 @@
 
                 <StackPanel Grid.Row="1"
                             Orientation="Vertical"
-                            HorizontalAlignment="Stretch">
+                            HorizontalAlignment="Stretch" 
+                            IsEnabled="{Binding Path=AreOptionsEnabled}">
                     <Separator/>
                     <Grid x:Name="InstallOptions" DockPanel.Dock="Top" VerticalAlignment="Stretch">
                         <Grid.RowDefinitions>
