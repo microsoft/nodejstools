@@ -93,7 +93,7 @@
       <Version>17.0.0-preview-2-31221-277</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core">
-      <Version>0.4.1</Version>
+      <Version>1.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
