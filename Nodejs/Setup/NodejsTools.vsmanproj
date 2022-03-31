@@ -26,9 +26,9 @@
     <OutputPath>$(BinDirectory)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" />
-    <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" />
-    <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" />
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\NodejsToolsVsix\Microsoft.VisualStudio.NodejsTools.NodejsTools.json" SBOMFileLocation="$(SYSTEM_ARTIFACTSDIRECTORY)\sbom\_manifest\spdx_2.2\manifest.spdx.json" />
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\TargetsVsix\Microsoft.VisualStudio.NodejsTools.Targets.json" SBOMFileLocation="$(SYSTEM_ARTIFACTSDIRECTORY)\sbom\_manifest\spdx_2.2\manifest.spdx.json" />
+    <MergeManifest Include="$(BuildOutputRoot)\Setup\TestAdapterVsix\Microsoft.VisualStudio.NodejsTools.TestAdapter.json" SBOMFileLocation="$(SYSTEM_ARTIFACTSDIRECTORY)\sbom\_manifest\spdx_2.2\manifest.spdx.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Product\NodejsToolsVsix\NodejsToolsVsix.csproj">
