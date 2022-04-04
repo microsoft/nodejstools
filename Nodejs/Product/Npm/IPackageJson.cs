@@ -18,7 +18,6 @@ namespace Microsoft.NodejsTools.Npm
         IBundledDependencies BundledDependencies { get; }
         IDependencies OptionalDependencies { get; }
         IDependencies AllDependencies { get; }
-        IEnumerable<string> RequiredBy { get; }
         string Main { get; }
         IPackageJsonScript[] Scripts { get; }
         string TestRoot { get; }
