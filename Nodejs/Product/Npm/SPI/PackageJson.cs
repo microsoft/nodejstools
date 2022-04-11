@@ -23,7 +23,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
             this.BundledDependencies = LoadBundledDependencies(package);
             this.OptionalDependencies = LoadOptionalDependencies(package);
             this.AllDependencies = LoadAllDependencies(package);
-            this.RequiredBy = LoadRequiredBy(package);
 
             this.Name = package.name?.ToString();
             this.versionString = package.version;
@@ -141,19 +140,6 @@ The following error occurred:
             }
         }
 
-        private static IEnumerable<string> LoadRequiredBy(dynamic package)
-        {
-            try
-            {
-                return (package["_requiredBy"] as IEnumerable<JToken> ?? Enumerable.Empty<JToken>()).Values<string>().ToList();
-            }
-            catch (RuntimeBinderException rbe)
-            {
-                System.Diagnostics.Debug.WriteLine(rbe);
-                throw WrapRuntimeBinderException("required by", rbe);
-            }
-        }
-
         private static IPackageJsonScript[] LoadScripts(dynamic package)
         {
             try
@@ -216,7 +202,6 @@ The following error occurred:
         public IBundledDependencies BundledDependencies { get; }
         public IDependencies OptionalDependencies { get; }
         public IDependencies AllDependencies { get; }
-        public IEnumerable<string> RequiredBy { get; }
         public string Main { get; }
         public IPackageJsonScript[] Scripts { get; }
         public string TestRoot { get; }

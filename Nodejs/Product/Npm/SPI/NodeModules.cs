@@ -30,27 +30,15 @@ namespace Microsoft.NodejsTools.Npm.SPI
             {
                 Debug.Assert(this.allModules.Count == 0, "Depth is 0, but top-level modules have already been added.");
 
+                var rootJson = parent.PackageJson;
                 // Go through every directory in node_modules, and see if it's required as a top-level dependency
                 foreach (var topLevelDependency in GetTopLevelPackageDirectories(modulesBase))
                 {
                     var moduleDir = topLevelDependency.Key;
                     var packageJson = topLevelDependency.Value;
-                    if (packageJson.RequiredBy.Any())
+                    if (rootJson.AllDependencies.Contains(packageJson.Name))
                     {
-                        // All dependencies in npm v3 will have at least one element present in _requiredBy.
-                        // _requiredBy dependencies that begin with hash characters represent top-level dependencies
-                        foreach (var requiredBy in packageJson.RequiredBy)
-                        {
-                            if (requiredBy.StartsWith("#", StringComparison.Ordinal) || requiredBy == "/")
-                            {
-                                AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // This dependency is a top-level dependency not added by npm v3
+                        // This is a top-level dependency, so add it to the list of modules
                         AddTopLevelModule(parent, showMissingDevOptionalSubPackages, moduleDir, depth, maxDepth);
                     }
                 }
@@ -125,12 +113,10 @@ namespace Microsoft.NodejsTools.Npm.SPI
 
             IPackage package = moduleInfo.Package;
 
-            if (package == null || depth == 1 || !moduleInfo.RequiredBy.Contains(parent.Path))
+            if (package == null || depth == 1)
             {
                 // Create a dummy value for the current package to prevent infinite loops
                 moduleInfo.Package = new PackageProxy();
-
-                moduleInfo.RequiredBy.Add(parent.Path);
 
                 var pkg = new Package(parent, moduleDir, showMissingDevOptionalSubPackages, this.allModules, depth, maxDepth);
                 if (dependency != null)
@@ -207,8 +193,6 @@ namespace Microsoft.NodejsTools.Npm.SPI
         public int Depth { get; set; }
 
         public IPackage Package { get; set; }
-
-        public IList<string> RequiredBy { get; } = new List<string>();
 
         internal ModuleInfo(int depth)
         {
