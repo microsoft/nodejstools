@@ -17,6 +17,7 @@
     <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Web</ProjectTypeTag>
     <ProjectTypeTag>Console</ProjectTypeTag>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="FromExistingCode.njsproj" ReplaceParameters="true">
