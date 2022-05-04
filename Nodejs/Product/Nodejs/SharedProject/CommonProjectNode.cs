@@ -474,7 +474,15 @@ namespace Microsoft.VisualStudioTools.Project
 
                 if (this.UserBuildProject != null)
                 {
-                    this.UserBuildProject.ProjectCollection.UnloadProject(this.UserBuildProject);
+                    try
+                    {
+                        this.UserBuildProject.ProjectCollection.UnloadProject(this.UserBuildProject);
+                    }
+                    catch(InvalidOperationException)
+                    {
+                        // The project was already been unloaded. Ignore the exception and continue execution.
+                    }
+                    
                 }
 
                 this.idleManager.OnIdle -= this.OnIdle;
