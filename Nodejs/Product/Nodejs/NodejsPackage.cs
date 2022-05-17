@@ -9,8 +9,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.NodejsTools.Commands;
-using Microsoft.NodejsTools.Debugger.DebugEngine;
-using Microsoft.NodejsTools.Debugger.Remote;
 using Microsoft.NodejsTools.Jade;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.Project;
@@ -41,11 +39,8 @@ namespace Microsoft.NodejsTools
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [Guid(Guids.NodejsPackageString)]
     [ProvideOptionPage(typeof(NodejsGeneralOptionsPage), "Node.js Tools", "General", 114, 115, true)]
-    [ProvideDebugEngine("Node.js Debugging", typeof(AD7ProgramProvider), typeof(AD7Engine), AD7Engine.DebugEngineId, setNextStatement: false, hitCountBp: true, justMyCodeStepping: false)]
-    [ProvideDebugLanguage(NodejsConstants.Nodejs, Guids.NodejsDebugLanguageString, NodeExpressionEvaluatorGuid, AD7Engine.DebugEngineId)]
     [WebSiteProject("JavaScript", "JavaScript")]
     [ProvideProjectFactory(typeof(NodejsProjectFactory), null, null, null, null, ".\\NullPath", LanguageVsTemplate = NodejsConstants.Nodejs, SortPriority = 0x17)]   // outer flavor, no file extension
-    [ProvideDebugPortSupplier("Node remote debugging", typeof(NodeRemoteDebugPortSupplier), NodeRemoteDebugPortSupplier.PortSupplierId)]
     [ProvideMenuResource("Menus.ctmenu", 1)]                              // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideLanguageTemplates("{349C5851-65DF-11DA-9384-00065B846F21}", NodejsConstants.JavaScript, Guids.NodejsPackageString, "Web", "Node.js Project Templates", "{" + Guids.NodejsBaseProjectFactoryString + "}", ".js", NodejsConstants.Nodejs, "{" + Guids.NodejsBaseProjectFactoryString + "}")]
     [ProvideProjectItem(typeof(BaseNodeProjectFactory), NodejsConstants.Nodejs, "FileTemplates\\NewItem", 0)]
@@ -116,7 +111,6 @@ namespace Microsoft.NodejsTools
             };            
 
             RegisterCommands(commands, Guids.NodejsCmdSet);
-            MakeDebuggerContextAvailable();
 
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
@@ -142,21 +136,6 @@ namespace Microsoft.NodejsTools
         }
 
         public new IComponentModel ComponentModel => this.GetComponentModel();
-
-        /// <summary>
-        /// Makes the debugger context available - this enables our debugger when we're installed into
-        /// a SKU which doesn't support every installed debugger.
-        /// </summary>
-        private void MakeDebuggerContextAvailable()
-        {
-            var monitorSelection = (IVsMonitorSelection)GetService(typeof(SVsShellMonitorSelection));
-            var debugEngineGuid = AD7Engine.DebugEngineGuid;
-
-            if (ErrorHandler.Succeeded(monitorSelection.GetCmdUIContextCookie(ref debugEngineGuid, out var contextCookie)))
-            {
-                ErrorHandler.ThrowOnFailure(monitorSelection.SetCmdUIContext(contextCookie, 1));
-            }
-        }
 
         protected override int CreateToolWindow(ref Guid toolWindowType, int id)
         {

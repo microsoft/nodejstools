@@ -14,8 +14,6 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using System.Windows.Forms;
-using Microsoft.NodejsTools.Debugger;
-using Microsoft.NodejsTools.Debugger.DebugEngine;
 using Microsoft.NodejsTools.Npm.SPI;
 using Microsoft.NodejsTools.Options;
 using Microsoft.NodejsTools.SharedProject;
@@ -29,6 +27,7 @@ using Microsoft.VisualStudioTools.Project;
 using Microsoft.Internal.VisualStudio.Shell.Interop;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Microsoft.NodejsTools.Debugger;
 
 namespace Microsoft.NodejsTools.Project
 {
@@ -84,13 +83,8 @@ namespace Microsoft.NodejsTools.Project
             {
                 if (nodeVersion >= new Version(8, 0))
                 {
-                    StartWithChromeV2Debugger(file, nodePath, shouldStartBrowser, browserPath);
+                    StartWithChromeDebugger(file, nodePath, shouldStartBrowser, browserPath);
                     TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
-                }
-                else
-                {
-                    StartWithDebugger(file);
-                    TelemetryHelper.LogDebuggingStarted("Node6", nodeVersion.ToString());
                 }
             }
             else
@@ -253,20 +247,7 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        /// <summary>
-        /// Default implementation of the "Start Debugging" command.
-        /// </summary>
-        private void StartWithDebugger(string startupFile)
-        {
-            var dbgInfo = new VsDebugTargetInfo();
-            dbgInfo.cbSize = (uint)Marshal.SizeOf(dbgInfo);
-            if (SetupDebugInfo(ref dbgInfo, startupFile))
-            {
-                LaunchDebugger(this._project.Site, dbgInfo);
-            }
-        }
-
-        private void StartWithChromeV2Debugger(string file, string nodePath, bool shouldStartBrowser, string browserPath)
+        private void StartWithChromeDebugger(string file, string nodePath, bool shouldStartBrowser, string browserPath)
         {
             var serviceProvider = _project.Site;
 
@@ -392,54 +373,6 @@ namespace Microsoft.NodejsTools.Project
             }
 
             dbgInfo.bstrOptions += option + "=" + HttpUtility.UrlEncode(value);
-        }
-
-        /// <summary>
-        /// Sets up debugger information.
-        /// </summary>
-        private bool SetupDebugInfo(ref VsDebugTargetInfo dbgInfo, string startupFile)
-        {
-            dbgInfo.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-
-            dbgInfo.bstrExe = GetNodePath();
-            dbgInfo.bstrCurDir = this._project.GetWorkingDirectory();
-            dbgInfo.bstrArg = GetFullArguments(startupFile, includeNodeArgs: false);    // we need to supply node args via options
-            dbgInfo.bstrRemoteMachine = null;
-            var nodeArgs = this._project.GetProjectProperty(NodeProjectProperty.NodeExeArguments);
-            if (!string.IsNullOrWhiteSpace(nodeArgs))
-            {
-                AppendOption(ref dbgInfo, AD7Engine.InterpreterOptions, nodeArgs);
-            }
-
-            var url = GetFullUrl();
-            if (ShouldStartBrowser() && !string.IsNullOrWhiteSpace(url))
-            {
-                AppendOption(ref dbgInfo, AD7Engine.WebBrowserUrl, url);
-            }
-
-            var debuggerPort = this._project.GetProjectProperty(NodeProjectProperty.DebuggerPort);
-            if (!string.IsNullOrWhiteSpace(debuggerPort))
-            {
-                AppendOption(ref dbgInfo, AD7Engine.DebuggerPort, debuggerPort);
-            }
-
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnAbnormalExit)
-            {
-                AppendOption(ref dbgInfo, AD7Engine.WaitOnAbnormalExitSetting, "true");
-            }
-
-            if (NodejsPackage.Instance.GeneralOptionsPage.WaitOnNormalExit)
-            {
-                AppendOption(ref dbgInfo, AD7Engine.WaitOnNormalExitSetting, "true");
-            }
-
-            dbgInfo.fSendStdoutToOutputWindow = 0;
-            dbgInfo.bstrEnv = GetEnvironmentVariablesString(url);
-
-            // Set the Node  debugger
-            dbgInfo.clsidCustom = AD7Engine.DebugEngineGuid;
-            dbgInfo.grfLaunch = (uint)__VSDBGLAUNCHFLAGS.DBGLAUNCH_StopDebuggingOnEnd;
-            return true;
         }
 
         private string GetEnvironmentVariablesString(string url)
