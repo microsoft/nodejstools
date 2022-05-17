@@ -70,7 +70,7 @@
     <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7EvalErrorProperty.cs" />
+    <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Diagnostics\HierarchyItem.cs" />
     <Compile Include="Diagnostics\NodeJsToolsEventSource.cs" />
     <Compile Include="Project\OperationProgressService.cs" />
@@ -84,10 +84,8 @@
     <Compile Include="TypeScriptHelpers\TypeScriptCompilerLocator.cs" />
     <Compile Include="Workspace\BaseFileScanner.cs" />
     <Compile Include="Workspace\ContextMenuProvider.cs" />
-    <Compile Include="Workspace\LaunchDebugTargetProvider.cs" />
     <Compile Include="Workspace\PackageJsonTestContainer.cs" />
     <Compile Include="Workspace\PackageJsonTestContainerDiscoverer.cs" />
-    <Compile Include="Workspace\NodeJsDebugLaunchTargetProvider.cs" />
     <Compile Include="GeneratedHelpAboutVersion.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -98,14 +96,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportWizardResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Debugger\FilePosition.cs" />
-    <Compile Include="Debugger\FuzzyLogicFileNameMapper.cs" />
-    <Compile Include="Debugger\IFileNameMapper.cs" />
-    <Compile Include="Debugger\LocalFileNameMapper.cs" />
-    <Compile Include="Debugger\NodeProcess.cs" />
-    <Compile Include="Debugger\ScriptTree.cs" />
     <Compile Include="Logging\LiveLogger.cs" />
-    <Compile Include="NodejsPackage.Debugger.cs" />
     <Compile Include="NpmUI\FilterStateVisibilityConverter.cs" />
     <Compile Include="NpmUI\LastRefreshedMessageProvider.cs" />
     <Compile Include="NpmUI\NpmInstallWindowResources.Designer.cs">
@@ -142,18 +133,6 @@
     <Compile Include="Project\NodejsTypeScriptFileNode.cs" />
     <Compile Include="Project\NodejsTypeScriptFileNodeProperties.cs" />
     <Compile Include="Project\NpmNodeProperties.cs" />
-    <Compile Include="Debugger\Communication\AsyncProducerConsumerCollection.cs" />
-    <Compile Include="Debugger\BreakOn.cs" />
-    <Compile Include="Debugger\BreakOnKind.cs" />
-    <Compile Include="Debugger\Commands\ChangeLiveCommand.cs" />
-    <Compile Include="Debugger\Commands\SetVariableValueCommand.cs" />
-    <Compile Include="Debugger\Communication\INetworkClient.cs" />
-    <Compile Include="Debugger\Communication\INetworkClientFactory.cs" />
-    <Compile Include="Debugger\Communication\NetworkClientFactory.cs" />
-    <Compile Include="Debugger\Communication\WebSocketNetworkClient.cs" />
-    <Compile Include="Debugger\Communication\TcpNetworkClient.cs" />
-    <Compile Include="Debugger\ExceptionHitTreatment.cs" />
-    <Compile Include="Debugger\ExceptionHandler.cs" />
     <Compile Include="ProvideLanguageTemplates.cs" />
     <Compile Include="Repl\InfoReplCommand.cs" />
     <Compile Include="Repl\InteractiveWindowColor.cs" />
@@ -167,13 +146,9 @@
     <Compile Include="SharedProject\OutputWindowWrapper.cs" />
     <Compile Include="SourceMapping\FunctionInfo.cs" />
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
-    <Compile Include="Debugger\NodeConstants.cs" />
-    <Compile Include="Debugger\Serialization\NodeSetValueVariable.cs" />
     <Compile Include="SourceMapping\SourceMapper.cs" />
-    <Compile Include="Debugger\SteppingKind.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
     <Compile Include="Jade\JadeEditorFactory.cs" />
-    <Compile Include="Workspace\JsFileDebugLaunchTargetProvider.cs" />
     <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
     <Compile Include="Workspace\TsConfigScannerFactory.cs" />
     <Compile Include="Workspace\TypeScriptActionProviderFactory.cs" />
@@ -185,44 +160,6 @@
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="Repl\NpmReplCommand.cs" />
     <Compile Include="TaggerProviderMetadata.cs" />
-    <Compile Include="Debugger\Communication\BreakpointEventArgs.cs" />
-    <Compile Include="Debugger\Communication\CompileScriptEventArgs.cs" />
-    <Compile Include="Debugger\Communication\ExceptionEventArgs.cs" />
-    <Compile Include="Debugger\Communication\IDebuggerClient.cs" />
-    <Compile Include="Debugger\Communication\IDebuggerConnection.cs" />
-    <Compile Include="Debugger\Communication\MessageEventArgs.cs" />
-    <Compile Include="Debugger\Communication\DebuggerClient.cs" />
-    <Compile Include="Debugger\Communication\DebuggerConnection.cs" />
-    <Compile Include="Debugger\Commands\BacktraceCommand.cs" />
-    <Compile Include="Debugger\Commands\ChangeBreakpointCommand.cs" />
-    <Compile Include="Debugger\Commands\ClearBreakpointCommand.cs" />
-    <Compile Include="Debugger\Commands\ContinueCommand.cs" />
-    <Compile Include="Debugger\Commands\DisconnectCommand.cs" />
-    <Compile Include="Debugger\Commands\EvaluateCommand.cs" />
-    <Compile Include="Debugger\Events\BreakpointEvent.cs" />
-    <Compile Include="Debugger\Events\CompileScriptEvent.cs" />
-    <Compile Include="Debugger\Events\ExceptionEvent.cs" />
-    <Compile Include="Debugger\Events\IDebuggerEvent.cs" />
-    <Compile Include="Debugger\Commands\ListBreakpointsCommand.cs" />
-    <Compile Include="Debugger\Commands\LookupCommand.cs" />
-    <Compile Include="Debugger\Commands\DebuggerCommand.cs" />
-    <Compile Include="Debugger\Commands\DebuggerCommandException.cs" />
-    <Compile Include="Debugger\Commands\ScriptsCommand.cs" />
-    <Compile Include="Debugger\Commands\SetBreakpointCommand.cs" />
-    <Compile Include="Debugger\Commands\SetExceptionBreakCommand.cs" />
-    <Compile Include="Debugger\Commands\SuspendCommand.cs" />
-    <Compile Include="Debugger\NodeExpressionType.cs" />
-    <Compile Include="Debugger\Serialization\IEvaluationResultFactory.cs" />
-    <Compile Include="Debugger\Serialization\NaturalSortComparer.cs" />
-    <Compile Include="Debugger\Serialization\NodeBacktraceVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeEvaluationVariable.cs" />
-    <Compile Include="Debugger\Serialization\INodeVariable.cs" />
-    <Compile Include="Debugger\Serialization\EvaluationResultFactory.cs" />
-    <Compile Include="Debugger\Serialization\NodeLookupVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodePropertyAttributes.cs" />
-    <Compile Include="Debugger\Serialization\NodePropertyType.cs" />
-    <Compile Include="Debugger\Serialization\NodePrototypeVariable.cs" />
-    <Compile Include="Debugger\Serialization\NodeVariableType.cs" />
     <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
     <Compile Include="Jade\Classifier\ICompositeToken.cs" />
     <Compile Include="Jade\Classifier\JadeClassificationDefinitions.cs" />
@@ -346,49 +283,6 @@
     <Compile Include="TestFrameworks\TestFrameworkDirectories.cs" />
     <Compile Include="VsMenus.cs" />
     <Compile Include="BaseNodeProjectFactory.cs" />
-    <Compile Include="Debugger\BreakpointBindingEventArgs.cs" />
-    <Compile Include="Debugger\BreakpointHitEventArgs.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7BoundBreakpoint.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7BreakpointResolution.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Document.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7DocumentContext.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Engine.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Enums.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Events.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7MemoryAddress.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Module.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7PendingBreakpoint.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7ProgramNode.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7ProgramProvider.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Property.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7StackFrame.cs" />
-    <Compile Include="Debugger\DebugEngine\AD7Thread.cs" />
-    <Compile Include="Debugger\DebugEngine\BreakpointManager.cs" />
-    <Compile Include="Debugger\DebugEngine\DebuggerConstants.cs" />
-    <Compile Include="Debugger\DebugEngine\EngineUtils.cs" />
-    <Compile Include="Debugger\DebugEngine\UncalculatedAD7Expression.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteDebugPort.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteDebugPortSupplier.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteDebugProcess.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteDebugProgram.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteEnumDebug.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteEnumDebugProcesses.cs" />
-    <Compile Include="Debugger\DebugEngine\Remote\NodeRemoteEnumDebugPrograms.cs" />
-    <Compile Include="Debugger\ExceptionRaisedEventArgs.cs" />
-    <Compile Include="Debugger\Extensions.cs" />
-    <Compile Include="Debugger\ModuleLoadedEventArgs.cs" />
-    <Compile Include="Debugger\OutputEventArgs.cs" />
-    <Compile Include="Debugger\ProcessExitedEventArgs.cs" />
-    <Compile Include="Debugger\NodeBreakpoint.cs" />
-    <Compile Include="Debugger\NodeBreakpointBinding.cs" />
-    <Compile Include="Debugger\NodeDebugOptions.cs" />
-    <Compile Include="Debugger\NodeEvaluationResult.cs" />
-    <Compile Include="Debugger\NodeException.cs" />
-    <Compile Include="Debugger\NodeModule.cs" />
-    <Compile Include="Debugger\NodeDebugger.cs" />
-    <Compile Include="Debugger\NodeStackFrame.cs" />
-    <Compile Include="Debugger\NodeThread.cs" />
-    <Compile Include="Debugger\ThreadEventArgs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="JsonListener.cs" />
@@ -1123,9 +1017,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.VisualStudio.Interop">
       <Version>17.0.0-previews-1-31318-023</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Debugger.Interop.10.0">
-      <Version>17.0.0-previews-1-31321-211</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
       <Version>17.0.0-previews-1-31321-311</Version>
