@@ -86,6 +86,12 @@ namespace Microsoft.NodejsTools.Project
                     StartWithChromeDebugger(file, nodePath, shouldStartBrowser, browserPath);
                     TelemetryHelper.LogDebuggingStarted("ChromeV2", nodeVersion.ToString());
                 }
+                else
+                {
+                    var output = OutputWindowRedirector.GetGeneral(NodejsPackage.Instance);
+                    output.WriteErrorLine(string.Format(CultureInfo.CurrentCulture, Resources.ErrorDebuggingNode7NotSupported));
+                    output.ShowAndActivate();
+                }
             }
             else
             {

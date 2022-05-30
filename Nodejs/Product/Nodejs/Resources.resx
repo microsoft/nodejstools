@@ -743,4 +743,7 @@ The following error occurred trying to execute npm.cmd:
   <data name="ExecutingNpmCommandMessage" xml:space="preserve">
     <value>Executing npm command</value>
   </data>
+  <data name="ErrorDebuggingNode7NotSupported" xml:space="preserve">
+    <value>Debugging Node 7 and below is not supported. Current Node version is {0}.</value>
+  </data>
 </root>
