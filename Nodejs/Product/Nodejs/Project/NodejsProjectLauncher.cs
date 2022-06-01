@@ -235,10 +235,9 @@ namespace Microsoft.NodejsTools.Project
                     return optionVal != 0;
                 }
             }
-            catch (Exception) { } // do nothing. proceed to trying the feature flag below.
+            catch (Exception) { } // do nothing
 
-            var featureFlagsService = (IVsFeatureFlags)ServiceProvider.GlobalProvider.GetService(typeof(SVsFeatureFlags));
-            return featureFlagsService is IVsFeatureFlags && featureFlagsService.IsFeatureEnabled("JavaScript.Debugger.V3CdpNodeDebugAdapter", false);
+            return true;
         }
 
         private int TestServerPort
