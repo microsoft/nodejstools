@@ -129,6 +129,12 @@ function readConfigs(projectFolder, context)
     const pathToReactConfig = path.join(projectFolder, 'node_modules/react-scripts/scripts/utils/createJestConfig.js');
     if(fs.existsSync(pathToReactConfig))
     {
+        const pathToReactAppRewired = path.join(projectFolder, 'node_modules/react-app-rewired/overrides/jest.js');
+        if (fs.existsSync(pathToReactAppRewired)) {
+            // Support react-app-rewired.  This overrides the normal createJestConfig
+            require(pathToReactAppRewired);
+        }
+
         const createJestConfig = require(pathToReactConfig);
         config = createJestConfig(
             relativePath => path.join(projectFolder, 'node_modules/react-scripts/', relativePath),
