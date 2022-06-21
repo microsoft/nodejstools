@@ -163,8 +163,8 @@ namespace Microsoft.VisualStudioTools
             return (DTE)runningObject;
         }
 
-        private static readonly Guid WebkitPortSupplierGuid = Guid.Parse("4103f338-2255-40c0-acf5-7380e2bea13d");
-        private static readonly Guid Node2AttachEngineGuid = Guid.Parse("3F14B534-C345-44B5-AF84-642246EEEB62");
+        private static readonly Guid V3PortSupplierGuid = Guid.Parse("61D1E397-7AA6-4ED9-815A-0C5CA0E728B4");
+        private static readonly Guid V3AttachEngineGuid = Guid.Parse("394120B6-2FF9-4D0D-8953-913EF5CD0BCD");
 
         private bool AttachToProcessNode2DebugAdapter(int port)
         {
@@ -177,14 +177,14 @@ namespace Microsoft.VisualStudioTools
             var debugUri = $"http://127.0.0.1:{port}";
             try
             {
-                Marshal.StructureToPtr(Node2AttachEngineGuid, pDebugEngine, false);
+                Marshal.StructureToPtr(V3AttachEngineGuid, pDebugEngine, false);
                 var dbgInfo = new VsDebugTargetInfo4()
                 {
                     dlo = (uint)DEBUG_LAUNCH_OPERATION.DLO_AlreadyRunning,
                     pDebugEngines = pDebugEngine,
                     dwDebugEngineCount = 1,
                     bstrExe = "dummy",
-                    guidPortSupplier = WebkitPortSupplierGuid,
+                    guidPortSupplier = V3PortSupplierGuid,
                     bstrPortName = debugUri,
                     dwProcessId = 1
                 };
