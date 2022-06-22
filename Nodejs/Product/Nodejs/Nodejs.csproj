@@ -369,10 +369,6 @@
     </Content>
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\JestUnitTest\UnitTest.vstemplate" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
-    <ZipProject Include="ProjectTemplates\VuejsApp\babel.config.js" />
-    <Resource Include="ProjectTemplates\VuejsApp\logo.png" />
-    <Resource Include="ProjectTemplates\TypeScriptVuejsApp\logo.png" />
     <Content Include="Workspace\OpenFolderSchema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -428,19 +424,24 @@
     <Compile Include="SharedProject\CommonProjectNode.DiskMerger.cs" />
     <ZipItem Include="Templates\Files\TypeScriptJsConfig\jsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\App.vue" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\babel.config.js" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\favicon.ico" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\Home.vue" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\HelloWorld.vue" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\index.html" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\logo.png" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\main.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\package.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\README.md" />
+    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims-vue.d.ts" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\tsconfig.json" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.njsproj" />
     <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\TypeScriptVuejsApp.vstemplate" />
     <ZipProject Include="ProjectTemplates\VuejsApp\App.vue" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\babel.config.js" />
     <ZipProject Include="ProjectTemplates\VuejsApp\favicon.ico" />
-    <ZipProject Include="ProjectTemplates\VuejsApp\Home.vue" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\HelloWorld.vue" />
     <ZipProject Include="ProjectTemplates\VuejsApp\index.html" />
+    <ZipProject Include="ProjectTemplates\VuejsApp\logo.png" />
     <ZipProject Include="ProjectTemplates\VuejsApp\main.js" />
     <ZipProject Include="ProjectTemplates\VuejsApp\package.json" />
     <ZipProject Include="ProjectTemplates\VuejsApp\README.md" />
@@ -451,9 +452,7 @@
     <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vstemplate" />
     <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
     <None Include="ProjectTemplates\TypeScriptVuejsApp\.browserslistrc" />
-    <None Include="ProjectTemplates\TypeScriptVuejsApp\HelloWorld.vue" />
     <None Include="ProjectTemplates\VuejsApp\.browserslistrc" />
-    <None Include="ProjectTemplates\VuejsApp\HelloWorld.vue" />
     <None Include="Theme\contrast.vstheme">
       <SubType>Designer</SubType>
     </None>
@@ -1060,10 +1059,6 @@
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims-tsx.d.ts" />
-    <TypeScriptProject Include="ProjectTemplates\TypeScriptVuejsApp\shims-vue.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
