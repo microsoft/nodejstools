@@ -38,7 +38,6 @@
       </Folder>
       <ProjectItem>babel.config.js</ProjectItem>
       <ProjectItem>.browserslistrc</ProjectItem>
-      <ProjectItem>babel.config.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
       <ProjectItem>tsconfig.json</ProjectItem>      
