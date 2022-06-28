@@ -33,7 +33,6 @@
         <ProjectItem>App.vue</ProjectItem>
         <ProjectItem OpenInEditor="true">main.js</ProjectItem>
       </Folder>
-      <ProjectItem>.browserslistrc</ProjectItem>
       <ProjectItem>babel.config.js</ProjectItem>
       <ProjectItem ReplaceParameters="true">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true">README.md</ProjectItem>
