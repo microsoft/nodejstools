@@ -34,10 +34,7 @@
         <Folder Include="src\components\" />
     </ItemGroup>
     <ItemGroup>
-        <Content Include=".browserslistrc" />
-        <Content Include=".gitignore" />
         <Content Include="babel.config.js" />
-        <Content Include="package-lock.json" />
         <Content Include="package.json" />
         <Content Include="public\favicon.ico" />
         <Content Include="public\index.html" />
