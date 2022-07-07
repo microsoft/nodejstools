@@ -13,7 +13,7 @@ function itReplacement(it) {
 function getFileLocation() {
     const stackLineRegex = /at.*\(.*_karma_webpack_(?:\/webpack\:)?(.*\.spec\.ts):(\d*):(\d*)/;
     const match = (new Error()).stack.match(stackLineRegex);
-
+    
     return match
         ? {
             relativeFilePath: match[1], // Relative to project root defined on angular.json.
@@ -57,5 +57,5 @@ var myReporter = {
 };
 
 jasmine.getEnv().addReporter(myReporter);
-jasmine.getEnv().it = itReplacement(jasmine.getEnv().it);
+jasmine.getEnv().it_ = itReplacement(jasmine.getEnv().it_);
 
