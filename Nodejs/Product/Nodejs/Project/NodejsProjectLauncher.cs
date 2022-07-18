@@ -272,7 +272,7 @@ namespace Microsoft.NodejsTools.Project
 
             var cwd = _project.GetWorkingDirectory(); // Current working directory
 
-            var config = new NodePinezorroDebugLaunchConfig(file, 
+            var config = new NodePinezorroDebugLaunchConfig(file,
                                                             scriptArguments,
                                                             nodePath,
                                                             runtimeArguments,
@@ -281,26 +281,6 @@ namespace Microsoft.NodejsTools.Project
                                                             CheckEnableDiagnosticLoggingOption(),
                                                             _project.ProjectGuid.ToString(),
                                                             JObject.FromObject(envVars));
-
-            bool usingV3Debugger = ShouldUseV3CdpDebugger();
-
-            if (usingV3Debugger && shouldStartBrowser && (browserPath.EndsWith("chrome.exe") || browserPath.EndsWith("msedge.exe")))
-            {
-                config = new NodePinezorroDebugLaunchConfig()
-                {
-                    ConfigName = "Debug Node program and browser from Visual Studio",
-                    Request = "launch",
-                    DebugType = browserPath.EndsWith("chrome.exe") ? "chrome" : "edge",
-                    RuntimeExecutable = browserPath,
-                    BrowserUrl = webBrowserUrl,
-                    BrowserUserDataDir = true,
-                    Server = config.toPwaChromeServerConfig(),
-                    WorkingDir = cwd,
-                    WebRoot = cwd,
-                    ProjectGuid = _project.ProjectGuid.ToString()
-                };
-                shouldStartBrowser = false; // the v3 cdp debug adapter will launch the browser as part of debugging so no need to launch it here anymore
-            }
 
             var jsonContent = JObject.FromObject(config).ToString();
 
@@ -316,7 +296,7 @@ namespace Microsoft.NodejsTools.Project
             var processInfo = new VsDebugTargetProcessInfo[debugTargets.Length];
 
             var debugger = (IVsDebugger4)serviceProvider.GetService(typeof(SVsShellDebugger));
-            debugger.LaunchDebugTargets4(1, debugTargets, processInfo);
+            debugger.LaunchDebugTargets4((uint)debugTargets.Length, debugTargets, processInfo);
 
             // Launch browser 
             if (shouldStartBrowser && !string.IsNullOrWhiteSpace(webBrowserUrl))
@@ -528,7 +508,7 @@ namespace Microsoft.NodejsTools.Project
         {
             this.ConfigName = "Debug Node.js program from Visual Studio";
             this.Request = "launch";
-            this.DebugType = "node2";
+            this.DebugType = "node";
             this.Console = "externalTerminal";
             this.Program = program;
             this.ProgramArgs = programArgs;
@@ -536,6 +516,7 @@ namespace Microsoft.NodejsTools.Project
             this.RuntimeArgs = runtimeArgs;
             this.Port = port;
             this.WorkingDir = currWorkingDir;
+            this.WebRoot = currWorkingDir;
             this.Environment = environmentSettings;
             this.Trace = trace;
             this.ProjectGuid = projectGuid;
