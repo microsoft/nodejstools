@@ -129,12 +129,6 @@ function readConfigs(projectFolder, context)
     const pathToReactConfig = path.join(projectFolder, 'node_modules/react-scripts/scripts/utils/createJestConfig.js');
     if(fs.existsSync(pathToReactConfig))
     {
-        const pathToReactAppRewired = path.join(projectFolder, 'node_modules/react-app-rewired/overrides/jest.js');
-        if (fs.existsSync(pathToReactAppRewired)) {
-            // Support react-app-rewired.  This overrides the normal createJestConfig
-            require(pathToReactAppRewired);
-        }
-
         const createJestConfig = require(pathToReactConfig);
         config = createJestConfig(
             relativePath => path.join(projectFolder, 'node_modules/react-scripts/', relativePath),
@@ -142,6 +136,16 @@ function readConfigs(projectFolder, context)
             false
         );
 
+		const pathToReactAppRewired = path.join(projectFolder, 'node_modules/react-app-rewired');
+		const pathToConfigOverrides = path.join(projectFolder, 'config-overrides.js');
+        if (fs.existsSync(pathToReactAppRewired) && fs.existsSync(pathToConfigOverrides)) {
+            // Support react-app-rewired.  This overrides the normal createJestConfig
+            const configOverrides = require(pathToConfigOverrides);
+			if (configOverrides && typeof configOverrides.jest === 'function') {
+				config = configOverrides.jest(config);
+			}
+        }
+		
         return config;
     }
 
