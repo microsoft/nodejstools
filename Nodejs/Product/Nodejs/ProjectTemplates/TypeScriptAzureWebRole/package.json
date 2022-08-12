@@ -10,11 +10,24 @@
   "author": {
     "name": ""
   },
-  "devDependencies": {
-    "@types/node": "^14.14.7",
-    "typescript": "^4.5.2"
-  },
   "engines": {
     "node": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.7",
+    "typescript": "^4.5.2",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
+    "@typescript-eslint/parser": "^5.33.0",
+    "eslint": "^8.21.0"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ]
   }
 }
