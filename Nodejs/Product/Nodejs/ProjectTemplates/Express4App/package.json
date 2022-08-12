@@ -19,10 +19,8 @@
     "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
-    "eslint": "^8.21.0",
-    "eslint-plugin-node": "^11.1.0"
+    "eslint": "^8.21.0"
   },
   "eslintConfig": {
-    "extends": "plugin:node/recommended"
   }
 }
