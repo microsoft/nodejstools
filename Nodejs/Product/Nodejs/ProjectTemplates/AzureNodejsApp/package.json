@@ -10,5 +10,12 @@
   },
   "author": {
     "name": ""
+  },
+  "devDependencies": {
+    "eslint": "^8.21.0",
+    "eslint-plugin-node": "^11.1.0"
+  },
+  "eslintConfig": {
+    "extends": "plugin:node/recommended"
   }
 }
