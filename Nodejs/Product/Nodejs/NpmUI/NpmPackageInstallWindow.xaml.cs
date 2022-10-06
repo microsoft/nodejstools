@@ -58,6 +58,9 @@ namespace Microsoft.NodejsTools.NpmUI
 
         private void InstallCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // Clear the focus for screen readers to understand the control has been disabled.
+            Keyboard.ClearFocus();
+
             this.viewModel.Install(e.Parameter as PackageCatalogEntryViewModel);
         }
 
