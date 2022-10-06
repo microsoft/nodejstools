@@ -203,6 +203,6 @@
     <comment>Parameter is a number representing the amount of results.</comment>
   </data>
   <data name="PackageListName" xml:space="preserve">
-    <value>Package list</value>
+    <value>Packages</value>
   </data>
 </root>

@@ -250,7 +250,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Package list.
+        ///   Looks up a localized string similar to Packages.
         /// </summary>
         public static string PackageListName {
             get {
