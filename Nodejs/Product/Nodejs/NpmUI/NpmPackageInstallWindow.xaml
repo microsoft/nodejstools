@@ -294,6 +294,7 @@
                           SelectedItem="{Binding SelectedPackage}"
                           SelectionChanged="packageList_SelectionChanged"
                           PreviewKeyDown="packageList_PreviewKeyDown"
+                          SelectionMode="Single"
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"
