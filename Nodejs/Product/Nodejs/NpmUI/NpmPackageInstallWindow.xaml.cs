@@ -25,6 +25,11 @@ namespace Microsoft.NodejsTools.NpmUI
             this.viewModel.OnSearchResultEnded += this.RaiseNotification_OnSearchResultEnded;
             InitializeComponent();
             this.DependencyComboBox.SelectedIndex = (int)dependencyType;
+
+            // If the default screen is smaller, use all of the screen.
+            // Substract a bit more on the height to consider the "Close" button.
+            this.Height = SystemParameters.PrimaryScreenHeight < 500 ? SystemParameters.PrimaryScreenHeight - 50 : 500;
+            this.Width = SystemParameters.PrimaryScreenWidth < 700 ? SystemParameters.PrimaryScreenWidth : 700;
         }
 
         public void Dispose()
