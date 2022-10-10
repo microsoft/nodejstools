@@ -1,7 +1,7 @@
 ﻿<vsui:DialogWindow
     x:Class="Microsoft.NodejsTools.NpmUI.NpmPackageInstallWindow"
-    x:ClassModifier="public"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    x:ClassModifier="public"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:npmUi="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
@@ -9,10 +9,8 @@
     xmlns:resx="clr-namespace:Microsoft.NodejsTools.NpmUI"
     xmlns:ntvs="clr-namespace:Microsoft.NodejsTools.SharedProject.Wpf"
     Title="{x:Static resx:NpmInstallWindowResources.WindowTitle}"
-    Height="500"
-    MinHeight="500"
-    Width="700"
-    MinWidth="600"
+    MinHeight="300"
+    MinWidth="400"
     WindowStartupLocation="CenterOwner"
     Background="{DynamicResource {x:Static wpf:Controls.BackgroundKey}}"
     Foreground="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
@@ -52,10 +50,10 @@
                                 <Run Text="{Binding Path=Version, Mode=OneWay}" />
                             </TextBlock>
 
-                            <TextBlock Margin="0 4 0 4"
-                                        Text="{Binding Keywords, Mode=OneWay}"
-                                        TextWrapping="Wrap"
-                                        Opacity="0.5" />
+                            <TextBlock Margin="0 4 0 4" TextWrapping="Wrap">
+                                <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.KeywordLabel}" />
+                                <Run Text="{Binding Keywords, Mode=OneWay}"/>
+                            </TextBlock>
 
                             <TextBlock Margin="0 4 0 4" TextWrapping="Wrap" x:Name="DescriptionBlock" Visibility="{Binding Path=DescriptionVisibility, Mode=OneWay}" KeyboardNavigation.TabIndex="6">
                                 <Run FontWeight="Bold" xml:space="preserve" Text="{x:Static resx:NpmInstallWindowResources.DescriptionLabel}" />
@@ -294,6 +292,7 @@
                           SelectedItem="{Binding SelectedPackage}"
                           SelectionChanged="packageList_SelectionChanged"
                           PreviewKeyDown="packageList_PreviewKeyDown"
+                          SelectionMode="Single"
                           HorizontalContentAlignment="Stretch"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           MinHeight="0"

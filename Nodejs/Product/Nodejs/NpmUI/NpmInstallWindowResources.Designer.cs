@@ -187,6 +187,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Keywords:.
+        /// </summary>
+        public static string KeywordLabel {
+            get {
+                return ResourceManager.GetString("KeywordLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (latest).
         /// </summary>
         public static string LatestVersion {
@@ -250,7 +259,7 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Package list.
+        ///   Looks up a localized string similar to Packages.
         /// </summary>
         public static string PackageListName {
             get {
