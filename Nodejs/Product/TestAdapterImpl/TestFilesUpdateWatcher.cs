@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -24,16 +25,17 @@ namespace Microsoft.NodejsTools.TestAdapter
         const int DISPOSED = 1;
 
         private int disposed = NOT_DISPOSED;
+        private System.IServiceProvider serviceProvider;
 
         public event EventHandler<TestFileChangedEventArgs> FileChangedEvent;
 
-        private /*readonly*/ IVsFileChangeEx fileWatcher; // writeable for dispose
+        private /*readonly*/ Lazy<IVsFileChangeEx> fileWatcher => new Lazy<IVsFileChangeEx> (() => { return serviceProvider.GetService<IVsFileChangeEx>(typeof(SVsFileChangeEx)); }); // writeable for dispose
 
-        public TestFilesUpdateWatcher(IServiceProvider serviceProvider)
+        public TestFilesUpdateWatcher(System.IServiceProvider serviceProvider)
         {
             ValidateArg.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.fileWatcher = serviceProvider.GetService<IVsFileChangeEx>(typeof(SVsFileChangeEx));
+            this.serviceProvider = serviceProvider;
         }
 
         public bool AddFileWatch(string path)
@@ -43,7 +45,7 @@ namespace Microsoft.NodejsTools.TestAdapter
 
             const uint mask = (uint)(_VSFILECHANGEFLAGS.VSFILECHG_Add | _VSFILECHANGEFLAGS.VSFILECHG_Del | _VSFILECHANGEFLAGS.VSFILECHG_Size | _VSFILECHANGEFLAGS.VSFILECHG_Time);
 
-            if (!string.IsNullOrEmpty(path) && !this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseFileChange(path, mask, this, out uint cookie)))
+            if (!string.IsNullOrEmpty(path) && !this.watchedFiles.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.Value.AdviseFileChange(path, mask, this, out uint cookie)))
             {
                 this.watchedFiles.Add(path, cookie);
                 return true;
@@ -56,7 +58,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             ValidateArg.NotNull(path, nameof(path));
             this.CheckDisposed();
 
-            if (!string.IsNullOrEmpty(path) && !this.watchedFolders.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
+            if (!string.IsNullOrEmpty(path) && !this.watchedFolders.ContainsKey(path) && ErrorHandler.Succeeded(this.fileWatcher.Value.AdviseDirChange(path, VSConstants.S_OK, this, out uint cookie)))
             {
                 this.watchedFolders.Add(path, cookie);
                 return true;
@@ -72,7 +74,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (!string.IsNullOrEmpty(path) && this.watchedFiles.TryGetValue(path, out uint cookie))
             {
                 this.watchedFiles.Remove(path);
-                return ErrorHandler.Succeeded(this.fileWatcher.UnadviseFileChange(cookie));
+                return ErrorHandler.Succeeded(this.fileWatcher.Value.UnadviseFileChange(cookie));
             }
             return false;
         }
@@ -85,7 +87,7 @@ namespace Microsoft.NodejsTools.TestAdapter
             if (!string.IsNullOrEmpty(path) && this.watchedFolders.TryGetValue(path, out uint cookie))
             {
                 this.watchedFolders.Remove(path);
-                return ErrorHandler.Succeeded(this.fileWatcher.UnadviseDirChange(cookie));
+                return ErrorHandler.Succeeded(this.fileWatcher.Value.UnadviseDirChange(cookie));
             }
             return false;
         }
@@ -181,19 +183,19 @@ namespace Microsoft.NodejsTools.TestAdapter
 
         public void Dispose()
         {
-            if (Interlocked.CompareExchange(ref this.disposed, DISPOSED, NOT_DISPOSED) == NOT_DISPOSED)
+            if (Interlocked.CompareExchange(ref this.disposed, DISPOSED, NOT_DISPOSED) == NOT_DISPOSED
+                && this.fileWatcher.IsValueCreated)
             {
                 foreach (var cookie in this.watchedFiles.Values)
                 {
-                    this.fileWatcher.UnadviseFileChange(cookie);
+                    this.fileWatcher.Value.UnadviseFileChange(cookie);
                 }
                 foreach (var cookie in this.watchedFolders.Values)
                 {
-                    this.fileWatcher.UnadviseDirChange(cookie);
+                    this.fileWatcher.Value.UnadviseDirChange(cookie);
                 }
                 this.watchedFiles.Clear();
                 this.watchedFolders.Clear();
-                this.fileWatcher = null;
             }
         }
     }
