@@ -41,6 +41,16 @@
                 <ResourceDictionary>
                     <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
                         <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="AutomationProperties.Name" Value="{Binding Path=Name}" />
+                        <Setter Property="AutomationProperties.HelpText">
+                            <Setter.Value>
+                                <MultiBinding StringFormat="{} {0}, {1}, {2}">
+                                    <Binding Path="Description"/>
+                                    <Binding Path="VersionWithLabel" />
+                                    <Binding Path="AuthorWithLabel" />
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
 
                     <DataTemplate x:Key="PackageInfoTemplate">

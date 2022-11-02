@@ -40,11 +40,13 @@ namespace Microsoft.NodejsTools.NpmUI
         public virtual string Name { get; }
 
         public string Version => this.version?.ToString() ?? string.Empty;
+        public string VersionWithLabel => String.IsNullOrWhiteSpace(this.version?.ToString()) ? string.Empty : $"{NpmInstallWindowResources.VersionLabel} {this.version?.ToString()}";
 
         public IEnumerable<SemverVersion> AvailableVersions { get; }
 
         public string Author { get; }
         public Visibility AuthorVisibility => string.IsNullOrEmpty(this.Author) ? Visibility.Collapsed : Visibility.Visible;
+        public string AuthorWithLabel => String.IsNullOrWhiteSpace(this.Author) ? string.Empty : $"{NpmInstallWindowResources.AuthorLabel} {this.Author}";
 
         public string Description { get; }
         public Visibility DescriptionVisibility => string.IsNullOrEmpty(this.Description) ? Visibility.Collapsed : Visibility.Visible;
