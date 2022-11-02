@@ -322,6 +322,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version:.
+        /// </summary>
+        public static string VersionLabel {
+            get {
+                return ResourceManager.GetString("VersionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Install New npm Packages.
         /// </summary>
         public static string WindowTitle {
