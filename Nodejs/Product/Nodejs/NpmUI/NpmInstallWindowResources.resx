@@ -211,4 +211,7 @@
   <data name="VersionLabel" xml:space="preserve">
     <value>Version:</value>
   </data>
+  <data name="HelpTextSpeechAction" xml:space="preserve">
+    <value>press tab to get more details</value>
+  </data>
 </root>

@@ -44,10 +44,11 @@
                         <Setter Property="AutomationProperties.Name" Value="{Binding Path=Name}" />
                         <Setter Property="AutomationProperties.HelpText">
                             <Setter.Value>
-                                <MultiBinding StringFormat="{} {0}, {1}, {2}">
+                                <MultiBinding StringFormat="{} {0}, {1}, {2}, {3}">
                                     <Binding Path="Description"/>
                                     <Binding Path="VersionWithLabel" />
                                     <Binding Path="AuthorWithLabel" />
+                                    <Binding Path="SpeechAction" />
                                 </MultiBinding>
                             </Setter.Value>
                         </Setter>
