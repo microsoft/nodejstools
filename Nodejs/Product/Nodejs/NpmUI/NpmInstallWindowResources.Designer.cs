@@ -160,6 +160,15 @@ namespace Microsoft.NodejsTools.NpmUI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to press tab to get more details.
+        /// </summary>
+        public static string HelpTextSpeechAction {
+            get {
+                return ResourceManager.GetString("HelpTextSpeechAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Homepage: .
         /// </summary>
         public static string HomepageLabel {

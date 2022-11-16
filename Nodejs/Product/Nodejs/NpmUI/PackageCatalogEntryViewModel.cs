@@ -56,6 +56,8 @@ namespace Microsoft.NodejsTools.NpmUI
 
         public string Keywords { get; }
 
+        public string SpeechAction => NpmInstallWindowResources.HelpTextSpeechAction;
+
         public bool IsInstalledLocally => !this.IsLocalInstallMissing && this.localVersion.HasValue;
         public bool IsLocalInstallOutOfDate => this.IsInstalledLocally && this.localVersion < this.version;
 
