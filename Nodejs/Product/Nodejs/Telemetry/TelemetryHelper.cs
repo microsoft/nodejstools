@@ -36,11 +36,6 @@ namespace Microsoft.NodejsTools.Telemetry
             LogUserTaskEvent(UnInstallNpm, isProject);
         }
 
-        public static void LogReplUse()
-        {
-            TelemetryService.DefaultSession?.PostUserTask(UsedRepl, TelemetryResult.Success);
-        }
-
         public static void LogTestDiscoveryStarted(string testAdapterName, string testDiscovererName)
         {
             LogUserTaskEvent(TestDiscoveryStarted, (TestAdapterName, testAdapterName), (TestDiscovererName, testDiscovererName));

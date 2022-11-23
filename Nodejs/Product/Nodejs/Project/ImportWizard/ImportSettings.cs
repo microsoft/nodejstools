@@ -38,8 +38,6 @@ namespace Microsoft.NodejsTools.Project.ImportWizard
                 ".ejs",
                 ".styl",
                 ".xml",
-                Jade.JadeContentTypeDefinition.JadeFileExtension,
-                Jade.JadeContentTypeDefinition.PugFileExtension
             }.Select(x => "*" + x));
 
         // prepend ';' since this is appended to the DefaultLanguageExtensionsFilter

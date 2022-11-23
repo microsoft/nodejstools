@@ -33,11 +33,6 @@ namespace Microsoft.NodejsTools.Telemetry
         /// User uninstalled package.
         /// </summary>
         public const string UnInstallNpm = Prefix + "UnInstallNpm";
-
-        /// <summary>
-        /// User executed some script in the interactive window.
-        /// </summary>
-        public const string UsedRepl = Prefix + "UsedRepl";
         
         public const string OperationRegistrationFaulted = Prefix + "OperationRegistrationFaulted";
 
