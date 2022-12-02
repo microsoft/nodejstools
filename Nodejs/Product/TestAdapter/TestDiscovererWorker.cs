@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.NodejsTools.SourceMapping;
-using Microsoft.NodejsTools.Telemetry;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -38,8 +37,6 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             // If it's a framework name we support, is safe to submit the string to telemetry.
             var testAdapterName = Enum.GetNames(typeof(SupportedFramework)).Contains(testFx.Name, StringComparer.OrdinalIgnoreCase) ? testFx.Name : "Other";
-
-            TelemetryHelper.LogTestDiscoveryStarted(testAdapterName, testDiscovererName);
 
             if (!File.Exists(this.nodeExePath))
             {

@@ -41,9 +41,9 @@ namespace Microsoft.NodejsTools.Telemetry
             TelemetryService.DefaultSession?.PostUserTask(UsedRepl, TelemetryResult.Success);
         }
 
-        public static void LogTestDiscoveryStarted(string testAdapterName, string testDiscovererName)
+        public static void LogTestDiscoveryStarted(string testAdapterName)
         {
-            LogUserTaskEvent(TestDiscoveryStarted, (TestAdapterName, testAdapterName), (TestDiscovererName, testDiscovererName));
+            LogUserTaskEvent(TestDiscoveryStarted, (TestAdapterName, testAdapterName));
         }
 
         private static void LogUserTaskEvent(string eventName, bool isProject)
@@ -55,7 +55,7 @@ namespace Microsoft.NodejsTools.Telemetry
         {
             if (TelemetryService.DefaultSession != null)
             {
-                var userTask = new UserTaskEvent(DebbugerStarted, TelemetryResult.Success);
+                var userTask = new UserTaskEvent(eventName, TelemetryResult.Success);
                 foreach (var (PropertName, Value) in args)
                 {
                     userTask.Properties[PropertName] = Value;
