@@ -54,6 +54,9 @@
     <Compile Include="..\Nodejs\NodejsConstants.cs">
       <Link>NodejsConstants.cs</Link>
     </Compile>
+    <Compile Include="..\Nodejs\Telemetry\TelemetryHelper.cs">
+      <Link>Telemetry\TelemetryHelper.cs</Link>
+    </Compile>
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>TypeScriptHelpers.cs</Link>
     </Compile>

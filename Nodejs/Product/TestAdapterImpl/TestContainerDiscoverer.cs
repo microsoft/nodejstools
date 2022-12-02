@@ -6,6 +6,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Microsoft.Internal.VisualStudio.Shell;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -267,7 +268,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 yield break;
             }
 
-            if (!this.knownProjects.TryGetValue(path, out var projectInfo) || !TryGetProjectUnitTestProperties(projectInfo.Project, out _, out _))
+            if (!this.knownProjects.TryGetValue(path, out var projectInfo) || !TryGetProjectUnitTestProperties(projectInfo.Project, out _, out var testFramework))
             {
                 // Don't return any containers for projects we don't know about or that we know that they are not configured for JavaScript unit tests.
                 yield break;
@@ -288,6 +289,11 @@ namespace Microsoft.NodejsTools.TestAdapter
                     }
                     return latest;
                 });
+
+            if (!string.IsNullOrEmpty(testFramework))
+            { 
+                Microsoft.NodejsTools.Telemetry.TelemetryHelper.LogTestDiscoveryStarted(testFramework);
+            }
 
             yield return new TestContainer(this, path, latestWrite);
         }
