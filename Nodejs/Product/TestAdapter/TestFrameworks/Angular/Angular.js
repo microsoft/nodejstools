@@ -62,7 +62,7 @@ const find_tests = async function (configFiles, discoverResultFile) {
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigFilePath}`
+                    `--karma-config=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
@@ -126,7 +126,7 @@ const run_tests = async function (context) {
                 [
                     'test',
                     project.name,
-                    `--karmaConfig=${vsKarmaConfigFilePath}`
+                    `--karma-config=${vsKarmaConfigFilePath}`
                 ],
                 {
                     env: {
