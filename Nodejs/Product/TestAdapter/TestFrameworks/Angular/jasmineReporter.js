@@ -11,6 +11,7 @@ var myReporter = {
     },
 };
 
+// Function used to add fileLocation to the result. Includes filepath, line and column of the test.
 function itReplacement(it) {
     return (description, testFunction, timeout) => {
         const specMetadata = it(description, testFunction, timeout);
