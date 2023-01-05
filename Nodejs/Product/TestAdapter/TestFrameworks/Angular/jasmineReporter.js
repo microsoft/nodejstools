@@ -1,12 +1,22 @@
 //@ts-check
 
+let lookup = new Map();
+
+var myReporter = {
+    specDone: result => {
+        result.fileLocation = lookup.get(result.id);
+
+        // Communicate results through the console.
+        console.log(JSON.stringify(result, getCircularReplacer()));
+    },
+};
+
 // Function used to add fileLocation to the result. Includes filepath, line and column of the test.
 function itReplacement(it) {
     return (description, testFunction, timeout) => {
-        const spec = it(description, testFunction, timeout);
-        spec.result.fileLocation = getFileLocation();
-
-        return spec;
+        const specMetadata = it(description, testFunction, timeout);
+        lookup.set(specMetadata.id, getFileLocation());
+        return specMetadata;
     };
 }
 
@@ -49,13 +59,9 @@ function isObject(value) {
         && !(value instanceof String)
 }
 
-var myReporter = {
-    specDone: result => {
-        // Communicate results through the console.
-        console.log(JSON.stringify(result, getCircularReplacer()));
-    }
-};
-
 jasmine.getEnv().addReporter(myReporter);
-jasmine.getEnv().it_ = itReplacement(jasmine.getEnv().it_);
-
+if (jasmine.getEnv().it_) {
+    jasmine.getEnv().it_ = itReplacement(jasmine.getEnv().it_);
+} else {
+    jasmine.getEnv().it = itReplacement(jasmine.getEnv().it);
+}
