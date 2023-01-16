@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Runtime.InteropServices;
@@ -16,11 +16,6 @@ namespace Microsoft.VisualStudioTools.Project
         private uint _componentID;
 
         public abstract ProjectFactory CreateProjectFactory();
-        public abstract CommonEditorFactory CreateEditorFactory();
-        public virtual CommonEditorFactory CreateEditorFactoryPromptForEncoding()
-        {
-            return null;
-        }
         /// <summary>
         /// This method is called to get the icon that will be displayed in the
         /// Help About dialog when this package is selected.
@@ -55,16 +50,6 @@ namespace Microsoft.VisualStudioTools.Project
 
             base.Initialize();
             this.RegisterProjectFactory(CreateProjectFactory());
-            var editFactory = CreateEditorFactory();
-            if (editFactory != null)
-            {
-                this.RegisterEditorFactory(editFactory);
-            }
-            var encodingEditorFactory = CreateEditorFactoryPromptForEncoding();
-            if (encodingEditorFactory != null)
-            {
-                RegisterEditorFactory(encodingEditorFactory);
-            }
             var componentManager = this._compMgr = (IOleComponentManager)GetService(typeof(SOleComponentManager));
             var crinfo = new OLECRINFO[1];
             crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));

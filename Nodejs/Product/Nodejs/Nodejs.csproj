@@ -67,7 +67,6 @@
     <Compile Include="..\TypeScript\TypeScriptHelpers.cs">
       <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
-    <Compile Include="ClassifierProviderMetadata.cs" />
     <Compile Include="Commands\ImportWizardCommand.cs" />
     <Compile Include="Commands\OpenReplWindowCommand.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
@@ -148,7 +147,6 @@
     <Compile Include="SourceMapping\JavaScriptSourceMapInfo.cs" />
     <Compile Include="SourceMapping\SourceMapper.cs" />
     <Compile Include="Project\NodejsFileNodeProperties.cs" />
-    <Compile Include="Jade\JadeEditorFactory.cs" />
     <Compile Include="Workspace\PackageJsonScannerFactory.cs" />
     <Compile Include="Workspace\TsConfigScannerFactory.cs" />
     <Compile Include="Workspace\TypeScriptActionProviderFactory.cs" />
@@ -159,63 +157,6 @@
   <ItemGroup>
     <Compile Include="Project\ProjectResources.cs" />
     <Compile Include="Repl\NpmReplCommand.cs" />
-    <Compile Include="TaggerProviderMetadata.cs" />
-    <Compile Include="Jade\Classifier\IClassificationContextNameProvider.cs" />
-    <Compile Include="Jade\Classifier\ICompositeToken.cs" />
-    <Compile Include="Jade\Classifier\JadeClassificationDefinitions.cs" />
-    <Compile Include="Jade\Classifier\JadeClassificationNameProvider.cs" />
-    <Compile Include="Jade\Classifier\JadeClassificationTypes.cs" />
-    <Compile Include="Jade\Classifier\JadeClassifier.cs" />
-    <Compile Include="Jade\Classifier\JadeClassifierProvider.cs" />
-    <Compile Include="Jade\Classifier\TokenBasedClassifier.cs" />
-    <Compile Include="Jade\EntityTable.cs" />
-    <Compile Include="Jade\IdleTimeAsyncTask.cs" />
-    <Compile Include="Jade\ITextSnapshotProvider.cs" />
-    <Compile Include="Jade\JadeContentTypeDefinition.cs" />
-    <Compile Include="Jade\JadeLanguageInfo.cs" />
-    <Compile Include="Jade\Outlining\IndentBasedRegionBuilder.cs" />
-    <Compile Include="Jade\Outlining\JadeOutlineTaggerProvider.cs" />
-    <Compile Include="Jade\Outlining\JadeOutliningTagger.cs" />
-    <Compile Include="Jade\Outlining\OutlineRegion.cs" />
-    <Compile Include="Jade\Outlining\OutlineRegionBuilder.cs" />
-    <Compile Include="Jade\Outlining\OutlineRegionCollection.cs" />
-    <Compile Include="Jade\Outlining\OutlineRegionsChange.cs" />
-    <Compile Include="Jade\Outlining\OutlineRegionsChangedEventArgs.cs" />
-    <Compile Include="Jade\Outlining\OutliningTagger.cs" />
-    <Compile Include="Jade\ServiceManager.cs" />
-    <Compile Include="Jade\TextProvider.cs" />
-    <Compile Include="Jade\TextUtility.cs" />
-    <Compile Include="Jade\Text\CharacterStream.cs" />
-    <Compile Include="Jade\Text\Def\ICompositeTextRange.cs" />
-    <Compile Include="Jade\Text\Def\ITextProvider.cs" />
-    <Compile Include="Jade\Text\Def\ITextRange.cs" />
-    <Compile Include="Jade\Text\Def\ITextRangeCollection.cs" />
-    <Compile Include="Jade\Text\ReadonlyTextRangeCollection.cs" />
-    <Compile Include="Jade\Text\textchange.cs" />
-    <Compile Include="Jade\Text\TextChangeArgs.cs" />
-    <Compile Include="Jade\Text\TextHelper.cs" />
-    <Compile Include="Jade\Text\TextRange.cs" />
-    <Compile Include="Jade\Text\TextRangeCollection.cs" />
-    <Compile Include="Jade\Text\TextStream.cs" />
-    <Compile Include="Jade\TimeUtility.cs" />
-    <Compile Include="Jade\Tokenizer\JadeToken.cs" />
-    <Compile Include="Jade\Tokenizer\JadeTokenizer.cs" />
-    <Compile Include="Jade\Tokenizer\JadeTokenType.cs" />
-    <Compile Include="Jade\Tokenizer\Keywords\JadeCodeKeywords.cs" />
-    <Compile Include="Jade\Tokenizer\Keywords\JadeFilters.cs" />
-    <Compile Include="Jade\Tokenizer\Keywords\JadeTagKeywords.cs" />
-    <Compile Include="Jade\Tokenizer\States\AttributeState.cs" />
-    <Compile Include="Jade\Tokenizer\States\FilterState.cs" />
-    <Compile Include="Jade\Tokenizer\States\HtmlState.cs" />
-    <Compile Include="Jade\Tokenizer\States\InlineCodeState.cs" />
-    <Compile Include="Jade\Tokenizer\States\ScriptState.cs" />
-    <Compile Include="Jade\Tokenizer\States\StyleState.cs" />
-    <Compile Include="Jade\Tokenizer\States\TagState.cs" />
-    <Compile Include="Jade\Tokenizer\States\TextState.cs" />
-    <Compile Include="Jade\Tokens\IToken.cs" />
-    <Compile Include="Jade\Tokens\ITokenizer.cs" />
-    <Compile Include="Jade\Tokens\Token.cs" />
-    <Compile Include="Jade\Tokens\Tokenizer.cs" />
     <Compile Include="Nodejs.cs" />
     <Compile Include="NodejsProjectConfig.cs" />
     <Compile Include="NpmUI\ErrorHelper.cs" />
@@ -275,7 +216,6 @@
     <Compile Include="Project\DependencyNode.cs" />
     <Compile Include="Project\NodeModulesNode.cs" />
     <Compile Include="Project\NodejsFileNode.cs" />
-    <Compile Include="ProvideEditorExtension2Attribute.cs" />
     <Compile Include="Repl\SaveReplCommand.cs" />
     <Compile Include="Repl\NodejsReplSite.cs" />
     <Compile Include="SourceMapping\SourceMap.cs" />
@@ -453,13 +393,6 @@
     <ZipItem Include="Templates\Files\TypeScriptVueComponent\TypeScriptVueComponent.vue" />
     <None Include="ProjectTemplates\TypeScriptVuejsApp\.browserslistrc" />
     <None Include="ProjectTemplates\VuejsApp\.browserslistrc" />
-    <None Include="Theme\contrast.vstheme">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Theme\dark.vstheme">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Theme\make_theme_pkgdef.py" />
     <ZipProject Include="ProjectTemplates\NodejsWebApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\AzureNodejsApp\Preview.png" />
     <ZipProject Include="ProjectTemplates\NodejsConsoleApp\Preview.png" />
@@ -671,7 +604,6 @@
     <ZipItem Include="Templates\Files\TypeScriptUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
     </ZipItem>
-    <None Include="Theme\Microsoft.NodejsTools.theme.v15.0.pkgdef" />
     <ZipItem Include="Templates\Files\JasmineUnitTest\UnitTest.js" />
     <ZipItem Include="Templates\Files\JasmineUnitTest\UnitTest.vstemplate">
       <SubType>Designer</SubType>
@@ -864,7 +796,6 @@
     <Compile Include="SharedProject\BuildDependency.cs" />
     <Compile Include="SharedProject\BuildPropertyPage.cs" />
     <Compile Include="SharedProject\CommonConfigProvider.cs" />
-    <Compile Include="SharedProject\CommonEditorFactory.cs" />
     <Compile Include="SharedProject\CommonFileNode.cs" />
     <Compile Include="SharedProject\CommonFolderNode.cs" />
     <Compile Include="SharedProject\CommonNonCodeFileNode.cs" />
@@ -970,7 +901,6 @@
     <Compile Include="SharedProject\ProvideDebugLanguageAttribute.cs" />
     <Compile Include="SharedProject\ProvideDebugPortSupplierAttribute.cs" />
     <Compile Include="SharedProject\ProvideDebugPortPickerAttribute.cs" />
-    <Compile Include="SharedProject\ProvideTextEditorAutomationAttribute.cs" />
     <Compile Include="SharedProject\VsExtensions.cs" />
     <Compile Include="SharedProject\TaskExtensions.cs" />
     <Compile Include="SharedProject\VsTaskExtensions.cs" />

@@ -81,5 +81,7 @@ namespace Microsoft.NodejsTools
         // Interactive window guids
         public const string NodejsInteractiveWindowString = "2153A414-267E-4731-B891-E875ADBA1993";
         public static readonly Guid NodejsInteractiveWindow = new Guid(NodejsInteractiveWindowString);
-    };
+        
+        public const string NodeExtrasPackageString = "64BADECB-C679-4D59-944A-A3A46FB53E31";
+    }
 }

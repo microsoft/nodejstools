@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
 using System.Globalization;
@@ -15,6 +15,8 @@ namespace Microsoft.VisualStudioTools
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     internal sealed class ProvideTextEditorAutomationAttribute : RegistrationAttribute
     {
+        internal const string TextEditorPackage = "{F5E7E720-1401-11D1-883B-0000F87579D2}";
+
         private readonly string _categoryName;
         private readonly short _categoryResourceId;
         private readonly short _descriptionResourceId;
@@ -23,8 +25,6 @@ namespace Microsoft.VisualStudioTools
         public ProvideTextEditorAutomationAttribute(string categoryName, short categoryResourceId,
             short descriptionResourceId, ProfileMigrationType migrationType)
         {
-            Utilities.ArgumentNotNull(categoryName, "categoryName");
-
             this._categoryName = categoryName;
             this._categoryResourceId = categoryResourceId;
             this._descriptionResourceId = descriptionResourceId;
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudioTools
                 automationKey.SetValue(null, "#" + this.CategoryResourceId);
                 automationKey.SetValue("Description", "#" + this.DescriptionResourceId);
                 automationKey.SetValue("Name", this.CategoryName);
-                automationKey.SetValue("Package", CommonConstants.TextEditorPackage);
+                automationKey.SetValue("Package", TextEditorPackage);
                 automationKey.SetValue("ProfileSave", 1);
                 automationKey.SetValue("ResourcePackage", context.ComponentType.GUID.ToString("B"));
                 automationKey.SetValue("VsSettingsMigration", (int)this.MigrationType);
