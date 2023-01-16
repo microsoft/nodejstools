@@ -5,9 +5,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Extras;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudioTools;
-using SR = Microsoft.NodejsTools.Project.SR;
 
 namespace Microsoft.NodejsTools.Jade
 {
@@ -181,16 +182,12 @@ namespace Microsoft.NodejsTools.Jade
                         }
                         finally
                         {
-                            NodejsPackage.Instance.GetUIThread().InvokeAsync(() => UIThreadCompletedCallback(result))
-                                .HandleAllExceptions(SR.ProductName)
-                                .DoNotWait();
+                            NodeExtrasPackage.Instance.GetUIThread().InvokeAsync(() => UIThreadCompletedCallback(result)).FileAndForget("vs/nodejstools/extras/fault");
                         }
                     }
                     else if (Interlocked.Read(ref this._closed) > 0)
                     {
-                        NodejsPackage.Instance.GetUIThread().InvokeAsync((() => UIThreadCanceledCallback(null)))
-                            .HandleAllExceptions(SR.ProductName)
-                            .DoNotWait();
+                        NodeExtrasPackage.Instance.GetUIThread().InvokeAsync((() => UIThreadCanceledCallback(null))).FileAndForget("vs/nodejstools/extras/fault");
                     }
                 });
             }
@@ -243,11 +240,11 @@ namespace Microsoft.NodejsTools.Jade
 
                 // make sure our package is loaded so we can use its
                 // OnIdle event
-                var nodePackage = new Guid(Guids.NodejsPackageString);
-                var shell = (IVsShell)NodejsPackage.GetGlobalService(typeof(SVsShell));
+                var nodePackage = new Guid(Guids.NodeExtrasPackageString);
+                var shell = (IVsShell)NodeExtrasPackage.GetGlobalService(typeof(SVsShell));
                 shell.LoadPackage(ref nodePackage, out var package);
 
-                NodejsPackage.Instance.OnIdle += this.OnIdle;
+                NodeExtrasPackage.Instance.OnIdle += this.OnIdle;
             }
         }
 
@@ -256,7 +253,7 @@ namespace Microsoft.NodejsTools.Jade
             if (this._connectedToIdle)
             {
                 this._connectedToIdle = false;
-                NodejsPackage.Instance.OnIdle -= this.OnIdle;
+                NodeExtrasPackage.Instance.OnIdle -= this.OnIdle;
             }
         }
 
