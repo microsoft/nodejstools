@@ -4,8 +4,6 @@ namespace Microsoft.NodejsTools
 {
     internal static class PkgCmdId
     {
-        public const int cmdidReplWindow = 0x200;
-        public const int cmdidOpenReplWindow = 0x201;
         public const int cmdidSetAsNodejsStartupFile = 0x203;
 
         public const int cmdidImportWizard = 0x205;

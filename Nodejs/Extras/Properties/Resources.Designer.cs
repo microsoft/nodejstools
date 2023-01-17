@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extras.Properties {
+namespace Microsoft.NodejsTools.Extras {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Extras.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Extras.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.NodeJsTools.Extras.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,204 @@ namespace Extras.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Black.
+        /// </summary>
+        internal static string ClassificationBlack {
+            get {
+                return ResourceManager.GetString("ClassificationBlack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Blue.
+        /// </summary>
+        internal static string ClassificationBlue {
+            get {
+                return ResourceManager.GetString("ClassificationBlue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Cyan.
+        /// </summary>
+        internal static string ClassificationCyan {
+            get {
+                return ResourceManager.GetString("ClassificationCyan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Blue.
+        /// </summary>
+        internal static string ClassificationDarkBlue {
+            get {
+                return ResourceManager.GetString("ClassificationDarkBlue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Cyan.
+        /// </summary>
+        internal static string ClassificationDarkCyan {
+            get {
+                return ResourceManager.GetString("ClassificationDarkCyan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Gray.
+        /// </summary>
+        internal static string ClassificationDarkGray {
+            get {
+                return ResourceManager.GetString("ClassificationDarkGray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Green.
+        /// </summary>
+        internal static string ClassificationDarkGreen {
+            get {
+                return ResourceManager.GetString("ClassificationDarkGreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Magenta.
+        /// </summary>
+        internal static string ClassificationDarkMagenta {
+            get {
+                return ResourceManager.GetString("ClassificationDarkMagenta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Red.
+        /// </summary>
+        internal static string ClassificationDarkRed {
+            get {
+                return ResourceManager.GetString("ClassificationDarkRed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Dark Yellow.
+        /// </summary>
+        internal static string ClassificationDarkYellow {
+            get {
+                return ResourceManager.GetString("ClassificationDarkYellow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Error.
+        /// </summary>
+        internal static string ClassificationError {
+            get {
+                return ResourceManager.GetString("ClassificationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Gray.
+        /// </summary>
+        internal static string ClassificationGray {
+            get {
+                return ResourceManager.GetString("ClassificationGray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Green.
+        /// </summary>
+        internal static string ClassificationGreen {
+            get {
+                return ResourceManager.GetString("ClassificationGreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Magenta.
+        /// </summary>
+        internal static string ClassificationMagenta {
+            get {
+                return ResourceManager.GetString("ClassificationMagenta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Red.
+        /// </summary>
+        internal static string ClassificationRed {
+            get {
+                return ResourceManager.GetString("ClassificationRed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - White.
+        /// </summary>
+        internal static string ClassificationWhite {
+            get {
+                return ResourceManager.GetString("ClassificationWhite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive - Yellow.
+        /// </summary>
+        internal static string ClassificationYellow {
+            get {
+                return ResourceManager.GetString("ClassificationYellow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download Node.js.
+        /// </summary>
+        internal static string DownloadNodejs {
+            get {
+                return ResourceManager.GetString("DownloadNodejs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to start interactive process: {0}{1}{2}.
+        /// </summary>
+        internal static string InteractiveWindowFailedToStartProcessErrorMessage {
+            get {
+                return ResourceManager.GetString("InteractiveWindowFailedToStartProcessErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current interactive window is disconnected - please reset the process..
+        /// </summary>
+        internal static string InteractiveWindowNoProcessErrorMessage {
+            get {
+                return ResourceManager.GetString("InteractiveWindowNoProcessErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The process has exited.
+        /// </summary>
+        internal static string InteractiveWindowProcessExitedMessage {
+            get {
+                return ResourceManager.GetString("InteractiveWindowProcessExitedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Interactive Window.
+        /// </summary>
+        internal static string InteractiveWindowTitle {
+            get {
+                return ResourceManager.GetString("InteractiveWindowTitle", resourceCulture);
             }
         }
         
@@ -102,6 +300,186 @@ namespace Extras.Properties {
         internal static string JadeVariable {
             get {
                 return ResourceManager.GetString("JadeVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your project is currently configured to look for Node.exe at &quot;{0}&quot; but the file does not exist..
+        /// </summary>
+        internal static string NodeExeDoesntExist {
+            get {
+                return ResourceManager.GetString("NodeExeDoesntExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from https://nodejs.org, or specify the location of your Node.exe in the Visual Studio Node Project&apos;s properties page..
+        /// </summary>
+        internal static string NodejsNotInstalled {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from &apos;https://nodejs.org&apos;, or specify the location of your Node.exe in the &apos;{0}&apos; file..
+        /// </summary>
+        internal static string NodejsNotInstalledAnyCode {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledAnyCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a Node.js runtime on your computer. Please install Node.js and restart VS, or specify the location of node.exe in the project properties page..
+        /// </summary>
+        internal static string NodejsNotInstalledInfoBar {
+            get {
+                return ResourceManager.GetString("NodejsNotInstalledInfoBar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName] &lt;npm arguments&gt;.
+        /// </summary>
+        internal static string NpmExecuteCommand {
+            get {
+                return ResourceManager.GetString("NpmExecuteCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} completed with errors.
+        /// </summary>
+        internal static string NpmReplCommandCompletedWithErrors {
+            get {
+                return ResourceManager.GetString("NpmReplCommandCompletedWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir] &lt;npm arguments&gt; For example: .npm [MyApp] list..
+        /// </summary>
+        internal static string NpmSpecifyValidProject {
+            get {
+                return ResourceManager.GetString("NpmSpecifyValidProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} successfully completed.
+        /// </summary>
+        internal static string NpmSuccessfullyCompleted {
+            get {
+                return ResourceManager.GetString("NpmSuccessfullyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resets the context object to an empty object and clears any multi-line expression..
+        /// </summary>
+        internal static string ReplClearDescription {
+            get {
+                return ResourceManager.GetString("ReplClearDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show information about the current used Node.js executable..
+        /// </summary>
+        internal static string ReplInfoDescription {
+            get {
+                return ResourceManager.GetString("ReplInfoDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js interactive window. Type .help for a list of commands..
+        /// </summary>
+        internal static string ReplInitializationMessage {
+            get {
+                return ResourceManager.GetString("ReplInitializationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve Nodejs.exe information..
+        /// </summary>
+        internal static string ReplNodeError {
+            get {
+                return ResourceManager.GetString("ReplNodeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using Node.js exe from: &apos;{0}&apos;.
+        /// </summary>
+        internal static string ReplNodeInfo {
+            get {
+                return ResourceManager.GetString("ReplNodeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node.js Version: {0}.
+        /// </summary>
+        internal static string ReplNodeVersion {
+            get {
+                return ResourceManager.GetString("ReplNodeVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save the current REPL session to a file..
+        /// </summary>
+        internal static string ReplSaveDescription {
+            get {
+                return ResourceManager.GetString("ReplSaveDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to save: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveFailed {
+            get {
+                return ResourceManager.GetString("ReplSaveFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid filename: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveInvalidFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveInvalidFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save requires a filename..
+        /// </summary>
+        internal static string ReplSaveNoFileName {
+            get {
+                return ResourceManager.GetString("ReplSaveNoFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session saved to: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ReplSaveSucces {
+            get {
+                return ResourceManager.GetString("ReplSaveSucces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please run &apos;.npm init -y&apos; to create a new package.json file..
+        /// </summary>
+        internal static string ReplWindowNpmInitNoYesFlagWarning {
+            get {
+                return ResourceManager.GetString("ReplWindowNpmInitNoYesFlagWarning", resourceCulture);
             }
         }
     }

@@ -11,6 +11,7 @@ using System.Globalization;
 using Microsoft.VisualStudio.InteractiveWindow.Commands;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.InteractiveWindow;
+using Microsoft.NodejsTools.Extras;
 
 namespace Microsoft.NodejsTools.Repl
 {

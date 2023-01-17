@@ -144,26 +144,6 @@
         </Strings>
       </Button>
 
-      <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
-        <Icon guid="guidReplImage" id="1"/>
-        <Strings>
-          <CommandName>Node.js Interactive Window</CommandName>
-          <ButtonText>Node.js Interactive Window</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
-        <Icon guid="guidReplImage" id="1"/>
-        <CommandFlag>DefaultInvisible</CommandFlag>
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <CommandName>Open Node.js Interactive Window</CommandName>
-          <ButtonText>Open Node.js Interactive Window</ButtonText>
-        </Strings>
-      </Button>
-
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" priority="0x8000" type="Button">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -281,8 +261,7 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidCommandPromptImage" href="..\Icons\ContextMenuBMP32\OpenCommandPromptHere_16x_32.bmp" />
-      <Bitmap guid="guidReplImage" href="..\Icons\ToolMenuPNG\NodeJSInteractiveWindow_16x.png" />
-      <Bitmap guid="guidImages" href="..\Icons\Images_32bit.png" usedList="nodeReplPic, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, nodeDebugRepl"/>
+      <Bitmap guid="guidImages" href="..\Icons\Images_32bit.png" usedList="bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows"/>
     </Bitmaps>
   </Commands>
 
@@ -331,7 +310,6 @@
   </CommandPlacements>
 
   <KeyBindings>
-    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control" key2="N" editor="guidVSStd97"/>
     <KeyBinding guid="guidNodeToolsNpmCmdSet" id="cmdidNpmManageModules" key1="K" mod1="Control" key2="G" editor="guidVSStd97"/>
   </KeyBindings>
 
@@ -341,8 +319,6 @@
 
     <!-- This is our command set GUID and associated commands -->
     <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
-      <IDSymbol name="cmdidReplWindow" value="0x200" />
-      <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
       <IDSymbol name="cmdidSetAsNodejsStartupFile" value="0x0203" />
       <IDSymbol name="cmdidImportWizard" value ="0x0205" />
 
@@ -374,15 +350,12 @@
     </GuidSymbol>
 
     <GuidSymbol name="guidCommandPromptImage" value="{6CFD0EC5-3818-4439-AC50-71365BD2A756}" />
-    <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
 
     <GuidSymbol name="guidImages" value="{C616533C-7A95-4A3D-A22A-A5361A8037D8}" >
-      <IDSymbol name="nodeReplPic" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
       <IDSymbol name="bmpPicX" value="4" />
       <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="nodeDebugRepl" value="6" />
     </GuidSymbol>
 
     <GuidSymbol name="guidNodeToolsWseContextMenuCmdSet" value="{0D701F33-94A3-421C-9865-6F65E7E4B689}">

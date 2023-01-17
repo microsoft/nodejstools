@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Extern href="VSDbgCmd.h"/>
+  <Extern href="VsDebugGuids.h"/>
+
+  <!--The Commands section is where we the commands, menus and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidNodeExtrasPkg">
+    <!-- Inside this section we have different sub-sections: one for the menus, another  
+    for the menu groups, one for the buttons (the actual commands), one for the combos 
+    and the last one for the bitmaps used. Each element is identified by a command id that  
+    is a unique pair of guid and numeric identifier; the guid part of the identifier is usually  
+    called "command set" and is used to group different command inside a logically related  
+    group; your package should define its own command set in order to avoid collisions  
+    with command ids defined by other packages. -->
+
+    
+    <!--Buttons section: buttons include both buttons on toolbars as well as individual menu items -->
+    <Buttons>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidReplWindow" priority="0x7f00" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
+        <Icon guid="guidReplImage" id="1"/>
+        <Strings>
+          <CommandName>Node.js Interactive Window</CommandName>
+          <ButtonText>Node.js Interactive Window</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidNodeToolsCmdSet" id="cmdidOpenReplWindow" priority="0x0600" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_BUILD"/>
+        <Icon guid="guidReplImage" id="1"/>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>Open Node.js Interactive Window</CommandName>
+          <ButtonText>Open Node.js Interactive Window</ButtonText>
+        </Strings>
+      </Button>
+
+    </Buttons>
+
+    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
+    <Bitmaps>
+      <!--  The bitmap id is defined in a way that is a little bit different from the others: 
+            the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
+            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
+            inside a button definition. An important aspect of this declaration is that the element id 
+            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
+      <Bitmap guid="guidReplImage" href="NodeJSInteractiveWindow_16x.png" />
+      <Bitmap guid="guidImages" href="Images_32bit.png" usedList="nodeReplPic, nodeDebugRepl"/>
+    </Bitmaps>
+  </Commands>
+  
+  <KeyBindings>
+    <KeyBinding guid="guidNodeToolsCmdSet" id="cmdidReplWindow" key1="K" mod1="Control" key2="N" editor="guidVSStd97"/>
+  </KeyBindings>
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidNodeExtrasPkg" value="{64BADECB-C679-4D59-944A-A3A46FB53E31}" />
+    <GuidSymbol name="guidReplImage" value="{31C0C4BE-487E-4CCB-BEA2-A2EE8D23EDBB}" />
+
+    <!-- This is our command set GUID and associated commands -->
+    <GuidSymbol name="guidNodeToolsCmdSet" value="{695e37e2-c6df-4e0a-8833-f688e4c65f1f}">
+      <IDSymbol name="cmdidReplWindow" value="0x200" />
+      <IDSymbol name="cmdidOpenReplWindow" value="0x201" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{C616533C-7A95-4A3D-A22A-A5361A8037D8}" >
+      <IDSymbol name="nodeReplPic" value="1" />
+      <IDSymbol name="nodeDebugRepl" value="6" />
+    </GuidSymbol>
+
+  </Symbols>
+
+</CommandTable>

@@ -13,20 +13,22 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 using Microsoft.NodejsTools.Telemetry;
 using Microsoft.VisualStudio.InteractiveWindow;
 using Microsoft.VisualStudio.InteractiveWindow.Commands;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Utilities;
 using Newtonsoft.Json;
+using EnvDTE;
+using Microsoft.NodejsTools.Extras;
+
 
 namespace Microsoft.NodejsTools.Repl
 {
     public sealed class NodejsReplEvaluator : IInteractiveEvaluator, IDisposable
     {
         private ListenerThread listener;
-        private readonly NodejsReplSite site;
         private readonly IServiceProvider serviceProvider;
         private readonly IContentType contentType;
 
@@ -38,7 +40,6 @@ namespace Microsoft.NodejsTools.Repl
 
         public NodejsReplEvaluator(IServiceProvider serviceProvider, IContentType contentType)
         {
-            this.site = NodejsReplSite.Site;
             this.serviceProvider = serviceProvider;
             this.contentType = contentType;
         }
@@ -166,7 +167,7 @@ namespace Microsoft.NodejsTools.Repl
 
         public string FormatClipboard()
         {
-            return Clipboard.GetText();
+            return string.Empty;
         }
 
         public void AbortExecution()
@@ -242,13 +243,13 @@ namespace Microsoft.NodejsTools.Repl
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-            if (this.site.TryGetStartupFileAndDirectory(out _, out var directory))
+            if (TryGetStartupDirectory(out var directory))
             {
                 psi.WorkingDirectory = directory;
                 psi.EnvironmentVariables["NODE_PATH"] = directory;
             }
 
-            var process = new Process();
+            var process = new System.Diagnostics.Process();
             process.StartInfo = psi;
             try
             {
@@ -263,22 +264,25 @@ namespace Microsoft.NodejsTools.Repl
             this.listener = new ListenerThread(this, process, socket);
         }
 
+        private bool TryGetStartupDirectory(out string directory)
+        {
+            directory = string.Empty;
+            var dte = serviceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            if (dte != null)
+            {
+                var dteProject = (EnvDTE.Project)((Array)dte.ActiveSolutionProjects).GetValue(0);
+                if (dteProject != null)
+                {
+                    directory= Path.GetDirectoryName(dteProject.FullName);
+                    return directory != null;
+                }
+            }
+            return false;
+        }
+
         private string GetNodeExePath()
         {
-            var startupProject = this.site.GetStartupProject();
-            string nodeExePath;
-            if (startupProject != null)
-            {
-                nodeExePath = Nodejs.GetAbsoluteNodeExePath(
-                    startupProject.ProjectHome,
-                    startupProject.GetProjectProperty(NodeProjectProperty.NodeExePath)
-                );
-            }
-            else
-            {
-                nodeExePath = Nodejs.NodeExePath;
-            }
-            return nodeExePath;
+            return Nodejs.NodeExePath;
         }
 
         private static void CreateConnection(out Socket conn, out int portNum)
@@ -488,7 +492,7 @@ namespace Microsoft.NodejsTools.Repl
         private class ListenerThread : JsonListener, IDisposable
         {
             private readonly NodejsReplEvaluator eval;
-            private readonly Process process;
+            private readonly System.Diagnostics.Process process;
             private readonly object socketLock = new object();
             private Socket acceptSocket;
             public bool connected;
@@ -496,10 +500,10 @@ namespace Microsoft.NodejsTools.Repl
             private string executionText;
             private bool disposed;
 #if DEBUG
-            private Thread socketLockedThread;
+            private System.Threading.Thread socketLockedThread;
 #endif
 
-            public ListenerThread(NodejsReplEvaluator eval, Process process, Socket socket)
+            public ListenerThread(NodejsReplEvaluator eval, System.Diagnostics.Process process, Socket socket)
             {
                 this.eval = eval;
                 this.process = process;
@@ -788,7 +792,7 @@ namespace Microsoft.NodejsTools.Repl
                     Monitor.Enter(evaluator.socketLock);
 #if DEBUG
                     Debug.Assert(evaluator.socketLockedThread == null);
-                    evaluator.socketLockedThread = Thread.CurrentThread;
+                    evaluator.socketLockedThread = System.Threading.Thread.CurrentThread;
 #endif
                     this.evaluator = evaluator;
                 }
