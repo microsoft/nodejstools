@@ -4,7 +4,8 @@ using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
-using Extras.Properties;
+using Microsoft.NodejsTools.Extras;
+
 
 namespace Microsoft.NodejsTools.Jade
 {

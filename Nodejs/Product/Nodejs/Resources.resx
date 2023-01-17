@@ -389,12 +389,6 @@ NAME2=value2
   <data name="PackageCatalogRefreshFailed" xml:space="preserve">
     <value>Refresh failed - see output below for details</value>
   </data>
-  <data name="ReplInitializationMessage" xml:space="preserve">
-    <value>Node.js interactive window. Type .help for a list of commands.</value>
-  </data>
-  <data name="ReplWindowNpmInitNoYesFlagWarning" xml:space="preserve">
-    <value>Please run '.npm init -y' to create a new package.json file.</value>
-  </data>
   <data name="NodeExePathDescription" xml:space="preserve">
     <value>Specifies the path to the node.exe executable.</value>
   </data>
@@ -403,9 +397,6 @@ NAME2=value2
   </data>
   <data name="NpmPackageInstallHelpMessage" xml:space="preserve">
     <value>(enter arguments above)</value>
-  </data>
-  <data name="NpmReplCommandCompletedWithErrors" xml:space="preserve">
-    <value>{0} completed with errors</value>
   </data>
   <data name="CacheDirectoryClearFailedTitle" xml:space="preserve">
     <value>Could Not Clear Node.js Cache Directory</value>
@@ -454,18 +445,6 @@ NAME2=value2
   </data>
   <data name="ImportingProjectErrorStatusText" xml:space="preserve">
     <value>An error occurred and your project was not created.</value>
-  </data>
-  <data name="InteractiveWindowFailedToStartProcessErrorMessage" xml:space="preserve">
-    <value>Failed to start interactive process: {0}{1}{2}</value>
-  </data>
-  <data name="InteractiveWindowNoProcessErrorMessage" xml:space="preserve">
-    <value>Current interactive window is disconnected - please reset the process.</value>
-  </data>
-  <data name="InteractiveWindowProcessExitedMessage" xml:space="preserve">
-    <value>The process has exited</value>
-  </data>
-  <data name="InteractiveWindowTitle" xml:space="preserve">
-    <value>Node.js Interactive Window</value>
   </data>
   <data name="ImportingProjectAccessErrorStatusText" xml:space="preserve">
     <value>Some file paths could not be accessed.{0}Try moving your source code to a location where you can read and write files.</value>
@@ -580,40 +559,8 @@ The following error occurred trying to execute npm.cmd:
     <value>Could not find a Node.js runtime on your computer.  Please download and install the current Node.js release from 'https://nodejs.org', or specify the location of your Node.exe in the '{0}' file.</value>
     <comment>Template contains a filename, like launch.json</comment>
   </data>
-  <data name="ReplClearDescription" xml:space="preserve">
-    <value>Resets the context object to an empty object and clears any multi-line expression.</value>
-  </data>
-  <data name="ReplSaveDescription" xml:space="preserve">
-    <value>Save the current REPL session to a file.</value>
-  </data>
-  <data name="ReplSaveFailed" xml:space="preserve">
-    <value>Failed to save: '{0}'.</value>
-  </data>
-  <data name="ReplSaveInvalidFileName" xml:space="preserve">
-    <value>Invalid filename: '{0}'.</value>
-  </data>
-  <data name="ReplSaveNoFileName" xml:space="preserve">
-    <value>Save requires a filename.</value>
-  </data>
-  <data name="ReplSaveSucces" xml:space="preserve">
-    <value>Session saved to: '{0}'.</value>
-  </data>
   <data name="DebuggerAttachToDescription" xml:space="preserve">
     <value>Allows attaching to Node.js processes running behind a remote debug proxy (RemoteDebug.js). Related documentation can be found under the 'Tools\Node.js Tool\Remote Debug Proxy' menu. Specify the target hostname and debugger port in the 'Qualifier' textbox, e.g. 'targethost: {0}'. This transport is not secure, and should not be used on a network that might have hostile traffic.</value>
-  </data>
-  <data name="ReplInfoDescription" xml:space="preserve">
-    <value>Show information about the current used Node.js executable.</value>
-  </data>
-  <data name="ReplNodeError" xml:space="preserve">
-    <value>Failed to retrieve Nodejs.exe information.</value>
-  </data>
-  <data name="ReplNodeInfo" xml:space="preserve">
-    <value>Using Node.js exe from: '{0}'</value>
-    <comment>template is substituted with a path.</comment>
-  </data>
-  <data name="ReplNodeVersion" xml:space="preserve">
-    <value>Node.js Version: {0}</value>
-    <comment>template is substituted with version info</comment>
   </data>
   <data name="ConfigureProjectProperties" xml:space="preserve">
     <value>Configure project properties</value>
@@ -632,57 +579,6 @@ The following error occurred trying to execute npm.cmd:
   </data>
   <data name="BrowseWorkingDirDialogTitle" xml:space="preserve">
     <value>Select Working Dir</value>
-  </data>
-  <data name="ClassificationBlack" xml:space="preserve">
-    <value>Node.js Interactive - Black</value>
-  </data>
-  <data name="ClassificationBlue" xml:space="preserve">
-    <value>Node.js Interactive - Blue</value>
-  </data>
-  <data name="ClassificationCyan" xml:space="preserve">
-    <value>Node.js Interactive - Cyan</value>
-  </data>
-  <data name="ClassificationDarkBlue" xml:space="preserve">
-    <value>Node.js Interactive - Dark Blue</value>
-  </data>
-  <data name="ClassificationDarkCyan" xml:space="preserve">
-    <value>Node.js Interactive - Dark Cyan</value>
-  </data>
-  <data name="ClassificationDarkGray" xml:space="preserve">
-    <value>Node.js Interactive - Dark Gray</value>
-  </data>
-  <data name="ClassificationDarkGreen" xml:space="preserve">
-    <value>Node.js Interactive - Dark Green</value>
-  </data>
-  <data name="ClassificationDarkMagenta" xml:space="preserve">
-    <value>Node.js Interactive - Dark Magenta</value>
-  </data>
-  <data name="ClassificationDarkRed" xml:space="preserve">
-    <value>Node.js Interactive - Dark Red</value>
-  </data>
-  <data name="ClassificationDarkYellow" xml:space="preserve">
-    <value>Node.js Interactive - Dark Yellow</value>
-  </data>
-  <data name="ClassificationError" xml:space="preserve">
-    <value>Node.js Interactive - Error</value>
-  </data>
-  <data name="ClassificationGray" xml:space="preserve">
-    <value>Node.js Interactive - Gray</value>
-  </data>
-  <data name="ClassificationGreen" xml:space="preserve">
-    <value>Node.js Interactive - Green</value>
-  </data>
-  <data name="ClassificationMagenta" xml:space="preserve">
-    <value>Node.js Interactive - Magenta</value>
-  </data>
-  <data name="ClassificationRed" xml:space="preserve">
-    <value>Node.js Interactive - Red</value>
-  </data>
-  <data name="ClassificationWhite" xml:space="preserve">
-    <value>Node.js Interactive - White</value>
-  </data>
-  <data name="ClassificationYellow" xml:space="preserve">
-    <value>Node.js Interactive - Yellow</value>
   </data>
   <data name="SaveNodeSettingsInProjectFile" xml:space="preserve">
     <value>&amp;Apply Node.js settings to all users (save in project file)</value>

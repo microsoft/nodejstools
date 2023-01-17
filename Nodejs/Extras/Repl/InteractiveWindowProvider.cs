@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.InteractiveWindow.Shell;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.NodejsTools.Extras;
 
 namespace Microsoft.NodejsTools.Repl
 {

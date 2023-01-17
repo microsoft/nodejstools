@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.InteractiveWindow;
 using Microsoft.VisualStudio.InteractiveWindow.Commands;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.NodejsTools.Extras;
+
 
 namespace Microsoft.NodejsTools.Repl
 {

@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.NodejsTools.Npm;
 using Microsoft.NodejsTools.NpmUI;
-using Microsoft.NodejsTools.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.InteractiveWindow;
 using Microsoft.VisualStudio.InteractiveWindow.Commands;
@@ -19,6 +18,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudioTools.Project;
+using EnvDTE;
+using Microsoft.NodejsTools.Extras;
 
 namespace Microsoft.NodejsTools.Repl
 {
@@ -120,11 +121,11 @@ namespace Microsoft.NodejsTools.Repl
                 projectNameToDirectoryDictionary.TryGetValue(projectPath, out projectInfo);
             }
 
-            NodejsProjectNode nodejsProject = null;
+            Project nodejsProject = null;
             projectPath = projectInfo.ProjectPath;
             if (projectInfo.Hierarchy != null)
             {
-                nodejsProject = projectInfo.Hierarchy.GetProject().GetNodejsProject();
+                nodejsProject = projectInfo.Hierarchy.GetProject();
             }
 
             var isGlobalCommand = false;
@@ -149,14 +150,11 @@ namespace Microsoft.NodejsTools.Repl
             {
                 npmPath = NpmHelpers.GetPathToNpm(
                     nodejsProject != null ?
-                        Nodejs.GetAbsoluteNodeExePath(
-                            nodejsProject.ProjectHome,
-                            nodejsProject.GetProjectProperty(NodeProjectProperty.NodeExePath))
+                        Nodejs.GetPathToNodeExecutableFromEnvironment()
                         : null);
             }
             catch (NpmNotFoundException)
             {
-                Nodejs.ShowNodejsNotInstalled();
                 return ExecutionResult.Failure;
             }
 

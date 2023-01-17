@@ -605,20 +605,6 @@ namespace Microsoft.NodejsTools.Project
             }
         }
 
-        internal override int QueryStatusOnNode(Guid cmdGroup, uint cmd, IntPtr pCmdText, ref QueryStatusResult result)
-        {
-            if (cmdGroup == Guids.NodejsCmdSet)
-            {
-                switch (cmd)
-                {
-                    case PkgCmdId.cmdidOpenReplWindow:
-                        result = QueryStatusResult.SUPPORTED | QueryStatusResult.ENABLED;
-                        return VSConstants.S_OK;
-                }
-            }
-            return base.QueryStatusOnNode(cmdGroup, cmd, pCmdText, ref result);
-        }
-
         protected override QueryStatusResult QueryStatusSelectionOnNodes(IList<HierarchyNode> selectedNodes, Guid cmdGroup, uint cmd, IntPtr pCmdText)
         {
             if (cmdGroup == Guids.NodejsNpmCmdSet)
@@ -664,16 +650,17 @@ namespace Microsoft.NodejsTools.Project
 
         internal override int ExecCommandOnNode(Guid cmdGroup, uint cmd, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-            if (cmdGroup == Guids.NodejsCmdSet)
-            {
-                switch (cmd)
-                {
-                    case PkgCmdId.cmdidOpenReplWindow:
-                        NodejsPackage.Instance.OpenReplWindow();
-                        return VSConstants.S_OK;
-                }
-            }
-            else if (cmdGroup == Guids.NodejsNpmCmdSet)
+            //if (cmdGroup == Guids.NodejsCmdSet)
+            //{
+            //    switch (cmd)
+            //    {
+            //        case PkgCmdId.cmdidOpenReplWindow:
+            //            NodejsPackage.Instance.OpenReplWindow();
+            //            return VSConstants.S_OK;
+            //    }
+            //}
+            //else 
+            if (cmdGroup == Guids.NodejsNpmCmdSet)
             {
                 try
                 {
