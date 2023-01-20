@@ -60,8 +60,6 @@ namespace Microsoft.NodejsTools.Workspace
             {
                 await this.workspaceContext.JTF.SwitchToMainThreadAsync();
 
-                this.outputPane.InitializeOutputPanes();
-
                 var actions = new List<IFileContextAction>();
 
                 if (TypeScriptHelpers.IsTsJsConfigJsonFile(filePath))
@@ -76,6 +74,11 @@ namespace Microsoft.NodejsTools.Workspace
                     {
                         actions.Add(new BuildTsFileContextAction(filePath, fileContext, this.outputPane));
                     }
+                }
+
+                if (actions.Count > 0)
+                {
+                    this.outputPane.InitializeOutputPanes();
                 }
 
                 return actions;
