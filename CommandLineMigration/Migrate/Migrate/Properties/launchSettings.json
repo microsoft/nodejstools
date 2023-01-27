@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Migrate": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\sheya\\source\\repos\\NodejsConsoleApp1\\NodejsConsoleApp1\\NodejsConsoleApp1.njsproj\""
+    }
+  }
+}
