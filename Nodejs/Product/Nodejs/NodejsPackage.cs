@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudioTools;
+using MigrateToJsps;
 
 namespace Microsoft.NodejsTools
 {
@@ -94,11 +95,17 @@ namespace Microsoft.NodejsTools
             RegisterProjectFactory(new NodejsProjectFactory(this));
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            var commands = new List<Command> {
-                new ImportWizardCommand(),
-            };            
+            var importWizardCmd = new List<Command> {
+                new ImportWizardCommand()
+            };
 
-            RegisterCommands(commands, Guids.NodejsCmdSet);
+            var migrateToJspsCmd = new List<Command> {
+                new MigrateToJspsCommand(),
+                new RevertMigrationCommand()
+            };
+
+            RegisterCommands(importWizardCmd, Guids.NodejsCmdSet);
+            RegisterCommands(migrateToJspsCmd, Guids.MigrateToJspsCmdSet);
 
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
