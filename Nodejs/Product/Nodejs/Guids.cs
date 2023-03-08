@@ -42,6 +42,8 @@ namespace Microsoft.NodejsTools
         public static readonly Guid NodejsNpmCmdSet = new Guid(NodejsNpmCmdSetString);
         public static readonly Guid NodeToolsWorkspaceCmdSet = new Guid(NodeToolsWorkspaceCmdSetString);
 
+        public static readonly Guid MigrateToJspsCmdSet = new Guid("5F602F6D-4592-448A-B321-2ECFA442BB29");
+
         public static readonly Guid TypeScriptLanguageInfo = new Guid(TypeScriptLanguageInfoString);
         public static readonly Guid TypeScriptDebugLanguage = new Guid(TypeScriptDebuggerLanguageInfoString);
 

@@ -68,6 +68,7 @@
       <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
+    <Compile Include="Commands\MigrateToJspsCommand.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Diagnostics\HierarchyItem.cs" />
     <Compile Include="Diagnostics\NodeJsToolsEventSource.cs" />
