@@ -715,6 +715,10 @@
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\MigrateToJsps\MigrateToJsps.csproj">
+      <Project>{FCAE2282-8ADC-46C8-B4C8-C25A76BD9567}</Project>
+      <Name>MigrateToJsps</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
