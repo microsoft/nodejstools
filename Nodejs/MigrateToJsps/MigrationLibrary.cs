@@ -1,38 +1,33 @@
-﻿using NtvsMigration;
-using System;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Security;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace NtvsMigration
+namespace MigrateToJsps
 {
-    class Program
+    public static class MigrationLibrary
     {
-        public static void Main(string[] args)
+        public static void Migrate(string njsprojFile, string newProjectDir) 
         {
-            if (args.Length == 0)
-            {
-                Console.WriteLine("Please input a non-empty path to your .njsproj file.");
-                return;
-            }
+            if (string.IsNullOrEmpty(njsprojFile)) throw new ArgumentNullException("Please input a non-empty path to your .njsproj file.");
 
-            Console.WriteLine("Please enter the full path for an existing directory for the new project to live:");
-            var newProjectDir = Console.ReadLine();
             if (!string.IsNullOrEmpty(newProjectDir) && VerifyNewProjectDir(newProjectDir))
             {
-                var pathToNjsproj = args[0];
-
-                if (VerifyNjsprojPath(pathToNjsproj))
+                if (VerifyNjsprojPath(njsprojFile))
                 {
-                    Migrate(pathToNjsproj, newProjectDir);
+                    MigrateProject(njsprojFile, newProjectDir);
                 }
             }
             else
             {
-                Console.WriteLine("Destination path not valid.");
+                throw new ArgumentException("Destination path not valid");
             }
         }
 
-        private static void Migrate(string njsprojFilepath, string destinationDir)
+        private static void MigrateProject(string njsprojFilepath, string destinationDir)
         {
             // TODO: move to JspsProjectCreator constructor
             var njsprojFile = NjsprojFileReader.ProcessNjsproj(njsprojFilepath);
@@ -46,13 +41,7 @@ namespace NtvsMigration
             // write .sln file?
         }
 
-        private static Stream GetManifestResourceStream(string resourceName)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            return assembly.GetManifestResourceStream(resourceName);
-        }
-
-        private static bool VerifyNewProjectDir(string? userInputtedPath)
+        private static bool VerifyNewProjectDir(string userInputtedPath)
         {
             if (userInputtedPath == null)
             {
@@ -102,7 +91,8 @@ namespace NtvsMigration
                 return false;
             }
 
-            if (!File.Exists(fullPath)) {
+            if (!File.Exists(fullPath))
+            {
                 Console.WriteLine($"{fullPath} does not exist.");
                 return false;
             }

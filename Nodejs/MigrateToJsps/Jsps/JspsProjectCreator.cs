@@ -1,20 +1,20 @@
-﻿using NtvsMigration;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NtvsMigration
+namespace MigrateToJsps
 {
     internal class JspsProjectCreator
     {
         private string njsprojDir;
         private NjsprojFileModel njsprojFileModel;
         private string newProjectParentDir;
-        
-        public JspsProjectCreator(string njsprojDir, NjsprojFileModel njsprojFileModel, string newProjectParentDir) 
-        { 
+
+        public JspsProjectCreator(string njsprojDir, NjsprojFileModel njsprojFileModel, string newProjectParentDir)
+        {
             this.njsprojDir = njsprojDir;
             this.njsprojFileModel = njsprojFileModel;
             this.newProjectParentDir = newProjectParentDir;
@@ -37,9 +37,9 @@ namespace NtvsMigration
             EsprojFileWriter.WriteEsproj(newProjDir, njsprojFileModel.ProjectName);
         }
 
-        private void CopyProjectFiles(string destinationDir) 
+        private void CopyProjectFiles(string destinationDir)
         {
-            foreach(var fileItem in njsprojFileModel.ProjectFiles)
+            foreach (var fileItem in njsprojFileModel.ProjectFiles)
             {
                 var source = Path.Combine(njsprojDir, fileItem);
                 var destination = Path.Combine(destinationDir, fileItem);
@@ -49,7 +49,7 @@ namespace NtvsMigration
                 {
                     Directory.CreateDirectory(fileDir);
                 }
-                
+
                 File.Copy(source, destination, true);
             }
         }

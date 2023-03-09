@@ -1,13 +1,12 @@
-﻿using Microsoft.CodeAnalysis.MSBuild;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace NtvsMigration
+namespace MigrateToJsps
 {
     internal class NjsprojFileReader
     {
@@ -30,7 +29,7 @@ namespace NtvsMigration
                 }
 
                 // get startup file and name of project
-                foreach(var propertyGroup in ntvsProj.PropertyGroup)
+                foreach (var propertyGroup in ntvsProj.PropertyGroup)
                 {
                     if (!string.IsNullOrEmpty(propertyGroup.Name))
                     {
@@ -45,9 +44,9 @@ namespace NtvsMigration
                 }
 
                 List<string> files = new List<string>();
-                foreach(var itemGroup in ntvsProj.ItemGroup)
+                foreach (var itemGroup in ntvsProj.ItemGroup)
                 {
-                    foreach(var content in itemGroup.Content)
+                    foreach (var content in itemGroup.Content)
                     {
                         //TODO: need to look at none includes also
                         if (content.Include != null)

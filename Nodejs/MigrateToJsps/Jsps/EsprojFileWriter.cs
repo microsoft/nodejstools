@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NtvsMigration
+namespace MigrateToJsps
 {
     internal static class EsprojFileWriter
     {
-
         private static string template =
 @"<Project Sdk=""Microsoft.VisualStudio.JavaScript.Sdk/0.5.64-alpha"">
   <PropertyGroup>
