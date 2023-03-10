@@ -71,6 +71,14 @@
       <VSIXSubPath>.</VSIXSubPath>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\MigrateToJsps\MigrateToJsps.csproj">
+      <Project>{FCAE2282-8ADC-46C8-B4C8-C25A76BD9567}</Project>
+      <Name>MigrateToJsps</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <VSIXSubPath>.</VSIXSubPath>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).vsix">

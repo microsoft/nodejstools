@@ -22,7 +22,7 @@ namespace MigrateToJsps
 
         public void CreateJspsProject() // to be called by outsiders
         {
-            var parentDir = Path.Combine(newProjectParentDir, njsprojFileModel.ProjectName + "-migrated");
+            var parentDir = Path.Combine(newProjectParentDir, njsprojFileModel.ProjectName);
             var newProjDir = Path.Combine(parentDir, njsprojFileModel.ProjectName);
 
             Directory.CreateDirectory(newProjDir);
