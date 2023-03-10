@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MigrateToJsps
 {
-    public static class MigrationLibrary
+    public class MigrationLibrary
     {
         public static void Migrate(string njsprojFile, string newProjectDir) 
         {
@@ -33,8 +34,10 @@ namespace MigrateToJsps
             var njsprojFile = NjsprojFileReader.ProcessNjsproj(njsprojFilepath);
 
             var njsprojDir = Path.GetDirectoryName(njsprojFilepath);
+            var renamedNjsprojDir = njsprojDir + "-old";
+            Directory.Move(njsprojDir, renamedNjsprojDir);
 
-            var jspsProjCreator = new JspsProjectCreator(njsprojDir, njsprojFile, destinationDir);
+            var jspsProjCreator = new JspsProjectCreator(renamedNjsprojDir, njsprojFile, destinationDir);
 
             jspsProjCreator.CreateJspsProject();
 

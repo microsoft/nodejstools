@@ -18,7 +18,7 @@ namespace MigrateToJsps
     }
 
     [XmlRoot(ElementName = "PropertyGroup")]
-    internal class PropertyGroup
+    public class PropertyGroup
     {
         [XmlElement(ElementName = "Name")]
         public string Name { get; set; }
@@ -43,7 +43,7 @@ namespace MigrateToJsps
     }
 
     [XmlRoot(ElementName = "ItemGroup")]
-    internal class ItemGroup
+    public class ItemGroup
     {
         [XmlElement(ElementName = "Content")]
         public List<Content> Content { get; set; }
@@ -53,7 +53,7 @@ namespace MigrateToJsps
     }
 
     [XmlRoot(ElementName = "Content")]
-    internal class Content
+    public class Content
     {
         [XmlAttribute(AttributeName = "Include")]
         public string Include { get; set; }
@@ -69,7 +69,7 @@ namespace MigrateToJsps
     }
 
     [XmlRoot(ElementName = "Project", Namespace = "http://schemas.microsoft.com/developer/msbuild/2003")]
-    internal class Project
+    public class Project
     {
         [XmlElement(ElementName = "PropertyGroup")]
         public List<PropertyGroup> PropertyGroup { get; set; } = new List<PropertyGroup> { };
