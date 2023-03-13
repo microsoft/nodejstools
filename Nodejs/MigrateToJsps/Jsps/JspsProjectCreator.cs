@@ -30,7 +30,7 @@ namespace MigrateToJsps
             // TODO: account for none includes also!
             CopyProjectFiles(newProjDir);
 
-            LaunchJsonWriter.CreateLaunchJson(newProjDir, njsprojFileModel.StartupFile);
+            LaunchJsonWriter.CreateLaunchJson(njsprojFileModel.ProjectTypeGuids, newProjDir, njsprojFileModel.StartupFile);
 
             NugetConfigWriter.GenerateNugetConfig(newProjDir);
 
