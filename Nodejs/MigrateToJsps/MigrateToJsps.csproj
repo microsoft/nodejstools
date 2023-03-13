@@ -123,6 +123,7 @@
     <Compile Include="Jsps\NugetConfigWriter.cs" />
     <Compile Include="Ntvs\NjsprojFileModel.cs" />
     <Compile Include="Ntvs\NjsprojFileReader.cs" />
+    <Compile Include="Ntvs\ProjectGuids.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

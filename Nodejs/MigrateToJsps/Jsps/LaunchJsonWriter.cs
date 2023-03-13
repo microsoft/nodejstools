@@ -9,7 +9,7 @@ namespace MigrateToJsps
 {
     internal static class LaunchJsonWriter
     {
-        private static string template =
+        private static string consoleAppLaunchTemplate =
 @"{
   ""version"": ""0.2.0"",
   ""configurations"": [
@@ -25,12 +25,61 @@ namespace MigrateToJsps
   ]
 }
 ";
-        public static void CreateLaunchJson(string projectRootDir, string startupFile)
+
+        private static string expressAppLaunchTemplate =
+@"{
+  ""version"": ""0.2.0"",
+  ""configurations"": [
+    {
+      ""name"": ""localhost (Edge)"",
+      ""type"": ""edge"",
+      ""request"": ""launch"",
+      ""url"": ""http://localhost:3000"",
+      ""webRoot"": ""${workspaceFolder}\\public""
+    },
+    {
+      ""name"": ""localhost (Chrome)"",
+      ""type"": ""chrome"",
+      ""request"": ""launch"",
+      ""url"": ""http://localhost:3000"",
+      ""webRoot"": ""${workspaceFolder}\\public""
+    },
+    {
+      ""name"": ""Debug Dev Env"",
+      ""type"": ""node"",
+      ""request"": ""launch"",
+      ""program"": ""${workspaceFolder}/*startupFile*"",
+      ""cwd"": ""${workspaceFolder}"",
+      ""stopOnEntry"": true
+    }
+  ],
+  ""compounds"": [
+    {
+      ""name"": ""Launch Node and Browser"",
+      ""configurations"": [
+        ""Debug Dev Env"",
+        ""localhost (Edge)""
+      ]
+    }
+  ]
+}
+";
+
+        public static void CreateLaunchJson(string projectTypeGuids, string projectRootDir, string startupFile)
         {
             var vscodeDir = Path.Combine(projectRootDir, ".vscode");
             Directory.CreateDirectory(vscodeDir);
             var filePath = Path.Combine(vscodeDir, "launch.json");
-            var launchJson = template.Replace("*startupFile*", startupFile);
+
+            var launchJson = "";
+            if (projectTypeGuids.Contains(ProjectGuids.Express))
+            {
+                launchJson = expressAppLaunchTemplate.Replace("*startupFile*", startupFile);
+            }
+            else
+            {
+                launchJson = consoleAppLaunchTemplate.Replace("*startupFile*", startupFile);
+            }
 
             using (FileStream fs = File.Create(filePath))
             {
