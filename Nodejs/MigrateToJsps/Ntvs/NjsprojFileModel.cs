@@ -16,7 +16,7 @@ namespace MigrateToJsps
 
         public List<string> ProjectFiles { get; set; } = new List<string>();
 
-        public string ProjectTypeGuids { get; set; }
+        public List<Guid> ProjectTypeGuids { get; set; }
     }
 
     [XmlRoot(ElementName = "PropertyGroup")]

@@ -65,14 +65,14 @@ namespace MigrateToJsps
 }
 ";
 
-        public static void CreateLaunchJson(string projectTypeGuids, string projectRootDir, string startupFile)
+        public static void CreateLaunchJson(List<Guid> projectTypeGuids, string projectRootDir, string startupFile)
         {
             var vscodeDir = Path.Combine(projectRootDir, ".vscode");
             Directory.CreateDirectory(vscodeDir);
             var filePath = Path.Combine(vscodeDir, "launch.json");
 
             var launchJson = "";
-            if (projectTypeGuids.Contains(ProjectGuids.Express))
+            if (projectTypeGuids.Contains(ProjectGuids.DotnetMVC5WebApp)) // this means the NTVS project is one of the "web app" templates
             {
                 launchJson = expressAppLaunchTemplate.Replace("*startupFile*", startupFile);
             }

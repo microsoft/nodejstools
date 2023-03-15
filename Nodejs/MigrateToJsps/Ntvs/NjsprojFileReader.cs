@@ -15,7 +15,7 @@ namespace MigrateToJsps
         {
             var name = "";
             var startupFile = "";
-            var projectTypeGuids = "";
+            var projectTypeGuidsString = "";
 
             using (var fileStream = File.Open(njsprojPath, FileMode.Open, FileAccess.Read))
             {
@@ -45,7 +45,7 @@ namespace MigrateToJsps
                     if (!string.IsNullOrEmpty(propertyGroup.ProjectTypeGuids))
                     {
                         //Console.WriteLine("StartupFile prop is: " + propertyGroup.StartupFile);
-                        projectTypeGuids = propertyGroup.ProjectTypeGuids;
+                        projectTypeGuidsString = propertyGroup.ProjectTypeGuids;
                     }
                 }
 
@@ -61,6 +61,11 @@ namespace MigrateToJsps
                         }
                     }
                 }
+
+                List<Guid> projectTypeGuids = 
+                    string.IsNullOrEmpty(projectTypeGuidsString) ? 
+                    new List<Guid>() : 
+                    projectTypeGuidsString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(guidString => Guid.Parse(guidString)).ToList();
 
                 return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids };
             }
