@@ -67,8 +67,14 @@
     </FilesToSign>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Composition">
+      <Version>15.0.70</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.ProjectSystem">
       <Version>16.2.133-pre</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Validation">
+      <Version>15.3.32</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
