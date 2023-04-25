@@ -66,6 +66,17 @@
       <InProject>false</InProject>
     </FilesToSign>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem">
+      <Version>15.8.243</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="System.Xml.XmlSerializer">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\Product\Nodejs\SharedResources.proj" />
   <Import Project="..\Product\ProjectAfter.targets" />

@@ -175,12 +175,14 @@ namespace TestAdapter.Tests
 
         private static TestCase GetTestCase(TestCaseOptions testCaseOptions, string fullyQualifiedName, string displayName, int lineNumber, string filePath)
         {
+            var executorUri = new Uri("executor://NodejsTestExecutor/v1");
+
             var testCase = new TestCase()
             {
                 FullyQualifiedName = fullyQualifiedName,
                 DisplayName = displayName,
                 LineNumber = lineNumber,
-                ExecutorUri = NodejsConstants.ExecutorUri,
+                ExecutorUri = executorUri,
                 Source = testCaseOptions.Source,
                 CodeFilePath = filePath,
             };

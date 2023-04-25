@@ -21,13 +21,12 @@ namespace MigrateToJsps
 
             using (var fileStream = File.Open(njsprojPath, FileMode.Open, FileAccess.Read))
             {
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Project));
+                var xmlSerializer = new XmlSerializer(typeof(Project));
 
-                Project ntvsProj = (Project)xmlSerializer.Deserialize(fileStream);
+                var ntvsProj = (Project)xmlSerializer.Deserialize(fileStream);
 
                 if (ntvsProj == null)
                 {
-                    Console.Error.WriteLine("Something went wrong");
                     throw new Exception("Deserialized project is null");
                 }
 
@@ -36,17 +35,14 @@ namespace MigrateToJsps
                 {
                     if (!string.IsNullOrEmpty(propertyGroup.Name))
                     {
-                        //Console.WriteLine("Name prop is: " + propertyGroup.Name);
                         name = propertyGroup.Name;
                     }
                     if (!string.IsNullOrEmpty(propertyGroup.StartupFile))
                     {
-                        //Console.WriteLine("StartupFile prop is: " + propertyGroup.StartupFile);
                         startupFile = propertyGroup.StartupFile;
                     }
                     if (!string.IsNullOrEmpty(propertyGroup.ProjectTypeGuids))
                     {
-                        //Console.WriteLine("StartupFile prop is: " + propertyGroup.StartupFile);
                         projectTypeGuidsString = propertyGroup.ProjectTypeGuids;
                     }
                     if (!string.IsNullOrEmpty(propertyGroup.NodejsPort))
