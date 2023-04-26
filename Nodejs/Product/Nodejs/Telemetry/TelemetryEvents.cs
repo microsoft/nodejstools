@@ -50,6 +50,16 @@ namespace Microsoft.NodejsTools.Telemetry
         /// User started discovery on the test adapters.
         /// </summary>
         public const string TestDiscoveryStarted = Prefix + "TestDiscoveryStarted";
+
+        /// <summary>
+        /// User migrated project to Jsps
+        /// </summary>
+        public const string MigratedToJsps = Prefix + "MigratedToJsps";
+
+        /// <summary>
+        /// User reverted project back to Ntvs
+        /// </summary>
+        public const string RevertedBackToNtvs = Prefix + "RevertedBackToNtvs";
     }
 
     internal static class TelemetryProperties
@@ -84,5 +94,7 @@ namespace Microsoft.NodejsTools.Telemetry
         /// The type of test adapter that launched discovery.
         /// </summary>
         public const string TestDiscovererName = Prefix + "TestDiscovererName";
+
+        public const string ProjectGuid = Prefix + "NtvsProjectGuid";
     }
 }

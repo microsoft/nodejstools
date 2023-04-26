@@ -20,6 +20,7 @@ namespace Microsoft.NodejsTools
         public const string TypeScriptLanguageInfoString = "4a0dddb5-7a95-4fbf-97cc-616d07737a77";
         public const string JadeEditorFactoryString = "6CB69EF8-1329-4DC0-84B4-FA134EA59BE3";
         public const string DefaultLanguageServiceString = "8239BEC4-EE87-11D0-8C98-00C04FC2AB22";
+        public const string MigrateToJspsCmdSetString = "5F602F6D-4592-448A-B321-2ECFA442BB29";
 
         public static readonly Guid DefaultLanguageService = new Guid(DefaultLanguageServiceString);
 
@@ -41,6 +42,8 @@ namespace Microsoft.NodejsTools
         public static readonly Guid NodejsDebugLanguage = new Guid(NodejsDebugLanguageString);
         public static readonly Guid NodejsNpmCmdSet = new Guid(NodejsNpmCmdSetString);
         public static readonly Guid NodeToolsWorkspaceCmdSet = new Guid(NodeToolsWorkspaceCmdSetString);
+
+        public static readonly Guid MigrateToJspsCmdSet = new Guid(MigrateToJspsCmdSetString);
 
         public static readonly Guid TypeScriptLanguageInfo = new Guid(TypeScriptLanguageInfoString);
         public static readonly Guid TypeScriptDebugLanguage = new Guid(TypeScriptDebuggerLanguageInfoString);

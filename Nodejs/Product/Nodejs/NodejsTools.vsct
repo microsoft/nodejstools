@@ -59,6 +59,10 @@
         <Parent guid="guidNodeToolsWseContextMenuCmdSet" id="idmNpm"/>
       </Group>
 
+      <Group guid="guidMigrateToJspsCmdSet" id="cmdidJspsMigrate">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
+      </Group>
+
     </Groups>
 
     <Menus>
@@ -164,6 +168,24 @@
         </Strings>
       </Button>
 
+      <Button guid="guidMigrateToJspsCmdSet" id="cmdidJspsProjectMigrate" type="Button">
+        <Parent guid="guidMigrateToJspsCmdSet" id="cmdidJspsMigrate"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Convert to New JavaScript Project Experience</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidMigrateToJspsCmdSet" id="cmdidJspsProjectRevert" type="Button">
+        <Parent guid="guidMigrateToJspsCmdSet" id="cmdidJspsMigrate"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Revert Project To Old Experience</ButtonText>
+        </Strings>
+      </Button>
+      
       <Button guid="guidNodeToolsNpmCmdSet" id="cmdidNpmUpdateModules" priority="0x8200" type="Button">
         <Parent guid="guidNodeToolsNpmCmdSet" id="NpmGroup" />
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -332,6 +354,12 @@
       <!-- Groups -->
       <IDSymbol name="CodeFileGroup" value="0x1012" />
       <IDSymbol name="AddNewFileGroup" value="0x1016"/>
+    </GuidSymbol>
+
+    <GuidSymbol name="guidMigrateToJspsCmdSet" value="{5F602F6D-4592-448A-B321-2ECFA442BB29}">
+      <IDSymbol name="cmdidJspsProjectMigrate" value="0x206" />
+      <IDSymbol name="cmdidJspsProjectRevert" value="0x207" />
+      <IDSymbol name="cmdidJspsMigrate" value="0x208" />
     </GuidSymbol>
 
     <GuidSymbol name="guidNodeToolsNpmCmdSet" value="{9F4B31B4-09AC-4937-A2E7-F4BC02BB7DBA}">

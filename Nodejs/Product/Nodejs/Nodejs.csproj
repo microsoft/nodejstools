@@ -68,6 +68,9 @@
       <Link>TypeScriptHelpers\TypeScriptHelpers.cs</Link>
     </Compile>
     <Compile Include="Commands\ImportWizardCommand.cs" />
+    <Compile Include="Commands\MigrateToJspsCommand.cs" />
+    <Compile Include="Commands\MigrateToJspsUtils.cs" />
+    <Compile Include="Commands\RevertMigrationCommand.cs" />
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Diagnostics\HierarchyItem.cs" />
     <Compile Include="Diagnostics\NodeJsToolsEventSource.cs" />
@@ -291,6 +294,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="FeatureFlags.pkgdef">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="OpenFolder.pkgdef">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -714,6 +721,10 @@
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\MigrateToJsps\MigrateToJsps.csproj">
+      <Project>{FCAE2282-8ADC-46C8-B4C8-C25A76BD9567}</Project>
+      <Name>MigrateToJsps</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <TypeScriptProject Include="ProjectTemplates\TypeScriptAzureWebRole\server.ts" />
@@ -1030,11 +1041,11 @@
       into the NodejsTools output folder temporarily to generate the pkgdef file.
   -->
   <Target Name="_CopyForCreatePkgDef" BeforeTargets="GeneratePkgDef">
-    <Copy SourceFiles="$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;" DestinationFolder="$(OutputPath)">
+    <Copy SourceFiles="$(OutputPath)..\ProjectWizard\Microsoft.NodejsTools.ProjectWizard.dll;$(OutputPath)..\Npm\Microsoft.NodejsTools.Npm.dll;$(OutputPath)..\PressAnyKey\Microsoft.NodejsTools.PressAnyKey.exe;$(OutputPath)..\MigrateToJsps\MigrateToJsps.dll;" DestinationFolder="$(OutputPath)">
       <Output TaskParameter="CopiedFiles" ItemName="_CopiedForCreatePkgdef" />
     </Copy>
   </Target>
   <Target Name="_DeleteAfterCreatePkgDef" AfterTargets="GeneratePkgDef">
-    <Delete Files="@(_CopiedForCreatePkgdef)" />
+    <!--<Delete Files="@(_CopiedForCreatePkgdef)" />-->
   </Target>
 </Project>
