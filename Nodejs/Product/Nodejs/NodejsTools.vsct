@@ -181,6 +181,7 @@
       <Button guid="guidMigrateToJspsCmdSet" id="cmdidJspsProjectRevert" type="Button">
         <Parent guid="guidMigrateToJspsCmdSet" id="cmdidJspsMigrate"/>
         <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
           <ButtonText>Revert Project To Old Experience</ButtonText>
         </Strings>
