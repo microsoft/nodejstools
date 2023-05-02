@@ -182,7 +182,6 @@
         <Parent guid="guidMigrateToJspsCmdSet" id="cmdidJspsMigrate"/>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
-        <CommandFlag>TextChanges</CommandFlag>
         <Strings>
           <ButtonText>Revert Project To Old Experience</ButtonText>
         </Strings>
