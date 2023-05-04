@@ -15,6 +15,7 @@
     <LanguageTag>Typescript</LanguageTag>
     <PlatformTag>Azure</PlatformTag>
     <ProjectTypeTag>Cloud</ProjectTypeTag>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptExpressApp.njsproj" ReplaceParameters="true">
