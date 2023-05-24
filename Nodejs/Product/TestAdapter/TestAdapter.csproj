@@ -53,11 +53,7 @@
     </Compile>
     <Compile Include="AssemblyResolver.cs" />
     <Compile Include="DefaultTestDiscoverer.cs" />
-    <Compile Include="DotNetTestDiscoverer.cs" />
-    <Compile Include="JavascriptProjectTestDiscoverer.cs" />
     <Compile Include="NodejsToolsTestDiscoverer.cs" />
-    <Compile Include="PackageJsonTestDiscoverer.cs" />
-    <Compile Include="PackageJsonTestExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelpers.cs" />
     <Compile Include="ProjectTestExecutor.cs" />
