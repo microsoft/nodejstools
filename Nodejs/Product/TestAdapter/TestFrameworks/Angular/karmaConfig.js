@@ -19,6 +19,11 @@ module.exports = function (config) {
     // Replace all reporters
     config.reporters = ['vsKarmaReporter'];
 
+    if (!config.hostname && !config.listenAddress) {
+        // The default address is IPv4 but node 17+ uses IPv6. Update the value to 'localhost' (which works with both IPv4 and IPv6) if it was not set.
+        config.hostname = config.listenAddress = 'localhost';
+    }
+
     setGrep(config);
 };
 
