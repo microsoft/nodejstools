@@ -300,7 +300,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return this.flags.HasFlag(HierarchyNodeFlags.IsVisible);
+                return (this.flags & HierarchyNodeFlags.IsVisible) == HierarchyNodeFlags.IsVisible;
             }
             set
             {
@@ -412,7 +412,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return this.flags.HasFlag(HierarchyNodeFlags.IsExpanded);
+                return (this.flags & HierarchyNodeFlags.IsExpanded) == HierarchyNodeFlags.IsExpanded;
             }
             set
             {
@@ -457,7 +457,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return this.flags.HasFlag(HierarchyNodeFlags.ExcludeFromScc);
+                return (this.flags & HierarchyNodeFlags.ExcludeFromScc) == HierarchyNodeFlags.ExcludeFromScc;
             }
             set
             {
@@ -480,7 +480,7 @@ namespace Microsoft.VisualStudioTools.Project
         {
             get
             {
-                return this.flags.HasFlag(HierarchyNodeFlags.HasParentNodeNameRelation);
+                return (this.flags & HierarchyNodeFlags.HasParentNodeNameRelation) == HierarchyNodeFlags.HasParentNodeNameRelation;
             }
             set
             {
