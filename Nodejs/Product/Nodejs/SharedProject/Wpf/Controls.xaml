@@ -18,6 +18,21 @@
         </Setter>
     </Style>
 
+    <Style x:Key="OutOfMarginFocusVisualStyle" TargetType="{x:Type Control}">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle 
+                        Margin="-2"
+                        RenderOptions.EdgeMode="Aliased"
+                        StrokeThickness="1" 
+                        Stroke="{DynamicResource {x:Static wpf:Controls.ForegroundKey}}"
+                        StrokeDashArray="1 1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="EllipseFocusVisualStyle" TargetType="{x:Type Control}">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -250,6 +265,7 @@
     <Style x:Key="HyperlinkButton" TargetType="{x:Type vsui:HyperlinkButton}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static wpf:Controls.HyperlinkKey}}" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource OutOfMarginFocusVisualStyle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">

@@ -347,7 +347,8 @@
                               Content="{Binding Path=SelectedPackage}"
                               ContentTemplate="{StaticResource PackageInfoTemplate}"
                               IsTabStop="True" AutomationProperties.Name="{Binding Path=SelectedPackage.Name}"
-                              TabIndex="3" />
+                              TabIndex="3" 
+                              FocusVisualStyle="{DynamicResource OutOfMarginFocusVisualStyle}"/>
 
                 <StackPanel Grid.Row="1"
                             Orientation="Vertical"
