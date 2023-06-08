@@ -139,14 +139,16 @@
                                            Text="{Binding Author,Mode=OneWay}"
                                            TextTrimming="CharacterEllipsis"
                                            ToolTip="{Binding Author,Mode=OneWay}"
-                                           Opacity="0.6" />
+                                           Opacity="0.6" 
+                                           Visibility="{Binding AuthorVisibility, Mode=OneWay}" />
                             </Grid>
 
                             <TextBlock Grid.Row="1"
                                        Margin="3"
                                        Text="{Binding Description,Mode=OneWay}"
                                        TextWrapping="Wrap" 
-                                       TextTrimming="CharacterEllipsis" Height="30"/>
+                                       TextTrimming="CharacterEllipsis" Height="30"
+                                       Visibility="{Binding DescriptionVisibility, Mode=OneWay}" />
 
                             <Grid Grid.Row="2" Margin="3 6 3 3">
                                 <Grid.ColumnDefinitions>
@@ -347,7 +349,8 @@
                               Content="{Binding Path=SelectedPackage}"
                               ContentTemplate="{StaticResource PackageInfoTemplate}"
                               IsTabStop="True" AutomationProperties.Name="{Binding Path=SelectedPackage.Name}"
-                              TabIndex="3" />
+                              TabIndex="3" 
+                              FocusVisualStyle="{DynamicResource OutOfMarginFocusVisualStyle}"/>
 
                 <StackPanel Grid.Row="1"
                             Orientation="Vertical"
