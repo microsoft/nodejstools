@@ -42,10 +42,7 @@ namespace Microsoft.NodejsTools.TypeScript
         {
             var extension = Path.GetExtension(filePath);
 
-            return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.NodejsProjectExtension)
-                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.CSharpProjectExtension)
-                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.VisualBasicProjectExtension)
-                || StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.JavaScriptProjectExtension);
+            return StringComparer.OrdinalIgnoreCase.Equals(extension, NodejsConstants.NodejsProjectExtension);
         }
 
 #if !NETSTANDARD2_0
