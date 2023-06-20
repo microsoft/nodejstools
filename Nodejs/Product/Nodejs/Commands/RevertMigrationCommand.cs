@@ -65,6 +65,7 @@ namespace Microsoft.NodejsTools.Commands
                         if (MigrateToJspsUtils.MigrationIsEnabled() && MigrateToJspsUtils.ProjectFileIsJsps(activeProject.FullName) && MigrateToJspsUtils.DirectoryContainsNjsproj(projectDir))
                         {
                             cmd.Visible = cmd.Enabled = true;
+                            cmd.Text = MigrateToJspsResources.RevertToNtvsCmd;
                         }
                     }
                     catch (Exception e)

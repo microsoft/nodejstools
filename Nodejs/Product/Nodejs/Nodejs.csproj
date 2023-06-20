@@ -74,6 +74,11 @@
     <Compile Include="Debugger\NodeProcess.cs" />
     <Compile Include="Diagnostics\HierarchyItem.cs" />
     <Compile Include="Diagnostics\NodeJsToolsEventSource.cs" />
+    <Compile Include="MigrateToJspsResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MigrateToJspsResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Project\OperationProgressService.cs" />
     <Compile Include="SharedProject\SystemUtilities.cs" />
     <Compile Include="SharedProject\UiaAutomationNativeMethods.cs" />
@@ -255,6 +260,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="MigrateToJspsResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MigrateToJspsResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Project\NodejsGeneralPropertyPageControl.resx">
       <DependentUpon>NodejsGeneralPropertyPageControl.cs</DependentUpon>
       <SubType>Designer</SubType>

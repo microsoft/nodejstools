@@ -83,11 +83,11 @@ namespace Microsoft.NodejsTools.Commands
 
                             if (MigrateToJspsUtils.IsTypeScriptProject(activeProject))
                             {
-                                cmd.Text = "Convert to New TypeScript Project Experience";
+                                cmd.Text = MigrateToJspsResources.MigrateToTypescriptExpCmd;
                             }
                             else
                             {
-                                cmd.Text = "Convert to New JavaScript Project Experience";
+                                cmd.Text = MigrateToJspsResources.MigrateToJavascriptExpCmd;
                             }
                         }
                     }
