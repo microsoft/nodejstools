@@ -11,7 +11,7 @@ namespace MigrateToJsps
     public class EsprojFile
     {
         [XmlAttribute(AttributeName = "Sdk")]
-        public string Sdk = @"Microsoft.VisualStudio.JavaScript.Sdk/0.5.85-alpha";
+        public string Sdk = @"Microsoft.VisualStudio.JavaScript.Sdk/0.5.89-alpha";
 
         [XmlElement(ElementName = "PropertyGroup")]
         public EsprojPropertyGroup PropertyGroup { get; set; }
