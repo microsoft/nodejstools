@@ -14,6 +14,7 @@
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
     <TemplateGroupID>Node.js</TemplateGroupID>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="TypeScriptWebApp.njsproj" ReplaceParameters="true">
