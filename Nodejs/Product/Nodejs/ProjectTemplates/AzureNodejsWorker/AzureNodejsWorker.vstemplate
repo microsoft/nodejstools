@@ -13,6 +13,7 @@
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <PromptForSaveOnCreation>true</PromptForSaveOnCreation>
     <PreviewImage>Preview.png</PreviewImage>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="Worker.njsproj" ReplaceParameters="true">
