@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.NodejsTools.TestAdapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using Newtonsoft.Json;
 
 namespace TestAdapter.Tests
@@ -79,12 +79,9 @@ namespace TestAdapter.Tests
             var actual = new List<TestCase>();
             var expected = TestProjectFactory.GetTestCases(projectName);
 
-            var discoverContext = new Mock<IDiscoveryContext>();
-            var messageLogger = new Mock<IMessageLogger>();
-            var testCaseDiscoverySink = new Mock<ITestCaseDiscoverySink>();
-
-            testCaseDiscoverySink.Setup(x => x.SendTestCase(It.IsAny<TestCase>()))
-                .Callback<TestCase>(x => actual.Add(x));
+            var discoverContext = new DiscoveryContextMock();
+            var messageLogger = new MessageLoggerMock();
+            var testCaseDiscoverySink = new TestCaseDiscoverySinkMock();
 
             var testSource = TestProjectFactory.GetProjectFilePath(projectName);
             var sources = new List<string>() { testSource };
@@ -94,10 +91,10 @@ namespace TestAdapter.Tests
             var testDiscoverer = new DefaultTestDiscoverer();
 
             // Act
-            testDiscoverer.DiscoverTests(sources, discoverContext.Object, messageLogger.Object, testCaseDiscoverySink.Object);
+            testDiscoverer.DiscoverTests(sources, discoverContext, messageLogger, testCaseDiscoverySink);
 
             // Assert
-            testCaseDiscoverySink.Verify(x => x.SendTestCase(It.IsAny<TestCase>()), Times.Exactly(expectedTests));
+            Assert.AreEqual(expectedTests, testCaseDiscoverySink.CasesSent);
             this.AssertTestCases(expected, actual);
         }
 
@@ -137,6 +134,28 @@ namespace TestAdapter.Tests
         public void DiscoversTests_ReactAppWithJestTestsTypeScript()
         {
             this.AssertProject(TestProjectFactory.ProjectName.reactappwithjestteststypescript, 1);
+        }
+    }
+
+    class DiscoveryContextMock : IDiscoveryContext
+    {
+        public IRunSettings RunSettings => null;
+    }
+
+    class MessageLoggerMock : IMessageLogger
+    {
+        public void SendMessage(TestMessageLevel testMessageLevel, string message)
+        {
+        }
+    }
+
+    class TestCaseDiscoverySinkMock : ITestCaseDiscoverySink
+    {
+        public int CasesSent { get; private set; }
+
+        public void SendTestCase(TestCase discoveredTest)
+        {
+            CasesSent++;
         }
     }
 }
