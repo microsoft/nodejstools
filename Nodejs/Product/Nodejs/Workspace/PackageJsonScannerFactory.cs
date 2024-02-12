@@ -70,7 +70,7 @@ namespace Microsoft.NodejsTools.Workspace
                 {
                     var launchSettings = new PropertySettings
                     {
-                        [LaunchConfigurationConstants.NameKey] = $"node {main} (package.json)",
+                        [LaunchConfigurationConstants.NameKey] = $"node a {main} (package.json)",
                         [LaunchConfigurationConstants.TypeKey] = "default"
                     };
 

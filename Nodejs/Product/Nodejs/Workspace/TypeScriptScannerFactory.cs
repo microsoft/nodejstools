@@ -71,7 +71,7 @@ namespace Microsoft.NodejsTools.Workspace
                 {
                     var launchSettings = new PropertySettings
                     {
-                        [LaunchConfigurationConstants.NameKey] = $"node {outFile}",
+                        [LaunchConfigurationConstants.NameKey] = $"node c {outFile}",
                         [LaunchConfigurationConstants.TypeKey] = "default"
                     };
 
@@ -94,8 +94,9 @@ namespace Microsoft.NodejsTools.Workspace
 
             protected override Task<bool> IsValidFileAsync(string filePath)
             {
-                var isValidFile = TypeScriptHelpers.IsTypeScriptFile(filePath);
-                return Task.FromResult(isValidFile);
+                return Task.FromResult(false);
+                //var isValidFile = TypeScriptHelpers.IsTypeScriptFile(filePath);
+                //return Task.FromResult(isValidFile);
             }
 
             private async Task<string> DetermineOutFileAsync(string filePath)

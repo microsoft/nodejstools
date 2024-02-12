@@ -89,6 +89,10 @@
     <Compile Include="TypeScriptHelpers\TypeScriptCompilerLocator.cs" />
     <Compile Include="Workspace\BaseFileScanner.cs" />
     <Compile Include="Workspace\ContextMenuProvider.cs" />
+    <Compile Include="Workspace\LaunchJsonScannerFactory.cs" />
+    <Compile Include="Workspace\LaunchJson\Compound.cs" />
+    <Compile Include="Workspace\LaunchJson\Configuration.cs" />
+    <Compile Include="Workspace\LaunchJson\LaunchJson.cs" />
     <Compile Include="Workspace\PackageJsonTestContainer.cs" />
     <Compile Include="Workspace\PackageJsonTestContainerDiscoverer.cs" />
     <Compile Include="GeneratedHelpAboutVersion.cs">

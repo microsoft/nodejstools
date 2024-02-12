@@ -32,6 +32,11 @@ namespace Microsoft.NodejsTools
         public const string BowerComponentsFolder = "bower_components";
 
         /// <summary>
+        /// The name of the launch.json file
+        /// </summary>
+        public const string LaunchJsonFile = "launch.json";
+
+        /// <summary>
         /// The name of the package.json file
         /// </summary>
         public const string PackageJsonFile = "package.json";
