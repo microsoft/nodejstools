@@ -1,4 +1,4 @@
-﻿# 'Allow scripts to access the OAuth token' was selected in pipeline.  Add the following YAML to any steps requiring access:
+# 'Allow scripts to access the OAuth token' was selected in pipeline.  Add the following YAML to any steps requiring access:
 #       env:
 #           MY_ACCESS_TOKEN: $(System.AccessToken)
 # ❎Variable 'Codeql.Enabled' was defined in the Variables tab
@@ -74,9 +74,9 @@ extends:
     pool:
       name: VSEngSS-MicroBuild2022-1ES
     sdl:
-      # sourceRepositoriesToScan:
-      #   exclude:
-      #   - repository: NodeJsTools
+    #   sourceRepositoriesToScan:
+    #     exclude:
+    #     - repository: self
       binskim:
         scanOutputDirectoryOnly: true
     customBuildTags:
@@ -107,7 +107,7 @@ extends:
             vsDropServiceUri: https://vsdrop.corp.microsoft.com/file/v1
 
         steps:
-        - checkout: NodeJsTools
+        - checkout: self
           fetchTags: false
           persistCredentials: True
 
