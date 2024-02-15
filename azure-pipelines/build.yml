@@ -248,6 +248,13 @@ extends:
         #     AccessToken: $(System.AccessToken)
         #     DropServiceUri: https://devdiv.artifacts.visualstudio.com/DefaultCollection
 
+        - task: DeleteFiles@1
+          displayName: Remove MicroBuild from artifact's folder
+          inputs:
+            SourceFolder: $(Build.ArtifactStagingDirectory)/MicroBuild
+            Contents: '*'
+            RemoveSourceFolder: true
+
         - task: MicroBuildCleanup@1
           name: MicroBuildCleanup_14
           displayName: Perform Cleanup Tasks
