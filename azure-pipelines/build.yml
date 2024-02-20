@@ -34,9 +34,7 @@ parameters:
   default: Release
 
 variables:
-# - name: DropRoot
-#   value: '\\cpvsbuild\drops\nodejstools\build\'
-- name: TeamName
+- name: TeamName # Needed for MicroBuildSigningPlugin
   value: nodejstools
 
 extends:
@@ -95,14 +93,6 @@ extends:
         - task: MicroBuildSwixPlugin@4
           name: MicroBuildSwixPlugin_3
           displayName: Install Swix Plugin
-
-        - task: DeleteFiles@1
-          name: DeleteFiles_4
-          displayName: Delete files from BuildOutput
-          continueOnError: True
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\
-            Contents: '**'
         
         - task: NuGetAuthenticate@1
           displayName: NuGet Authenticate
@@ -215,8 +205,16 @@ extends:
           displayName: Remove MicroBuild from artifact's folder
           inputs:
             SourceFolder: $(Build.ArtifactStagingDirectory)/MicroBuild
-            Contents: '*'
+            Contents: '**'
             RemoveSourceFolder: true
+            
+        - task: DeleteFiles@1
+          name: DeleteFiles_4
+          displayName: Delete files from BuildOutput
+          continueOnError: True
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\
+            Contents: '**'
 
         - task: MicroBuildCleanup@1
           name: MicroBuildCleanup_14
