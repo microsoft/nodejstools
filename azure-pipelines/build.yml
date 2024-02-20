@@ -33,7 +33,7 @@ parameters:
   type: string
   default: Release
 
-variables:
+# variables:
 # - name: DropRoot
 #   value: '\\cpvsbuild\drops\nodejstools\build\'
 # - name: TeamName
