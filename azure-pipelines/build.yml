@@ -34,10 +34,10 @@ parameters:
   default: Release
 
 variables:
-- name: DropRoot
-  value: '\\cpvsbuild\drops\nodejstools\build\'
-- name: TeamName
-  value: nodejstools
+# - name: DropRoot
+#   value: '\\cpvsbuild\drops\nodejstools\build\'
+# - name: TeamName
+#   value: nodejstools
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
