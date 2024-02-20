@@ -83,7 +83,7 @@ extends:
 
         - task: MicroBuildSigningPlugin@4
           name: MicroBuildSigningPlugin_1
-          displayName: Install Signing Plugin`
+          displayName: Install Signing Plugin
           inputs:
             signType: ${{ parameters.signType }}
             zipSources: false
