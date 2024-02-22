@@ -177,7 +177,9 @@ extends:
             Contents: >-
               Binaries\**\Microsoft.NodejsTools?(*.exe|*.pdb|*.dll)
 
-              Binaries\**\localize\** Binaries\**\Microsoft.JavaScript.TestAdapter?(*.pdb|*.dll)
+              Binaries\**\localize\**
+              
+              Binaries\**\Microsoft.JavaScript.TestAdapter?(*.pdb|*.dll)
 
               Setup\**\Microsoft.JavaScript.UnitTest.*.nupkg
             TargetFolder: '$(Build.ArtifactStagingDirectory)\raw'
