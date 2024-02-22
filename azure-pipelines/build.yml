@@ -1,221 +1,128 @@
-# This is the pipeline definition for the Nodejstools Signed Build Pipeline
-# Link: https://dev.azure.com/devdiv/DevDiv/_build?definitionId=20713
+# ✅Variable 'Publish2019VsixToMarketplace' was defined in the Variables tab
+# ✅Variable 'Publish2022VsixToMarketplace' was defined in the Variables tab
+# ✅ Variable 'SignType' was defined in the Variables tab
+# ✅ Variable 'TeamName' was defined in the Variables tab
 
-trigger: none
+variables:
+- name: BuildParameters.solution
+  value: '**\*.sln'
+- name: TeamName
+  value: TypeScript
+- name: BuildConfiguration
+  value: release
+- name: BuildPlatform
+  value: 'any cpu'
 
-schedules:
-- cron: 0 16 * * 2 # Run the pipeline every Tuesday, but only if there has been a change to the main branch
-  branches:
-    include:
-    - main
-  always: false # This is the line that tells it not to run if there have not been any changes to the branchs specified
-
-name: $(Date:yyyyMMdd)$(Rev:.r)
+name: $(date:yyyyMMdd)$(rev:.r)
 
 resources:
   repositories:
   - repository: self
     type: git
     ref: refs/heads/main
-  - repository: 1ESPipelineTemplates
-    type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/release
 
 parameters:
-- name: signType
+- name: Publish2019VsixToMarketplace
+  type: boolean
+  default: false
+- name: Publish2022VsixToMarketplace
+  type: boolean
+  default: false
+- name: SignType
   type: string
   default: real
   values:
-  - test
   - real
-- name: BuildConfiguration
-  type: string
-  default: Release
+  - test
 
-variables:
-- name: TeamName # Needed for MicroBuildSigningPlugin
-  value: nodejstools
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    name: VSEngSS-MicroBuild2019-1ES
+  steps:
+  - checkout: self
+    fetchTags: false
+    persistCredentials: True
 
-extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
-  parameters:
-    pool:
-      name: VSEngSS-MicroBuild2022-1ES
-    sdl:
-      binskim:
-        scanOutputDirectoryOnly: true
-    customBuildTags:
-    - ES365AIMigrationTooling
-    stages:
-    - stage: stage
-      jobs:
-      - job: Phase_1
-        displayName: Phase 1
-        timeoutInMinutes: 600
-        cancelTimeoutInMinutes: 1
-        templateContext:
-          outputParentDirectory: '$(Build.ArtifactStagingDirectory)'
-          outputs:
-          - output: pipelineArtifact
-            displayName: 'Publish Artifact: raw'
-            targetPath: $(Build.ArtifactStagingDirectory)\raw
-            artifactName: raw
-          
-          - output: pipelineArtifact
-            displayName: 'Publish Symbols Artifact'
-            targetPath: $(Build.ArtifactStagingDirectory)\symbols
-            artifactName: Symbols
-          
-          - output: microBuildVstsDrop
-            displayName: Upload VSTS Drop
-            dropFolder: $(Build.ArtifactStagingDirectory)\vsdrop
-            accessToken: $(System.AccessToken)
-            dropServiceUri: https://devdiv.artifacts.visualstudio.com/DefaultCollection
-            vsDropServiceUri: https://vsdrop.corp.microsoft.com/file/v1
+  - task: MicroBuildSigningPlugin@4
+    name: MicroBuildSigningPlugin_1
+    displayName: Install Signing Plugin
+    inputs:
+      signType: ${{parameters.SignType}}
 
-        steps:
-        - checkout: self
-          fetchTags: false
-          persistCredentials: True
+  - task: NuGetToolInstaller@0
+    displayName: Use NuGet 4.4.1
+    inputs:
+      versionSpec: 4.4.1
 
-        - task: MicroBuildSigningPlugin@4
-          name: MicroBuildSigningPlugin_1
-          displayName: Install Signing Plugin
-          inputs:
-            signType: ${{ parameters.signType }}
-            zipSources: false
+  - task: NuGetCommand@2
+    displayName: NuGet restore
+    inputs:
+      solution: $(BuildParameters.solution)
+      feedRestore: 91935767-5f32-476b-b8d3-39faa4d6f7ad
+      nugetConfigPath: nuget.config
 
-        - task: MicroBuildLocalizationPlugin@4
-          name: MicroBuildLocalizationPlugin_2
-          displayName: Install Localization Plugin
+  - task: VSBuild@1
+    displayName: Build solution **\*.sln
+    inputs:
+      solution: $(BuildParameters.solution)
+      platform: $(BuildPlatform)
+      configuration: $(BuildConfiguration)
 
-        - task: MicroBuildSwixPlugin@4
-          name: MicroBuildSwixPlugin_3
-          displayName: Install Swix Plugin
-        
-        - task: NuGetAuthenticate@1
-          displayName: NuGet Authenticate
+  - task: VSTest@2
+    displayName: VsTest - testAssemblies
+    inputs:
+      testAssemblyVer2: >-
+        **\$(BuildConfiguration)\*test*.dll
 
-        - task: NuGetToolInstaller@1
-          displayName: Use NuGet 5.x
-          inputs:
-            versionSpec: 5.x
+        !**\obj\**
+      platform: $(BuildPlatform)
+      configuration: $(BuildConfiguration)
 
-        - task: NuGetCommand@2
-          name: NuGetInstaller_6
-          displayName: NuGet restore for solution
-          inputs:
-            solution: Nodejs/NodejsTools.sln
-            selectOrConfig: config
-            nugetConfigPath: nuget.config
+  - task: PublishSymbols@2
+    displayName: Publish symbols path
+    continueOnError: True
+    inputs:
+      SearchPattern: '**\bin\**\*.pdb'
+      PublishSymbols: false
+      SymbolServerType: TeamServices
 
-        - task: VSBuild@1
-          name: VSBuild_7
-          displayName: Build solution Nodejs/NodejsTools.sln
-          inputs:
-            solution: Nodejs/NodejsTools.sln
-            msbuildArgs: /p:SourceLinkCreate=true
-            configuration: ${{ parameters.BuildConfiguration }}
-            clean: true
-            maximumCpuCount: true
-            logProjectEvents: false
+  - task: CopyFiles@2
+    displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+    condition: succeededOrFailed()
+    inputs:
+      SourceFolder: $(system.defaultworkingdirectory)
+      Contents: '**\bin\$(BuildConfiguration)\**'
+      TargetFolder: $(build.artifactstagingdirectory)
 
-        - task: CopyFiles@2
-          displayName: Flatten Binary Output for SBOM
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\${{parameters.BuildConfiguration}}\Binaries
-            TargetFolder: $(Build.ArtifactStagingDirectory)\sbom
-            CleanTargetFolder: true
-            OverWrite: true
-            flattenFolders: true
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    condition: succeededOrFailed()
+    inputs:
+      PathtoPublish: $(build.artifactstagingdirectory)
+      TargetPath: '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
 
-        - task: VSBuild@1
-          displayName: Build solution Setup
-          inputs:
-            solution: Nodejs/Setup/NodejsSetup.sln
-            msbuildArgs: /p:SourceLinkCreate=true
-            configuration: ${{ parameters.BuildConfiguration }}
-            clean: true
-            logProjectEvents: false
+  - task: ms-devlabs.vsts-developer-tools-build-tasks.publish-vs-extension-build-task.PublishVisualStudioExtension@3
+    displayName: Publish VS 2019 Extension
+    # condition: and(succeeded(), eq(variables['Publish2019VsixToMarketplace'], 'true'))
+    condition: ${{parameters.Publish2019VsixToMarketplace}}
+    inputs:
+      connectedServiceName: 0c27eb7e-9441-49b0-ade7-9a7f36f98a51
+      vsixFile: $(system.defaultworkingdirectory)\AngularLanguageService.2019\bin\Release\AngularLanguageService.2019.vsix
+      manifestFile: $(system.defaultworkingdirectory)\AngularLanguageService.2019\manifest.json
+      publisherId: TypeScriptTeam
 
-        - task: CopyFiles@2
-          displayName: Collect Symbols
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\${{ parameters.BuildConfiguration }}
-            Contents: >-
-              Binaries\**\Microsoft.NodejsTools?(*.exe|*.pdb|*.dll)
+  - task: ms-devlabs.vsts-developer-tools-build-tasks.publish-vs-extension-build-task.PublishVisualStudioExtension@3
+    displayName: Publish VS 2022 Extension
+    # condition: and(succeeded(), eq(variables['Publish2022VsixToMarketplace'], 'true'))
+    condition: ${{parameters.Publish2022VsixToMarketplace}}
+    inputs:
+      connectedServiceName: 0c27eb7e-9441-49b0-ade7-9a7f36f98a51
+      vsixFile: $(system.defaultworkingdirectory)\AngularLanguageService.2022\bin\Release\AngularLanguageService.2022.vsix
+      manifestFile: $(system.defaultworkingdirectory)\AngularLanguageService.2022\manifest.json
+      publisherId: TypeScriptTeam
 
-              Binaries\**\Microsoft.JavaScript.TestAdapter?(*.pdb|*.dll)
-
-              Binaries\**\MigrateToJsps?(*.exe|*.pdb|*.dll)
-            TargetFolder: $(Build.ArtifactStagingDirectory)\symbols
-
-        - task: CopyFiles@2
-          name: CopyFiles_10
-          displayName: Copy setup files to vsdrop folder
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\${{ parameters.BuildConfiguration }}\Setup
-            Contents: '**\?(*.vsix|*.json|*.vsman|*.nupkg|*sbom.json)'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)\vsdrop'
-            CleanTargetFolder: true
-            OverWrite: true
-            flattenFolders: true
-
-        - task: MicroBuildCodesignVerify@3
-          name: MicroBuildCodesignVerify1
-          displayName: Verify Signed Files
-          inputs:
-            TargetFolders: '$(Build.ArtifactStagingDirectory)\vsdrop'
-            ApprovalListPathForCerts: signWhiteList.txt
-
-        - task: CopyFiles@2
-          name: CopyFiles_9
-          displayName: Copy binaries and nupkg to raw folder
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\${{ parameters.BuildConfiguration }}
-            Contents: >-
-              Binaries\**\Microsoft.NodejsTools?(*.exe|*.pdb|*.dll)
-
-              Binaries\**\localize\** Binaries\**\Microsoft.JavaScript.TestAdapter?(*.pdb|*.dll)
-
-              Setup\**\Microsoft.JavaScript.UnitTest.*.nupkg
-            TargetFolder: '$(Build.ArtifactStagingDirectory)\raw'
-            CleanTargetFolder: true
-
-        - task: CopyFiles@2
-          displayName: Copy SBOM files to Raw
-          inputs:
-            SourceFolder: $(Build.ArtifactStagingDirectory)\sbom
-            Contents: _manifest\**\*.json
-            TargetFolder: '$(Build.ArtifactStagingDirectory)\raw'
-
-        - task: PublishSymbols@2
-          displayName: Index Sources and Publish Symbols
-          inputs:
-            SymbolsFolder: $(Build.ArtifactStagingDirectory)\symbols
-            SearchPattern: >-
-              **\*.pdb
-
-              **\*.dll
-            SymbolServerType: TeamServices
-            TreatNotIndexedAsWarning: true
-
-        - task: DeleteFiles@1
-          displayName: Remove MicroBuild from artifact's folder
-          inputs:
-            SourceFolder: $(Build.ArtifactStagingDirectory)/MicroBuild
-            Contents: '**'
-            RemoveSourceFolder: true
-            
-        - task: DeleteFiles@1
-          name: DeleteFiles_4
-          displayName: Delete files from BuildOutput
-          continueOnError: True
-          inputs:
-            SourceFolder: $(Build.SourcesDirectory)\BuildOutput\
-            Contents: '**'
-
-        - task: MicroBuildCleanup@1
-          name: MicroBuildCleanup_14
-          displayName: Perform Cleanup Tasks
+  - task: ms-vseng.MicroBuildTasks.521a94ea-9e68-468a-8167-6dcf361ea776.MicroBuildCleanup@1
+    displayName: Send Telemetry
+...
