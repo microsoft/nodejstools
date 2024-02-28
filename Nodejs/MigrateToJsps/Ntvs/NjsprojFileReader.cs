@@ -94,6 +94,11 @@ namespace MigrateToJsps
                     new List<Guid>() : 
                     projectTypeGuidsString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(guidString => Guid.Parse(guidString)).ToList();
 
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = "MIGRATED_PROJECT";
+                }
+
                 return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids, ProjectIncludeFolders = folders, NodejsPort = nodejsPort };
             }
         }
