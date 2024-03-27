@@ -14,6 +14,7 @@ using System.Collections;
 using Microsoft.Build.Utilities;
 using System.Runtime.Remoting.Channels;
 using Microsoft.Internal.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace Microsoft.NodejsTools.Commands
 {
@@ -23,6 +24,13 @@ namespace Microsoft.NodejsTools.Commands
 
         public override async void DoCommand(object sender, EventArgs args)
         {
+            var confirmationResponse = MessageDialog.Show("Migration confirmation", "Confirm project migration to new JavaScript Project System?", MessageDialogCommandSet.YesNo);
+
+            if (confirmationResponse == MessageDialogCommand.No)
+            {
+                return;
+            }
+
             EnvDTE.Project project = MigrateToJspsUtils.GetActiveProject();
 
             string projectFilepath = project.FullName;
