@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Drawing.Text;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using Microsoft.NodejsTools.Commands;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
@@ -21,7 +26,13 @@ namespace Microsoft.NodejsTools.Project
 
             CurrentInfoBarElement?.Close();
 
-            var infoBarModel = new InfoBarModel(Resources.MigrateToJspsPrompt);
+            Action migrateProjectCmd = MigrateProjectCommand;
+
+            var actionItems = new[]
+            {
+                new InfoBarHyperlink(Resources.MigrateToJspsClickHere, migrateProjectCmd)
+            };
+            var infoBarModel = new InfoBarModel(Resources.MigrateToJspsPrompt, actionItems);
 
             uint eventCookie = 2;
             CurrentInfoBarElement = infoBarUiFactory.CreateInfoBar(infoBarModel);
@@ -32,6 +43,11 @@ namespace Microsoft.NodejsTools.Project
             void OnClose()
             {
                 CurrentInfoBarElement.Unadvise(eventCookie); 
+            }
+
+            void MigrateProjectCommand()
+            {
+                NodejsPackage.Instance.DTE.Commands.Raise(Guids.MigrateToJspsCmdSet.ToString(), PkgCmdId.cmdidJspsProjectMigrate, null, null);
             }
         }
 
