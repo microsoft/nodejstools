@@ -79,6 +79,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MigrateToJspsResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Project\MigrateToJspsInfoBar.cs" />
     <Compile Include="Project\OperationProgressService.cs" />
     <Compile Include="SharedProject\SystemUtilities.cs" />
     <Compile Include="SharedProject\UiaAutomationNativeMethods.cs" />

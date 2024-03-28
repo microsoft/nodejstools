@@ -36,6 +36,8 @@ parameters:
 variables:
 - name: TeamName # Needed for MicroBuildSigningPlugin
   value: nodejstools
+- name: Packaging.EnableSBOMSigning
+  value: true
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
