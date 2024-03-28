@@ -399,7 +399,16 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please migrate to the new JavaScript Project System experience by right-clicking on the project node and selecting &apos;Convert to New JavaScript Project Experience.&apos;.
+        ///   Looks up a localized string similar to Or click here to convert the current project..
+        /// </summary>
+        internal static string MigrateToJspsClickHere {
+            get {
+                return ResourceManager.GetString("MigrateToJspsClickHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We have an improved experience for JavaScript Projects. Right-click on a project node and select &apos;Convert to New JavaScript Project Experience&apos; to convert the project..
         /// </summary>
         internal static string MigrateToJspsPrompt {
             get {
