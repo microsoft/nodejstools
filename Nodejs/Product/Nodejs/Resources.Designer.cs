@@ -399,7 +399,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Click here to convert current project..
+        ///   Looks up a localized string similar to Or click here to convert the current project..
         /// </summary>
         internal static string MigrateToJspsClickHere {
             get {
@@ -408,7 +408,7 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please migrate to the new JavaScript Project System experience..
+        ///   Looks up a localized string similar to We have an improved experience for JavaScript Projects. Right-click on a project node and select &apos;Convert to New JavaScript Project Experience&apos; to convert the project..
         /// </summary>
         internal static string MigrateToJspsPrompt {
             get {
