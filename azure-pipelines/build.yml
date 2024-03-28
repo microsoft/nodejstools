@@ -132,6 +132,11 @@ extends:
             OverWrite: true
             flattenFolders: true
 
+        - task: AzureArtifacts.manifest-generator-task.manifest-generator-task.ManifestGeneratorTask@0
+          displayName: Generate SBOM
+          inputs:
+            BuildDropPath: $(Build.ArtifactStagingDirectory)\sbom
+
         - task: VSBuild@1
           displayName: Build solution Setup
           inputs:
