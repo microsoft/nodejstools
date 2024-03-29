@@ -16,7 +16,53 @@ namespace Microsoft.NodejsTools.Project
     {
         private static IVsInfoBarUIElement CurrentInfoBarElement;
 
-        public static void Show(IVsShell vsShell, IVsInfoBarUIFactory infoBarUiFactory)
+        private const string UserClosedMigrationPrompt = "PromptedToMigrateToJsps";
+
+        private static string GetUserFilePath(string projectFilepath)
+        {
+            return projectFilepath + ".user";
+        }
+
+        private static XDocument GetXDocumentForUserFile(string userFile)
+        {
+            if (File.Exists(userFile))
+            {
+                try
+                {
+                    return XDocument.Load(userFile);
+                }
+                catch
+                {
+                    // do nothing, just return null
+                }
+            }
+
+            return null;
+        }
+
+        private static void WritePropertyToUserFile(string userFilePath)
+        {
+            try
+            {
+                var userProperties = GetXDocumentForUserFile(userFilePath);
+                var ns = userProperties.Root.Name.Namespace; 
+
+                var newPropertyGroup = new XElement(ns + "PropertyGroup");
+                var newProperty = new XElement(ns + UserClosedMigrationPrompt);
+
+                newPropertyGroup.Add(newProperty);
+
+                userProperties.Root.Add(newPropertyGroup);
+
+                userProperties.Save(userFilePath);
+            }
+            catch
+            {
+                // it's fine, if something goes wrong, we just won't write it to the userfile
+            }
+        }
+
+        public static void Show(IVsShell vsShell, IVsInfoBarUIFactory infoBarUiFactory, string projectFileLocation)
         {
             if (ErrorHandler.Failed(vsShell.GetProperty((int)__VSSPROPID7.VSSPROPID_MainWindowInfoBarHost, out var tmp)))
             {
@@ -25,6 +71,19 @@ namespace Microsoft.NodejsTools.Project
             var infoBarHost = (IVsInfoBarHost)tmp;
 
             CurrentInfoBarElement?.Close();
+
+            var userFile = GetUserFilePath(projectFileLocation);
+            var userProperties = GetXDocumentForUserFile(userFile);
+
+            if (userProperties != null)
+            {
+                var userClosedPrompt = userProperties.Descendants().Any(prop => prop.Name.ToString().Contains(UserClosedMigrationPrompt));
+
+                if (userClosedPrompt)
+                {
+                    return;
+                }
+            }
 
             Action migrateProjectCmd = MigrateProjectCommand;
 
@@ -35,32 +94,42 @@ namespace Microsoft.NodejsTools.Project
             var infoBarModel = new InfoBarModel(Resources.MigrateToJspsPrompt, actionItems);
 
             uint eventCookie = 2;
+            Action<string> OnClose = (filePath) =>
+            {
+                CurrentInfoBarElement.Unadvise(eventCookie);
+                WritePropertyToUserFile(filePath);
+            };
             CurrentInfoBarElement = infoBarUiFactory.CreateInfoBar(infoBarModel);
-            CurrentInfoBarElement.Advise(new InfoBarUIEvents(OnClose), out eventCookie);
+            CurrentInfoBarElement.Advise(new InfoBarUIEvents(OnClose, userFile), out eventCookie);
 
             infoBarHost.AddInfoBar(CurrentInfoBarElement);
 
-            void OnClose()
-            {
-                CurrentInfoBarElement.Unadvise(eventCookie); 
-            }
-
             void MigrateProjectCommand()
             {
-                NodejsPackage.Instance.DTE.Commands.Raise(Guids.MigrateToJspsCmdSet.ToString(), PkgCmdId.cmdidJspsProjectMigrate, null, null);
+                try
+                {
+                    NodejsPackage.Instance.DTE.Commands.Raise(Guids.MigrateToJspsCmdSet.ToString(), PkgCmdId.cmdidJspsProjectMigrate, null, null);
+                }
+                catch
+                {
+                    // do nothing if there is an error in raising the command (like if the project is not loaded)
+                }
             }
         }
 
         private sealed class InfoBarUIEvents : IVsInfoBarUIEvents
         {
-            private readonly Action OnClose;
+            private readonly Action<string> OnClose;
 
-            public InfoBarUIEvents(Action onClose)
+            private string UserFile;
+
+            public InfoBarUIEvents(Action<string> onClose, string userFile)
             {
                 this.OnClose = onClose;
+                this.UserFile = userFile;
             }
 
-            public void OnClosed(IVsInfoBarUIElement infoBarUIElement) => this.OnClose();
+            public void OnClosed(IVsInfoBarUIElement infoBarUIElement) => this.OnClose(UserFile);
 
             public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem) => (actionItem.ActionContext as Action)?.Invoke();
         }

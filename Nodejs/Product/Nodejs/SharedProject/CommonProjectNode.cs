@@ -13,6 +13,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Microsoft.NodejsTools;
+using Microsoft.NodejsTools.Project;
 using Microsoft.NodejsTools.TypeScript;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.ComponentModelHost;
@@ -918,6 +919,10 @@ namespace Microsoft.VisualStudioTools.Project
             {
                 libraryManager.RegisterHierarchy(this.InteropSafeHierarchy);
             }
+
+            var shell = GetService(typeof(SVsShell)) as IVsShell;
+            var infoBarUiFactory = GetService(typeof(SVsInfoBarUIFactory)) as IVsInfoBarUIFactory;
+            MigrateToJspsInfoBar.Show(shell, infoBarUiFactory, filename);
         }
 
         internal IVsHierarchyItemManager HierarchyManager
