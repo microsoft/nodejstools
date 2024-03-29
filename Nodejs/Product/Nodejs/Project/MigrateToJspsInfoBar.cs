@@ -106,7 +106,14 @@ namespace Microsoft.NodejsTools.Project
 
             void MigrateProjectCommand()
             {
-                NodejsPackage.Instance.DTE.Commands.Raise(Guids.MigrateToJspsCmdSet.ToString(), PkgCmdId.cmdidJspsProjectMigrate, null, null);
+                try
+                {
+                    NodejsPackage.Instance.DTE.Commands.Raise(Guids.MigrateToJspsCmdSet.ToString(), PkgCmdId.cmdidJspsProjectMigrate, null, null);
+                }
+                catch
+                {
+                    // do nothing if there is an error in raising the command (like if the project is not loaded)
+                }
             }
         }
 
