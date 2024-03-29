@@ -108,10 +108,6 @@ namespace Microsoft.NodejsTools
             RegisterCommands(importWizardCmd, Guids.NodejsCmdSet);
             RegisterCommands(migrateToJspsCmd, Guids.MigrateToJspsCmdSet);
 
-            var shell = GetService(typeof(SVsShell)) as IVsShell;
-            var infoBarUiFactory = GetService(typeof(SVsInfoBarUIFactory)) as IVsInfoBarUIFactory;
-            MigrateToJspsInfoBar.Show(shell, infoBarUiFactory);
-
             // The variable is inherited by child processes backing Test Explorer, and is used in
             // the NTVS test discoverer and test executor to connect back to VS.
             Environment.SetEnvironmentVariable(NodejsConstants.NodeToolsProcessIdEnvironmentVariable, Process.GetCurrentProcess().Id.ToString());
