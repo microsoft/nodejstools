@@ -627,10 +627,4 @@ The following error occurred trying to execute npm.cmd:
   <data name="ErrorDebuggingNode7NotSupported" xml:space="preserve">
     <value>Debugging Node 7 and below is not supported. Current Node version is {0}.</value>
   </data>
-  <data name="MigrateToJspsPrompt" xml:space="preserve">
-    <value>We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.</value>
-  </data>
-  <data name="MigrateToJspsClickHere" xml:space="preserve">
-    <value>Or click here to convert the current project.</value>
-  </data>
 </root>

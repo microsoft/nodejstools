@@ -89,9 +89,9 @@ namespace Microsoft.NodejsTools.Project
 
             var actionItems = new[]
             {
-                new InfoBarHyperlink(Resources.MigrateToJspsClickHere, migrateProjectCmd)
+                new InfoBarHyperlink(MigrateToJspsResources.MigrateToJspsClickHere, migrateProjectCmd)
             };
-            var infoBarModel = new InfoBarModel(Resources.MigrateToJspsPrompt, actionItems);
+            var infoBarModel = new InfoBarModel(MigrateToJspsResources.MigrateToJspsPrompt, actionItems);
 
             uint eventCookie = 2;
             Action<string> OnClose = (filePath) =>

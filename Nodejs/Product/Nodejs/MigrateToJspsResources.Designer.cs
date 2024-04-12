@@ -70,11 +70,47 @@ namespace Microsoft.NodejsTools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Or click here to convert the current project..
+        /// </summary>
+        internal static string MigrateToJspsClickHere {
+            get {
+                return ResourceManager.GetString("MigrateToJspsClickHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We have an improved experience for JavaScript Projects. Right-click on a project node and select &apos;Convert to New JavaScript Project Experience&apos; to convert the project..
+        /// </summary>
+        internal static string MigrateToJspsPrompt {
+            get {
+                return ResourceManager.GetString("MigrateToJspsPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Convert to New TypeScript Project Experience.
         /// </summary>
         internal static string MigrateToTypescriptExpCmd {
             get {
                 return ResourceManager.GetString("MigrateToTypescriptExpCmd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm project migration to new JavaScript Project System?.
+        /// </summary>
+        internal static string MigrationConfirmationMessage {
+            get {
+                return ResourceManager.GetString("MigrationConfirmationMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Migration Confirmation.
+        /// </summary>
+        internal static string MigrationConfirmationTitle {
+            get {
+                return ResourceManager.GetString("MigrationConfirmationTitle", resourceCulture);
             }
         }
         
