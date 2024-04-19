@@ -120,8 +120,20 @@
   <data name="MigrateToJavascriptExpCmd" xml:space="preserve">
     <value>Convert to New JavaScript Project Experience</value>
   </data>
+  <data name="MigrateToJspsClickHere" xml:space="preserve">
+    <value>Or click here to convert the current project.</value>
+  </data>
+  <data name="MigrateToJspsPrompt" xml:space="preserve">
+    <value>We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.</value>
+  </data>
   <data name="MigrateToTypescriptExpCmd" xml:space="preserve">
     <value>Convert to New TypeScript Project Experience</value>
+  </data>
+  <data name="MigrationConfirmationMessage" xml:space="preserve">
+    <value>Confirm project migration to new JavaScript Project System?</value>
+  </data>
+  <data name="MigrationConfirmationTitle" xml:space="preserve">
+    <value>Migration Confirmation</value>
   </data>
   <data name="RevertToNtvsCmd" xml:space="preserve">
     <value>Revert Project To Old Experience</value>

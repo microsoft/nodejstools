@@ -24,7 +24,7 @@ namespace Microsoft.NodejsTools.Commands
 
         public override async void DoCommand(object sender, EventArgs args)
         {
-            var confirmationResponse = MessageDialog.Show("Migration confirmation", "Confirm project migration to new JavaScript Project System?", MessageDialogCommandSet.YesNo);
+            var confirmationResponse = MessageDialog.Show(MigrateToJspsResources.MigrationConfirmationTitle, MigrateToJspsResources.MigrationConfirmationMessage, MessageDialogCommandSet.YesNo);
 
             if (confirmationResponse == MessageDialogCommand.No)
             {
@@ -99,7 +99,7 @@ namespace Microsoft.NodejsTools.Commands
                             }
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
  
                     }
