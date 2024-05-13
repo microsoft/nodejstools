@@ -38,6 +38,8 @@ variables:
   value: nodejstools
 - name: Packaging.EnableSBOMSigning
   value: true
+- name: Codeql.language
+  value: csharp,javascript
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
