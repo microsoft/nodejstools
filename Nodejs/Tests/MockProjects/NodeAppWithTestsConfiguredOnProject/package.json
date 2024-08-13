@@ -7,6 +7,6 @@
     "name": ""
   },
   "dependencies": {
-    "mocha": "^9.2.1"
+    "mocha": "^10.7.3"
   }
 }
