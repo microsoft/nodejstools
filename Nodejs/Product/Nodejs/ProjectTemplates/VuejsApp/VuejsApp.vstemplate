@@ -16,7 +16,7 @@
     <PlatformTag>Linux</PlatformTag>
     <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Web</ProjectTypeTag>
-    <Hidden>false</Hidden>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="VuejsApp.njsproj" ReplaceParameters="true">
