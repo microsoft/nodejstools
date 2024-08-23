@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
 using Newtonsoft.Json.Linq;
 
 namespace MigrateToJsps
@@ -85,6 +80,7 @@ namespace MigrateToJsps
 
                 var nodeLaunch = NodeLaunchTemplate;
                 nodeLaunch.Program = nodeLaunch.Program.Replace("*STARTUP_FILE*", njsprojFileModel.StartupFile);
+                nodeLaunch.Args = njsprojFileModel.ScriptArguments.Split(';');
                 nodeLaunch.Env = new JObject(new JProperty("port", port));
 
                 var edgeLaunch = EdgeLaunchTemplate;

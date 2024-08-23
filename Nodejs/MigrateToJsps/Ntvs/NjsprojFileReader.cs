@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 
 namespace MigrateToJsps
@@ -18,6 +15,7 @@ namespace MigrateToJsps
             var startupFile = "";
             var projectTypeGuidsString = "";
             var nodejsPort = "";
+            var scriptArguments = "";
 
             using (var fileStream = File.Open(njsprojPath, FileMode.Open, FileAccess.Read))
             {
@@ -48,6 +46,10 @@ namespace MigrateToJsps
                     if (!string.IsNullOrEmpty(propertyGroup.NodejsPort))
                     {
                         nodejsPort = propertyGroup.NodejsPort;
+                    }
+                    if (!string.IsNullOrEmpty(propertyGroup.ScriptArguments))
+                    {
+                        scriptArguments = propertyGroup.ScriptArguments;
                     }
                 }
 
@@ -99,7 +101,7 @@ namespace MigrateToJsps
                     name = "MIGRATED_PROJECT";
                 }
 
-                return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids, ProjectIncludeFolders = folders, NodejsPort = nodejsPort };
+                return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids, ProjectIncludeFolders = folders, NodejsPort = nodejsPort, ScriptArguments = scriptArguments };
             }
         }
     }
