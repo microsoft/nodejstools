@@ -8,6 +8,7 @@ using System.Linq;
 using System.Management;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.NodejsTools.TestFrameworks;
@@ -213,7 +214,8 @@ namespace Microsoft.NodejsTools.TestAdapter
                 env: null,
                 visible: false,
                 redirector: new TestExecutionRedirector(this.ProcessTestRunnerEmit),
-                quoteArgs: false);
+                quoteArgs: false,
+                Encoding.UTF8);
 
             if (this.runContext.IsBeingDebugged && startedFromVs)
             {
