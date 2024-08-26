@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -21,6 +18,8 @@ namespace MigrateToJsps
         public List<string> ProjectIncludeFolders { get; set; } = new List<string>();
 
         public List<Guid> ProjectTypeGuids { get; set; }
+
+        public string ScriptArguments { get; set; } = string.Empty;
     }
 
     [XmlRoot(ElementName = "PropertyGroup")]
@@ -46,6 +45,9 @@ namespace MigrateToJsps
 
         [XmlElement(ElementName = "NodejsPort")]
         public string NodejsPort { get; set; }
+
+        [XmlElement(ElementName = "ScriptArguments")]
+        public string ScriptArguments { get; set; }
 
         [XmlAnyElement]
         public List<XmlElement> ExtraElements { get; set; } = new List<XmlElement> { };

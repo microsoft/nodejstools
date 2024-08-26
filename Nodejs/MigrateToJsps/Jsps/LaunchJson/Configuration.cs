@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -66,7 +62,7 @@ namespace MigrateToJsps
         public string[] Skipfiles { get; set; }
 
         /// <summary>
-        /// Automatically stops the progam after launch (only applies to Node launch configurations)
+        /// Automatically stops the program after launch (only applies to Node launch configurations)
         /// </summary>
         [JsonProperty("stopOnEntry")]
         public bool? StopOnEntry { get; set; }
@@ -82,6 +78,12 @@ namespace MigrateToJsps
         /// </summary>
         [JsonProperty("env")]
         public JObject Env { get; set; }
+
+        /// <summary>
+        /// List of arguments passed to the program on the "Program" property
+        /// </summary>
+        [JsonProperty("args")]
+        public string[] Args { get; set; }
 
         /// <summary>
         /// Other configuration properties which aren't explicitly listed in this class
