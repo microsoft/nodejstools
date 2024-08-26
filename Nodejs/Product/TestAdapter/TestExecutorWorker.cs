@@ -9,6 +9,7 @@ using System.Management;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using Microsoft.NodejsTools.TestAdapter.TestFrameworks;
 using Microsoft.NodejsTools.TestFrameworks;
@@ -17,7 +18,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudioTools;
 using Microsoft.VisualStudioTools.Project;
-using Newtonsoft.Json;
 
 namespace Microsoft.NodejsTools.TestAdapter
 {
@@ -222,7 +222,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                 this.AttachDebugger(vsProcessId, port, nodeVersion);
             }
 
-            var serializedObjects = JsonConvert.SerializeObject(testObjects);
+            var serializedObjects = JsonSerializer.Serialize(testObjects);
 
             // Send the process the list of tests to run and wait for it to complete
             this.nodeProcess.WriteInputLine(serializedObjects);
@@ -256,7 +256,7 @@ namespace Microsoft.NodejsTools.TestAdapter
         {
             try
             {
-                var testEvent = JsonConvert.DeserializeObject<TestEvent>(line);
+                var testEvent = JsonSerializer.Deserialize<TestEvent>(line);
                 // Extract test from list of tests
                 var test = this.currentTests
                                .Where(n => n.TestCase.FullyQualifiedName == testEvent.fullyQualifiedName)
@@ -288,7 +288,7 @@ namespace Microsoft.NodejsTools.TestAdapter
                     this.testsCompleted.Set();
                 }
             }
-            catch (JsonReaderException)
+            catch (JsonException)
             {
                 // Often lines emitted while running tests are not test results, and thus will fail to parse above
             }
