@@ -922,7 +922,8 @@ namespace Microsoft.VisualStudioTools.Project
 
             var shell = GetService(typeof(SVsShell)) as IVsShell;
             var infoBarUiFactory = GetService(typeof(SVsInfoBarUIFactory)) as IVsInfoBarUIFactory;
-            MigrateToJspsInfoBar.Show(shell, infoBarUiFactory, filename);
+            var solutionPersistence = GetService(typeof(SVsSolutionPersistence)) as IVsSolutionPersistence;
+            MigrateToJspsInfoBar.Show(shell, infoBarUiFactory, solutionPersistence, filename);
         }
 
         internal IVsHierarchyItemManager HierarchyManager
