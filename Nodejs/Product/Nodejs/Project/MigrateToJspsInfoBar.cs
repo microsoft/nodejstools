@@ -40,13 +40,13 @@ namespace Microsoft.NodejsTools.Project
             var infoBarModel = new InfoBarModel(MigrateToJspsResources.MigrateToJspsPrompt, actionItems);
 
             uint eventCookie = 2;
-            Action<string> OnClose = (userFile) =>
+            Action OnClose = () =>
             {
                 userPreference.dismissedMigration = true;
                 solutionPersistence.SavePackageUserOpts(userPreference, UserClosedMigrationPrompt);
             };
             CurrentInfoBarElement = infoBarUiFactory.CreateInfoBar(infoBarModel);
-            CurrentInfoBarElement.Advise(new InfoBarUIEvents(OnClose, ""), out eventCookie);
+            CurrentInfoBarElement.Advise(new InfoBarUIEvents(OnClose), out eventCookie);
 
             infoBarHost.AddInfoBar(CurrentInfoBarElement);
 
@@ -89,17 +89,14 @@ namespace Microsoft.NodejsTools.Project
                 if (pszKey == UserClosedMigrationPrompt)
                 {
                     // Allocate a buffer to hold the data
-                    byte[] buffer = new byte[256]; // Assuming the boolean is stored as a small string
+                    byte[] buffer = new byte[1]; // Assuming the boolean is stored as a small string
                     uint bytesRead = 0;
 
                     // Read the data from the IStream 
                     pOptionsStream.Read(buffer, (uint)buffer.Length, out bytesRead);
 
-                    // Convert the byte array to a string (only up to the bytes that were read)
-                    string booleanValue = System.Text.Encoding.UTF8.GetString(buffer, 0, (int)bytesRead);
-
-                    // Parse the string into a boolean value
-                    bool.TryParse(booleanValue, out dismissedMigration);
+                    // Interpret the byte array as a boolean value
+                    dismissedMigration = BitConverter.ToBoolean(buffer, 0);
                 }
 
                 return VSConstants.S_OK;
@@ -113,8 +110,8 @@ namespace Microsoft.NodejsTools.Project
                 {
                     uint outBytesWritten = 0;
 
-                    // Convert the boolean to string and then to a byte array
-                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(dismissedMigration.ToString());
+                    // Convert the boolean to a byte array
+                    byte[] buffer = BitConverter.GetBytes(dismissedMigration);
 
                     // Write the byte array to the IStream
                     pOptionsStream.Write(buffer, (uint)buffer.Length, out outBytesWritten);
@@ -126,17 +123,14 @@ namespace Microsoft.NodejsTools.Project
 
         private sealed class InfoBarUIEvents : IVsInfoBarUIEvents
         {
-            private readonly Action<string> OnClose;
+            private readonly Action OnClose;
 
-            private string UserFile;
-
-            public InfoBarUIEvents(Action<string> onClose, string userFile)
+            public InfoBarUIEvents(Action onClose)
             {
                 this.OnClose = onClose;
-                this.UserFile = userFile;
             }
 
-            public void OnClosed(IVsInfoBarUIElement infoBarUIElement) => this.OnClose(UserFile);
+            public void OnClosed(IVsInfoBarUIElement infoBarUIElement) => this.OnClose();
 
             public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem) => (actionItem.ActionContext as Action)?.Invoke();
         }
