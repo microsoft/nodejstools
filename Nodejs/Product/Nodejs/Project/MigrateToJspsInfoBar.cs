@@ -89,7 +89,7 @@ namespace Microsoft.NodejsTools.Project
                 if (pszKey == UserClosedMigrationPrompt)
                 {
                     // Allocate a buffer to hold the data
-                    byte[] buffer = new byte[1]; // Assuming the boolean is stored as a small string
+                    byte[] buffer = new byte[1]; // Assuming the boolean is stored as 0 and 1
                     uint bytesRead = 0;
 
                     // Read the data from the IStream 
