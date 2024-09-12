@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
 
 namespace MigrateToJsps
@@ -11,7 +7,7 @@ namespace MigrateToJsps
     public class EsprojFile
     {
         [XmlAttribute(AttributeName = "Sdk")]
-        public string Sdk = @"Microsoft.VisualStudio.JavaScript.Sdk/0.5.89-alpha";
+        public string Sdk = @"Microsoft.VisualStudio.JavaScript.Sdk/1.0.1635611";
 
         [XmlElement(ElementName = "PropertyGroup")]
         public EsprojPropertyGroup PropertyGroup { get; set; }
