@@ -116,7 +116,12 @@ namespace MigrateToJsps
         {
             // Use the installed version of JSPS on the NuGet fallback folder.
             var versions = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio", "Shared", "NuGetPackages", "microsoft.visualstudio.javascript.sdk"));
-            return Path.GetFileName(versions.OrderByDescending(v => v).FirstOrDefault());
+            var newestVersion = versions
+                .Select(v => new { Path = v, Version = new Version(Path.GetFileName(v)) })
+                .OrderByDescending(v => v.Version)
+                .FirstOrDefault();
+
+            return newestVersion?.Version.ToString();
         }
     }
 }
