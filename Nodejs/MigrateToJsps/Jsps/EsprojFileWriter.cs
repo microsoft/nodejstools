@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
@@ -43,6 +40,13 @@ namespace MigrateToJsps
             }
 
             EsprojFile esprojFile = new EsprojFile() { PropertyGroup = propGroup };
+            var sdkVersion = GetSdkVersion();
+
+            // If the SDK version is not found on NuGet fallback folder, keep the one hardcoded on EsProjFileModel
+            if (sdkVersion != null)
+            {
+                esprojFile.Sdk = $"Microsoft.VisualStudio.JavaScript.Sdk/{sdkVersion}";
+            }
 
             XmlSerializer serializer = new XmlSerializer(typeof(EsprojFile));
 
@@ -110,9 +114,18 @@ namespace MigrateToJsps
 
         private static string GetSdkVersion()
         {
-            // TODO: figure out if sdk is installed on machine?
-            // do i need to do that or will VS automatically install given version
-            throw new NotImplementedException();
+            // Use the installed version of JSPS on the NuGet fallback folder.
+            var versions = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio", "Shared", "NuGetPackages", "microsoft.visualstudio.javascript.sdk"));
+            var newestVersion = versions
+                .Select(v =>
+                {
+                    Version.TryParse(Path.GetFileName(v), out var version);
+                    return version;
+                })
+                .OrderByDescending(v => v)
+                .FirstOrDefault();
+
+            return newestVersion?.ToString();
         }
     }
 }
