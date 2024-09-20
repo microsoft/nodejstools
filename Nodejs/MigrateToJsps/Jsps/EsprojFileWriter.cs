@@ -45,7 +45,7 @@ namespace MigrateToJsps
             // If the SDK version is not found on NuGet fallback folder, keep the one hardcoded on EsProjFileModel
             if (sdkVersion != null)
             {
-                esprojFile.Sdk = $"Microsoft.VisualStudio.JavaScript.Sdk/{GetSdkVersion()}";
+                esprojFile.Sdk = $"Microsoft.VisualStudio.JavaScript.Sdk/{sdkVersion}";
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(EsprojFile));
@@ -119,8 +119,7 @@ namespace MigrateToJsps
             var newestVersion = versions
                 .Select(v =>
                 {
-                    Version version;
-                    Version.TryParse(Path.GetFileName(v), out version);
+                    Version.TryParse(Path.GetFileName(v), out var version);
                     return version;
                 })
                 .OrderByDescending(v => v)
