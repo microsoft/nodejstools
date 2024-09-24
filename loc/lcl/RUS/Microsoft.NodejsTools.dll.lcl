@@ -244,12 +244,36 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";MigrateToJspsClickHere" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Or click here to convert the current project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";MigrateToJspsPrompt" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";MigrateToTypescriptExpCmd" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Convert to New TypeScript Project Experience]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Преобразовать в новый интерфейс проекта TypeScript]]></Val>
           </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";MigrationConfirmationMessage" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Confirm project migration to new JavaScript Project System?]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";MigrationConfirmationTitle" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Migration Confirmation]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
