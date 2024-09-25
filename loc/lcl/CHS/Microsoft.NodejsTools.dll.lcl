@@ -247,12 +247,18 @@
       <Item ItemId=";MigrateToJspsClickHere" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Or click here to convert the current project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[或单击此处转换当前项目。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrateToJspsPrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[我们改进了 JavaScript Project 的体验。右键单击项目节点，然后选择“转换为新的 JavaScript Project 体验”以转换项目。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -268,12 +274,18 @@
       <Item ItemId=";MigrationConfirmationMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Confirm project migration to new JavaScript Project System?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[是否确认将项目迁移到新的 JavaScript Project System?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrationConfirmationTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Migration Confirmation]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[迁移确认]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>

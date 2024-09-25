@@ -247,12 +247,18 @@
       <Item ItemId=";MigrateToJspsClickHere" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Or click here to convert the current project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Możesz też kliknąć tutaj, aby przekonwertować bieżący projekt.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrateToJspsPrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Oferujemy ulepszone środowisko dla projektów JavaScript. Kliknij prawym przyciskiem myszy węzeł projektu i wybierz polecenie „Konwertuj na nowe środowisko projektu JavaScript”, aby przekonwertować projekt.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -268,12 +274,18 @@
       <Item ItemId=";MigrationConfirmationMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Confirm project migration to new JavaScript Project System?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Potwierdzić migrację projektu do nowego systemu projektów JavaScript?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrationConfirmationTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Migration Confirmation]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Potwierdzenie migracji]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>

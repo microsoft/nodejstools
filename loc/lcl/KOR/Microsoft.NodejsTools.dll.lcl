@@ -247,12 +247,18 @@
       <Item ItemId=";MigrateToJspsClickHere" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Or click here to convert the current project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[또는 현재 프로젝트를 변환하려면 여기를 클릭하세요.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrateToJspsPrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[We have an improved experience for JavaScript Projects. Right-click on a project node and select 'Convert to New JavaScript Project Experience' to convert the project.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[JavaScript Projects의 환경이 개선되었습니다. 프로젝트 노드를 마우스 오른쪽 단추로 클릭하고 '새 JavaScript 프로젝트 환경으로 변환'을 선택하여 프로젝트를 변환합니다.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -268,12 +274,18 @@
       <Item ItemId=";MigrationConfirmationMessage" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Confirm project migration to new JavaScript Project System?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[새 JavaScript Project System 프로젝트 마이그레이션을 확인하시겠습니까?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";MigrationConfirmationTitle" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Migration Confirmation]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[마이그레이션 확인]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
