@@ -89,13 +89,24 @@ namespace MigrateToJsps
                 var chromeLaunch = ChromeLaunchTemplate;
                 chromeLaunch.Url = chromeLaunch.Url.Replace("*PORT*", port);
 
-                Configuration[] launchConfigs = new Configuration[]
+                Configuration[] launchConfigs;
+
+                if (bool.Parse(njsprojFileModel.StartWebBrowser))
                 {
-                    edgeLaunch, chromeLaunch, nodeLaunch
-                };
+                    launchConfigs = new Configuration[]
+                    {
+                        edgeLaunch, chromeLaunch, nodeLaunch
+                    };
+                }
+                else
+                {
+                    launchConfigs = new Configuration[]
+                    {
+                        nodeLaunch, edgeLaunch, chromeLaunch
+                    };
+                }
 
                 var compoundLaunch = new Compound[] { CompoundLaunchTemplate };
-
                 launchJson = new LaunchJson() { Configurations = launchConfigs, Compounds = compoundLaunch };
             }
             else // this means the NTVS project is a console app

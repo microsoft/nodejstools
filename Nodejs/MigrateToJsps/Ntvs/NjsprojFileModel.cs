@@ -20,6 +20,8 @@ namespace MigrateToJsps
         public List<Guid> ProjectTypeGuids { get; set; }
 
         public string ScriptArguments { get; set; } = string.Empty;
+
+        public string StartWebBrowser { get; set; } = string.Empty;
     }
 
     [XmlRoot(ElementName = "PropertyGroup")]
