@@ -12,7 +12,6 @@
     <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>app.ts</StartupFile>
-    <StartWebBrowser>False</StartWebBrowser>
     <SearchPath></SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
