@@ -57,6 +57,9 @@ extends:
         timeoutInMinutes: 600
         cancelTimeoutInMinutes: 1
         templateContext:
+          sdl:
+            codeSignValidation:
+              enabled: false
           outputParentDirectory: '$(Build.ArtifactStagingDirectory)'
           outputs:
           - output: pipelineArtifact
