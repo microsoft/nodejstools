@@ -17,6 +17,7 @@
     <PlatformTag>Linux</PlatformTag>
     <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Console</ProjectTypeTag>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="NodejsConsoleApp.njsproj" ReplaceParameters="true">

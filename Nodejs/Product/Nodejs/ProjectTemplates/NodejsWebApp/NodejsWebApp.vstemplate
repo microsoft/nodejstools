@@ -17,6 +17,7 @@
     <PlatformTag>Linux</PlatformTag>
     <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Web</ProjectTypeTag>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="NodejsWebApp.njsproj" ReplaceParameters="true">

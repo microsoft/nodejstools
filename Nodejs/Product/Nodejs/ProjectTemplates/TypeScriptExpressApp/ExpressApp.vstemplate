@@ -18,6 +18,7 @@
     <PlatformTag>Linux</PlatformTag>
     <PlatformTag>macOS</PlatformTag>
     <ProjectTypeTag>Web</ProjectTypeTag>
+    <Hidden>true</Hidden>
   </TemplateData>
   <TemplateContent>
     <Project File="ExpressApp.njsproj" ReplaceParameters="true">
