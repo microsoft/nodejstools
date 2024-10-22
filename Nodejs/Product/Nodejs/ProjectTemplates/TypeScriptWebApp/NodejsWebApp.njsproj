@@ -13,7 +13,6 @@
     <ProjectGuid>$guid1$</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>server.ts</StartupFile>
-    <StartWebBrowser>True</StartWebBrowser>
     <SearchPath></SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>

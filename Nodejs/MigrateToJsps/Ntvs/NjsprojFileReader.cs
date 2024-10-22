@@ -16,6 +16,7 @@ namespace MigrateToJsps
             var projectTypeGuidsString = "";
             var nodejsPort = "";
             var scriptArguments = "";
+            var startWebBrowser = "";
 
             using (var fileStream = File.Open(njsprojPath, FileMode.Open, FileAccess.Read))
             {
@@ -50,6 +51,10 @@ namespace MigrateToJsps
                     if (!string.IsNullOrEmpty(propertyGroup.ScriptArguments))
                     {
                         scriptArguments = propertyGroup.ScriptArguments;
+                    }
+                    if (!string.IsNullOrEmpty(propertyGroup.StartWebBrowser))
+                    {
+                        startWebBrowser = propertyGroup.StartWebBrowser;
                     }
                 }
 
@@ -101,7 +106,7 @@ namespace MigrateToJsps
                     name = "MIGRATED_PROJECT";
                 }
 
-                return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids, ProjectIncludeFolders = folders, NodejsPort = nodejsPort, ScriptArguments = scriptArguments };
+                return new NjsprojFileModel() { ProjectName = name, StartupFile = startupFile, ProjectFiles = files, ProjectTypeGuids = projectTypeGuids, ProjectIncludeFolders = folders, NodejsPort = nodejsPort, ScriptArguments = scriptArguments, StartWebBrowser = startWebBrowser };
             }
         }
     }
