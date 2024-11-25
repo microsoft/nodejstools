@@ -93,7 +93,7 @@
       <Version>17.12.40394</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.12.40392</Version>
+      <Version>17.12.40394</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TemplateWizardInterface" >
       <Version>17.0.0-previews-1-31318-023</Version>
