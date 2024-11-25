@@ -90,7 +90,7 @@
       <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Settings.15.0">
-      <Version>17.12.40392</Version>
+      <Version>17.13.0-preview-1-35404-219</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
       <Version>17.12.40392</Version>
