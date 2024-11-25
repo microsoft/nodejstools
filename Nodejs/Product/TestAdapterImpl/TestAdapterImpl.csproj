@@ -107,6 +107,7 @@
       <Version>1.0.0</Version>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="MessagePack" Version="2.5.187" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\ProjectAfter.targets" />

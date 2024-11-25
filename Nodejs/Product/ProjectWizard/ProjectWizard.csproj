@@ -90,14 +90,15 @@
       <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Settings.15.0">
-      <Version>17.0.0-previews-1-31318-023</Version>
+      <Version>17.12.40392</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
-      <Version>17.0.0-previews-1-31318-023</Version>
+      <Version>17.12.40392</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.TemplateWizardInterface" >
       <Version>17.0.0-previews-1-31318-023</Version>
     </PackageReference>
+    <PackageReference Include="MessagePack" Version="2.5.187" />
   </ItemGroup>
   <Import Project="..\Nodejs\SharedResources.proj" />
   <Import Project="$(BuildRoot)\Build\Common.Build.CSharp.targets" />
