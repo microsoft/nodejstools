@@ -114,16 +114,26 @@ namespace MigrateToJsps
 
         private static string GetSdkVersion()
         {
-            // Use the installed version of JSPS on the NuGet fallback folder.
-            var versions = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio", "Shared", "NuGetPackages", "microsoft.visualstudio.javascript.sdk"));
-            var newestVersion = versions
-                .Select(v =>
-                {
-                    Version.TryParse(Path.GetFileName(v), out var version);
-                    return version;
-                })
-                .OrderByDescending(v => v)
-                .FirstOrDefault();
+            Version newestVersion = null;
+
+            try
+            {
+                // Use the installed version of JSPS on the NuGet fallback folder.
+                var versions = Directory.GetDirectories(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Microsoft Visual Studio", "Shared", "NuGetPackages", "microsoft.visualstudio.javascript.sdk"));
+                newestVersion = versions
+                    .Select(v =>
+                    {
+                        Version.TryParse(Path.GetFileName(v), out var version);
+                        return version;
+                    })
+                    .OrderByDescending(v => v)
+                    .FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                // If the SDK version is not found on NuGet fallback folder, use the one hardcoded on EsProjFileModel
+                return null;
+            }
 
             return newestVersion?.ToString();
         }
