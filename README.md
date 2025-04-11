@@ -40,4 +40,4 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## License
 [Apache License 2.0 (Apache)](https://github.com/Microsoft/nodejstools/blob/master/LICENSE)
 
-Thank you for using and supporting the Node.js Tools for Visual Studio.
+Thank you for using and supporting the Node.js Tools for Visual Studio. 
