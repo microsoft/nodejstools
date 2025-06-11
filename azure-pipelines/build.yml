@@ -32,7 +32,7 @@ parameters:
 - name: BuildConfiguration
   type: string
   default: Release
-- name: BuildConfiguration
+- name: VisualStudioVersion
   type: string
   default: 17.0
 
