@@ -32,6 +32,9 @@ parameters:
 - name: BuildConfiguration
   type: string
   default: Release
+- name: BuildConfiguration
+  type: string
+  default: 17.0
 
 variables:
 - name: TeamName # Needed for MicroBuildSigningPlugin
@@ -117,7 +120,7 @@ extends:
           displayName: Build solution Nodejs/NodejsTools.sln
           inputs:
             solution: Nodejs/NodejsTools.sln
-            msbuildArgs: /p:SourceLinkCreate=true
+            msbuildArgs: /p:SourceLinkCreate=true /p:VisualStudioVersion=${{ parameters.VisualStudioVersion }}
             configuration: ${{ parameters.BuildConfiguration }}
             clean: true
             maximumCpuCount: true
@@ -141,7 +144,7 @@ extends:
           displayName: Build solution Setup
           inputs:
             solution: Nodejs/Setup/NodejsSetup.sln
-            msbuildArgs: /p:SourceLinkCreate=true
+            msbuildArgs: /p:SourceLinkCreate=true /p:VisualStudioVersion=${{ parameters.VisualStudioVersion }}
             configuration: ${{ parameters.BuildConfiguration }}
             clean: true
             logProjectEvents: false
