@@ -120,7 +120,8 @@ extends:
           displayName: Build solution Nodejs/NodejsTools.sln
           inputs:
             solution: Nodejs/NodejsTools.sln
-            msbuildArgs: /p:SourceLinkCreate=true /p:VisualStudioVersion=${{ parameters.VisualStudioVersion }}
+            msbuildArgs: /p:SourceLinkCreate=true 
+            vsVersion: ${{ parameters.VisualStudioVersion }}
             configuration: ${{ parameters.BuildConfiguration }}
             clean: true
             maximumCpuCount: true
@@ -144,7 +145,8 @@ extends:
           displayName: Build solution Setup
           inputs:
             solution: Nodejs/Setup/NodejsSetup.sln
-            msbuildArgs: /p:SourceLinkCreate=true /p:VisualStudioVersion=${{ parameters.VisualStudioVersion }}
+            msbuildArgs: /p:SourceLinkCreate=true 
+            vsVersion: ${{ parameters.VisualStudioVersion }}
             configuration: ${{ parameters.BuildConfiguration }}
             clean: true
             logProjectEvents: false
