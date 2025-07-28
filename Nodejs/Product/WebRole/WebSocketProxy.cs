@@ -25,8 +25,7 @@ namespace Microsoft.NodejsTools.Debugger
             using (var reader = new StreamReader(stream))
             {
                 string html = reader.ReadToEnd();
-                var wsUri = new UriBuilder(context.Request.Url) { Scheme = "wss", Port = -1 };
-                context.Response.Write(html.Replace("{{WS_URI}}", wsUri.ToString()));
+                context.Response.Write(html);
                 context.Response.End();
             }
         }
