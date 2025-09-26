@@ -29,7 +29,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <MicrosoftBuildAssemblyVersion>16.0.0.0</MicrosoftBuildAssemblyVersion>
+    <MicrosoftBuildAssemblyVersion>16.11.6</MicrosoftBuildAssemblyVersion>
     <MicrosoftBuildAssemblyVersionSuffix>Core</MicrosoftBuildAssemblyVersionSuffix>
   </PropertyGroup>
 
