@@ -17,18 +17,12 @@ resources:
   - repository: self
     type: git
     ref: refs/heads/main
-  - repository: 1ESPipelineTemplates
+  - repository: MicroBuildTemplate
     type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    name: 1ESPipelineTemplates/MicroBuildTemplate
     ref: refs/tags/release
 
 parameters:
-- name: signType
-  type: string
-  default: real
-  values:
-  - test
-  - real
 - name: BuildConfiguration
   type: string
   default: Release
@@ -43,8 +37,10 @@ variables:
   value: true
 
 extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
+    settings:
+      networkIsolationPolicy: Permissive  
     pool:
       name: VSEngSS-MicroBuild2022-1ES
     sdl:
@@ -60,6 +56,15 @@ extends:
         timeoutInMinutes: 600
         cancelTimeoutInMinutes: 1
         templateContext:
+          mb:
+            signing:
+              enabled: true
+              # Set signType to real if the build is a CI, otherwise use test
+              ${{ if or(eq(variables['Build.Reason'], 'IndividualCI'), eq(variables['Build.Reason'], 'Schedule')) }}:
+                signType: real
+                signWithProd: true
+              ${{ else }}:
+                signType: test        
           sdl:
             codeSignValidation:
               enabled: false
@@ -86,13 +91,6 @@ extends:
         - checkout: self
           fetchTags: false
           persistCredentials: True
-
-        - task: MicroBuildSigningPlugin@4
-          name: MicroBuildSigningPlugin_1
-          displayName: Install Signing Plugin
-          inputs:
-            signType: ${{ parameters.signType }}
-            zipSources: false
 
         - task: MicroBuildLocalizationPlugin@4
           name: MicroBuildLocalizationPlugin_2
