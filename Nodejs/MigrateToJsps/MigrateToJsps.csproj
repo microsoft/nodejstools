@@ -67,6 +67,9 @@
     </FilesToSign>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core">
+      <Version>16.11.6</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Composition">
       <Version>15.0.70</Version>
     </PackageReference>
