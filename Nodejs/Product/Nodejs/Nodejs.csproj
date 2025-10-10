@@ -949,7 +949,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>17.0.0-preview-21256-03</Version>
+      <Version>16.11.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>

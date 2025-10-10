@@ -81,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build">
-      <Version>17.0.0-preview-21256-03</Version>
+      <Version>16.11.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>
@@ -90,7 +90,7 @@
       <Version>16.10.0-release-20210429-01</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Interop">
-      <Version>17.0.0-preview-2-31221-277</Version>
+      <Version>17.0.32112.339</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0">
       <Version>17.0.0-preview-2-31221-277</Version>
