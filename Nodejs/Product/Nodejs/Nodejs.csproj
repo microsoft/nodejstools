@@ -948,6 +948,9 @@
     </T4ParameterValues>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Tasks.Core">
+      <Version>16.11.6</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Build.Utilities.Core">
       <Version>16.11.6</Version>
     </PackageReference>
