@@ -994,7 +994,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MessagePack" Version="2.5.187" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ZipItem Include="Templates\Files\TypeScriptJasmineUnitTest\UnitTest.ts" />
