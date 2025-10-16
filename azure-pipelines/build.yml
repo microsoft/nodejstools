@@ -226,7 +226,7 @@ extends:
             TargetFolder: $(Build.ArtifactStagingDirectory)\tools
 
         #Variables
-        - template: release-deployment-prep.yml@self
+        - template: azure-pipelines/release-deployment-prep.yml@self
 
         - task: CopyFiles@2
           displayName: Copy Variables-Windows files
