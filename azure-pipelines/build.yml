@@ -78,7 +78,17 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish Symbols Artifact'
             targetPath: $(Build.ArtifactStagingDirectory)\symbols
-            artifactName: Symbols
+            artifactName: symbolsToArchive
+          
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact: vsix'
+            targetPath: $(Build.ArtifactStagingDirectory)\vsix
+            artifactName: vsix
+          
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact: Variables-Windows'
+            targetPath: $(Build.SourcesDirectory)/azure-pipelines/variables
+            artifactName: Variables-Windows
           
           - output: microBuildVstsDrop
             displayName: Upload VSTS Drop
@@ -197,11 +207,33 @@ extends:
             CleanTargetFolder: true
 
         - task: CopyFiles@2
+          displayName: Copy VSIX and related files to ArtifactStagingDirectory
+          inputs:
+            SourceFolder: DebugAdapterExtensions.VSIX\bin\${{ parameters.BuildConfiguration }}
+            TargetFolder: $(Build.ArtifactStagingDirectory)\DebugAdapterExtensions.VSIX
+
+        - task: CopyFiles@2
           displayName: Copy SBOM files to Raw
           inputs:
             SourceFolder: $(Build.ArtifactStagingDirectory)\sbom
             Contents: _manifest\**\*.json
             TargetFolder: '$(Build.ArtifactStagingDirectory)\raw'
+        
+        - task: CopyFiles@2
+          displayName: Copy tools folder for symbols-legacy
+          inputs:
+            SourceFolder: tools
+            TargetFolder: $(Build.ArtifactStagingDirectory)\tools
+
+        #Variables
+        - template: release-deployment-prep.yml@self
+
+        - task: CopyFiles@2
+          displayName: Copy Variables-Windows files
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)/azure-pipelines/variables
+            TargetFolder: $(Build.ArtifactStagingDirectory)/$(VSTSDROPNAMES)/azure-pipelines/variables
+
 
         - task: PublishSymbols@2
           displayName: Index Sources and Publish Symbols
