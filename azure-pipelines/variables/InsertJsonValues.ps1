@@ -1,6 +1,6 @@
 $vstsDropNames = & "$PSScriptRoot\VstsDropNames.ps1"
 
-$BasePath = "$PSScriptRoot\..\..\Nodejs\Setup\bin\Release"
+$BasePath = "$PSScriptRoot\..\..\Nodejs\Setup\NodejsTools.vsmanproj"
 
 if (Test-Path $BasePath) {
     $vsmanFiles = @()
