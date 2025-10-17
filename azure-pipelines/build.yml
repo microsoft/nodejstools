@@ -207,12 +207,6 @@ extends:
             CleanTargetFolder: true
 
         - task: CopyFiles@2
-          displayName: Copy VSIX and related files to ArtifactStagingDirectory
-          inputs:
-            SourceFolder: DebugAdapterExtensions.VSIX\bin\${{ parameters.BuildConfiguration }}
-            TargetFolder: $(Build.ArtifactStagingDirectory)\DebugAdapterExtensions.VSIX
-
-        - task: CopyFiles@2
           displayName: Copy SBOM files to Raw
           inputs:
             SourceFolder: $(Build.ArtifactStagingDirectory)\sbom
