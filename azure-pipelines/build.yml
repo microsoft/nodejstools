@@ -218,6 +218,14 @@ extends:
           inputs:
             SourceFolder: tools
             TargetFolder: $(Build.ArtifactStagingDirectory)\tools
+        
+        - task: CopyFiles@2
+          displayName: Copy VSIX to staging directory
+          inputs:
+            SourceFolder: '$(System.DefaultWorkingDirectory)'
+            Contents: '**\*.vsix'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)\vsix'
+            flattenFolders: true
 
         #Variables
         - template: azure-pipelines/release-deployment-prep.yml@self
