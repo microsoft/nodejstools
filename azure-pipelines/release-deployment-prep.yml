@@ -1,0 +1,3 @@
+steps:
+- powershell: azure-pipelines/variables/_define.ps1
+  displayName: ⚙️ Set pipeline variables based on artifacts

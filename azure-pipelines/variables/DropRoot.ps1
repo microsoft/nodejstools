@@ -1,0 +1,1 @@
+'\\cpvsbuild\drops\nodejstools\build'

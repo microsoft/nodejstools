@@ -1,0 +1,95 @@
+trigger: none # We only want to trigger manually or based on resources
+pr: none
+
+resources:
+  repositories:
+  - repository: MicroBuildTemplate
+    type: git
+    name: 1ESPipelineTemplates/MicroBuildTemplate
+    ref: refs/tags/release
+  pipelines:
+  - pipeline: projectSystemBuild
+    source: NTVS main - nodejstools
+    tags:
+      - Real signed
+    trigger: none
+
+variables:
+  ContainsVsix: true
+
+extends:
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  parameters:
+    sdl:
+      sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+    stages:
+    - stage: insertion
+      jobs:
+      - job: insertion
+        displayName: VS insertion
+        pool: VSEngSS-MicroBuild2022-1ES
+        templateContext:
+          outputParentDirectory: $(Pipeline.Workspace)
+          sdl:
+            binskim:
+              analyzeTargetGlob: +:f|$(Pipeline.Workspace)/**;
+        steps:
+        - checkout: self
+        - download: projectSystemBuild
+          artifact: Variables-Windows
+          displayName: 🔻 Download Variables-Windows artifact
+        - powershell: $(Pipeline.Workspace)/projectSystemBuild/Variables-Windows/_define.ps1
+          displayName: ⚙︝ Set pipeline variables based on artifacts
+        - powershell: Write-Host "##vso[build.updatebuildnumber]$(Build.BuildNumber)"
+          displayName: ⚙️ Set pipeline name
+        - template: /azure-pipelines/release-deployment-prep.yml@self
+        - powershell: |
+            $testsDropName = '$(VstsDropNames)' -replace 'Products', 'Tests'
+            Write-Host "##vso[task.setvariable variable=TESTSDROPNAME]$testsDropName"
+          displayName: ⚙ Set test drop name
+        - download: projectSystemBuild
+          artifact: vsix
+          displayName: 🔻 Download vsix artifact
+        - ${{ if eq(variables['ContainsVsix'], 'true') }}:
+          - task: 1ES.MicroBuildVstsDrop@1
+            displayName: 🔺 Upload VSTS Drop
+            inputs:
+              dropFolder: $(Pipeline.Workspace)/projectSystemBuild/vsix
+              dropName: $(VstsDropNames)
+              accessToken: $(System.AccessToken)
+              skipUploadIfExists: true
+        - task: MicroBuildInsertVsPayload@5
+          displayName: 🏭 Insert VS Payload
+          inputs:
+            TeamName: Node Tools for Visual Studio
+            TeamEmail: jojteam@microsoft.com
+            InsertionPayloadName: Node Tools for Visual Studio build
+            InsertionReviewers: '$(Build.RequestedFor);JSTSteam;JSTS CTI'
+            CustomScriptExecutionCommand: '$(Build.SourcesDirectory)/tools/empty-powershell.ps1' #This is intentionally an empty powershell run because MicroBuild needs a CustomScriptExecutionCommand but we don't actually need it
+            AutoCompletePR: true
+            AutoCompleteMergeStrategy: Squash
+            ShallowClone: true
+            InsertAutoComplete: true
+        - download: projectSystemBuild
+          artifact: symbolsToArchive
+          displayName: 🔻 Download symbolsToArchive artifact
+        - task: MicroBuildArchiveSymbols@6
+          displayName: 🔣 Archive symbols to Symweb
+          inputs:
+            TeamName: Node Tools for Visual Studio
+            azureSubscription: 'VSEng-SymbolsUpload'     # SERVICE CONNECTION
+            SymbolsFeatureName: NTVS
+            SymbolsProject: VS
+            SymbolsAgentPath: $(Pipeline.Workspace)/projectSystemBuild/symbolsToArchive #$(System.DefaultWorkingDirectory)\NTVS v3\Symbols    link: https://dev.azure.com/devdiv/DevDiv/_releaseDefinition?definitionId=300&_a=definition-variables
+          env:
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+        - powershell: |
+            $contentType = 'application/json';
+            $headers = @{ Authorization = 'Bearer $(System.AccessToken)' };
+            $rawRequest = @{ daysValid = 365 * 2; definitionId = $(System.DefinitionId); ownerId = 'User:$(Build.RequestedForId)'; protectPipeline = $false; runId = $(Build.BuildId) };
+            $request = ConvertTo-Json @($rawRequest);
+            Write-Host $request
+            $uri = "$(System.CollectionUri)$(System.TeamProject)/_apis/build/retention/leases?api-version=6.0-preview.1";
+            Invoke-RestMethod -uri $uri -method POST -Headers $headers -ContentType $contentType -Body $request;
+          displayName: 🗻 Retain inserted builds
