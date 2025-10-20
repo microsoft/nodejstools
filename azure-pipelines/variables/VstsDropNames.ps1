@@ -1,0 +1,1 @@
+"Products/$env:SYSTEM_TEAMPROJECT/microsoft/nodejstools/$env:BUILD_SOURCEBRANCHNAME/$env:BUILD_BUILDNUMBER"
