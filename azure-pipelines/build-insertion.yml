@@ -22,6 +22,8 @@ extends:
   parameters:
     sdl:
       sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
     stages:
     - stage: insertion
       jobs:
