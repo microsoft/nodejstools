@@ -28,7 +28,7 @@ parameters:
   default: Release
 - name: VisualStudioVersion
   type: string
-  default: 17.0
+  default: 18.0
 
 variables:
 - name: TeamName # Needed for MicroBuildSigningPlugin
