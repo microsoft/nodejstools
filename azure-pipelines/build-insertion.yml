@@ -66,6 +66,7 @@ extends:
             TeamName: Node Tools for Visual Studio
             TeamEmail: jojteam@microsoft.com
             InsertionPayloadName: Node Tools for Visual Studio build
+            InsertionBuildPolicies: Request Perf DDRITs
             InsertionReviewers: '$(Build.RequestedFor);JSTSteam;JSTS CTI'
             CustomScriptExecutionCommand: '$(Build.SourcesDirectory)/tools/empty-powershell.ps1' #This is intentionally an empty powershell run because MicroBuild needs a CustomScriptExecutionCommand but we don't actually need it
             AutoCompletePR: true
