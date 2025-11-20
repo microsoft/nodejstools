@@ -13,7 +13,10 @@ resources:
     tags:
       - Real signed
     trigger: none
-
+parameters:
+- name: VSInsertTargetBranch
+  type: string
+  default: main
 variables:
   ContainsVsix: true
 
@@ -73,6 +76,10 @@ extends:
             AutoCompleteMergeStrategy: Squash
             ShallowClone: true
             InsertAutoComplete: true
+            ConnectedVSDropServiceName: 'VSEng-VSDrop-MI'
+            TargetBranch: ${{ parameters.VSInsertTargetBranch }}
+          env:
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         - download: projectSystemBuild
           artifact: symbolsToArchive
           displayName: 🔻 Download symbolsToArchive artifact
