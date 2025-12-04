@@ -34,5 +34,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "@babel/core": "7.26.10",
+    "@babel/helpers": "7.26.10",
+    "@babel/runtime": "7.26.10"
   }
 }

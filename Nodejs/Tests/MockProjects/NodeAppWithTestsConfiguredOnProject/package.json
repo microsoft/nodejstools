@@ -8,5 +8,9 @@
   },
   "dependencies": {
     "mocha": "^10.7.3"
+  },
+  "overrides":{
+    "js-yaml": "4.1.1",
+    "brace-expansion": "2.0.2"
   }
 }

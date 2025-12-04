@@ -12,5 +12,12 @@
     "jest-editor-support": "^31.1.2",
     "mocha": "^10.7.3",
     "tape": "^5.8.1"
+  },
+  "overrides": {
+    "@babel/core": "7.26.10",
+    "@babel/helpers": "7.26.10",
+    "@babel/runtime": "7.26.10",
+    "js-yaml": "4.1.1",
+    "brace-expansion": "2.0.2"
   }
 }
