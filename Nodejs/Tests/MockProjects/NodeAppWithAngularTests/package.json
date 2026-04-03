@@ -41,7 +41,7 @@
     "typescript": "~5.5.4"
   },
   "overrides": {
-    "brace-expansion": "1.1.12",
+    "brace-expansion": "1.1.13",
     "js-yaml": "3.14.2"
   }
 }
