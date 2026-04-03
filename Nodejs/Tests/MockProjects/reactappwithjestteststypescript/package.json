@@ -45,6 +45,6 @@
     "@babel/helpers": "7.26.10",
     "@babel/runtime": "7.26.10",
     "js-yaml": "4.1.1",
-    "brace-expansion": "1.1.12"
+    "brace-expansion": "1.1.13"
   }
 }
