@@ -11,6 +11,7 @@
   },
   "overrides":{
     "js-yaml": "4.1.1",
-    "brace-expansion": "2.0.3"
+    "brace-expansion": "2.0.3",
+    "serialize-javascript": "7.0.3"
   }
 }
