@@ -1,0 +1,8 @@
+schemaVersion: 0.0.1
+isProduction: true
+accountableOwners:
+  service: ba68e50f-27c1-4c0b-a97f-5c9a9dee6357
+routing:
+  defaultAreaPath:
+    org: devdiv
+    path: DevDiv\TypeScript
