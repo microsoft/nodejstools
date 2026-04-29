@@ -17,7 +17,7 @@
   -->
   <Target Name="GenerateContentCatalog"
           AfterTargets="Build"
-          Condition="'$(CreateVsixContainer)' == 'true'">
+          Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''">
 
     <PropertyGroup>
       <_CatBaseName>$(MSBuildProjectName)-content</_CatBaseName>
@@ -76,7 +76,7 @@
   -->
   <Target Name="IncludeCatalogInVsix"
           BeforeTargets="CreateVsixContainer"
-          Condition="'$(CreateVsixContainer)' == 'true'"
+          Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''"
           DependsOnTargets="GenerateContentCatalog">
     <PropertyGroup>
       <_CatBaseName>$(MSBuildProjectName)-content</_CatBaseName>
