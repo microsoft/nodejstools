@@ -8,4 +8,82 @@
       </FilesToSign>
     </ItemGroup>
   </Target>
+
+  <!--
+    Generate a catalog (.cat) file covering all JS and XML content shipped in the VSIX.
+    This satisfies VS signing compliance (SignVerify) for non-PE files that cannot carry
+    direct Authenticode signatures (template files users will modify, XML data files).
+    The .cat is signed with Microsoft400 by MicroBuild and included in the VSIX.
+  -->
+  <Target Name="GenerateContentCatalog"
+          AfterTargets="Build"
+          Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''">
+
+    <PropertyGroup>
+      <_CatBaseName>$(MSBuildProjectName)-content</_CatBaseName>
+      <_CdfFile>$(IntermediateOutputPath)$(_CatBaseName).cdf</_CdfFile>
+      <_CatFile>$(OutDir)$(_CatBaseName).cat</_CatFile>
+    </PropertyGroup>
+
+    <!-- Collect JS and XML files from the project's content/template output -->
+    <ItemGroup>
+      <!-- NodejsToolsVsix: project templates, item templates, and extras -->
+      <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'NodejsToolsVsix'"
+                         Include="$(MSBuildThisFileDirectory)..\Nodejs\ProjectTemplates;$(MSBuildThisFileDirectory)..\Nodejs\Templates\Files;$(MSBuildThisFileDirectory)..\..\Extras" />
+      <!-- TestAdapterVsix: test framework scripts -->
+      <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'TestAdapterVsix'"
+                         Include="$(MSBuildThisFileDirectory)..\TestAdapter\TestFrameworks" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.js" />
+      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.xml"
+                      Exclude="%(_CatalogSourceDir.Identity)\**\*.vstemplate" />
+    </ItemGroup>
+
+    <!-- Write CDF (Catalog Definition File) -->
+    <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogHeader]" Overwrite="true" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="Name=$(_CatBaseName).cat" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="ResultDir=$(OutDir)" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="CatalogVersion=2" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="HashAlgorithms=SHA256" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogFiles]" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(Filename)%(Extension)=%(FullPath)')" />
+
+    <MakeDir Directories="$(OutDir)" />
+    <Exec Command="makecat.exe &quot;$(_CdfFile)&quot;"
+          StandardOutputImportance="High"
+          IgnoreExitCode="true"
+          Condition="@(_CatSourceFile->Count()) > 0">
+      <Output TaskParameter="ExitCode" PropertyName="_MakecatExitCode" />
+    </Exec>
+
+    <Warning Text="makecat.exe not found or failed (exit code $(_MakecatExitCode)). Catalog file not generated. This is expected for local builds without the Windows SDK."
+             Condition="'$(_MakecatExitCode)' != '0' AND @(_CatSourceFile->Count()) > 0" />
+
+    <!-- Sign the .cat file -->
+    <ItemGroup Condition="Exists('$(_CatFile)')">
+      <FilesToSign Include="$(_CatFile)">
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Include the signed .cat file in the VSIX container.
+    Runs after MicroBuild signing so the .cat is already signed.
+  -->
+  <Target Name="IncludeCatalogInVsix"
+          BeforeTargets="CreateVsixContainer"
+          Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''"
+          DependsOnTargets="GenerateContentCatalog">
+    <PropertyGroup>
+      <_CatBaseName>$(MSBuildProjectName)-content</_CatBaseName>
+      <_CatFile>$(OutDir)$(_CatBaseName).cat</_CatFile>
+    </PropertyGroup>
+    <ItemGroup Condition="Exists('$(_CatFile)')">
+      <VSIXSourceItem Include="$(_CatFile)" />
+    </ItemGroup>
+  </Target>
 </Project>
