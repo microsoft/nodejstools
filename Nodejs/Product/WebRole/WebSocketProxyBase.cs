@@ -12,11 +12,84 @@ using System.Web.WebSockets;
 
 namespace Microsoft.VisualStudioTools
 {
+    /// <summary>
+    /// A bounded string writer that caps the internal buffer at a maximum number of characters.
+    /// When the limit is exceeded, the oldest content is discarded.
+    /// </summary>
+    internal sealed class BoundedStringWriter : TextWriter
+    {
+        private const int DefaultMaxChars = 32768; // 64 KB at 2 bytes/char
+        private readonly StringBuilder _sb;
+        private readonly int _maxChars;
+        private readonly object _lock = new object();
+
+        public BoundedStringWriter(int maxChars = DefaultMaxChars)
+        {
+            _maxChars = maxChars;
+            _sb = new StringBuilder();
+        }
+
+        public override Encoding Encoding => Encoding.Unicode;
+
+        public override void Write(char value)
+        {
+            lock (_lock)
+            {
+                _sb.Append(value);
+                TrimIfNeeded();
+            }
+        }
+
+        public override void Write(string value)
+        {
+            if (value == null) return;
+            lock (_lock)
+            {
+                _sb.Append(value);
+                TrimIfNeeded();
+            }
+        }
+
+        public override void WriteLine(string value)
+        {
+            lock (_lock)
+            {
+                _sb.Append(value);
+                _sb.Append(NewLine);
+                TrimIfNeeded();
+            }
+        }
+
+        private void TrimIfNeeded()
+        {
+            if (_sb.Length > _maxChars)
+            {
+                _sb.Remove(0, _sb.Length - _maxChars);
+            }
+        }
+
+        public void Clear()
+        {
+            lock (_lock)
+            {
+                _sb.Clear();
+            }
+        }
+
+        public override string ToString()
+        {
+            lock (_lock)
+            {
+                return _sb.ToString();
+            }
+        }
+    }
+
     public abstract class WebSocketProxyBase : IHttpHandler
     {
         private static long _lastId;
         private static Task _currentSession; // represents the current active debugging session, and completes when it is over
-        private static volatile StringWriter _log;
+        private static volatile BoundedStringWriter _log;
 
         private readonly long _id;
 
@@ -50,7 +123,7 @@ namespace Microsoft.VisualStudioTools
                 switch (context.Request.QueryString["debug"])
                 {
                     case "startlog":
-                        _log = new StringWriter();
+                        _log = new BoundedStringWriter();
                         context.Response.Write("Logging is now enabled. <a href='?debug=viewlog'>View</a>. <a href='?debug=stoplog'>Disable</a>.");
                         return;
 
@@ -64,7 +137,7 @@ namespace Microsoft.VisualStudioTools
                             var log = _log;
                             if (log != null)
                             {
-                                log.GetStringBuilder().Clear();
+                                log.Clear();
                             }
                             context.Response.Write("Log is cleared. <a href='?debug=viewlog'>View</a>.");
                             return;
