@@ -68,17 +68,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebRole\WebRole.csproj">
-      <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>
-      <Name>WebRole</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-      <InstallRoot>MSBuild</InstallRoot>
-      <VSIXSubPath>Microsoft\VisualStudio\v$(VsVersion)\Node.js Tools</VSIXSubPath>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).vsix">
       <Authenticode>VsixSHA2</Authenticode>
       <InProject>false</InProject>
