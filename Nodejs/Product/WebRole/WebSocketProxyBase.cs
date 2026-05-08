@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudioTools
                             else
                             {
                                 context.Response.Write("Logging is enabled. <a href='?debug=clearlog'>Clear</a>. <a href='?debug=stoplog'>Disable</a>. <p><pre>");
-                                context.Response.Write(HttpUtility.HtmlDecode(log.ToString()));
+                                context.Response.Write(HttpUtility.HtmlEncode(log.ToString()));
                                 context.Response.Write("</pre>");
                             }
                             context.Response.End();
