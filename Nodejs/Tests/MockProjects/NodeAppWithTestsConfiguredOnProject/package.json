@@ -9,9 +9,10 @@
   "dependencies": {
     "mocha": "^10.7.3"
   },
-  "overrides":{
+  "overrides": {
     "js-yaml": "4.1.1",
     "brace-expansion": "2.0.3",
-    "serialize-javascript": "7.0.3"
+    "serialize-javascript": "7.0.3",
+    "picomatch": "^2.3.2"
   }
 }
