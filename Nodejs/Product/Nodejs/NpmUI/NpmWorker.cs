@@ -380,7 +380,12 @@ namespace Microsoft.NodejsTools.NpmUI
             var homepage = links?["homepage"];
             if (homepage != null)
             {
-                builder.AddHomepage((string)homepage);
+                var url = (string)homepage;
+                if (Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                    && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                {
+                    builder.AddHomepage(uri.AbsoluteUri);
+                }
             }
         }
 
