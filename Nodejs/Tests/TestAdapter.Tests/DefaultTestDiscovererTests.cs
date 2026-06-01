@@ -101,6 +101,12 @@ namespace TestAdapter.Tests
         [TestInitialize]
         public void InitializeTests()
         {
+            // Register MSBuild so that Microsoft.Build APIs resolve correctly on .NET 5+.
+            if (!Microsoft.Build.Locator.MSBuildLocator.IsRegistered)
+            {
+                Microsoft.Build.Locator.MSBuildLocator.RegisterDefaults();
+            }
+
             // Setup the variable due to LoadProjects looks for a specific path of Microsoft.NodejsToolsV2.targets.
             // TODO: Probably we could remove this dependency by configuring the BuildOutput path, but I haven't found how to do it.
             Environment.SetEnvironmentVariable("VSINSTALLDIR", @"C:\Program Files\Microsoft Visual Studio\2022\Preview");
