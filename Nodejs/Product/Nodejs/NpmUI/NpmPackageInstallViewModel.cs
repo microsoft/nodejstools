@@ -333,13 +333,18 @@ namespace Microsoft.NodejsTools.NpmUI
             }
         }
 
-        internal bool CanOpenHomepage(string homepage) => !string.IsNullOrEmpty(homepage);
+        internal bool CanOpenHomepage(string homepage)
+        {
+            return Uri.TryCreate(homepage, UriKind.Absolute, out var uri)
+                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
 
         internal void OpenHomepage(string homepage)
         {
-            if (!string.IsNullOrEmpty(homepage))
+            if (Uri.TryCreate(homepage, UriKind.Absolute, out var uri)
+                && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
             {
-                VsShellUtilities.OpenBrowser(homepage);
+                VsShellUtilities.OpenBrowser(uri.AbsoluteUri);
             }
         }
 
