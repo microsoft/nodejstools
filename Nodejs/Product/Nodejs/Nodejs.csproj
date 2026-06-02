@@ -723,10 +723,6 @@
       <Project>{cb61d8bd-48dc-40f4-a4ba-5b68a10a7481}</Project>
       <Name>PressAnyKey</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WebRole\WebRole.csproj">
-      <Project>{712d84ec-b2a6-46d1-b030-ba697ae5e554}</Project>
-      <Name>WebRole</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ProjectWizard\ProjectWizard.csproj">
       <Project>{dbc73df7-1b4c-48be-8b48-715297487e7a}</Project>
       <Name>ProjectWizard</Name>
@@ -1043,8 +1039,6 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>
-      mkdir $(OutDir)RemoteDebug\
-      copy /y $(OutDir)..\WebRole\Microsoft.NodejsTools.WebRole.dll $(OutDir)RemoteDebug\
     </PostBuildEvent>
   </PropertyGroup>
   <!-- 
