@@ -1,1 +1,3 @@
 *.vsman, ignore vsman files
+*.js, covered by signed catalog file (.cat) in VSIX
+*.xml, covered by signed catalog file (.cat) in VSIX
