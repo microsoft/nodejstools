@@ -19,12 +19,19 @@
       <Using Namespace="System.Collections.Generic" />
       <Code Type="Fragment" Language="cs"><![CDATA[
         var kept = new List<Microsoft.Build.Framework.ITaskItem>();
+        int index = 0;
         foreach (var item in InputFiles)
         {
             var p = item.GetMetadata("FullPath");
             if (File.Exists(p) && new FileInfo(p).Length > 0)
             {
+                // Assign a unique catalog member tag. makecat keeps only one entry
+                // per member name, so files sharing a basename (e.g. the several
+                // UnitTest.js / roletemplatedata.xml templates) would otherwise
+                // collide and all but one would be dropped from the catalog.
+                item.SetMetadata("CatTag", index + "_" + Path.GetFileName(p));
                 kept.Add(item);
+                index++;
             }
         }
         NonEmptyFiles = kept.ToArray();
@@ -86,7 +93,7 @@
     <WriteLinesToFile File="$(_CdfFile)" Lines="HashAlgorithms=SHA256" />
     <WriteLinesToFile File="$(_CdfFile)" Lines="" />
     <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogFiles]" />
-    <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(Filename)%(Extension)=%(FullPath)')" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(CatTag)=%(FullPath)')" />
 
     <MakeDir Directories="$(OutDir)" />
 
