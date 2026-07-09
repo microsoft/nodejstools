@@ -61,10 +61,10 @@
     <ItemGroup>
       <!-- NodejsToolsVsix: project templates, item templates, and extras -->
       <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'NodejsToolsVsix'"
-                         Include="$(MSBuildThisFileDirectory)..\Nodejs\ProjectTemplates;$(MSBuildThisFileDirectory)..\Nodejs\Templates\Files;$(MSBuildThisFileDirectory)..\..\Extras" />
+                         Include="$(MSBuildThisFileDirectory)Nodejs\ProjectTemplates;$(MSBuildThisFileDirectory)Nodejs\Templates\Files;$(MSBuildThisFileDirectory)..\Extras" />
       <!-- TestAdapterVsix: test framework scripts -->
       <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'TestAdapterVsix'"
-                         Include="$(MSBuildThisFileDirectory)..\TestAdapter\TestFrameworks" />
+                         Include="$(MSBuildThisFileDirectory)TestAdapter\TestFrameworks" />
     </ItemGroup>
 
     <ItemGroup>
@@ -126,10 +126,15 @@
 
   <!--
     Include the signed .cat file in the VSIX container.
-    Runs after MicroBuild signing so the .cat is already signed.
+    Must run BEFORE GetVsixSourceItems (which enumerates @(VSIXSourceItem)
+    into the package) - hooking BeforeTargets=CreateVsixContainer is too late,
+    because CreateVsixContainer depends on GetVsixSourceItems, so the item is
+    added after the package contents are already gathered and never ships.
+    GenerateContentCatalog (AfterTargets=Build) + MicroBuild signing both run
+    before GetVsixSourceItems, so the .cat is already signed by this point.
   -->
   <Target Name="IncludeCatalogInVsix"
-          BeforeTargets="CreateVsixContainer"
+          BeforeTargets="GetVsixSourceItems"
           Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''"
           DependsOnTargets="GenerateContentCatalog">
     <PropertyGroup>
