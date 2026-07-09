@@ -1,5 +1,37 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(BuildRoot)\Build\fileVersion.targets" />
+
+  <!--
+    makecat.exe cannot hash a zero-byte file: it aborts with
+    "NOT processed: calculating the indirect data" / "Errors found in parsing
+    the CDF file" and produces no catalog at all. Empty placeholder templates
+    (e.g. EmptyJs.js) carry no content to protect, so they must be filtered out
+    of the catalog source list. This inline task returns only non-empty files.
+  -->
+  <UsingTask TaskName="SelectNonEmptyFiles" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <InputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <NonEmptyFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Collections.Generic" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var kept = new List<Microsoft.Build.Framework.ITaskItem>();
+        foreach (var item in InputFiles)
+        {
+            var p = item.GetMetadata("FullPath");
+            if (File.Exists(p) && new FileInfo(p).Length > 0)
+            {
+                kept.Add(item);
+            }
+        }
+        NonEmptyFiles = kept.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
   <Target Name="GatherLocalizedOutputsForSigning" Condition="'$(LocalizationEnabled)' == 'true'">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\localize\**\$(AssemblyName).resources.dll">
@@ -36,10 +68,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.js" />
-      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.xml"
-                      Exclude="%(_CatalogSourceDir.Identity)\**\*.vstemplate" />
+      <_CatSourceFileAll Include="%(_CatalogSourceDir.Identity)\**\*.js" />
+      <_CatSourceFileAll Include="%(_CatalogSourceDir.Identity)\**\*.xml"
+                         Exclude="%(_CatalogSourceDir.Identity)\**\*.vstemplate" />
     </ItemGroup>
+
+    <!-- Drop zero-byte files (e.g. EmptyJs.js); makecat.exe rejects the whole CDF otherwise. -->
+    <SelectNonEmptyFiles InputFiles="@(_CatSourceFileAll)">
+      <Output TaskParameter="NonEmptyFiles" ItemName="_CatSourceFile" />
+    </SelectNonEmptyFiles>
 
     <!-- Write CDF (Catalog Definition File) -->
     <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogHeader]" Overwrite="true" />
