@@ -52,15 +52,32 @@
     <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(Filename)%(Extension)=%(FullPath)')" />
 
     <MakeDir Directories="$(OutDir)" />
-    <Exec Command="makecat.exe &quot;$(_CdfFile)&quot;"
-          StandardOutputImportance="High"
-          IgnoreExitCode="true"
-          Condition="@(_CatSourceFile->Count()) > 0">
-      <Output TaskParameter="ExitCode" PropertyName="_MakecatExitCode" />
-    </Exec>
 
-    <Warning Text="makecat.exe not found or failed (exit code $(_MakecatExitCode)). Catalog file not generated. This is expected for local builds without the Windows SDK."
-             Condition="'$(_MakecatExitCode)' != '0' AND @(_CatSourceFile->Count()) > 0" />
+    <!--
+      Resolve makecat.exe from the Windows 10 SDK. It is NOT on PATH on the official
+      build agents, so a bare 'makecat.exe' invocation fails with exit code 9009 and,
+      because the call previously ignored the exit code, the .cat was silently never
+      produced or signed - shipping an unsigned payload that fails the VS insertion
+      SignCheck (33 unsigned .js/.xml files). Resolve the SDK location explicitly.
+    -->
+    <PropertyGroup>
+      <_WindowsSdkDir>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetPlatformSDKLocation('Windows', '10.0'))</_WindowsSdkDir>
+      <_WindowsSdkDir Condition="'$(_WindowsSdkDir)' == ''">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots@KitsRoot10)</_WindowsSdkDir>
+      <_WindowsSdkDir Condition="'$(_WindowsSdkDir)' == ''">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots@KitsRoot10)</_WindowsSdkDir>
+      <_WindowsSdkVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</_WindowsSdkVersion>
+      <_MakeCatExe>$(_WindowsSdkDir)bin\$(_WindowsSdkVersion)\x64\makecat.exe</_MakeCatExe>
+      <_MakeCatExe Condition="!Exists('$(_MakeCatExe)')">$(_WindowsSdkDir)bin\$(_WindowsSdkVersion)\x86\makecat.exe</_MakeCatExe>
+    </PropertyGroup>
+
+    <Error Text="makecat.exe was not found under the Windows 10 SDK (resolved dir '$(_WindowsSdkDir)', version '$(_WindowsSdkVersion)'). The content catalog required for VS signing compliance cannot be generated."
+           Condition="!Exists('$(_MakeCatExe)') AND @(_CatSourceFile->Count()) > 0" />
+
+    <Exec Command="&quot;$(_MakeCatExe)&quot; &quot;$(_CdfFile)&quot;"
+          StandardOutputImportance="High"
+          Condition="@(_CatSourceFile->Count()) > 0" />
+
+    <Error Text="Content catalog '$(_CatFile)' was not produced by makecat.exe. The VSIX would ship without a signed catalog and fail the insertion SignCheck."
+           Condition="!Exists('$(_CatFile)') AND @(_CatSourceFile->Count()) > 0" />
 
     <!-- Sign the .cat file -->
     <ItemGroup Condition="Exists('$(_CatFile)')">
