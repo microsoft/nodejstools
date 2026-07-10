@@ -1,5 +1,44 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(BuildRoot)\Build\fileVersion.targets" />
+
+  <!--
+    makecat.exe cannot hash a zero-byte file: it aborts with
+    "NOT processed: calculating the indirect data" / "Errors found in parsing
+    the CDF file" and produces no catalog at all. Empty placeholder templates
+    (e.g. EmptyJs.js) carry no content to protect, so they must be filtered out
+    of the catalog source list. This inline task returns only non-empty files.
+  -->
+  <UsingTask TaskName="SelectNonEmptyFiles" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <InputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <NonEmptyFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Collections.Generic" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var kept = new List<Microsoft.Build.Framework.ITaskItem>();
+        int index = 0;
+        foreach (var item in InputFiles)
+        {
+            var p = item.GetMetadata("FullPath");
+            if (File.Exists(p) && new FileInfo(p).Length > 0)
+            {
+                // Assign a unique catalog member tag. makecat keeps only one entry
+                // per member name, so files sharing a basename (e.g. the several
+                // UnitTest.js / roletemplatedata.xml templates) would otherwise
+                // collide and all but one would be dropped from the catalog.
+                item.SetMetadata("CatTag", index + "_" + Path.GetFileName(p));
+                kept.Add(item);
+                index++;
+            }
+        }
+        NonEmptyFiles = kept.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
   <Target Name="GatherLocalizedOutputsForSigning" Condition="'$(LocalizationEnabled)' == 'true'">
     <ItemGroup>
       <FilesToSign Include="$(OutDir)\localize\**\$(AssemblyName).resources.dll">
@@ -29,17 +68,22 @@
     <ItemGroup>
       <!-- NodejsToolsVsix: project templates, item templates, and extras -->
       <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'NodejsToolsVsix'"
-                         Include="$(MSBuildThisFileDirectory)..\Nodejs\ProjectTemplates;$(MSBuildThisFileDirectory)..\Nodejs\Templates\Files;$(MSBuildThisFileDirectory)..\..\Extras" />
+                         Include="$(MSBuildThisFileDirectory)Nodejs\ProjectTemplates;$(MSBuildThisFileDirectory)Nodejs\Templates\Files;$(MSBuildThisFileDirectory)..\Extras" />
       <!-- TestAdapterVsix: test framework scripts -->
       <_CatalogSourceDir Condition="'$(MSBuildProjectName)' == 'TestAdapterVsix'"
-                         Include="$(MSBuildThisFileDirectory)..\TestAdapter\TestFrameworks" />
+                         Include="$(MSBuildThisFileDirectory)TestAdapter\TestFrameworks" />
     </ItemGroup>
 
     <ItemGroup>
-      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.js" />
-      <_CatSourceFile Include="%(_CatalogSourceDir.Identity)\**\*.xml"
-                      Exclude="%(_CatalogSourceDir.Identity)\**\*.vstemplate" />
+      <_CatSourceFileAll Include="%(_CatalogSourceDir.Identity)\**\*.js" />
+      <_CatSourceFileAll Include="%(_CatalogSourceDir.Identity)\**\*.xml"
+                         Exclude="%(_CatalogSourceDir.Identity)\**\*.vstemplate" />
     </ItemGroup>
+
+    <!-- Drop zero-byte files (e.g. EmptyJs.js); makecat.exe rejects the whole CDF otherwise. -->
+    <SelectNonEmptyFiles InputFiles="@(_CatSourceFileAll)">
+      <Output TaskParameter="NonEmptyFiles" ItemName="_CatSourceFile" />
+    </SelectNonEmptyFiles>
 
     <!-- Write CDF (Catalog Definition File) -->
     <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogHeader]" Overwrite="true" />
@@ -49,18 +93,35 @@
     <WriteLinesToFile File="$(_CdfFile)" Lines="HashAlgorithms=SHA256" />
     <WriteLinesToFile File="$(_CdfFile)" Lines="" />
     <WriteLinesToFile File="$(_CdfFile)" Lines="[CatalogFiles]" />
-    <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(Filename)%(Extension)=%(FullPath)')" />
+    <WriteLinesToFile File="$(_CdfFile)" Lines="@(_CatSourceFile->'&lt;hash&gt;%(CatTag)=%(FullPath)')" />
 
     <MakeDir Directories="$(OutDir)" />
-    <Exec Command="makecat.exe &quot;$(_CdfFile)&quot;"
-          StandardOutputImportance="High"
-          IgnoreExitCode="true"
-          Condition="@(_CatSourceFile->Count()) > 0">
-      <Output TaskParameter="ExitCode" PropertyName="_MakecatExitCode" />
-    </Exec>
 
-    <Warning Text="makecat.exe not found or failed (exit code $(_MakecatExitCode)). Catalog file not generated. This is expected for local builds without the Windows SDK."
-             Condition="'$(_MakecatExitCode)' != '0' AND @(_CatSourceFile->Count()) > 0" />
+    <!--
+      Resolve makecat.exe from the Windows 10 SDK. It is NOT on PATH on the official
+      build agents, so a bare 'makecat.exe' invocation fails with exit code 9009 and,
+      because the call previously ignored the exit code, the .cat was silently never
+      produced or signed - shipping an unsigned payload that fails the VS insertion
+      SignCheck (33 unsigned .js/.xml files). Resolve the SDK location explicitly.
+    -->
+    <PropertyGroup>
+      <_WindowsSdkDir>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetPlatformSDKLocation('Windows', '10.0'))</_WindowsSdkDir>
+      <_WindowsSdkDir Condition="'$(_WindowsSdkDir)' == ''">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots@KitsRoot10)</_WindowsSdkDir>
+      <_WindowsSdkDir Condition="'$(_WindowsSdkDir)' == ''">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows Kits\Installed Roots@KitsRoot10)</_WindowsSdkDir>
+      <_WindowsSdkVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</_WindowsSdkVersion>
+      <_MakeCatExe>$(_WindowsSdkDir)bin\$(_WindowsSdkVersion)\x64\makecat.exe</_MakeCatExe>
+      <_MakeCatExe Condition="!Exists('$(_MakeCatExe)')">$(_WindowsSdkDir)bin\$(_WindowsSdkVersion)\x86\makecat.exe</_MakeCatExe>
+    </PropertyGroup>
+
+    <Error Text="makecat.exe was not found under the Windows 10 SDK (resolved dir '$(_WindowsSdkDir)', version '$(_WindowsSdkVersion)'). The content catalog required for VS signing compliance cannot be generated."
+           Condition="!Exists('$(_MakeCatExe)') AND @(_CatSourceFile->Count()) > 0" />
+
+    <Exec Command="&quot;$(_MakeCatExe)&quot; &quot;$(_CdfFile)&quot;"
+          StandardOutputImportance="High"
+          Condition="@(_CatSourceFile->Count()) > 0" />
+
+    <Error Text="Content catalog '$(_CatFile)' was not produced by makecat.exe. The VSIX would ship without a signed catalog and fail the insertion SignCheck."
+           Condition="!Exists('$(_CatFile)') AND @(_CatSourceFile->Count()) > 0" />
 
     <!-- Sign the .cat file -->
     <ItemGroup Condition="Exists('$(_CatFile)')">
@@ -72,10 +133,15 @@
 
   <!--
     Include the signed .cat file in the VSIX container.
-    Runs after MicroBuild signing so the .cat is already signed.
+    Must run BEFORE GetVsixSourceItems (which enumerates @(VSIXSourceItem)
+    into the package) - hooking BeforeTargets=CreateVsixContainer is too late,
+    because CreateVsixContainer depends on GetVsixSourceItems, so the item is
+    added after the package contents are already gathered and never ships.
+    GenerateContentCatalog (AfterTargets=Build) + MicroBuild signing both run
+    before GetVsixSourceItems, so the .cat is already signed by this point.
   -->
   <Target Name="IncludeCatalogInVsix"
-          BeforeTargets="CreateVsixContainer"
+          BeforeTargets="GetVsixSourceItems"
           Condition="'$(CreateVsixContainer)' == 'true' AND '$(SignType)' != ''"
           DependsOnTargets="GenerateContentCatalog">
     <PropertyGroup>
