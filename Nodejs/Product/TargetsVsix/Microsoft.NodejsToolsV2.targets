@@ -141,16 +141,13 @@
 
   <Target Name="DebugSymbolsProjectOutputGroup" />
 
-  <ItemGroup>
-    <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>
-  </ItemGroup>
   <Target
     Name="GetTargetPath"
     DependsOnTargets="CoreCompile"
     Returns="@(ScriptAndWebDeployFilesWithoutMetadata)"
     >
     <ItemGroup>
-      <NodejsBinFiles Include="bin\**\*"  Exclude="bin\Microsoft.NodejsTools.WebRole.dll"/>
+      <NodejsBinFiles Include="bin\**\*"/>
       <ScriptAndWebDeployFiles Include="@(NodejsBinFiles->'%(RootDir)%(Directory)%(Filename)%(Extension)')"/>
       <ScriptAndWebDeployFiles Include="@(FilesCopiedToIntermediate->'%(RootDir)%(Directory)%(Filename)%(Extension)')" />
     </ItemGroup>
