@@ -141,9 +141,6 @@
 
   <Target Name="DebugSymbolsProjectOutputGroup" />
 
-  <ItemGroup>
-    <NodejsAzureDeploymentFile Include="$(NodejsSupportPath)Microsoft.NodejsTools.WebRole.dll"></NodejsAzureDeploymentFile>
-  </ItemGroup>
   <Target
     Name="GetTargetPath"
     DependsOnTargets="CoreCompile"
