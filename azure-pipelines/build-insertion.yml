@@ -78,13 +78,20 @@ extends:
             InsertAutoComplete: true
             ConnectedVSDropServiceName: 'VSEng-VSDrop-MI'
             TargetBranch: ${{ parameters.VSInsertTargetBranch }}
+            # Skip optional commit/work-item enrichment; it is not needed for this repo
+            # and can otherwise abort the step after the PR has already been created.
+            AddCommitsToPR: false
+            LinkWorkItemsToPR: false
           env:
             SYSTEM_ACCESSTOKEN: $(System.AccessToken)
         - download: projectSystemBuild
           artifact: symbolsToArchive
           displayName: 🔻 Download symbolsToArchive artifact
+          # Always publish symbols, even if a preceding step reports a non-fatal error.
+          condition: succeededOrFailed()
         - task: MicroBuildArchiveSymbols@6
           displayName: 🔣 Archive symbols to Symweb
+          condition: succeededOrFailed()
           inputs:
             TeamName: Node Tools for Visual Studio
             azureSubscription: 'VSEng-SymbolsUpload'     # SERVICE CONNECTION
