@@ -632,7 +632,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Executes npm command. If solution contains multiple projects, specify target project using .npm [ProjectName]5D; <npm arguments>]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Führt NPM-Befehl aus. Legen Sie das Zielprojekt mit .npm [ProjectName]5D; <npm arguments> fest, wenn die Lösung mehrere Projekte enthält.]]></Val>
+            <Val><![CDATA[Führt einen npm-Befehl aus. Wenn die Projektmappe mehrere Projekte enthält, legen Sie das Zielprojekt fest mit: .npm [Projektname]5D; <npm-Argumente>]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -983,7 +983,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Please specify a valid Node.js project or project directory. If your solution contains multiple projects, specify a target project using .npm [ProjectName or ProjectDir]5D; <npm arguments> For example: .npm [MyApp]5D; list.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Geben Sie ein gültiges Node.js-Projekt oder -Projektverzeichnis an. Legen Sie über .npm [ProjectName or ProjectDir]5D; <npm arguments> ein Zielprojekt fest, wenn Ihre Lösung mehrere Projekte enthält. Beispiel: .npm [MyApp]5D;-Liste.]]></Val>
+            <Val><![CDATA[Geben Sie ein gültiges Node.js-Projekt oder -Projektverzeichnis an. Wenn die Projektmappe mehrere Projekte enthält, legen Sie ein Zielprojekt fest über: .npm [Projektname oder Projektverzeichnis]5D; <npm-Argumente> Beispiel: .npm [MyApp]5D; list.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
