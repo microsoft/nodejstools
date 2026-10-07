@@ -785,7 +785,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Please select a startup file to launch by right-clicking the file in Solution Explorer and selecting 'Set as Node.js Startup File' or by modifying your configuration in project properties]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Selezionare un file di avvio da usare facendo clic con il pulsante destro del mouse sul file in Esplora soluzioni e selezionando 'Imposta come file di avvio Node.js' oppure modificando la configurazione nelle proprietà del progetto]]></Val>
+            <Val><![CDATA[Seleziona un file di avvio da usare facendo clic con il pulsante destro del mouse sul file in Esplora soluzioni e selezionando 'Imposta come file di avvio Node.js' oppure modificando la configurazione nelle proprietà del progetto]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
